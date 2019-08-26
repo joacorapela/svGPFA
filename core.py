@@ -1,10 +1,11 @@
 
 import pdb
-from abc import ABCMeta
+from abc import ABC
 import numpy as np
 from scipy.optimize import minimize
+from utils import build3DdiagFromDiagVector
 
-class ExpectedLogLikelihood(ABCMeta):
+class ExpectedLogLikelihood(ABC):
     '''
 
     Abstract base class for expected log-likelihood subclasses 
@@ -13,7 +14,7 @@ class ExpectedLogLikelihood(ABCMeta):
 
     '''
 
-    def __init__(data, quadPoints, quadWeights, spikeTimes):
+    def __init__(self, legQuadPoints, legQuadWeights, linkFunction):
         '''
 
         Parameters
@@ -33,9 +34,11 @@ class ExpectedLogLikelihood(ABCMeta):
                      array of spike times
 
         '''
-        pass
+        self._legQuadPoints=legQuadPoints
+        self._legQuadWeights=legQuadWeights
+        self._linkFunction=linkFunction
 
-    def evalWithGradientOnQ(qMean, qVar):
+    def evalSumAcrossTrialsAndNeuronsWithGradientOnQ(self, qHMeanAtQuad, qHVarAtQuad, **kwargs):
         '''Evaluates the expected log likelihood of a svGPFA
 
         Parameters
@@ -60,39 +63,10 @@ class ExpectedLogLikelihood(ABCMeta):
         pass
 
 
-class KLDivergenceCalculator:
-    def evalSumAcrossTrials(S0Inv, mu1, S1):
-        '''
-        Answers the sum of KL divergences across trials.
-        (e.g., answer= \sum_k KL(N(0, s0Inv[k,:]), N(mu1[k,:], S1[k,:]))).
-
-        Parameters
-        ----------
-        S0Inv : array \in nTrials x nInd x nInd
-        mu1 : array \in nTrials x nInd x 1
-        S1 : array \in nTrials x nInd x nInd
-
-        Returns
-        -------
-        value : double
-                value of KL divergence
-        '''
-
-        ESS = S1 + np.matmul(mu, np.transpose(a=mu, axes=(0,2,1)))
-        answer = 0
-        for trial in range(mu1.shape[0]):
-            trialKL = .5*(-np.logdet(a=S0Inv[trial,:,:])
-                           -logdet(a=S1[trial,:,:])
-                           +np.dot(np.flatten(S0inv[:,:trial]),
-                                    np.flatten(ESS[:,:,trial]))
-                           -ESS.shape[0])
-            answer += trialKL
-        return answer
-
+# class PointProcessExpectedLogLikelihood():
 class PointProcessExpectedLogLikelihood(ExpectedLogLikelihood):
 
-    # def __init__(eLL, covMatricesStore, legQuadPoints, legQuadWeights, hermQuadPoints, hermQuadWeights, linkFunction):
-    def __init__(legQuadPoints, legQuadWeights, hermQuadPoints, hermQuadWeights, linkFunction):
+    def __init__(self, legQuadPoints, legQuadWeights, hermQuadPoints, hermQuadWeights, linkFunction):
         '''
 
         Parameters
@@ -112,19 +86,13 @@ class PointProcessExpectedLogLikelihood(ExpectedLogLikelihood):
                      array of spike times
 
         '''
-        self.__legQuadPoints = legQuadPoints
-        self.__legQuadWeights = legQuadWeights
+        super().__init__(legQuadPoints=legQuadPoints, 
+                          legQuadWeights=legQuadWeights,
+                          linkFunction=linkFunction)
         self.__hermQuadPoints = hermQuadPoints
         self.__hermQuadWeights = hermQuadWeights
-        self.__linkFunction = linkFunction
 
-    def evalSumAcrossTrialsAndNeuronsWithGradientOnQ(qHMeanAtQuad, 
-                                                      qHVarAtQuad,
-                                                      qHMeanAtSpike, 
-                                                      qHVarAtSpike,
-            C, d, Kzzi, 
-                                                      Kzz, KtzAtQuad, KttAtQuad,
-                                                      KtzAtSpike, KttAtSpike):
+    def evalSumAcrossTrialsAndNeuronsWithGradientOnQ(self, qHMeanAtQuad, qHVarAtQuad, **kwargs):
         ''' Evaluates the expected log likelihood of a svGPFA
 
         Parameters
@@ -147,55 +115,126 @@ class PointProcessExpectedLogLikelihood(ExpectedLogLikelihood):
 
         '''
 
-        qH = PointProcessSparseVariationalProposal()
-        qHMeanAtQuad, qHVarAtQuad = \
-         qH.getMeanAndVarianceAtQuadPoints(qMu=qMu, qSigma=qSigma, 
-                                                    C=C, d=d,
-                                                    Kzzi=Kzzi,
-                                                    Kzz=Kzz,
-                                                    Ktz=KtzAtQuad,
-                                                    Ktt=KttAtQuad)
-        qHMeanAtSpike, qHVarAtSpike = \
-             qH.getMeanAndVarianceAtSpikeTimes(qMu=qMu, qSigma=qSigma, 
-                                                    C=C, d=d,
-                                                    Kzzi=Kzzi,
-                                                    Kzz=Kzz,
-                                                    Ktz=KtzAtSpike,
-                                                    Ktt=KttAtSpike)
-        if self.__linkFunction == self.exp:
-            intval = np.exp(qHMeanAtQuad + 0.5*qHVarAtQuad)
-            logLink = qHMeanAtSpike
+        try:
+            qHMeanAtSpike = kwargs.get('qHMeanAtSpike')
+        except KeyError:
+           raise KeyError('Missing named argument qhMeanAtSpike')
+        try:
+            qHVarAtSpike = kwargs.get('qHVarAtSpike')
+        except KeyError:
+           raise KeyError('Missing named argument qhVarAtSpike')
+
+        if self._linkFunction==np.exp:
+            # intval \in nTrials x nQuadLeg x nNeurons
+            intval = np.exp(qHMeanAtQuad+0.5*qHVarAtQuad)
+            # logLink \in 
+            logLink = np.concatenate(np.squeeze(qHMeanAtSpike))
         else:
             # intval = permute(mtimesx(m.wwHerm',permute(m.link(qHmeanAtQuad + sqrt(2*qHMVarAtQuad).*permute(m.xxHerm,[2 3 4 1])),[4 1 2 3])),[2 3 4 1]);
 
-            # aux2 \in nQuad x nNeuros x nTrials
+            # aux2 \in  nTrials x nQuadLeg x nNeuros
             aux2 = np.sqrt(2*qHVarAtQuad)
-            # aux3 \in nQuad x nNeuros x nTrials x trLen
-            aux3 = np.multiply.outer(aux2, self.__hermQuadPoints)
-            # aux4 \in nQuad x nNeuros x nTrials x trLen
+            # aux3 \in nTrials x nQuadLeg x nNeuros x nQuadLeg
+            aux3 = np.multiply.outer(aux2, super()._hermQuadPoints)
+            # aux4 \in nQuad x nQuadLeg x nTrials x nQuadLeg
             aux4 = np.add(aux3, qHMeanAtQuad)
-            # aux5 \in nQuad x nNeuros x nTrials x trLen
-            aux5 = self.__linkFunction(x=aux4)
-            # intval \in nQuad x nNeuros x nTrials
-            intval = np.tensordot(a=aux5, b=self.__hermQuadWeights, axes=([4], [0]))
-
+            # aux5 \in nQuad x nQuadLeg x nTrials x nQuadLeg
+            aux5 = self._linkFunction(x=aux4)
+            # intval \in  nTrials x nQuadHerm x nNeurons
+            intval = np.tensordot(a=aux5, b=super()._hermQuadWeights, axes=([4], [0]))
             # log_link = cellvec(cellfun(@(x,y) log(m.link(x + sqrt(2*y).* m.xxHerm'))*m.wwHerm,mu_h_Spikes,var_h_Spikes,'uni',0));
             # aux1[trial] \in nSpikes[trial]
             aux1 = [2*qHVarAtSpike[trial] for trial in range(len(qHVarAtSpike))]
             # aux2[trial] \in nSpikes[trial] x nQuadLeg
-            aux2 = [np.multiply.outer(aux1[trial], self.__hermQuadPoints) for trial in range(len(aux2))]
+            aux2 = [np.multiply.outer(aux1[trial], super()._hermQuadPoints) for trial in range(len(aux1))]
             # aux3[trial] \in nSpikes[trial] x nQuadLeg
-            aux3 = [np.add(aux2[trial], qHMeanAtSpike[trial]) for trial in range(len(aux3))]
+            aux3 = [np.add(aux2[trial], qHMeanAtSpike[trial]) for trial in range(len(aux2))]
             # aux4[trial] \in nSpikes[trial] x nQuadLeg
-            aux4 = [np.log(self.__linkFunction(x=aux3[trial])) for trial in range(len(aux4))]
-            # logLink \in nSpikes[trial] x 1
-            logLink = np.tensordot(a=aux4, b=self.__hermQuadWeights, axes=([1], [0]))
+            aux4 = [np.log(self._linkFunction(x=aux3[trial])) for trial in range(len(aux3))]
+            # aux5[trial] \in nSpikes[trial] x 1
+            aux5 = [np.tensordot(a=aux4[trial], b=super()._hermQuadWeights, axes=([1], [0])) for trial in range(len(aux4))]
+            logLink = np.concatentate(aux5)
 
-        # aux1 \in 1 x nNeurons x nTrials
-        aux1 = np.matmul(np.transpose(a=self.__hermQuadWeights), intval)
+        # self._legQuadWeights \in nTrials x nQuadHerm x 1
+        # aux0 \in nTrials x 1 x nQuadHerm
+        aux0 = np.transpose(self._legQuadWeights, (0, 2, 1)) 
+        # intval \in  nTrials x nQuadHerm x nNeurons
+        # aux1 \in  nTrials x 1 x nNeurons
+        aux1 = np.matmul(aux0, intval)
         sELLTerm1 = np.sum(aux1)
         sELLTerm2 = np.sum(logLink)
         return -sELLTerm1+sELLTerm2
+
+class KLDivergence:
+
+    def evalSumAcrossLatentsAndTrials(self, Kzzi, qMu, qSigma):
+        klDiv = 0
+        for k in range(len(Kzzi)):
+            klDivK = self.evalSumAcrossTrials(Kzzi=Kzzi[k], qMu=qMu[k], qSigma=qSigma[k])
+            klDiv += klDivK
+        return klDiv
+
+    def evalSumAcrossTrials(self, Kzzi, qMu, qSigma):
+        '''
+        Answers the sum of KL divergences across trials.
+        (e.g., answer= \sum_k KL(N(0, s0Inv[tr,:]), N(qMu[tr,:], qSigma[tr,:])))
+
+        Parameters
+        ----------
+        Kzzi : array \in nTrials x nInd x nInd
+        qMu : array \in nTrials x nInd x 1
+        qSigma : array \in nTrials x nInd x nInd
+
+        Returns
+        -------
+        value : double
+                value of KL divergence
+        '''
+
+        # ESS \in nTrials x nInd x nInd
+        ESS = qSigma + np.matmul(qMu, np.transpose(a=qMu, axes=(0,2,1)))
+        nTrials = qMu.shape[0]
+        answer = 0
+        for trial in range(nTrials):
+            _, logdetKzzi = np.linalg.slogdet(a=Kzzi[trial,:,:])
+            _, logdetQSigma = np.linalg.slogdet(a=qSigma[trial,:,:])
+            # aux3 = np.dot(np.ndarray.flatten(Kzzi[trial,:,:]), np.ndarray.flatten(ESS[trial,:,:]))
+            # aux4 = ESS.shape[1]
+            trialKL = .5*(-logdetKzzi-logdetQSigma
+                           +np.dot(np.ndarray.flatten(Kzzi[trial,:,:]), np.ndarray.flatten(ESS[trial,:,:]))
+                           -ESS.shape[1])
+            answer += trialKL
+            # print("aux1=%f\naux2=%f\naux3=%f\naux4=%f\nkldiv_nn=%f,kldiv=%f"%(logdetKzzi, logdetQSigma, aux3, aux4, trialKL, answer))
+            # pdb.set_trace()
+        return answer
+
+class CovarianceMatricesStore:
+
+    def __init__(self, Kzz, Kzzi, quadKtz, quadKtt, spikeKtz, spikeKtt):
+        self.__Kzz = Kzz
+        self.__Kzzi = Kzzi
+        self.__quadKtz = quadKtz
+        self.__quadKtt = quadKtt
+        self.__spikeKtz = spikeKtz
+        self.__spikeKtt = spikeKtt
+
+    def getKzz(self):
+        return self.__Kzz
+
+    def getKzzi(self):
+        return self.__Kzzi
+
+    def getQuadKtz(self):
+        return self.__quadKtz
+
+    def getQuadKtt(self):
+        return self.__quadKtt
+
+    def getSpikeKtz(self):
+        return self.__spikeKtz
+
+    def getSpikeKtt(self):
+        return self.__spikeKtt
 
 class SparseVariationalEM:
 
@@ -211,7 +250,7 @@ class SparseVariationalEM:
         m0, SVec0, SDiag0 \in nInd x nNeruons x nTrials
         '''
         iter = 0
-        svl = SparseVariationalLowerBound(y=y, eLL=self.__eLL, 
+        svlb = SparseVariationalLowerBound(y=y, eLL=self.__eLL, 
                                                covMatricesStore=
                                                 self.__covMatricesStore,
                                                qMu=qMu0, qSVec0=qSVec0,
@@ -229,7 +268,7 @@ class SparseVariationalEM:
                                              sDiag=sDiag, 
                                              maxIter=maxEStepIter, 
                                              tol=tol)
-            svl.setVariationalProposalParams(flatteneQdParams=flattenedQParams)
+            svlb.setVariationalProposalParams(flatteneQdParams=flattenedQParams)
             '''
             modelParams = self.__mStepModelParams(nInd=nInd, 
                                         maxMStepModelParamsIter=
@@ -248,9 +287,9 @@ class SparseVariationalEM:
             self.__mStep()
             '''
 
-    def __eStep(self, lowerBound, qMu, SVec, SDiag, maxIter, tol):
-        x0 = lowerBound.flattenVariationalProposalParms(qMu=qMu, SVec=SVec, 
-                                                                 SDiag=SDiag)
+    def __eStep(self, lowerBound, qMu, qSVec, qSDiag, maxIter, tol):
+        x0 = lowerBound.flattenVariationalProposalParams(qMu=qMu, qSVec=SVec, 
+                                                                  qSDiag=SDiag)
         res = minimize(lowerBound.evalWithGradientOnQ, x0=x0, 
                         method='BFGS', options={'xtol': tol, 'disp': True},
                         args=(len(m)))
@@ -259,17 +298,18 @@ class SparseVariationalEM:
 
 class SparseVariationalLowerBound:
 
-    def __init__(self, eLL, covMatricesStore, qMu, qSVec, qSDiag, 
-                       C, d, kernelParms):
-        self.__y = y
+    def __init__(self, eLL, covMatricesStore, qMu, qSVec, qSDiag, C, d, 
+                  kernelParams, varRnk, neuronForSpikeIndex):
         self.__eLL = eLL
-        self.__covMatricesStore = __covMaatricesStore
+        self.__covMatricesStore = covMatricesStore
         self.__qMu = qMu
         self.__qSVec = qSVec
         self.__qSDiag = qSDiag
         self.__C = C
         self.__d = d
         self.__kernelParams = kernelParams
+        self.__varRnk = varRnk
+        self.__neuronForSpikeIndex = neuronForSpikeIndex
 
     def evalWithGradOnQ(self, x):
         '''
@@ -280,49 +320,71 @@ class SparseVariationalLowerBound:
         x : vector containing the concatenation of flattened qMu, qSVec and qSDiag.
         '''
 
-        qMu, qSVec, qSDiag = \
-         self.__unflattenVariationalProposalParams(flattenedQParams=x0)
+        qMu, qSVec, qSDiag = self.__unflattenVariationalProposalParams(flattenedQParams=x)
         qSigma = self.__buildQSigma(qSVec=qSVec, qSDiag=qSDiag)
-        qHMeanAtSpike, qHMVarAtSpike = qH.getMeanAndVarianceAtSpikeTimes()
-    
-        eLLEval = self.__eLL.evalWithGradOnQ(eLL=eLL, 
-                                              covMatricesStore=
-                                               covMatricesStore, 
-                                              qMu=qMu, qSigma=qSigma,
-                                              C=self.__C, d=self.__d,
-                                              trials=trials)
+        qH = PointProcessSparseVariationalProposal()
+        qHMeanAtQuad, qHVarAtQuad = qH.getMeanAndVarianceAtQuadPoints(qMu=qMu, qSigma=qSigma, C=self.__C, d=self.__d, Kzzi=self.__covMatricesStore.getKzzi(), Kzz=self.__covMatricesStore.getKzz(), Ktz=self.__covMatricesStore.getQuadKtz(), Ktt=self.__covMatricesStore.getQuadKtt())
+        qHMeanAtSpike, qHVarAtSpike = qH.getMeanAndVarianceAtSpikeTimes(qMu=qMu, qSigma=qSigma, C=self.__C, d=self.__d, Kzzi=self.__covMatricesStore.getKzzi(), Kzz=self.__covMatricesStore.getKzz(), Ktz=self.__covMatricesStore.getSpikeKtz(), Ktt=self.__covMatricesStore.getSpikeKtt(), neuronForSpikeIndex=self.__neuronForSpikeIndex)
+        eLLEval = self.__eLL.evalSumAcrossTrialsAndNeuronsWithGradientOnQ(qHMeanAtQuad=qHMeanAtQuad, qHVarAtQuad=qHVarAtQuad, qHMeanAtSpike=qHMeanAtSpike, qHVarAtSpike=qHVarAtSpike)
+        klDiv = KLDivergence()
+        klDivEval = klDiv.evalSumAcrossLatentsAndTrials(Kzzi=self.__covMatricesStore.getKzzi(), qMu=qMu, qSigma=qSigma)
 
-        klDivEval = self.__evalKLDivergenceTerm(Kzzi=Kzzi, qMu=qMu, 
-                                                           qSigma=qSigma)
-
-        answer = eLLEval - klDivEval
+        answer = -eLLEval+klDivEval
         return answer
+
+    def __buildQSigma(self, qSVec, qSDiag):
+        # qSVec[k]  \in nTrials x (nInd[k]*varRnk[k]) x 1
+        # qSDiag[k] \in nTrials x nInd[k] x 1
+
+        R = qSVec[0].shape[0]
+        K = len(qSVec)
+        qSigma = [None] * K
+        for k in range(K):
+            nIndK = qSDiag[k].shape[1]
+            # qq \in nTrials x nInd[k] x varRnk[k]
+            qq = np.reshape(a=qSVec[k], newshape=(R, nIndK, self.__varRnk[k]))
+            # dd \in nTrials x nInd[k] x varRnk[k]
+            nIndKVarRnkK = qSVec[k].shape[1]
+            dd = build3DdiagFromDiagVector(v=(qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
+            qSigma[k] = np.matmul(qq, np.transpose(a=qq, axes=(0,2,1))) + dd
+        return(qSigma)
 
     def setVariationalProposalParams(self, flattenedQParams):
         self.__qMu, self.__qSVec, self.__qSDiag = \
          self.__unflattenVariationalProposalParams(flattenedQParams=
                                                     flattenedQParams)
 
-    def flattenVariationalProposalParams(qMu, qSVec, qSDiag):
-        return self.__flattenArrays(qMu, qSVec, qSDiag)
-    '''
-    def __unflattenVariationalProposalParams(flattenedQParams):
+    def flattenVariationalProposalParams(self, qMu, qSVec, qSDiag):
+        return self.__flattenListOfArrays(qMu, qSVec, qSDiag)
+
+    def __flattenListOfArrays(self, *lists):
+        aListOfArrays = []
+        for arraysList in lists:
+            for array in arraysList:
+                aListOfArrays.append(array.flatten())
+        return np.concatenate(aListOfArrays)
+
+    def __unflattenVariationalProposalParams(self, flattenedQParams):
+        unflattenedLists =  \
+         self.__unflattenListsOfArrays(flattenedParams=flattenedQParams,
+                                        referenceLists=(self.__qMu,
+                                                         self.__qSVec,
+                                                         self.__qSDiag))
+        return unflattenedLists
+        
+    def __unflattenListsOfArrays(self, flattenedParams, referenceLists):
+        unflattenedLists = [None] * len(referenceLists)
         fromIndex = 0
-        qMu = np.reshape(a=flattenedQParmas[fromIndex+(0:self.__qMu.size)],
-                          newshape=self.__qMu.shape)
-        fromIndex += self.__qMu.size
-        qSVec = np.reshape(a=flattenedQParmas[fromIndex+(0:self.__qSVec.size)],
-                            newshape=self.__qSVec.shape)
-        fromIndex += self.__qSVec.size
-        qSVec = np.reshape(a=flattenedQParmas[fromIndex+(0:self.__qSDiag.size)],
-                            newshape=self.__qSDiag.shape)
-        return qMu, qSVec, qSDiag
-    '''
-    def __flattenArrays(self, *args):
-        answer = []
-        for arg in args:
-            answer.append(arg.flatten)
-        return answer
+        for i in range(len(referenceLists)):
+            unflattenedLists[i], fromIndex = self.__unflattenListOfArrays(flattenedParams=flattenedParams, fromIndex=fromIndex, referenceList=referenceLists[i])
+        return unflattenedLists
+
+    def __unflattenListOfArrays(self, flattenedParams, fromIndex, referenceList):
+        unflattenedList = [None] * len(referenceList)
+        for k in range(len(referenceList)):
+            unflattenedList[k] = np.reshape(a=flattenedParams[fromIndex+np.arange(referenceList[k].size)], newshape=referenceList[k].shape)
+            fromIndex += referenceList[k].size
+        return unflattenedList, fromIndex
 
     def __evalKLDivergenceTerm(Kzzi, qMu, qSigma):
         term = 0
@@ -446,4 +508,4 @@ class PointProcessSparseVariationalProposal(SparseVariationalProposal):
         for trialIndex in range(nTrials):
             qHMu[trialIndex] = np.sum(qKMu[trialIndex]*C[neuronForSpikeIndex[trialIndex]-1,:],axis=1)+d[neuronForSpikeIndex[trialIndex]-1]
             qHVar[trialIndex] = np.sum(qKVar[trialIndex]*(C[neuronForSpikeIndex[trialIndex]-1,:])**2,axis=1)
-        return qHMu, qHVar, qKMu, qKVar
+        return qHMu, qHVar
