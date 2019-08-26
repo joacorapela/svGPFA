@@ -30,13 +30,14 @@ def test_getMeanAndVarianceAtSpikeTimes():
     index = [mat['index'][i,0][:,0] for i in range(mat['index'].shape[0])]
 
     q = PointProcessSparseVariationalProposal()
-    qHMu, qHVar, qKMu, qKVar = q.getMeanAndVarianceAtSpikeTimes(qMu=qMu, qSigma=qSigma, C=C, d=b, Kzzi=Kzzi, Kzz=Kzz, Ktz=Ktz, Ktt=Ktt, neuronForSpikeIndex=index)
+    # qHMu, qHVar, qKMu, qKVar = q.getMeanAndVarianceAtSpikeTimes(qMu=qMu, qSigma=qSigma, C=C, d=b, Kzzi=Kzzi, Kzz=Kzz, Ktz=Ktz, Ktt=Ktt, neuronForSpikeIndex=index)
+    qHMu, qHVar = q.getMeanAndVarianceAtSpikeTimes(qMu=qMu, qSigma=qSigma, C=C, d=b, Kzzi=Kzzi, Kzz=Kzz, Ktz=Ktz, Ktt=Ktt, neuronForSpikeIndex=index)
 
-    for i in range(len(mu_k)):
-        qKMuError = math.sqrt(np.sum((mu_k[i]-qKMu[i])**2))/mu_k[i].size
-        qKVarError = math.sqrt(np.sum((var_k[i]-qKVar[i])**2))/var_k[i].size
-        assert(qKMuError<tol)
-        assert(qKVarError<tol)
+    # for i in range(len(mu_k)):
+        # qKMuError = math.sqrt(np.sum((mu_k[i]-qKMu[i])**2))/mu_k[i].size
+        # qKVarError = math.sqrt(np.sum((var_k[i]-qKVar[i])**2))/var_k[i].size
+        # assert(qKMuError<tol)
+        # assert(qKVarError<tol)
 
     # pdb.set_trace()
 
@@ -51,3 +52,6 @@ def test_getMeanAndVarianceAtSpikeTimes():
         # pdb.set_trace()
 
     pdb.set_trace()
+
+if __name__=="__main__":
+    test_getMeanAndVarianceAtSpikeTimes()
