@@ -4,40 +4,58 @@ import os
 import pdb
 import math
 from scipy.io import loadmat
-import numpy as np
-from core import PointProcessExpectedLogLikelihood
+import torch
+from approxPosteriorForH import PointProcessApproxPosteriorForH
+from inducingPointsPrior import InducingPointsPrior
+from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from expectedLogLikelihood import PointProcessExpectedLogLikelihood
 
-def test_evalSumAcrossTrialsAndNeuronsWithGradientOnQ():
+def test_evalSumAcrossTrialsAndNeurons():
     tol = 1e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/expectedLogLik_PointProcess.mat")
+    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
-    hermQuadPoints = mat["xxHerm"]
-    hermQuadWeights = mat["wwHerm"]
-    legQuadPoints = np.transpose(mat["ttQuad"], (2, 0, 1))
-    legQuadWeights = np.transpose(mat["wwQuad"], (2, 0, 1))
-    linkFunction = np.exp
-    qHMeanAtQuad = np.transpose(mat["mu_h_Quad"], [2, 0, 1])
-    qHVarAtQuad = np.transpose(mat["var_h_Quad"], [2, 0, 1])
-    qHMeanAtSpike = mat["mu_h_Spikes"]
-    qHVarAtSpike = mat["var_h_Spikes"]
-    lik_pp=mat["lik_pp"]
-    ell = PointProcessExpectedLogLikelihood(legQuadPoints=legQuadPoints,
-                                             legQuadWeights=legQuadWeights, 
+    nLatent = mat['spikeKtz'].shape[0]
+    nTrials = mat['spikeKtz'].shape[1]
+    qMu = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    qSVec = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    qSDiag = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    C = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
+    b = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
+    Kzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    Kzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    quadKtz = [torch.from_numpy(mat['quadKtz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    quadKtt = torch.from_numpy(mat['quadKtt']).type(torch.DoubleTensor).permute(2,0,1)
+    spikeKtz = [[torch.from_numpy(mat['spikeKtz'][k,tr]).type(torch.DoubleTensor) for tr in range(nTrials)] for k in range(nLatent)]
+    spikeKtt = [[torch.from_numpy(mat['spikeKtt'][k,tr]).type(torch.DoubleTensor) for tr in range(nTrials)] for k in range(nLatent)]
+    mu_h_spikes = [torch.from_numpy(mat['mu_h_Spikes'][0,i]).type(torch.DoubleTensor).squeeze() for i in range(nTrials)]
+    var_h_spikes = [torch.from_numpy(mat['var_h_Spikes'][0,i]).type(torch.DoubleTensor).squeeze() for i in range(nTrials)]
+    index = [torch.from_numpy(mat['index'][i,0][:,0]).type(torch.ByteTensor) for i in range(nTrials)]
+    Elik = torch.from_numpy(mat['Elik'])
+
+
+    hermQuadPoints = torch.from_numpy(mat['xxHerm']).type(torch.DoubleTensor)
+    hermQuadWeights = torch.from_numpy(mat['wwHerm']).type(torch.DoubleTensor)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+
+    linkFunction = torch.exp
+
+    qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
+    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
+    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore, neuronForSpikeIndex=index)
+
+    eLL = PointProcessExpectedLogLikelihood(approxPosteriorForH=qH,
                                              hermQuadPoints=hermQuadPoints, 
                                              hermQuadWeights=hermQuadWeights, 
+                                             legQuadPoints=legQuadPoints,
+                                             legQuadWeights=legQuadWeights, 
                                              linkFunction=linkFunction)
-    sELL = ell.evalSumAcrossTrialsAndNeuronsWithGradientOnQ(
-            qHMeanAtQuad, 
-            qHVarAtQuad, 
-            qHMeanAtSpike, 
-            qHVarAtSpike)
+    sELL = eLL.evalSumAcrossTrialsAndNeurons()
 
-    sELLerror = abs(sELL-lik_pp)
+    sELLerror = abs(sELL-Elik)
 
     assert(sELLerror<tol)
 
-    pdb.set_trace()
-
 if __name__=="__main__":
-    test_evalSumAcrossTrialsAndNeuronsWithGradientOnQ()
+    test_evalSumAcrossTrialsAndNeurons()

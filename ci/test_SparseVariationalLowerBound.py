@@ -4,154 +4,59 @@ import os
 import pdb
 import math
 from scipy.io import loadmat
-import numpy as np
-from core import SparseVariationalLowerBound, CovarianceMatricesStore, PointProcessExpectedLogLikelihood
+import torch
+from inducingPointsPrior import InducingPointsPrior
+from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from approxPosteriorForH import PointProcessApproxPosteriorForH
+from klDivergence import KLDivergence
+from expectedLogLikelihood import PointProcessExpectedLogLikelihood
+from sparseVariationalLowerBound import SparseVariationalLowerBound
 
-def test_buildQSigma():
+def test_eval():
     tol = 1e-5
-    dataFilename = os.path.expanduser('~/dev/research/gatsby/svGPFA/code/test/data/get_full_from_lowplusdiag.mat')
+    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
-    q_sqrt = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    q_diag = [mat['q_diag'][(0,i)].transpose((2,0,1)) for i in range(mat['q_diag'].shape[1])]
-    q_sigma = [mat['q_sigma'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sigma'].shape[1])]
+    nLatent = mat['spikeKtz'].shape[0]
+    nTrials = mat['spikeKtz'].shape[1]
+    qMu = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    qSVec = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    qSDiag = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    C = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
+    b = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
+    Kzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    Kzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    quadKtz = [torch.from_numpy(mat['quadKtz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
+    quadKtt = torch.from_numpy(mat['quadKtt']).type(torch.DoubleTensor).permute(2,0,1)
+    spikeKtz = [[torch.from_numpy(mat['spikeKtz'][k,tr]).type(torch.DoubleTensor) for tr in range(nTrials)] for k in range(nLatent)]
+    spikeKtt = [[torch.from_numpy(mat['spikeKtt'][k,tr]).type(torch.DoubleTensor) for tr in range(nTrials)] for k in range(nLatent)]
+    mu_h_spikes = [torch.from_numpy(mat['mu_h_Spikes'][0,i]).type(torch.DoubleTensor).squeeze() for i in range(nTrials)]
+    var_h_spikes = [torch.from_numpy(mat['var_h_Spikes'][0,i]).type(torch.DoubleTensor).squeeze() for i in range(nTrials)]
+    index = [torch.from_numpy(mat['index'][i,0][:,0]).type(torch.ByteTensor) for i in range(nTrials)]
+    obj = mat['obj'][0,0]
 
-    svLowerBound = SparseVariationalLowerBound(eLL=None, covMatricesStore=None, qMu=None, qSVec=None, qSDiag=None, C=None, d=None, kernelParams=None, varRnk=np.ones(shape=3, dtype=np.int8))
-    qSigma = svLowerBound._SparseVariationalLowerBound__buildQSigma(qSVec=q_sqrt, qSDiag=q_diag)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    hermQuadPoints = torch.from_numpy(mat['xxHerm']).type(torch.DoubleTensor)
+    hermQuadWeights = torch.from_numpy(mat['wwHerm']).type(torch.DoubleTensor)
 
-    error = np.array([np.linalg.norm(x=qSigma[k]-q_sigma[k]) for k in range(len(qSigma))]).sum()
+    linkFunction = torch.exp
 
-    assert(error<tol)
+    qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
+    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
+    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore, neuronForSpikeIndex=index)
 
-def test_flattenUnFlattenVariationalProposalParams():
-    tol = 1e-5
-    dataFilename = os.path.expanduser('~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat')
+    eLL = PointProcessExpectedLogLikelihood(approxPosteriorForH=qH,
+                                             hermQuadPoints=hermQuadPoints, 
+                                             hermQuadWeights=hermQuadWeights, 
+                                             legQuadPoints=legQuadPoints,
+                                             legQuadWeights=legQuadWeights, 
+                                             linkFunction=linkFunction)
+    klDiv = KLDivergence(Kzzi=Kzzi, inducingPointsPrior=qU)
+    svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
+    lbEval = svlb.eval()
 
-    mat = loadmat(dataFilename)
-    qMu0 = [mat['q_mu'][(0,i)].transpose((2,0,1)) for i in range(mat['q_mu'].shape[1])]
-    qSVec0 = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    qSDiag0 = [mat['q_diag'][(0,i)].transpose((2,0,1)) for i in range(mat['q_diag'].shape[1])]
-
-    legQuadPoints = np.transpose(mat['ttQuad'], (2, 0, 1))
-    legQuadWeights = np.transpose(mat['wwQuad'], (2, 0, 1))
-    hermQuadPoints = mat['xxHerm']
-    hermQuadWeights = mat['wwHerm']
-
-    q_sqrt = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    q_sqrt = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    q_diag = [mat['q_diag'][(0,i)].transpose((2,0,1)) for i in range(mat['q_diag'].shape[1])]
-
-    Kzz = [mat['Kzz'][(i,0)].transpose((2,0,1)) for i in range(mat['Kzz'].shape[0])]
-    Kzzi = [mat['Kzzi'][(i,0)].transpose((2,0,1)) for i in range(mat['Kzzi'].shape[0])]
-    quadKtz= mat['quadKtz']
-    quadKtt= mat['quadKtt']
-    spikeKtz= mat['spikeKtz']
-    spikeKtt= mat['spikeKtt']
-
-    C = mat['C']
-    b = np.squeeze(mat['b'])
-
-    varRnk = mat['varRnk']
-
-    funEvalPrs0 = mat['funEvalPrs0']
-
-    linkFunction = np.exp
-
-    covMatricesStore = CovarianceMatricesStore(Kzz=Kzz, 
-                                                Kzzi=Kzzi,
-                                                quadKtz=quadKtz, 
-                                                quadKtt=quadKtt, 
-                                                spikeKtz=spikeKtz,
-                                                spikeKtt=spikeKtt)
-    ppELL = PointProcessExpectedLogLikelihood(legQuadPoints=legQuadPoints, 
-                                               legQuadWeights=legQuadWeights, 
-                                               hermQuadPoints=hermQuadPoints, 
-                                               hermQuadWeights=hermQuadWeights, 
-                                               linkFunction=linkFunction)
-    svlb = SparseVariationalLowerBound(eLL=ppELL, 
-                                        covMatricesStore=covMatricesStore,
-                                        qMu=qMu0, 
-                                        qSVec=qSVec0,
-                                        qSDiag=qSDiag0, 
-                                        C=C, d=b,
-                                        kernelParams=None,
-                                        varRnk=varRnk)
-    x = svlb.flattenVariationalProposalParams(qMu=qMu0, qSVec=qSVec0, 
-                                                        qSDiag=qSDiag0)
-    uQMu, uQSVec, uQSDiag = svlb._SparseVariationalLowerBound__unflattenVariationalProposalParams(flattenedQParams=x)
-
-    for k in range(len(qMu0)):
-        assert(np.array_equal(qMu0[k], uQMu[k]))
-
-    for k in range(len(qSVec0)):
-        assert(np.array_equal(qSVec0[k], uQSVec[k]))
-
-    for k in range(len(qSDiag0)):
-        assert(np.array_equal(qSDiag0[k], uQSDiag[k]))
-
-def test_evalWithGradOnQ():
-    tol = 1e-5
-    dataFilename = os.path.expanduser('~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat')
-
-    mat = loadmat(dataFilename)
-    qMu0 = [mat['q_mu'][(0,i)].transpose((2,0,1)) for i in range(mat['q_mu'].shape[1])]
-    qSVec0 = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    qSDiag0 = [mat['q_diag'][(0,i)].transpose((2,0,1)) for i in range(mat['q_diag'].shape[1])]
-    legQuadPoints = np.transpose(mat['ttQuad'], (2, 0, 1))
-    legQuadWeights = np.transpose(mat['wwQuad'], (2, 0, 1))
-    hermQuadPoints = mat['xxHerm']
-    hermQuadWeights = mat['wwHerm']
-
-    q_sqrt = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    q_sqrt = [mat['q_sqrt'][(0,i)].transpose((2,0,1)) for i in range(mat['q_sqrt'].shape[1])]
-    q_diag = [mat['q_diag'][(0,i)].transpose((2,0,1)) for i in range(mat['q_diag'].shape[1])]
-
-    Kzz = [mat['Kzz'][(i,0)].transpose((2,0,1)) for i in range(mat['Kzz'].shape[0])]
-    Kzzi = [mat['Kzzi'][(i,0)].transpose((2,0,1)) for i in range(mat['Kzzi'].shape[0])]
-    quadKtz= [mat['quadKtz'][(i,0)].transpose((2,0,1)) for i in range(mat['quadKtz'].shape[0])]
-    quadKtt= mat['quadKtt'].transpose((2,0,1))
-    spikeKtz= mat['spikeKtz']
-    spikeKtt= mat['spikeKtt']
-
-    C = mat['C']
-    b = np.squeeze(mat['b'])
-
-    varRnk = mat['varRnk'][0]
-    index = [mat['index'][i,0][:,0] for i in range(mat['index'].shape[0])]
-
-    funEvalPrs0 = mat['funEvalPrs0'][0,0]
-
-    linkFunction = np.exp
-
-    covMatricesStore = CovarianceMatricesStore(Kzz=Kzz, 
-                                                Kzzi=Kzzi,
-                                                quadKtz=quadKtz, 
-                                                quadKtt=quadKtt, 
-                                                spikeKtz=spikeKtz,
-                                                spikeKtt=spikeKtt)
-    ppELL = PointProcessExpectedLogLikelihood(legQuadPoints=legQuadPoints, 
-                                               legQuadWeights=legQuadWeights, 
-                                               hermQuadPoints=hermQuadPoints, 
-                                               hermQuadWeights=hermQuadWeights, 
-                                               linkFunction=linkFunction)
-    svlb = SparseVariationalLowerBound(eLL=ppELL, 
-                                        covMatricesStore=covMatricesStore,
-                                        qMu=qMu0, 
-                                        qSVec=qSVec0,
-                                        qSDiag=qSDiag0, 
-                                        C=C, d=b,
-                                        kernelParams=None,
-                                        varRnk=varRnk,
-                                        neuronForSpikeIndex=index)
-    x = svlb.flattenVariationalProposalParams(qMu=qMu0, qSVec=qSVec0, 
-                                                        qSDiag=qSDiag0)
-    evalRes = svlb.evalWithGradOnQ(x=x)
-
-    assert(abs(evalRes-funEvalPrs0)<tol)
+    assert(abs(lbEval+obj)<tol)
     
-    pdb.set_trace()
-
 if __name__=='__main__':
-    # test_buildQSigma()
-    # test_flattenUnFlattenVariationalProposalParams()
-    test_evalWithGradOnQ()
+    test_eval()
