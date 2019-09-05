@@ -1,15 +1,25 @@
-import numpy as np
+import torch
 
 def getDiagIndicesIn3DArray(N, M):
-    frameDiagIndices = np.arange(N)*(N+1)
-    frameStartIndices = np.arange(M)*N**2
-    diagIndices = np.add.outer(frameDiagIndices, frameStartIndices).flatten()
-    return np.sort(diagIndices)
+    frameDiagIndices = torch.arange(end=N)*(N+1)
+    frameStartIndices = torch.arange(end=M)*N**2
+    # torch way of computing an outer sum
+    diagIndices = (frameDiagIndices.reshape(-1,1)+frameStartIndices).flatten()
+    answer, _ = diagIndices.sort()
+    return answer
 
 def build3DdiagFromDiagVector(v, N, M):
     assert(len(v)==N*M)
     diagIndices = getDiagIndicesIn3DArray(N=N, M=M)
-    D = np.zeros(M*N*N)
+    D = torch.zeros(M*N*N, dtype=torch.double)
     D[diagIndices] = v
-    reshapedD = np.reshape(a=D, newshape = (M, N, N))
+    reshapedD = D.reshape(shape = (M, N, N))
     return reshapedD
+
+def flattenListsOfArrays(self, *lists):
+    aListOfArrays = []
+    for arraysList in lists:
+        for array in arraysList:
+            aListOfArrays.append(array.flatten())
+    return torch.cat(aListOfArrays)
+
