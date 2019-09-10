@@ -14,6 +14,11 @@ class ApproxPosteriorForH(ABC):
     def getApproxPosteriorForHParams(self):
         return self._inducingPointsPrior.getParams()
 
+    def getModelParams(self):
+        # return [self._C]
+        # return [self._d]
+        return [self._C, self._d]
+                
     def getMeanAndVarianceAtQuadPoints(self):
 
         nTrials = self._covMatricesStore.getQuadKtt().shape[0]
