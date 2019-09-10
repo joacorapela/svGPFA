@@ -25,13 +25,14 @@ def test_evalSumAcrossTrialsAndNeurons():
     Kzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
     Kzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
     quadKtz = [torch.from_numpy(mat['quadKtz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
-    quadKtt = torch.from_numpy(mat['quadKtt']).type(torch.DoubleTensor)
+    quadKtt_tmp = torch.from_numpy(mat['quadKtt']).type(torch.DoubleTensor)
     hermQuadPoints = torch.from_numpy(mat['xxHerm']).type(torch.DoubleTensor)
     hermQuadWeights = torch.from_numpy(mat['wwHerm']).type(torch.DoubleTensor)
-    Y = torch.from_numpy(mat['Y']).type(torch.DoubleTensor)
+    Y = torch.from_numpy(mat['Y']).type(torch.DoubleTensor).permute(2,0,1) 
     binWidth = torch.from_numpy(mat['BinWidth'])
     Elik = torch.from_numpy(mat['Elik'])
 
+    quadKtt = torch.einsum('ij,k->kij', quadKtt_tmp, torch.ones(nTrials, dtype=torch.double))
     linkFunction = torch.exp
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
@@ -48,6 +49,8 @@ def test_evalSumAcrossTrialsAndNeurons():
     sELLerror = abs(sELL-Elik)
 
     assert(sELLerror<tol)
+
+    pdb.set_trace()
 
 if __name__=="__main__":
     test_evalSumAcrossTrialsAndNeurons()
