@@ -16,3 +16,6 @@ class SparseVariationalLowerBound:
 
     def getApproxPosteriorForHParams(self):
         return self.__eLL.getApproxPosteriorForHParams()
+
+    def getModelParams(self):
+        return self.__eLL.getModelParams()
