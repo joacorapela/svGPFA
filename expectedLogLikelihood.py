@@ -21,6 +21,9 @@ class ExpectedLogLikelihood(ABC):
     def getApproxPosteriorForHParams(self):
         return self._approxPosteriorForH.getApproxPosteriorForHParams()
 
+    def getModelParams(self):
+        return self._approxPosteriorForH.getModelParams()
+
     @abstractmethod
     def evalSumAcrossTrialsAndNeurons(self):
         pass
@@ -111,8 +114,7 @@ class PoissonExpectedLogLikelihood(ExpectedLogLikelihood):
             loglink = torch.einsum('ijkl,l->ijk', aux5a, self._hermQuadWeights.squeeze())
             intval = torch.einsum('ijkl,l->ijk', aux5b, self._hermQuadWeights.squeeze())
 
-        aux1 = torch.matmul(aux0, intval)
         sELLTerm1 = self.__binWidth*intval.sum()
         # Y \in nTrials x nNeurons x maxNBins
-        sELLTerm2 = (Y*logLink.permute(0, 2, 1)).sum()
+        sELLTerm2 = (self.__Y*logLink.permute(0, 2, 1)).sum()
         return -sELLTerm1+sELLTerm2
