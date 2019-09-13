@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import torch
 from approxPosteriorForH import PointProcessApproxPosteriorForH
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from kernelMatricesStore import PointProcessKernelMatricesStore
 
 # import matplotlib.pyplot as plt
 
@@ -34,8 +34,8 @@ def test_getMeanAndVarianceAtSpikeTimes():
     index = [torch.from_numpy(mat['index'][i,0][:,0]).type(torch.ByteTensor) for i in range(nTrials)]
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=None, quadKtt=None, spikeKtz=Ktz, spikeKtt=Ktt)
-    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore, neuronForSpikeIndex=index)
+    kernelMatricesStore = PointProcessKernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=None, quadKtt=None, spikeKtz=Ktz, spikeKtt=Ktt)
+    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore, neuronForSpikeIndex=index)
 
     # qHMu, qHVar, qKMu, qKVar = q.getMeanAndVarianceAtSpikeTimes(qMu=qMu, qSigma=qSigma, C=C, d=b, Kzzi=Kzzi, Kzz=Kzz, Ktz=Ktz, Ktt=Ktt, neuronForSpikeIndex=index)
     qHMu, qHVar = qH.getMeanAndVarianceAtSpikeTimes()
