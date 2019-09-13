@@ -5,13 +5,6 @@ import torch
 # import warnings
 
 class ExpectedLogLikelihood(ABC):
-    '''
-
-    Abstract base class for expected log-likelihood subclasses 
-    (e.g., PointProcessExpectedLogLikelihood).
-
-
-    '''
     def __init__(self, approxPosteriorForH, hermQuadPoints, hermQuadWeights, linkFunction):
         self._approxPosteriorForH = approxPosteriorForH
         self._hermQuadPoints=hermQuadPoints
@@ -24,8 +17,11 @@ class ExpectedLogLikelihood(ABC):
     def getModelParams(self):
         return self._approxPosteriorForH.getModelParams()
 
+    def buildKMatrices(self):
+        return self._approxPosteriorForH.buildKMatrices()
+
     @abstractmethod
-    def evalSumAcrossTrialsAndNeurons(self):
+    def evalSumAcrossTrialsAndNeurons(self, kMatrices):
         pass
 
 
@@ -35,9 +31,12 @@ class PointProcessExpectedLogLikelihood(ExpectedLogLikelihood):
         self.__legQuadPoints = legQuadPoints
         self.__legQuadWeights = legQuadWeights
 
-    def evalSumAcrossTrialsAndNeurons(self):
-        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForH.getMeanAndVarianceAtQuadPoints()
-        qHMeanAtSpike, qHVarAtSpike = self._approxPosteriorForH.getMeanAndVarianceAtSpikeTimes()
+    def getModelParamsApproxFunc(self):
+        allNeuronsAndTimesApproxPosteriorForHFunc = self._approxPosteriorForH.getModelParamsApproxFunc()
+
+    def evalSumAcrossTrialsAndNeurons(self, kMatrices=None):
+        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForH.getMeanAndVarianceForAllNeuronsAndTimes(kMatrices=kMatrices)
+        qHMeanAtSpike, qHVarAtSpike = self._approxPosteriorForH.getMeanAndVarianceForAllNeuronsAndAssociatedTimes(kMatrices=kMatrices)
         # warnings.warn("Use of analytical calculation has been disabled for testing")
         # if False:
         if self._linkFunction==torch.exp:
@@ -89,8 +88,8 @@ class PoissonExpectedLogLikelihood(ExpectedLogLikelihood):
         self.__Y = Y
         self.__binWidth = binWidth
 
-    def evalSumAcrossTrialsAndNeurons(self):
-        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForH.getMeanAndVarianceAtQuadPoints()
+    def evalSumAcrossTrialsAndNeurons(self, kMatrices=None):
+        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForH.getMeanAndVarianceForAllNeuronsAndTimes(kMatrices=kMatrices)
         # warnings.warn("Use of analytical calculation has been disabled for testing")
         # if False:
         if self._linkFunction==torch.exp:
