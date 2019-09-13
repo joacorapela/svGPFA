@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import torch
 from approxPosteriorForH import ApproxPosteriorForH
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import CovarianceMatricesStore
+from kernelMatricesStore import KernelMatricesStore
 from expectedLogLikelihood import PoissonExpectedLogLikelihood
 
 def test_evalSumAcrossTrialsAndNeurons():
@@ -36,7 +36,7 @@ def test_evalSumAcrossTrialsAndNeurons():
     linkFunction = torch.exp
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = CovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt)
+    kernelMatricesStore = KernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt)
     qH = ApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore)
 
     eLL = PoissonExpectedLogLikelihood(approxPosteriorForH=qH,
