@@ -4,15 +4,15 @@ import torch
 
 class KLDivergence:
 
-    def __init__(self, Kzzi, inducingPointsPrior):
-        self.__Kzzi = Kzzi
+    def __init__(self, kernelMatricesStore, inducingPointsPrior):
+        self.__kernelMatricesStore = kernelMatricesStore
         self.__inducingPointsPrior = inducingPointsPrior
 
     def evalSumAcrossLatentsAndTrials(self):
         klDiv = 0
         qSigma = self.__inducingPointsPrior.buildQSigma()
-        for k in range(len(self.__Kzzi)):
-            klDivK = self.__evalSumAcrossTrials(Kzzi=self.__Kzzi[k], qMu=self.__inducingPointsPrior.getQMu()[k], qSigma=qSigma[k])
+        for k in range(len(self.__kernelsMatricesStore.getKzzi())):
+            klDivK = self.__evalSumAcrossTrials(Kzzi=self.__kernelMatricesStore.getKzzi[k], qMu=self.__inducingPointsPrior.getQMu()[k], qSigma=qSigma[k])
             klDiv += klDivK
         return klDiv
 
