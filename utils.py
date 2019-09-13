@@ -16,10 +16,15 @@ def build3DdiagFromDiagVector(v, N, M):
     reshapedD = D.reshape(shape = (M, N, N))
     return reshapedD
 
-def flattenListsOfArrays(self, *lists):
+def flattenListsOfArrays(*lists):
     aListOfArrays = []
     for arraysList in lists:
         for array in arraysList:
             aListOfArrays.append(array.flatten())
     return torch.cat(aListOfArrays)
 
+def pinv3D(K):
+    Kinv = torch.zeros(K.shape, dtype=torch.double)
+    for i in range(K.shape[0]):
+        Kinv[i,:,:] = torch.pinverse(K[i,:,:])
+    return Kinv
