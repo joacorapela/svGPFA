@@ -25,7 +25,7 @@ class InducingPointsPrior:
 
         R = self.__qSVec[0].shape[0]
         K = len(self.__qSVec)
-        qSigma = [None] * K
+        qSigma = [[None] for k in range(K)]
         for k in range(K):
             nIndK = self.__qSDiag[k].shape[1]
             # qq \in nTrials x nInd[k] x varRnk[k]
