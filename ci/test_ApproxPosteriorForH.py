@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import torch
 from approxPosteriorForH import ApproxPosteriorForH
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from kernelMatricesStore import PointProcessKernelMatricesStore
 
 def test_getMeanAndVarianceAtQuadPoints():
     tol = 1e-6
@@ -31,12 +31,7 @@ def test_getMeanAndVarianceAtQuadPoints():
     var_h = torch.from_numpy(mat['var_h_Quad']).type(torch.DoubleTensor).permute(2,0,1)
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, 
-                                                Kzzi=Kzzi,
-                                                quadKtz=quadKtz, 
-                                                quadKtt=quadKtt, 
-                                                spikeKtz=spikeKtz,
-                                                spikeKtt=spikeKtt)
+    covMatricesStore = PointProcessKernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
     qH = ApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore)
     qHMu, qHVar = qH.getMeanAndVarianceAtQuadPoints()
 
