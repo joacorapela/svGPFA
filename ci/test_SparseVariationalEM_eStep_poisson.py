@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import torch
 from approxPosteriorForH import ApproxPosteriorForH
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import CovarianceMatricesStore
+from kernelMatricesStore import KernelMatricesStore
 from expectedLogLikelihood import PoissonExpectedLogLikelihood
 from klDivergence import KLDivergence
 from sparseVariationalLowerBound import SparseVariationalLowerBound
@@ -41,8 +41,8 @@ def test_eval():
     linkFunction = torch.exp
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = CovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt)
-    qH = ApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore)
+    kernelMatricesStore = KernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt)
+    qH = ApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore)
 
     eLL = PoissonExpectedLogLikelihood(approxPosteriorForH=qH,
                                         hermQuadPoints=hermQuadPoints,
@@ -52,10 +52,12 @@ def test_eval():
 
     klDiv = KLDivergence(Kzzi=Kzzi, inducingPointsPrior=qU)
     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SparseVariationalEM(lowerBound=svlb)
+    svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, covMatricesStore=covMatricesStore)
     res = svEM._SparseVariationalEM__eStep(maxNIter=500, tol=1e-3, lr=1e-3, verbose=True)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
+
+    pdb.set_trace()
 
 if __name__=='__main__':
     test_eval()
