@@ -6,7 +6,7 @@ import math
 from scipy.io import loadmat
 import torch
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from kernelMatricesStore import PointProcessKernelMatricesStore
 from approxPosteriorForH import PointProcessApproxPosteriorForH
 from klDivergence import KLDivergence
 from expectedLogLikelihood import PointProcessExpectedLogLikelihood
@@ -23,8 +23,8 @@ def test_eval():
     qMu = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
     qSVec = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
     qSDiag = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
-    C = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
-    b = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
+    C = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
+    b = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
     Kzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
     Kzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
     quadKtz = [torch.from_numpy(mat['quadKtz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatent)]
@@ -43,8 +43,8 @@ def test_eval():
     linkFunction = torch.exp
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
-    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore, neuronForSpikeIndex=index)
+    kernelMatricesStore = PointProcessKernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
+    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore, neuronForSpikeIndex=index)
 
     eLL = PointProcessExpectedLogLikelihood(approxPosteriorForH=qH,
                                              hermQuadPoints=hermQuadPoints, 
@@ -54,10 +54,10 @@ def test_eval():
                                              linkFunction=linkFunction)
     klDiv = KLDivergence(Kzzi=Kzzi, inducingPointsPrior=qU)
     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SparseVariationalEM(lowerBound=svlb)
-    res = svEM._SparseVariationalEM__mStepModelParams(maxNIter=10000, tol=1e-3, lr=1e-3, verbose=True)
+    svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, covMatricesStore=covMatricesStore)
+    res = svEM._SparseVariationalEM__mStepModelParams(maxNIter=4000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 
-    assert(res["lowerBound"]-(-nLowerBound)>0)
+    assert(abs(res["lowerBound"]-(-nLowerBound))<tol)
 
     pdb.set_trace()
 
