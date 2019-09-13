@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import torch
 from approxPosteriorForH import PointProcessApproxPosteriorForH
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from kernelMatricesStore import PointProcessKernelMatricesStore
 from expectedLogLikelihood import PointProcessExpectedLogLikelihood
 
 def test_evalSumAcrossTrialsAndNeurons():
@@ -42,8 +42,8 @@ def test_evalSumAcrossTrialsAndNeurons():
     linkFunction = torch.exp
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
-    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore, neuronForSpikeIndex=index)
+    kernelMatricesStore = PointProcessKernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
+    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore, neuronForSpikeIndex=index)
 
     eLL = PointProcessExpectedLogLikelihood(approxPosteriorForH=qH,
                                              hermQuadPoints=hermQuadPoints, 
