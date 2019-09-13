@@ -6,7 +6,7 @@ import math
 from scipy.io import loadmat
 import torch
 from inducingPointsPrior import InducingPointsPrior
-from covarianceMatricesStore import PointProcessCovarianceMatricesStore
+from kernelMatricesStore import PointProcessKernelMatricesStore
 from approxPosteriorForH import PointProcessApproxPosteriorForH
 from klDivergence import KLDivergence
 from expectedLogLikelihood import PointProcessExpectedLogLikelihood
@@ -43,8 +43,8 @@ def test_eval():
     linkFunction = torch.exp
 
     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    covMatricesStore = PointProcessCovarianceMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
-    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, covMatricesStore=covMatricesStore, neuronForSpikeIndex=index)
+    kernelMatricesStore = PointProcessKernelMatricesStore(Kzz=Kzz, Kzzi=Kzzi, quadKtz=quadKtz, quadKtt=quadKtt, spikeKtz=spikeKtz, spikeKtt=spikeKtt)
+    qH = PointProcessApproxPosteriorForH(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore, neuronForSpikeIndex=index)
 
     eLL = PointProcessExpectedLogLikelihood(approxPosteriorForH=qH,
                                              hermQuadPoints=hermQuadPoints, 
@@ -54,7 +54,7 @@ def test_eval():
                                              linkFunction=linkFunction)
     klDiv = KLDivergence(Kzzi=Kzzi, inducingPointsPrior=qU)
     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SparseVariationalEM(lowerBound=svlb)
+    svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, covMatricesStore=covMatricesStore)
     res = svEM._SparseVariationalEM__eStep(maxNIter=1000, tol=1e-3, lr=1e-3, verbose=True)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
