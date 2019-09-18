@@ -1,5 +1,4 @@
-# svGPFA
-Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA)
+# Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA)
 
 1. The source code can be found under src
 2. A Jupyter notebook running svGPFA on simulated data can be found at ipynb/demoPointProcess.ipynb
