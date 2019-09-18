@@ -7,3 +7,4 @@ fromRsync*
 nextRefractoring.txt
 todo.txt
 .ipynb*
+doc/design/*bak*
