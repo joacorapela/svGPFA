@@ -1,0 +1,6 @@
+*.pyc
+*.swp
+*~
+*.html
+toRsync*
+fromRsync*
