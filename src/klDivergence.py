@@ -11,8 +11,8 @@ class KLDivergence:
     def evalSumAcrossLatentsAndTrials(self):
         klDiv = 0
         qSigma = self.__inducingPointsPrior.buildQSigma()
-        for k in range(len(self.__kernelsMatricesStore.getKzzi())):
-            klDivK = self.__evalSumAcrossTrials(Kzzi=self.__kernelMatricesStore.getKzzi[k], qMu=self.__inducingPointsPrior.getQMu()[k], qSigma=qSigma[k])
+        for k in range(len(self.__kernelMatricesStore.getKzzi())):
+            klDivK = self.__evalSumAcrossTrials(Kzzi=self.__kernelMatricesStore.getKzzi()[k], qMu=self.__inducingPointsPrior.getQMu()[k], qSigma=qSigma[k])
             klDiv += klDivK
         return klDiv
 

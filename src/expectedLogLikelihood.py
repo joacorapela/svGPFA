@@ -5,38 +5,43 @@ import torch
 # import warnings
 
 class ExpectedLogLikelihood(ABC):
-    def __init__(self, approxPosteriorForH, hermQuadPoints, hermQuadWeights, linkFunction):
-        self._approxPosteriorForH = approxPosteriorForH
+    def __init__(self, hermQuadPoints, hermQuadWeights, linkFunction):
         self._hermQuadPoints=hermQuadPoints
         self._hermQuadWeights=hermQuadWeights
         self._linkFunction=linkFunction
 
+    @abstractmethod
+    def evalSumAcrossTrialsAndNeurons(self, kFactors):
+        pass
+
     def getApproxPosteriorForHParams(self):
-        return self._approxPosteriorForH.getApproxPosteriorForHParams()
+        return self._approxPosteriorForHForAllNeuronsAllTimes.getApproxPosteriorForHParams()
 
     def getModelParams(self):
-        return self._approxPosteriorForH.getModelParams()
-
-    def buildKMatrices(self):
-        return self._approxPosteriorForH.buildKMatrices()
+        return self._approxPosteriorForHForAllNeuronsAllTimes.getModelParams()
 
     @abstractmethod
-    def evalSumAcrossTrialsAndNeurons(self, kMatrices):
+    def buildKFactors(self):
         pass
 
 
 class PointProcessExpectedLogLikelihood(ExpectedLogLikelihood):
-    def __init__(self, approxPosteriorForH, hermQuadPoints, hermQuadWeights, legQuadPoints, legQuadWeights, linkFunction):
-        super().__init__(approxPosteriorForH=approxPosteriorForH, hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction)
+    def __init__(self, approxPosteriorForHForAllNeuronsAllTimes, approxPosteriorForHForAllNeuronsAssociatedTimes, hermQuadPoints, hermQuadWeights, legQuadPoints, legQuadWeights, linkFunction):
+        super().__init__(hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction)
+        self._approxPosteriorForHForAllNeuronsAllTimes = approxPosteriorForHForAllNeuronsAllTimes
+        self._approxPosteriorForHForAllNeuronsAssociatedTimes = approxPosteriorForHForAllNeuronsAssociatedTimes
         self.__legQuadPoints = legQuadPoints
         self.__legQuadWeights = legQuadWeights
 
-    def getModelParamsApproxFunc(self):
-        allNeuronsAndTimesApproxPosteriorForHFunc = self._approxPosteriorForH.getModelParamsApproxFunc()
-
-    def evalSumAcrossTrialsAndNeurons(self, kMatrices=None):
-        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForH.getMeanAndVarianceForAllNeuronsAndTimes(kMatrices=kMatrices)
-        qHMeanAtSpike, qHVarAtSpike = self._approxPosteriorForH.getMeanAndVarianceForAllNeuronsAndAssociatedTimes(kMatrices=kMatrices)
+    def evalSumAcrossTrialsAndNeurons(self, kFactors=None):
+        if kFactors is not None:
+            kFactorsAllNeuronsAllTimes = kFactors["allNeuronsAllTimes"]
+            kFactorsAllNeuronsAssociatedTimes = kFactors["allNeuronsAssociatedTimes"]
+        else:
+            kFactorsAllNeuronsAllTimes = None
+            kFactorsAllNeuronsAssociatedTimes = None
+        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForHForAllNeuronsAllTimes.getMeansAndVariances(kFactors=kFactorsAllNeuronsAllTimes)
+        qHMeanAtSpike, qHVarAtSpike = self._approxPosteriorForHForAllNeuronsAssociatedTimes.getMeansAndVariances(kFactors=kFactorsAllNeuronsAssociatedTimes)
         # warnings.warn("Use of analytical calculation has been disabled for testing")
         # if False:
         if self._linkFunction==torch.exp:
@@ -81,15 +86,22 @@ class PointProcessExpectedLogLikelihood(ExpectedLogLikelihood):
         sELLTerm2 = torch.sum(logLink)
         return -sELLTerm1+sELLTerm2
 
+    def buildKFactors(self):
+        allNeuronsAllTimesKFactors = self._approxPosteriorForHForAllNeuronsAllTimes.buildKFactors()
+        allNeuronsAssociatedTimesKFactors = self._approxPosteriorForHForAllNeuronsAssociatedTimes.buildKFactors()
+        answer = {"allNeuronsAllTimes": allNeuronsAllTimesKFactors, "allNeuronsAssociatedTimes": allNeuronsAssociatedTimesKFactors}
+        return answer
+
 class PoissonExpectedLogLikelihood(ExpectedLogLikelihood):
-    def __init__(self, approxPosteriorForH, hermQuadPoints, hermQuadWeights, linkFunction, Y, binWidth):
-        super().__init__(approxPosteriorForH=approxPosteriorForH, hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction)
+    def __init__(self, approxPosteriorForHForAllNeuronsAllTimes, hermQuadPoints, hermQuadWeights, linkFunction, Y, binWidth):
+        super().__init__(hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction)
+        self.__approxPosteriorForHForAllNeuronsAllTimes=approxPosteriorForHForAllNeuronsAllTimes
         # Y \in nTrials x nNeurons x maxNBins
         self.__Y = Y
         self.__binWidth = binWidth
 
-    def evalSumAcrossTrialsAndNeurons(self, kMatrices=None):
-        qHMeanAtQuad, qHVarAtQuad = self._approxPosteriorForH.getMeanAndVarianceForAllNeuronsAndTimes(kMatrices=kMatrices)
+    def evalSumAcrossTrialsAndNeurons(self, kFactors=None):
+        qHMeanAtQuad, qHVarAtQuad = self.__approxPosteriorForHForAllNeuronsAllTimes.getMeansAndVariances(kFactors=kFactors)
         # warnings.warn("Use of analytical calculation has been disabled for testing")
         # if False:
         if self._linkFunction==torch.exp:
@@ -117,3 +129,8 @@ class PoissonExpectedLogLikelihood(ExpectedLogLikelihood):
         # Y \in nTrials x nNeurons x maxNBins
         sELLTerm2 = (self.__Y*logLink.permute(0, 2, 1)).sum()
         return -sELLTerm1+sELLTerm2
+
+    def buildKFactors(self):
+        answer = self._approxPosteriorForHAllForNeuronsAllTimes.buildKFactors()
+        return answer
+

@@ -11,13 +11,20 @@ class Kernel(ABC):
         pass
 
     @abstractmethod
-    def buildKernelMatrixDiag(self, t):
+    def buildKernelMatrixDiag(self, X):
+        pass
+
+    @abstractmethod
+    def getVariableParameters(self):
         pass
 
 class ExponentialQuadraticKernel(Kernel):
     def __init__(self, scale, lengthScale):
         self.__scale = 1.0
-        self.__variableParams = torch.tensor([lengthScale])
+        self.__variableParams = torch.tensor([lengthScale], dtype=torch.double)
+
+    def getVariableParameters(self):
+        return self.__variableParams
 
     def buildKernelMatrix(self, X1, X2=None):
         scale = self.__scale
@@ -27,7 +34,7 @@ class ExponentialQuadraticKernel(Kernel):
         if X1.ndim==3:
             distance = (X1-X2.transpose(1, 2))**2
         else:
-            distance = (X1-X2.transpose(0, 1))**2
+            distance = (X1.reshape(-1,1)-X2.reshape(1,-1))**2
         covMatrix = scale**2*torch.exp(-.5*distance/lengthScale**2)
         return covMatrix
 
@@ -39,7 +46,10 @@ class ExponentialQuadraticKernel(Kernel):
 class PeriodicKernel(Kernel):
     def __init__(self, scale, lengthScale, period):
         self.__scale = scale
-        self.__variableParams = torch.tensor([lengthScale, period])
+        self.__variableParams = torch.tensor([lengthScale, period], dtype=torch.double)
+
+    def getVariableParameters(self):
+        return self.__variableParams
 
     def buildKernelMatrix(self, X1, X2=None):
         scale = self.__scale
@@ -50,7 +60,7 @@ class PeriodicKernel(Kernel):
         if X1.ndim==3:
             sDistance = X1-X2.transpose(1, 2)
         else:
-            sDistance = X1-X2.transpose(0, 1)
+            sDistance = X1.reshape(-1,1)-X2.reshape(1,-1)
         rr = math.pi*sDistance/period
         covMatrix = scale**2*torch.exp(-2*torch.sin(rr)**2/lengthScale**2)
         return covMatrix

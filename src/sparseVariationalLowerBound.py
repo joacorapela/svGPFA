@@ -19,3 +19,6 @@ class SparseVariationalLowerBound:
 
     def getModelParams(self):
         return self.__eLL.getModelParams()
+
+    def buildKMatrices(self):
+        return self.__eLL.buildKMatrices()

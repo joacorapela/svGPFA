@@ -18,13 +18,11 @@ def test_exponentialQuadraticKernel():
     scale = 1.0
 
     kernel = ExponentialQuadraticKernel(scale=scale, lengthScale=lengthScale)
-    K = kernel.buildCovarianceMatrix(Z1=Z)
+    K = kernel.buildKernelMatrix(X1=Z)
 
     error = math.sqrt(((K-leasK)**2).flatten().mean())
 
     assert(error<tol)
-
-    pdb.set_trace()
 
 def test_exponentialQuadraticKernelDiag():
     tol = 1e-6
@@ -37,13 +35,11 @@ def test_exponentialQuadraticKernelDiag():
     lengthScale = float(mat['lengthscale'][0,0])
 
     kernel = ExponentialQuadraticKernel(scale=scale, lengthScale=lengthScale)
-    KDiag = kernel.buildCovarianceMatrixDiag(t=t)
+    KDiag = kernel.buildKernelMatrixDiag(X=t)
 
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
 
     assert(error<tol)
-
-    pdb.set_trace()
 
 def test_periodicKernel():
     tol = 1e-6
@@ -57,13 +53,11 @@ def test_periodicKernel():
     scale = 1.0
 
     kernel = PeriodicKernel(scale=scale, lengthScale=lengthScale, period=period)
-    K = kernel.buildCovarianceMatrix(Z1=Z)
+    K = kernel.buildKernelMatrix(X1=Z)
 
     error = math.sqrt(((K-leasK)**2).flatten().mean())
 
     assert(error<tol)
-
-    pdb.set_trace()
 
 def test_periodicKernelDiag():
     tol = 1e-6
@@ -77,17 +71,15 @@ def test_periodicKernelDiag():
     period = float(mat['period'][0,0])
 
     kernel = PeriodicKernel(scale=scale, lengthScale=lengthScale, period=period)
-    KDiag = kernel.buildCovarianceMatrixDiag(t=t)
+    KDiag = kernel.buildKernelMatrixDiag(X=t)
 
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
 
     assert(error<tol)
 
-    pdb.set_trace()
-
 if __name__=="__main__":
-    # test_exponentialQuadraticKernel()
-    # test_exponentialQuadraticKernelDiag()
-    # test_periodicKernel()
+    test_exponentialQuadraticKernel()
+    test_exponentialQuadraticKernelDiag()
+    test_periodicKernel()
     test_periodicKernelDiag()
 
