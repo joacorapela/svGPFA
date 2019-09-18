@@ -1,0 +1,1833 @@
+]0;IPython: code/srcIteration 00, E-Step
+Start __setupAndMaximizeStep Value: 6180.619714
+Iteration: 0, Value: 6180.619714
+Iteration: 10, Value: 5897.443745
+Iteration: 20, Value: 5842.268679
+Iteration: 30, Value: 5817.135911
+Iteration: 40, Value: 5796.152578
+Iteration: 50, Value: 5778.050121
+Iteration: 60, Value: 5763.004901
+Iteration: 70, Value: 5749.780909
+Iteration: 80, Value: 5737.635142
+Iteration: 90, Value: 5726.199029
+End __setupAndMaximizeStep Value: 5715.349712
+Iteration 00, E-Step finished with negative lower bound 5716.393521
+Iteration 00, M-Step Model Params
+Start __setupAndMaximizeStep Value: 5715.349712
+Iteration: 0, Value: 5715.349712
+Iteration: 10, Value: 5694.982624
+Iteration: 20, Value: 5675.615389
+Iteration: 30, Value: 5657.268901
+Iteration: 40, Value: 5639.906455
+Iteration: 50, Value: 5623.455155
+Iteration: 60, Value: 5607.836874
+Iteration: 70, Value: 5592.977724
+Iteration: 80, Value: 5578.812106
+Iteration: 90, Value: 5565.283271
+End __setupAndMaximizeStep Value: 5552.342454
+Iteration 00, M-Step Model Params finished with negative lower bound 5553.611318
+Iteration 00, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 5552.342454
+Iteration: 0, Value: 5552.342454
+Iteration: 10, Value: 5542.597063
+Iteration: 20, Value: 5537.385808
+Iteration: 30, Value: 5532.025818
+Iteration: 40, Value: 5522.583303
+Iteration: 50, Value: 5509.623223
+Iteration: 60, Value: 5499.971395
+Iteration: 70, Value: 5495.250352
+Iteration: 80, Value: 5493.034766
+Iteration: 90, Value: 5491.788223
+End __setupAndMaximizeStep Value: 5490.921294
+Iteration 00, M-Step Kernel Params finished with negative lower bound 5490.998725
+Iteration 00, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 5490.921294
+Iteration: 0, Value: 5490.921294
+Iteration: 10, Value: 5476.296866
+Iteration: 20, Value: 5463.627594
+Iteration: 30, Value: 5442.387421
+Iteration: 40, Value: 5418.101869
+Iteration: 50, Value: 5395.203698
+Iteration: 60, Value: 5376.247271
+Iteration: 70, Value: 5363.875762
+Iteration: 80, Value: 5356.679544
+Iteration: 90, Value: 5352.247234
+End __setupAndMaximizeStep Value: 5349.260485
+Iteration 00, M-Step Inducing Points finished with negative lower bound 5349.505184
+Iteration 01, E-Step
+Start __setupAndMaximizeStep Value: 5349.260485
+Iteration: 0, Value: 5349.260485
+Iteration: 10, Value: 5310.920978
+Iteration: 20, Value: 5291.168876
+Iteration: 30, Value: 5275.254030
+Iteration: 40, Value: 5261.366172
+Iteration: 50, Value: 5249.057867
+Iteration: 60, Value: 5237.888814
+Iteration: 70, Value: 5227.596420
+Iteration: 80, Value: 5218.043812
+Iteration: 90, Value: 5209.130567
+End __setupAndMaximizeStep Value: 5200.789293
+Iteration 01, E-Step finished with negative lower bound 5201.599236
+Iteration 01, M-Step Model Params
+Start __setupAndMaximizeStep Value: 5200.789293
+Iteration: 0, Value: 5200.789293
+Iteration: 10, Value: 5191.440973
+Iteration: 20, Value: 5182.709665
+Iteration: 30, Value: 5174.575867
+Iteration: 40, Value: 5166.995412
+Iteration: 50, Value: 5159.915920
+Iteration: 60, Value: 5153.289383
+Iteration: 70, Value: 5147.073828
+Iteration: 80, Value: 5141.232705
+Iteration: 90, Value: 5135.733963
+End __setupAndMaximizeStep Value: 5130.549860
+Iteration 01, M-Step Model Params finished with negative lower bound 5131.054823
+Iteration 01, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 5130.549860
+Iteration: 0, Value: 5130.549860
+Iteration: 10, Value: 5130.511080
+Iteration: 20, Value: 5130.466413
+Iteration: 30, Value: 5130.428905
+Iteration: 40, Value: 5130.394820
+Iteration: 50, Value: 5130.361442
+Iteration: 60, Value: 5130.328088
+Iteration: 70, Value: 5130.294755
+Iteration: 80, Value: 5130.261450
+Iteration: 90, Value: 5130.228163
+End __setupAndMaximizeStep Value: 5130.194900
+Iteration 01, M-Step Kernel Params finished with negative lower bound 5130.198225
+Iteration 01, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 5130.194900
+Iteration: 0, Value: 5130.194900
+Iteration: 10, Value: 5127.102020
+Iteration: 20, Value: 5124.614662
+Iteration: 30, Value: 5123.018014
+Iteration: 40, Value: 5121.880858
+Iteration: 50, Value: 5120.981822
+Iteration: 60, Value: 5120.122133
+Iteration: 70, Value: 5119.195037
+Iteration: 80, Value: 5118.461790
+Iteration: 90, Value: 5117.866379
+End __setupAndMaximizeStep Value: 5117.191861
+Iteration 01, M-Step Inducing Points finished with negative lower bound 5117.260745
+Iteration 02, E-Step
+Start __setupAndMaximizeStep Value: 5117.191861
+Iteration: 0, Value: 5117.191861
+Iteration: 10, Value: 5101.389580
+Iteration: 20, Value: 5091.360802
+Iteration: 30, Value: 5082.549020
+Iteration: 40, Value: 5074.871629
+Iteration: 50, Value: 5067.825591
+Iteration: 60, Value: 5061.436742
+Iteration: 70, Value: 5055.570329
+Iteration: 80, Value: 5050.163529
+Iteration: 90, Value: 5045.145290
+End __setupAndMaximizeStep Value: 5040.462965
+Iteration 02, E-Step finished with negative lower bound 5040.917257
+Iteration 02, M-Step Model Params
+Start __setupAndMaximizeStep Value: 5040.462965
+Iteration: 0, Value: 5040.462965
+Iteration: 10, Value: 5033.983252
+Iteration: 20, Value: 5028.046328
+Iteration: 30, Value: 5022.584654
+Iteration: 40, Value: 5017.544899
+Iteration: 50, Value: 5012.885592
+Iteration: 60, Value: 5008.571032
+Iteration: 70, Value: 5004.569933
+Iteration: 80, Value: 5000.854658
+Iteration: 90, Value: 4997.400791
+End __setupAndMaximizeStep Value: 4994.186578
+Iteration 02, M-Step Model Params finished with negative lower bound 4994.497787
+Iteration 02, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4994.186578
+Iteration: 0, Value: 4994.186578
+Iteration: 10, Value: 4994.153604
+Iteration: 20, Value: 4994.119913
+Iteration: 30, Value: 4994.091284
+Iteration: 40, Value: 4994.064054
+Iteration: 50, Value: 4994.036752
+Iteration: 60, Value: 4994.010167
+Iteration: 70, Value: 4993.983595
+Iteration: 80, Value: 4993.957138
+Iteration: 90, Value: 4993.930688
+End __setupAndMaximizeStep Value: 4993.904262
+Iteration 02, M-Step Kernel Params finished with negative lower bound 4993.906904
+Iteration 02, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4993.904262
+Iteration: 0, Value: 4993.904262
+Iteration: 10, Value: 5006.099111
+Iteration: 20, Value: 4998.309824
+Iteration: 30, Value: 4996.747036
+Iteration: 40, Value: 4995.387639
+Iteration: 50, Value: 4993.953584
+Iteration: 60, Value: 4991.881941
+Iteration: 70, Value: 4987.292034
+Iteration: 80, Value: 4985.970111
+Iteration: 90, Value: 4985.130481
+End __setupAndMaximizeStep Value: 4984.518567
+Iteration 02, M-Step Inducing Points finished with negative lower bound 4984.587453
+Iteration 03, E-Step
+Start __setupAndMaximizeStep Value: 4984.518567
+Iteration: 0, Value: 4984.518567
+Iteration: 10, Value: 4977.693306
+Iteration: 20, Value: 4971.970754
+Iteration: 30, Value: 4967.284823
+Iteration: 40, Value: 4963.128059
+Iteration: 50, Value: 4959.327481
+Iteration: 60, Value: 4955.820719
+Iteration: 70, Value: 4952.550041
+Iteration: 80, Value: 4949.478887
+Iteration: 90, Value: 4946.578314
+End __setupAndMaximizeStep Value: 4943.827440
+Iteration 03, E-Step finished with negative lower bound 4944.096262
+Iteration 03, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4943.827440
+Iteration: 0, Value: 4943.827440
+Iteration: 10, Value: 4939.297889
+Iteration: 20, Value: 4935.367972
+Iteration: 30, Value: 4931.909091
+Iteration: 40, Value: 4928.829372
+Iteration: 50, Value: 4926.059526
+Iteration: 60, Value: 4923.552562
+Iteration: 70, Value: 4921.271869
+Iteration: 80, Value: 4919.189702
+Iteration: 90, Value: 4917.284437
+End __setupAndMaximizeStep Value: 4915.538278
+Iteration 03, M-Step Model Params finished with negative lower bound 4915.706183
+Iteration 03, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4915.538278
+Iteration: 0, Value: 4915.538278
+Iteration: 10, Value: 4915.514298
+Iteration: 20, Value: 4915.476454
+Iteration: 30, Value: 4915.448088
+Iteration: 40, Value: 4915.423223
+Iteration: 50, Value: 4915.399871
+Iteration: 60, Value: 4915.377612
+Iteration: 70, Value: 4915.355845
+Iteration: 80, Value: 4915.334029
+Iteration: 90, Value: 4915.312241
+End __setupAndMaximizeStep Value: 4915.290484
+Iteration 03, M-Step Kernel Params finished with negative lower bound 4915.292661
+Iteration 03, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4915.290484
+Iteration: 0, Value: 4915.290484
+Iteration: 10, Value: 4925.552757
+Iteration: 20, Value: 4917.991367
+Iteration: 30, Value: 4915.099216
+Iteration: 40, Value: 4913.663863
+Iteration: 50, Value: 4912.530342
+Iteration: 60, Value: 4911.671338
+Iteration: 70, Value: 4911.002568
+Iteration: 80, Value: 4910.423125
+Iteration: 90, Value: 4909.892344
+End __setupAndMaximizeStep Value: 4909.371033
+Iteration 03, M-Step Inducing Points finished with negative lower bound 4909.422920
+Iteration 04, E-Step
+Start __setupAndMaximizeStep Value: 4909.371033
+Iteration: 0, Value: 4909.371033
+Iteration: 10, Value: 4905.041767
+Iteration: 20, Value: 4901.001386
+Iteration: 30, Value: 4897.865653
+Iteration: 40, Value: 4895.128356
+Iteration: 50, Value: 4892.590456
+Iteration: 60, Value: 4890.215889
+Iteration: 70, Value: 4887.976305
+Iteration: 80, Value: 4885.856583
+Iteration: 90, Value: 4883.843279
+End __setupAndMaximizeStep Value: 4881.925823
+Iteration 04, E-Step finished with negative lower bound 4882.113530
+Iteration 04, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4881.925823
+Iteration: 0, Value: 4881.925823
+Iteration: 10, Value: 4878.969407
+Iteration: 20, Value: 4876.647717
+Iteration: 30, Value: 4874.735828
+Iteration: 40, Value: 4873.101544
+Iteration: 50, Value: 4871.674718
+Iteration: 60, Value: 4870.409333
+Iteration: 70, Value: 4869.277300
+Iteration: 80, Value: 4868.258792
+Iteration: 90, Value: 4867.338536
+End __setupAndMaximizeStep Value: 4866.503987
+Iteration 04, M-Step Model Params finished with negative lower bound 4866.583899
+Iteration 04, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4866.503987
+Iteration: 0, Value: 4866.503987
+Iteration: 10, Value: 4866.520742
+Iteration: 20, Value: 4866.466215
+Iteration: 30, Value: 4866.429691
+Iteration: 40, Value: 4866.406335
+Iteration: 50, Value: 4866.385653
+Iteration: 60, Value: 4866.365982
+Iteration: 70, Value: 4866.346211
+Iteration: 80, Value: 4866.326679
+Iteration: 90, Value: 4866.307303
+End __setupAndMaximizeStep Value: 4866.287905
+Iteration 04, M-Step Kernel Params finished with negative lower bound 4866.289849
+Iteration 04, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4866.287905
+Iteration: 0, Value: 4866.287905
+Iteration: 10, Value: 4880.722666
+Iteration: 20, Value: 4871.684287
+Iteration: 30, Value: 4867.264053
+Iteration: 40, Value: 4865.406369
+Iteration: 50, Value: 4864.380617
+Iteration: 60, Value: 4863.579163
+Iteration: 70, Value: 4862.846736
+Iteration: 80, Value: 4862.209782
+Iteration: 90, Value: 4861.651252
+End __setupAndMaximizeStep Value: 4861.160055
+Iteration 04, M-Step Inducing Points finished with negative lower bound 4861.206949
+Iteration 05, E-Step
+Start __setupAndMaximizeStep Value: 4861.160055
+Iteration: 0, Value: 4861.160055
+Iteration: 10, Value: 4857.816365
+Iteration: 20, Value: 4854.710367
+Iteration: 30, Value: 4852.357630
+Iteration: 40, Value: 4850.348956
+Iteration: 50, Value: 4848.495862
+Iteration: 60, Value: 4846.760633
+Iteration: 70, Value: 4845.121100
+Iteration: 80, Value: 4843.565811
+Iteration: 90, Value: 4842.085849
+End __setupAndMaximizeStep Value: 4840.674706
+Iteration 05, E-Step finished with negative lower bound 4840.812873
+Iteration 05, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4840.674706
+Iteration: 0, Value: 4840.674706
+Iteration: 10, Value: 4838.807192
+Iteration: 20, Value: 4837.556647
+Iteration: 30, Value: 4836.593038
+Iteration: 40, Value: 4835.783569
+Iteration: 50, Value: 4835.074534
+Iteration: 60, Value: 4834.439363
+Iteration: 70, Value: 4833.863213
+Iteration: 80, Value: 4833.338480
+Iteration: 90, Value: 4832.859399
+End __setupAndMaximizeStep Value: 4832.421233
+Iteration 05, M-Step Model Params finished with negative lower bound 4832.463326
+Iteration 05, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4832.421233
+Iteration: 0, Value: 4832.421233
+Iteration: 10, Value: 4832.457931
+Iteration: 20, Value: 4832.389717
+Iteration: 30, Value: 4832.348634
+Iteration: 40, Value: 4832.326382
+Iteration: 50, Value: 4832.307472
+Iteration: 60, Value: 4832.289609
+Iteration: 70, Value: 4832.271548
+Iteration: 80, Value: 4832.253526
+Iteration: 90, Value: 4832.235709
+End __setupAndMaximizeStep Value: 4832.217914
+Iteration 05, M-Step Kernel Params finished with negative lower bound 4832.219696
+Iteration 05, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4832.217914
+Iteration: 0, Value: 4832.217914
+Iteration: 10, Value: 4852.038389
+Iteration: 20, Value: 4840.645221
+Iteration: 30, Value: 4834.916372
+Iteration: 40, Value: 4832.565095
+Iteration: 50, Value: 4831.090779
+Iteration: 60, Value: 4829.978365
+Iteration: 70, Value: 4829.078498
+Iteration: 80, Value: 4828.363804
+Iteration: 90, Value: 4827.835311
+End __setupAndMaximizeStep Value: 4827.420294
+Iteration 05, M-Step Inducing Points finished with negative lower bound 4827.458514
+Iteration 06, E-Step
+Start __setupAndMaximizeStep Value: 4827.420294
+Iteration: 0, Value: 4827.420294
+Iteration: 10, Value: 4825.075525
+Iteration: 20, Value: 4822.392906
+Iteration: 30, Value: 4820.595178
+Iteration: 40, Value: 4819.105148
+Iteration: 50, Value: 4817.763196
+Iteration: 60, Value: 4816.509339
+Iteration: 70, Value: 4815.321414
+Iteration: 80, Value: 4814.188147
+Iteration: 90, Value: 4813.103764
+End __setupAndMaximizeStep Value: 4812.063826
+Iteration 06, E-Step finished with negative lower bound 4812.165948
+Iteration 06, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4812.063826
+Iteration: 0, Value: 4812.063826
+Iteration: 10, Value: 4810.707704
+Iteration: 20, Value: 4809.967868
+Iteration: 30, Value: 4809.427993
+Iteration: 40, Value: 4808.971511
+Iteration: 50, Value: 4808.567358
+Iteration: 60, Value: 4808.206210
+Iteration: 70, Value: 4807.881352
+Iteration: 80, Value: 4807.588890
+Iteration: 90, Value: 4807.325638
+End __setupAndMaximizeStep Value: 4807.088537
+Iteration 06, M-Step Model Params finished with negative lower bound 4807.111150
+Iteration 06, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4807.088537
+Iteration: 0, Value: 4807.088537
+Iteration: 10, Value: 4807.138119
+Iteration: 20, Value: 4807.056109
+Iteration: 30, Value: 4807.010941
+Iteration: 40, Value: 4806.989582
+Iteration: 50, Value: 4806.972526
+Iteration: 60, Value: 4806.956327
+Iteration: 70, Value: 4806.940040
+Iteration: 80, Value: 4806.923656
+Iteration: 90, Value: 4806.907465
+End __setupAndMaximizeStep Value: 4806.891338
+Iteration 06, M-Step Kernel Params finished with negative lower bound 4806.892948
+Iteration 06, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4806.891338
+Iteration: 0, Value: 4806.891338
+Iteration: 10, Value: 4834.717026
+Iteration: 20, Value: 4816.057515
+Iteration: 30, Value: 4811.231680
+Iteration: 40, Value: 4808.936473
+Iteration: 50, Value: 4807.284638
+Iteration: 60, Value: 4806.082305
+Iteration: 70, Value: 4805.079862
+Iteration: 80, Value: 4804.321343
+Iteration: 90, Value: 4803.761669
+End __setupAndMaximizeStep Value: 4803.342505
+Iteration 06, M-Step Inducing Points finished with negative lower bound 4803.378729
+Iteration 07, E-Step
+Start __setupAndMaximizeStep Value: 4803.342505
+Iteration: 0, Value: 4803.342505
+Iteration: 10, Value: 4801.867353
+Iteration: 20, Value: 4799.478685
+Iteration: 30, Value: 4798.002421
+Iteration: 40, Value: 4796.840972
+Iteration: 50, Value: 4795.779869
+Iteration: 60, Value: 4794.786256
+Iteration: 70, Value: 4793.842035
+Iteration: 80, Value: 4792.937477
+Iteration: 90, Value: 4792.067456
+End __setupAndMaximizeStep Value: 4791.229073
+Iteration 07, E-Step finished with negative lower bound 4791.311549
+Iteration 07, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4791.229073
+Iteration: 0, Value: 4791.229073
+Iteration: 10, Value: 4790.250807
+Iteration: 20, Value: 4789.837060
+Iteration: 30, Value: 4789.550498
+Iteration: 40, Value: 4789.303001
+Iteration: 50, Value: 4789.093704
+Iteration: 60, Value: 4788.910588
+Iteration: 70, Value: 4788.749456
+Iteration: 80, Value: 4788.607274
+Iteration: 90, Value: 4788.481195
+End __setupAndMaximizeStep Value: 4788.369378
+Iteration 07, M-Step Model Params finished with negative lower bound 4788.379962
+Iteration 07, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4788.369378
+Iteration: 0, Value: 4788.369378
+Iteration: 10, Value: 4788.446565
+Iteration: 20, Value: 4788.338589
+Iteration: 30, Value: 4788.287273
+Iteration: 40, Value: 4788.268519
+Iteration: 50, Value: 4788.253183
+Iteration: 60, Value: 4788.238579
+Iteration: 70, Value: 4788.223962
+Iteration: 80, Value: 4788.209152
+Iteration: 90, Value: 4788.194361
+End __setupAndMaximizeStep Value: 4788.179705
+Iteration 07, M-Step Kernel Params finished with negative lower bound 4788.181159
+Iteration 07, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4788.179705
+Iteration: 0, Value: 4788.179705
+Iteration: 10, Value: 4817.135557
+Iteration: 20, Value: 4797.873251
+Iteration: 30, Value: 4792.743028
+Iteration: 40, Value: 4790.135402
+Iteration: 50, Value: 4789.015441
+Iteration: 60, Value: 4787.854276
+Iteration: 70, Value: 4786.928414
+Iteration: 80, Value: 4786.204235
+Iteration: 90, Value: 4785.688384
+End __setupAndMaximizeStep Value: 4785.340445
+Iteration 07, M-Step Inducing Points finished with negative lower bound 4785.367727
+Iteration 08, E-Step
+Start __setupAndMaximizeStep Value: 4785.340445
+Iteration: 0, Value: 4785.340445
+Iteration: 10, Value: 4784.649470
+Iteration: 20, Value: 4782.435480
+Iteration: 30, Value: 4781.160580
+Iteration: 40, Value: 4780.172160
+Iteration: 50, Value: 4779.271931
+Iteration: 60, Value: 4778.429523
+Iteration: 70, Value: 4777.631189
+Iteration: 80, Value: 4776.868810
+Iteration: 90, Value: 4776.138543
+End __setupAndMaximizeStep Value: 4775.438014
+Iteration 08, E-Step finished with negative lower bound 4775.506788
+Iteration 08, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4775.438014
+Iteration: 0, Value: 4775.438014
+Iteration: 10, Value: 4774.685485
+Iteration: 20, Value: 4774.460574
+Iteration: 30, Value: 4774.307326
+Iteration: 40, Value: 4774.183535
+Iteration: 50, Value: 4774.083132
+Iteration: 60, Value: 4773.998959
+Iteration: 70, Value: 4773.928741
+Iteration: 80, Value: 4773.869642
+Iteration: 90, Value: 4773.819654
+End __setupAndMaximizeStep Value: 4773.777252
+Iteration 08, M-Step Model Params finished with negative lower bound 4773.781189
+Iteration 08, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4773.777252
+Iteration: 0, Value: 4773.777252
+Iteration: 10, Value: 4773.893655
+Iteration: 20, Value: 4773.751231
+Iteration: 30, Value: 4773.696025
+Iteration: 40, Value: 4773.680832
+Iteration: 50, Value: 4773.666776
+Iteration: 60, Value: 4773.652952
+Iteration: 70, Value: 4773.639432
+Iteration: 80, Value: 4773.625934
+Iteration: 90, Value: 4773.612318
+End __setupAndMaximizeStep Value: 4773.598752
+Iteration 08, M-Step Kernel Params finished with negative lower bound 4773.600110
+Iteration 08, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4773.598752
+Iteration: 0, Value: 4773.598752
+Iteration: 10, Value: 4813.902759
+Iteration: 20, Value: 4784.053568
+Iteration: 30, Value: 4778.960613
+Iteration: 40, Value: 4776.010601
+Iteration: 50, Value: 4774.551662
+Iteration: 60, Value: 4773.553452
+Iteration: 70, Value: 4772.710821
+Iteration: 80, Value: 4772.080627
+Iteration: 90, Value: 4771.634423
+End __setupAndMaximizeStep Value: 4771.327515
+Iteration 08, M-Step Inducing Points finished with negative lower bound 4771.354422
+Iteration 09, E-Step
+Start __setupAndMaximizeStep Value: 4771.327515
+Iteration: 0, Value: 4771.327515
+Iteration: 10, Value: 4770.865426
+Iteration: 20, Value: 4768.677923
+Iteration: 30, Value: 4767.474533
+Iteration: 40, Value: 4766.581453
+Iteration: 50, Value: 4765.786703
+Iteration: 60, Value: 4765.053648
+Iteration: 70, Value: 4764.367069
+Iteration: 80, Value: 4763.717209
+Iteration: 90, Value: 4763.100192
+End __setupAndMaximizeStep Value: 4762.513364
+Iteration 09, E-Step finished with negative lower bound 4762.570760
+Iteration 09, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4762.513364
+Iteration: 0, Value: 4762.513364
+Iteration: 10, Value: 4761.964477
+Iteration: 20, Value: 4761.866726
+Iteration: 30, Value: 4761.799823
+Iteration: 40, Value: 4761.754986
+Iteration: 50, Value: 4761.721595
+Iteration: 60, Value: 4761.693992
+Iteration: 70, Value: 4761.671971
+Iteration: 80, Value: 4761.654070
+Iteration: 90, Value: 4761.639726
+End __setupAndMaximizeStep Value: 4761.628330
+Iteration 09, M-Step Model Params finished with negative lower bound 4761.629351
+Iteration 09, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4761.628330
+Iteration: 0, Value: 4761.628330
+Iteration: 10, Value: 4761.788991
+Iteration: 20, Value: 4761.614760
+Iteration: 30, Value: 4761.557526
+Iteration: 40, Value: 4761.545696
+Iteration: 50, Value: 4761.532266
+Iteration: 60, Value: 4761.519136
+Iteration: 70, Value: 4761.506449
+Iteration: 80, Value: 4761.494068
+Iteration: 90, Value: 4761.481656
+End __setupAndMaximizeStep Value: 4761.469203
+Iteration 09, M-Step Kernel Params finished with negative lower bound 4761.470458
+Iteration 09, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4761.469203
+Iteration: 0, Value: 4761.469203
+Iteration: 10, Value: 4804.258129
+Iteration: 20, Value: 4772.438529
+Iteration: 30, Value: 4768.117732
+Iteration: 40, Value: 4764.814100
+Iteration: 50, Value: 4763.132829
+Iteration: 60, Value: 4762.088452
+Iteration: 70, Value: 4761.281850
+Iteration: 80, Value: 4760.607353
+Iteration: 90, Value: 4760.069223
+End __setupAndMaximizeStep Value: 4759.681053
+Iteration 09, M-Step Inducing Points finished with negative lower bound 4759.714406
+Iteration 10, E-Step
+Start __setupAndMaximizeStep Value: 4759.681053
+Iteration: 0, Value: 4759.681053
+Iteration: 10, Value: 4759.605223
+Iteration: 20, Value: 4757.824686
+Iteration: 30, Value: 4756.786201
+Iteration: 40, Value: 4756.093767
+Iteration: 50, Value: 4755.470328
+Iteration: 60, Value: 4754.892092
+Iteration: 70, Value: 4754.347171
+Iteration: 80, Value: 4753.830392
+Iteration: 90, Value: 4753.338477
+End __setupAndMaximizeStep Value: 4752.870286
+Iteration 10, E-Step finished with negative lower bound 4752.916090
+Iteration 10, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4752.870286
+Iteration: 0, Value: 4752.870286
+Iteration: 10, Value: 4752.450123
+Iteration: 20, Value: 4752.412587
+Iteration: 30, Value: 4752.382781
+Iteration: 40, Value: 4752.366640
+Iteration: 50, Value: 4752.356137
+Iteration: 60, Value: 4752.349396
+Iteration: 70, Value: 4752.345309
+Iteration: 80, Value: 4752.342841
+Iteration: 90, Value: 4752.341458
+End __setupAndMaximizeStep Value: 4752.340729
+Iteration 10, M-Step Model Params finished with negative lower bound 4752.340782
+Iteration 10, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4752.340729
+Iteration: 0, Value: 4752.340729
+Iteration: 10, Value: 4752.534732
+Iteration: 20, Value: 4752.335874
+Iteration: 30, Value: 4752.275662
+Iteration: 40, Value: 4752.266330
+Iteration: 50, Value: 4752.253660
+Iteration: 60, Value: 4752.241411
+Iteration: 70, Value: 4752.229656
+Iteration: 80, Value: 4752.218392
+Iteration: 90, Value: 4752.207153
+End __setupAndMaximizeStep Value: 4752.195842
+Iteration 10, M-Step Kernel Params finished with negative lower bound 4752.196986
+Iteration 10, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4752.195842
+Iteration: 0, Value: 4752.195842
+Iteration: 10, Value: 4798.420453
+Iteration: 20, Value: 4762.568841
+Iteration: 30, Value: 4760.395062
+Iteration: 40, Value: 4756.543450
+Iteration: 50, Value: 4754.747930
+Iteration: 60, Value: 4753.595900
+Iteration: 70, Value: 4752.694742
+Iteration: 80, Value: 4752.008401
+Iteration: 90, Value: 4751.453483
+End __setupAndMaximizeStep Value: 4751.018358
+Iteration 10, M-Step Inducing Points finished with negative lower bound 4751.056816
+Iteration 11, E-Step
+Start __setupAndMaximizeStep Value: 4751.018358
+Iteration: 0, Value: 4751.018358
+Iteration: 10, Value: 4751.127514
+Iteration: 20, Value: 4749.463276
+Iteration: 30, Value: 4748.632564
+Iteration: 40, Value: 4748.045625
+Iteration: 50, Value: 4747.525413
+Iteration: 60, Value: 4747.047960
+Iteration: 70, Value: 4746.603119
+Iteration: 80, Value: 4746.183739
+Iteration: 90, Value: 4745.787764
+End __setupAndMaximizeStep Value: 4745.413203
+Iteration 11, E-Step finished with negative lower bound 4745.449755
+Iteration 11, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4745.413203
+Iteration: 0, Value: 4745.413203
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mKeyboardInterrupt[0m                         Traceback (most recent call last)
+[0;32m~/dev/research/gatsby/svGPFA/code/src/ci/test_sparseVariationalEM.py[0m in [0;36m<module>[0;34m[0m
+[1;32m    321[0m     [0;31m# test_mStepKernelParams_pointProcess() # passed[0m[0;34m[0m[0;34m[0m[0m
+[1;32m    322[0m     [0;31m# test_mStepInducingPoints_pointProcess() # passed[0m[0;34m[0m[0;34m[0m[0m
+[0;32m--> 323[0;31m     [0mtest_maximize_pointProcess[0m[0;34m([0m[0;34m)[0m [0;31m# not tested[0m[0;34m[0m[0m
+[0m
+[0;32m~/dev/research/gatsby/svGPFA/code/src/ci/test_sparseVariationalEM.py[0m in [0;36mtest_maximize_pointProcess[0;34m()[0m
+[1;32m    311[0m     [0msvLB[0m [0;34m=[0m [0mSparseVariationalLowerBound[0m[0;34m([0m[0meLL[0m[0;34m=[0m[0meLL[0m[0;34m,[0m [0mklDiv[0m[0;34m=[0m[0mklDiv[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m    312[0m     [0msvEM[0m [0;34m=[0m [0mSparseVariationalEM[0m[0;34m([0m[0mlowerBound[0m[0;34m=[0m[0msvLB[0m[0;34m,[0m [0meLL[0m[0;34m=[0m[0meLL[0m[0;34m,[0m [0mkernelMatricesStore[0m[0;34m=[0m[0mkernelMatricesStore[0m[0;34m)[0m[0;34m[0m[0m
+[0;32m--> 313[0;31m     [0mmaxRes[0m [0;34m=[0m [0msvEM[0m[0;34m.[0m[0mmaximize[0m[0;34m([0m[0memMaxNIter[0m[0;34m=[0m[0;36m20[0m[0;34m,[0m [0meStepMaxNIter[0m[0;34m=[0m[0;36m100[0m[0;34m,[0m [0mmStepModelParamsMaxNIter[0m[0;34m=[0m[0;36m100[0m[0;34m,[0m [0mmStepKernelParamsMaxNIter[0m[0;34m=[0m[0;36m100[0m[0;34m,[0m [0mmStepKernelParamsLR[0m[0;34m=[0m[0;36m1e-5[0m[0;34m,[0m [0mmStepInducingPointsMaxNIter[0m[0;34m=[0m[0;36m100[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    314[0m [0;34m[0m[0m
+[1;32m    315[0m     [0;31m# pdb.set_trace()[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/sparseVariationalEM.py[0m in [0;36mmaximize[0;34m(self, emMaxNIter, eStepMaxNIter, eStepTol, eStepLR, eStepNIterDisplay, mStepModelParamsMaxNIter, mStepModelParamsTol, mStepModelParamsLR, mStepModelParamsNIterDisplay, mStepKernelParamsMaxNIter, mStepKernelParamsTol, mStepKernelParamsLR, mStepKernelParamsNIterDisplay, mStepInducingPointsMaxNIter, mStepInducingPointsTol, mStepInducingPointsLR, mStepInducingPointsNIterDisplay, verbose)[0m
+[1;32m     22[0m             [0mprint[0m[0;34m([0m[0;34m"Iteration %02d, E-Step finished with negative lower bound %f"[0m[0;34m%[0m[0;34m([0m[0miter[0m[0;34m,[0m [0;34m-[0m[0mmaxRes[0m[0;34m[[0m[0;34m'lowerBound'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m     23[0m             [0mprint[0m[0;34m([0m[0;34m"Iteration %02d, M-Step Model Params"[0m[0;34m%[0m[0;34m([0m[0miter[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+[0;32m---> 24[0;31m             [0mmaxRes[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m__mStepModelParams[0m[0;34m([0m[0mmaxNIter[0m[0;34m=[0m[0mmStepModelParamsMaxNIter[0m[0;34m,[0m [0mtol[0m[0;34m=[0m[0mmStepModelParamsTol[0m[0;34m,[0m [0mlr[0m[0;34m=[0m[0mmStepModelParamsLR[0m[0;34m,[0m [0mverbose[0m[0;34m=[0m[0mverbose[0m[0;34m,[0m [0mnIterDisplay[0m[0;34m=[0m[0mmStepModelParamsNIterDisplay[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     25[0m             [0mprint[0m[0;34m([0m[0;34m"Iteration %02d, M-Step Model Params finished with negative lower bound %f"[0m[0;34m%[0m[0;34m([0m[0miter[0m[0;34m,[0m [0;34m-[0m[0mmaxRes[0m[0;34m[[0m[0;34m'lowerBound'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m     26[0m             [0mprint[0m[0;34m([0m[0;34m"Iteration %02d, M-Step Kernel Params"[0m[0;34m%[0m[0;34m([0m[0miter[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/sparseVariationalEM.py[0m in [0;36m__mStepModelParams[0;34m(self, maxNIter, tol, lr, verbose, nIterDisplay)[0m
+[1;32m     43[0m         [0;31m# evalFunc = lambda: self.__eLL.evalSumAcrossTrialsAndNeurons(kFactors=kFactors)[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     44[0m         [0mevalFunc[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m__lowerBound[0m[0;34m.[0m[0meval[0m[0;34m[0m[0m
+[0;32m---> 45[0;31m         [0;32mreturn[0m [0mself[0m[0;34m.[0m[0m__setupAndMaximizeStep[0m[0;34m([0m[0mx[0m[0;34m=[0m[0mx[0m[0;34m,[0m [0mevalFunc[0m[0;34m=[0m[0mevalFunc[0m[0;34m,[0m [0mmaxNIter[0m[0;34m=[0m[0mmaxNIter[0m[0;34m,[0m [0mtol[0m[0;34m=[0m[0mtol[0m[0;34m,[0m [0mlr[0m[0;34m=[0m[0mlr[0m[0;34m,[0m [0mverbose[0m[0;34m=[0m[0mverbose[0m[0;34m,[0m [0mnIterDisplay[0m[0;34m=[0m[0mnIterDisplay[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     46[0m [0;34m[0m[0m
+[1;32m     47[0m     [0;32mdef[0m [0m__mStepKernelParams[0m[0;34m([0m[0mself[0m[0;34m,[0m [0mmaxNIter[0m[0;34m,[0m [0mtol[0m[0;34m,[0m [0mlr[0m[0;34m,[0m [0mverbose[0m[0;34m,[0m [0mnIterDisplay[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/sparseVariationalEM.py[0m in [0;36m__setupAndMaximizeStep[0;34m(self, x, evalFunc, maxNIter, tol, lr, verbose, nIterDisplay, updateModelFunc)[0m
+[1;32m     70[0m             [0mx[0m[0;34m[[0m[0mi[0m[0;34m][0m[0;34m.[0m[0mrequires_grad[0m [0;34m=[0m [0;32mTrue[0m[0;34m[0m[0m
+[1;32m     71[0m         [0moptimizer[0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0moptim[0m[0;34m.[0m[0mAdam[0m[0;34m([0m[0mx[0m[0;34m,[0m [0mlr[0m[0;34m=[0m[0mlr[0m[0;34m)[0m[0;34m[0m[0m
+[0;32m---> 72[0;31m         [0mmaxRes[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m__maximizeStep[0m[0;34m([0m[0mevalFunc[0m[0;34m=[0m[0mevalFunc[0m[0;34m,[0m [0mupdateModelFunc[0m[0;34m=[0m[0mupdateModelFunc[0m[0;34m,[0m [0moptimizer[0m[0;34m=[0m[0moptimizer[0m[0;34m,[0m [0mmaxNIter[0m[0;34m=[0m[0mmaxNIter[0m[0;34m,[0m [0mtol[0m[0;34m=[0m[0mtol[0m[0;34m,[0m [0mverbose[0m[0;34m=[0m[0mverbose[0m[0;34m,[0m [0mnIterDisplay[0m[0;34m=[0m[0mnIterDisplay[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     73[0m         [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mlen[0m[0;34m([0m[0mx[0m[0;34m)[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m     74[0m             [0mx[0m[0;34m[[0m[0mi[0m[0;34m][0m[0;34m.[0m[0mrequires_grad[0m [0;34m=[0m [0;32mFalse[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/sparseVariationalEM.py[0m in [0;36m__maximizeStep[0;34m(self, evalFunc, updateModelFunc, optimizer, maxNIter, tol, verbose, nIterDisplay)[0m
+[1;32m     86[0m         [0;32mwhile[0m [0;32mnot[0m [0mconverged[0m [0;32mand[0m [0miterCount[0m[0;34m<[0m[0mmaxNIter[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m     87[0m             [0moptimizer[0m[0;34m.[0m[0mzero_grad[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[0;32m---> 88[0;31m             [0mcurEval[0m [0;34m=[0m [0;34m-[0m[0mevalFunc[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     89[0m             [0;32mif[0m [0mverbose[0m [0;32mand[0m [0miterCount[0m[0;34m%[0m[0mnIterDisplay[0m[0;34m==[0m[0;36m0[0m[0;34m:[0m[0;34m[0m[0m
+[1;32m     90[0m                 [0mprint[0m[0;34m([0m[0;34m"Iteration: %d, Value: %f"[0m[0;34m%[0m[0;34m([0m[0miterCount[0m[0;34m,[0m [0mcurEval[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/sparseVariationalLowerBound.py[0m in [0;36meval[0;34m(self)[0m
+[1;32m     10[0m [0;34m[0m[0m
+[1;32m     11[0m     [0;32mdef[0m [0meval[0m[0;34m([0m[0mself[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0;32m---> 12[0;31m         [0meLLEval[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m__eLL[0m[0;34m.[0m[0mevalSumAcrossTrialsAndNeurons[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     13[0m         [0mklDivEval[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m__klDiv[0m[0;34m.[0m[0mevalSumAcrossLatentsAndTrials[0m[0;34m([0m[0;34m)[0m[0;34m[0m[0m
+[1;32m     14[0m         [0mtheEval[0m [0;34m=[0m [0meLLEval[0m[0;34m-[0m[0mklDivEval[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/expectedLogLikelihood.py[0m in [0;36mevalSumAcrossTrialsAndNeurons[0;34m(self, kFactors)[0m
+[1;32m     42[0m             [0mkFactorsAllNeuronsAssociatedTimes[0m [0;34m=[0m [0;32mNone[0m[0;34m[0m[0m
+[1;32m     43[0m         [0mqHMeanAtQuad[0m[0;34m,[0m [0mqHVarAtQuad[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_approxPosteriorForHForAllNeuronsAllTimes[0m[0;34m.[0m[0mgetMeansAndVariances[0m[0;34m([0m[0mkFactors[0m[0;34m=[0m[0mkFactorsAllNeuronsAllTimes[0m[0;34m)[0m[0;34m[0m[0m
+[0;32m---> 44[0;31m         [0mqHMeanAtSpike[0m[0;34m,[0m [0mqHVarAtSpike[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m_approxPosteriorForHForAllNeuronsAssociatedTimes[0m[0;34m.[0m[0mgetMeansAndVariances[0m[0;34m([0m[0mkFactors[0m[0;34m=[0m[0mkFactorsAllNeuronsAssociatedTimes[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m     45[0m         [0;31m# warnings.warn("Use of analytical calculation has been disabled for testing")[0m[0;34m[0m[0;34m[0m[0m
+[1;32m     46[0m         [0;31m# if False:[0m[0;34m[0m[0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/approxPosteriorForH.py[0m in [0;36mgetMeansAndVariances[0;34m(self, kFactors)[0m
+[1;32m    112[0m         [0mqKMu[0m [0;34m=[0m [0mkFactors[0m[0;34m[[0m[0;34m'qKMu'[0m[0;34m][0m[0;34m[0m[0m
+[1;32m    113[0m         [0mqKVar[0m [0;34m=[0m [0mkFactors[0m[0;34m[[0m[0;34m'qKVar'[0m[0;34m][0m[0;34m[0m[0m
+[0;32m--> 114[0;31m         [0mqHMu[0m[0;34m,[0m [0mqHVar[0m [0;34m=[0m [0mself[0m[0;34m.[0m[0m__getMeansAndVariancesGivenKFactors[0m[0;34m([0m[0mqKMu[0m[0;34m=[0m[0mqKMu[0m[0;34m,[0m [0mqKVar[0m[0;34m=[0m[0mqKVar[0m[0;34m)[0m[0;34m[0m[0m
+[0m[1;32m    115[0m         [0;32mreturn[0m [0mqHMu[0m[0;34m,[0m [0mqHVar[0m[0;34m[0m[0m
+[1;32m    116[0m [0;34m[0m[0m
+
+[0;32m~/dev/research/gatsby/svGPFA/code/src/approxPosteriorForH.py[0m in [0;36m__getMeansAndVariancesGivenKFactors[0;34m(self, qKMu, qKVar)[0m
+[1;32m    120[0m         [0mqHVar[0m [0;34m=[0m [0;34m[[0m[0;34m[[0m[0;32mNone[0m[0;34m][0m [0;32mfor[0m [0mtr[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mnTrials[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0m
+[1;32m    121[0m         [0;32mfor[0m [0mtrialIndex[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mnTrials[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0;32m--> 122[0;31m             [0mqHMu[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0msum[0m[0;34m([0m[0mqKMu[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m*[0m[0mself[0m[0;34m.[0m[0m_C[0m[0;34m[[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m__neuronForSpikeIndex[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m-[0m[0;36m1[0m[0;34m)[0m[0;34m.[0m[0mtolist[0m[0;34m([0m[0;34m)[0m[0;34m,[0m[0;34m:[0m[0;34m][0m[0;34m,[0m[0mdim[0m[0;34m=[0m[0;36m1[0m[0;34m)[0m[0;34m+[0m[0mself[0m[0;34m.[0m[0m_d[0m[0;34m[[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m__neuronForSpikeIndex[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m-[0m[0;36m1[0m[0;34m)[0m[0;34m.[0m[0mtolist[0m[0;34m([0m[0;34m)[0m[0;34m][0m[0;34m[0m[0m
+[0m[1;32m    123[0m             [0mqHVar[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0msum[0m[0;34m([0m[0mqKVar[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m*[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m_C[0m[0;34m[[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m__neuronForSpikeIndex[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m-[0m[0;36m1[0m[0;34m)[0m[0;34m.[0m[0mtolist[0m[0;34m([0m[0;34m)[0m[0;34m,[0m[0;34m:[0m[0;34m][0m[0;34m)[0m[0;34m**[0m[0;36m2[0m[0;34m,[0m[0mdim[0m[0;34m=[0m[0;36m1[0m[0;34m)[0m[0;34m[0m[0m
+[1;32m    124[0m         [0;32mreturn[0m [0mqHMu[0m[0;34m,[0m [0mqHVar[0m[0;34m[0m[0m
+
+[0;31mKeyboardInterrupt[0m: 
+> [0;32m/nfs/nhome/live/rapela/dev/research/gatsby/svGPFA/code/src/approxPosteriorForH.py[0m(122)[0;36m__getMeansAndVariancesGivenKFactors[0;34m()[0m
+[0;32m    120 [0;31m        [0mqHVar[0m [0;34m=[0m [0;34m[[0m[0;34m[[0m[0;32mNone[0m[0;34m][0m [0;32mfor[0m [0mtr[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mnTrials[0m[0;34m)[0m[0;34m][0m[0;34m[0m[0m
+[0m[0;32m    121 [0;31m        [0;32mfor[0m [0mtrialIndex[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mnTrials[0m[0;34m)[0m[0;34m:[0m[0;34m[0m[0m
+[0m[0;32m--> 122 [0;31m            [0mqHMu[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0msum[0m[0;34m([0m[0mqKMu[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m*[0m[0mself[0m[0;34m.[0m[0m_C[0m[0;34m[[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m__neuronForSpikeIndex[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m-[0m[0;36m1[0m[0;34m)[0m[0;34m.[0m[0mtolist[0m[0;34m([0m[0;34m)[0m[0;34m,[0m[0;34m:[0m[0;34m][0m[0;34m,[0m[0mdim[0m[0;34m=[0m[0;36m1[0m[0;34m)[0m[0;34m+[0m[0mself[0m[0;34m.[0m[0m_d[0m[0;34m[[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m__neuronForSpikeIndex[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m-[0m[0;36m1[0m[0;34m)[0m[0;34m.[0m[0mtolist[0m[0;34m([0m[0;34m)[0m[0;34m][0m[0;34m[0m[0m
+[0m[0;32m    123 [0;31m            [0mqHVar[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m [0;34m=[0m [0mtorch[0m[0;34m.[0m[0msum[0m[0;34m([0m[0mqKVar[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m*[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m_C[0m[0;34m[[0m[0;34m([0m[0mself[0m[0;34m.[0m[0m__neuronForSpikeIndex[0m[0;34m[[0m[0mtrialIndex[0m[0;34m][0m[0;34m-[0m[0;36m1[0m[0;34m)[0m[0;34m.[0m[0mtolist[0m[0;34m([0m[0;34m)[0m[0;34m,[0m[0;34m:[0m[0;34m][0m[0;34m)[0m[0;34m**[0m[0;36m2[0m[0;34m,[0m[0mdim[0m[0;34m=[0m[0;36m1[0m[0;34m)[0m[0;34m[0m[0m
+[0m[0;32m    124 [0;31m        [0;32mreturn[0m [0mqHMu[0m[0;34m,[0m [0mqHVar[0m[0;34m[0m[0m
+[0m
+ipdb> --KeyboardInterrupt--
+ipdb> --KeyboardInterrupt--
+ipdb> ipdb> ]0;IPython: code/srcIteration 00, E-Step
+Start __setupAndMaximizeStep Value: 6180.619714
+Iteration: 0, Value: 6180.619714
+Iteration: 10, Value: 5897.443745
+Iteration: 20, Value: 5842.268679
+Iteration: 30, Value: 5817.135911
+Iteration: 40, Value: 5796.152578
+Iteration: 50, Value: 5778.050121
+Iteration: 60, Value: 5763.004901
+Iteration: 70, Value: 5749.780909
+Iteration: 80, Value: 5737.635142
+Iteration: 90, Value: 5726.199029
+End __setupAndMaximizeStep Value: 5715.349712
+Iteration 00, E-Step finished with negative lower bound 5716.393521
+Iteration 00, M-Step Model Params
+Start __setupAndMaximizeStep Value: 5715.349712
+Iteration: 0, Value: 5715.349712
+Iteration: 10, Value: 5694.982624
+Iteration: 20, Value: 5675.615389
+Iteration: 30, Value: 5657.268901
+Iteration: 40, Value: 5639.906455
+Iteration: 50, Value: 5623.455155
+Iteration: 60, Value: 5607.836874
+Iteration: 70, Value: 5592.977724
+Iteration: 80, Value: 5578.812106
+Iteration: 90, Value: 5565.283271
+End __setupAndMaximizeStep Value: 5552.342454
+Iteration 00, M-Step Model Params finished with negative lower bound 5553.611318
+Iteration 00, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 5552.342454
+Iteration: 0, Value: 5552.342454
+Iteration: 10, Value: 5542.597063
+Iteration: 20, Value: 5537.385808
+Iteration: 30, Value: 5532.025818
+Iteration: 40, Value: 5522.583303
+Iteration: 50, Value: 5509.623223
+Iteration: 60, Value: 5499.971395
+Iteration: 70, Value: 5495.250352
+Iteration: 80, Value: 5493.034766
+Iteration: 90, Value: 5491.788223
+End __setupAndMaximizeStep Value: 5490.921294
+Iteration 00, M-Step Kernel Params finished with negative lower bound 5490.998725
+Iteration 00, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 5490.921294
+Iteration: 0, Value: 5490.921294
+Iteration: 10, Value: 5476.296866
+Iteration: 20, Value: 5463.627594
+Iteration: 30, Value: 5442.387421
+Iteration: 40, Value: 5418.101869
+Iteration: 50, Value: 5395.203698
+Iteration: 60, Value: 5376.247271
+Iteration: 70, Value: 5363.875762
+Iteration: 80, Value: 5356.679544
+Iteration: 90, Value: 5352.247234
+End __setupAndMaximizeStep Value: 5349.260485
+Iteration 00, M-Step Inducing Points finished with negative lower bound 5349.505184
+Iteration 01, E-Step
+Start __setupAndMaximizeStep Value: 5349.260485
+Iteration: 0, Value: 5349.260485
+Iteration: 10, Value: 5310.920978
+Iteration: 20, Value: 5291.168876
+Iteration: 30, Value: 5275.254030
+Iteration: 40, Value: 5261.366172
+Iteration: 50, Value: 5249.057867
+Iteration: 60, Value: 5237.888814
+Iteration: 70, Value: 5227.596420
+Iteration: 80, Value: 5218.043812
+Iteration: 90, Value: 5209.130567
+End __setupAndMaximizeStep Value: 5200.789293
+Iteration 01, E-Step finished with negative lower bound 5201.599236
+Iteration 01, M-Step Model Params
+Start __setupAndMaximizeStep Value: 5200.789293
+Iteration: 0, Value: 5200.789293
+Iteration: 10, Value: 5191.440973
+Iteration: 20, Value: 5182.709665
+Iteration: 30, Value: 5174.575867
+Iteration: 40, Value: 5166.995412
+Iteration: 50, Value: 5159.915920
+Iteration: 60, Value: 5153.289383
+Iteration: 70, Value: 5147.073828
+Iteration: 80, Value: 5141.232705
+Iteration: 90, Value: 5135.733963
+End __setupAndMaximizeStep Value: 5130.549860
+Iteration 01, M-Step Model Params finished with negative lower bound 5131.054823
+Iteration 01, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 5130.549860
+Iteration: 0, Value: 5130.549860
+Iteration: 10, Value: 5130.511080
+Iteration: 20, Value: 5130.466413
+Iteration: 30, Value: 5130.428905
+Iteration: 40, Value: 5130.394820
+Iteration: 50, Value: 5130.361442
+Iteration: 60, Value: 5130.328088
+Iteration: 70, Value: 5130.294755
+Iteration: 80, Value: 5130.261450
+Iteration: 90, Value: 5130.228163
+End __setupAndMaximizeStep Value: 5130.194900
+Iteration 01, M-Step Kernel Params finished with negative lower bound 5130.198225
+Iteration 01, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 5130.194900
+Iteration: 0, Value: 5130.194900
+Iteration: 10, Value: 5127.102020
+Iteration: 20, Value: 5124.614662
+Iteration: 30, Value: 5123.018014
+Iteration: 40, Value: 5121.880858
+Iteration: 50, Value: 5120.981822
+Iteration: 60, Value: 5120.122133
+Iteration: 70, Value: 5119.195037
+Iteration: 80, Value: 5118.461790
+Iteration: 90, Value: 5117.866379
+End __setupAndMaximizeStep Value: 5117.191861
+Iteration 01, M-Step Inducing Points finished with negative lower bound 5117.260745
+Iteration 02, E-Step
+Start __setupAndMaximizeStep Value: 5117.191861
+Iteration: 0, Value: 5117.191861
+Iteration: 10, Value: 5101.389580
+Iteration: 20, Value: 5091.360802
+Iteration: 30, Value: 5082.549020
+Iteration: 40, Value: 5074.871629
+Iteration: 50, Value: 5067.825591
+Iteration: 60, Value: 5061.436742
+Iteration: 70, Value: 5055.570329
+Iteration: 80, Value: 5050.163529
+Iteration: 90, Value: 5045.145290
+End __setupAndMaximizeStep Value: 5040.462965
+Iteration 02, E-Step finished with negative lower bound 5040.917257
+Iteration 02, M-Step Model Params
+Start __setupAndMaximizeStep Value: 5040.462965
+Iteration: 0, Value: 5040.462965
+Iteration: 10, Value: 5033.983252
+Iteration: 20, Value: 5028.046328
+Iteration: 30, Value: 5022.584654
+Iteration: 40, Value: 5017.544899
+Iteration: 50, Value: 5012.885592
+Iteration: 60, Value: 5008.571032
+Iteration: 70, Value: 5004.569933
+Iteration: 80, Value: 5000.854658
+Iteration: 90, Value: 4997.400791
+End __setupAndMaximizeStep Value: 4994.186578
+Iteration 02, M-Step Model Params finished with negative lower bound 4994.497787
+Iteration 02, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4994.186578
+Iteration: 0, Value: 4994.186578
+Iteration: 10, Value: 4994.153604
+Iteration: 20, Value: 4994.119913
+Iteration: 30, Value: 4994.091284
+Iteration: 40, Value: 4994.064054
+Iteration: 50, Value: 4994.036752
+Iteration: 60, Value: 4994.010167
+Iteration: 70, Value: 4993.983595
+Iteration: 80, Value: 4993.957138
+Iteration: 90, Value: 4993.930688
+End __setupAndMaximizeStep Value: 4993.904262
+Iteration 02, M-Step Kernel Params finished with negative lower bound 4993.906904
+Iteration 02, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4993.904262
+Iteration: 0, Value: 4993.904262
+Iteration: 10, Value: 5006.099111
+Iteration: 20, Value: 4998.309824
+Iteration: 30, Value: 4996.747036
+Iteration: 40, Value: 4995.387639
+Iteration: 50, Value: 4993.953584
+Iteration: 60, Value: 4991.881941
+Iteration: 70, Value: 4987.292034
+Iteration: 80, Value: 4985.970111
+Iteration: 90, Value: 4985.130481
+End __setupAndMaximizeStep Value: 4984.518567
+Iteration 02, M-Step Inducing Points finished with negative lower bound 4984.587453
+Iteration 03, E-Step
+Start __setupAndMaximizeStep Value: 4984.518567
+Iteration: 0, Value: 4984.518567
+Iteration: 10, Value: 4977.693306
+Iteration: 20, Value: 4971.970754
+Iteration: 30, Value: 4967.284823
+Iteration: 40, Value: 4963.128059
+Iteration: 50, Value: 4959.327481
+Iteration: 60, Value: 4955.820719
+Iteration: 70, Value: 4952.550041
+Iteration: 80, Value: 4949.478887
+Iteration: 90, Value: 4946.578314
+End __setupAndMaximizeStep Value: 4943.827440
+Iteration 03, E-Step finished with negative lower bound 4944.096262
+Iteration 03, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4943.827440
+Iteration: 0, Value: 4943.827440
+Iteration: 10, Value: 4939.297889
+Iteration: 20, Value: 4935.367972
+Iteration: 30, Value: 4931.909091
+Iteration: 40, Value: 4928.829372
+Iteration: 50, Value: 4926.059526
+Iteration: 60, Value: 4923.552562
+Iteration: 70, Value: 4921.271869
+Iteration: 80, Value: 4919.189702
+Iteration: 90, Value: 4917.284437
+End __setupAndMaximizeStep Value: 4915.538278
+Iteration 03, M-Step Model Params finished with negative lower bound 4915.706183
+Iteration 03, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4915.538278
+Iteration: 0, Value: 4915.538278
+Iteration: 10, Value: 4915.514298
+Iteration: 20, Value: 4915.476454
+Iteration: 30, Value: 4915.448088
+Iteration: 40, Value: 4915.423223
+Iteration: 50, Value: 4915.399871
+Iteration: 60, Value: 4915.377612
+Iteration: 70, Value: 4915.355845
+Iteration: 80, Value: 4915.334029
+Iteration: 90, Value: 4915.312241
+End __setupAndMaximizeStep Value: 4915.290484
+Iteration 03, M-Step Kernel Params finished with negative lower bound 4915.292661
+Iteration 03, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4915.290484
+Iteration: 0, Value: 4915.290484
+Iteration: 10, Value: 4925.552757
+Iteration: 20, Value: 4917.991367
+Iteration: 30, Value: 4915.099216
+Iteration: 40, Value: 4913.663863
+Iteration: 50, Value: 4912.530342
+Iteration: 60, Value: 4911.671338
+Iteration: 70, Value: 4911.002568
+Iteration: 80, Value: 4910.423125
+Iteration: 90, Value: 4909.892344
+End __setupAndMaximizeStep Value: 4909.371033
+Iteration 03, M-Step Inducing Points finished with negative lower bound 4909.422920
+Iteration 04, E-Step
+Start __setupAndMaximizeStep Value: 4909.371033
+Iteration: 0, Value: 4909.371033
+Iteration: 10, Value: 4905.041767
+Iteration: 20, Value: 4901.001386
+Iteration: 30, Value: 4897.865653
+Iteration: 40, Value: 4895.128356
+Iteration: 50, Value: 4892.590456
+Iteration: 60, Value: 4890.215889
+Iteration: 70, Value: 4887.976305
+Iteration: 80, Value: 4885.856583
+Iteration: 90, Value: 4883.843279
+End __setupAndMaximizeStep Value: 4881.925823
+Iteration 04, E-Step finished with negative lower bound 4882.113530
+Iteration 04, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4881.925823
+Iteration: 0, Value: 4881.925823
+Iteration: 10, Value: 4878.969407
+Iteration: 20, Value: 4876.647717
+Iteration: 30, Value: 4874.735828
+Iteration: 40, Value: 4873.101544
+Iteration: 50, Value: 4871.674718
+Iteration: 60, Value: 4870.409333
+Iteration: 70, Value: 4869.277300
+Iteration: 80, Value: 4868.258792
+Iteration: 90, Value: 4867.338536
+End __setupAndMaximizeStep Value: 4866.503987
+Iteration 04, M-Step Model Params finished with negative lower bound 4866.583899
+Iteration 04, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4866.503987
+Iteration: 0, Value: 4866.503987
+Iteration: 10, Value: 4866.520742
+Iteration: 20, Value: 4866.466215
+Iteration: 30, Value: 4866.429691
+Iteration: 40, Value: 4866.406335
+Iteration: 50, Value: 4866.385653
+Iteration: 60, Value: 4866.365982
+Iteration: 70, Value: 4866.346211
+Iteration: 80, Value: 4866.326679
+Iteration: 90, Value: 4866.307303
+End __setupAndMaximizeStep Value: 4866.287905
+Iteration 04, M-Step Kernel Params finished with negative lower bound 4866.289849
+Iteration 04, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4866.287905
+Iteration: 0, Value: 4866.287905
+Iteration: 10, Value: 4880.722666
+Iteration: 20, Value: 4871.684287
+Iteration: 30, Value: 4867.264053
+Iteration: 40, Value: 4865.406369
+Iteration: 50, Value: 4864.380617
+Iteration: 60, Value: 4863.579163
+Iteration: 70, Value: 4862.846736
+Iteration: 80, Value: 4862.209782
+Iteration: 90, Value: 4861.651252
+End __setupAndMaximizeStep Value: 4861.160055
+Iteration 04, M-Step Inducing Points finished with negative lower bound 4861.206949
+Iteration 05, E-Step
+Start __setupAndMaximizeStep Value: 4861.160055
+Iteration: 0, Value: 4861.160055
+Iteration: 10, Value: 4857.816365
+Iteration: 20, Value: 4854.710367
+Iteration: 30, Value: 4852.357630
+Iteration: 40, Value: 4850.348956
+Iteration: 50, Value: 4848.495862
+Iteration: 60, Value: 4846.760633
+Iteration: 70, Value: 4845.121100
+Iteration: 80, Value: 4843.565811
+Iteration: 90, Value: 4842.085849
+End __setupAndMaximizeStep Value: 4840.674706
+Iteration 05, E-Step finished with negative lower bound 4840.812873
+Iteration 05, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4840.674706
+Iteration: 0, Value: 4840.674706
+Iteration: 10, Value: 4838.807192
+Iteration: 20, Value: 4837.556647
+Iteration: 30, Value: 4836.593038
+Iteration: 40, Value: 4835.783569
+Iteration: 50, Value: 4835.074534
+Iteration: 60, Value: 4834.439363
+Iteration: 70, Value: 4833.863213
+Iteration: 80, Value: 4833.338480
+Iteration: 90, Value: 4832.859399
+End __setupAndMaximizeStep Value: 4832.421233
+Iteration 05, M-Step Model Params finished with negative lower bound 4832.463326
+Iteration 05, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4832.421233
+Iteration: 0, Value: 4832.421233
+Iteration: 10, Value: 4832.457931
+Iteration: 20, Value: 4832.389717
+Iteration: 30, Value: 4832.348634
+Iteration: 40, Value: 4832.326382
+Iteration: 50, Value: 4832.307472
+Iteration: 60, Value: 4832.289609
+Iteration: 70, Value: 4832.271548
+Iteration: 80, Value: 4832.253526
+Iteration: 90, Value: 4832.235709
+End __setupAndMaximizeStep Value: 4832.217914
+Iteration 05, M-Step Kernel Params finished with negative lower bound 4832.219696
+Iteration 05, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4832.217914
+Iteration: 0, Value: 4832.217914
+Iteration: 10, Value: 4852.038389
+Iteration: 20, Value: 4840.645221
+Iteration: 30, Value: 4834.916372
+Iteration: 40, Value: 4832.565095
+Iteration: 50, Value: 4831.090779
+Iteration: 60, Value: 4829.978365
+Iteration: 70, Value: 4829.078498
+Iteration: 80, Value: 4828.363804
+Iteration: 90, Value: 4827.835311
+End __setupAndMaximizeStep Value: 4827.420294
+Iteration 05, M-Step Inducing Points finished with negative lower bound 4827.458514
+Iteration 06, E-Step
+Start __setupAndMaximizeStep Value: 4827.420294
+Iteration: 0, Value: 4827.420294
+Iteration: 10, Value: 4825.075525
+Iteration: 20, Value: 4822.392906
+Iteration: 30, Value: 4820.595178
+Iteration: 40, Value: 4819.105148
+Iteration: 50, Value: 4817.763196
+Iteration: 60, Value: 4816.509339
+Iteration: 70, Value: 4815.321414
+Iteration: 80, Value: 4814.188147
+Iteration: 90, Value: 4813.103764
+End __setupAndMaximizeStep Value: 4812.063826
+Iteration 06, E-Step finished with negative lower bound 4812.165948
+Iteration 06, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4812.063826
+Iteration: 0, Value: 4812.063826
+Iteration: 10, Value: 4810.707704
+Iteration: 20, Value: 4809.967868
+Iteration: 30, Value: 4809.427993
+Iteration: 40, Value: 4808.971511
+Iteration: 50, Value: 4808.567358
+Iteration: 60, Value: 4808.206210
+Iteration: 70, Value: 4807.881352
+Iteration: 80, Value: 4807.588890
+Iteration: 90, Value: 4807.325638
+End __setupAndMaximizeStep Value: 4807.088537
+Iteration 06, M-Step Model Params finished with negative lower bound 4807.111150
+Iteration 06, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4807.088537
+Iteration: 0, Value: 4807.088537
+Iteration: 10, Value: 4807.138119
+Iteration: 20, Value: 4807.056109
+Iteration: 30, Value: 4807.010941
+Iteration: 40, Value: 4806.989582
+Iteration: 50, Value: 4806.972526
+Iteration: 60, Value: 4806.956327
+Iteration: 70, Value: 4806.940040
+Iteration: 80, Value: 4806.923656
+Iteration: 90, Value: 4806.907465
+End __setupAndMaximizeStep Value: 4806.891338
+Iteration 06, M-Step Kernel Params finished with negative lower bound 4806.892948
+Iteration 06, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4806.891338
+Iteration: 0, Value: 4806.891338
+Iteration: 10, Value: 4834.717026
+Iteration: 20, Value: 4816.057515
+Iteration: 30, Value: 4811.231680
+Iteration: 40, Value: 4808.936473
+Iteration: 50, Value: 4807.284638
+Iteration: 60, Value: 4806.082305
+Iteration: 70, Value: 4805.079862
+Iteration: 80, Value: 4804.321343
+Iteration: 90, Value: 4803.761669
+End __setupAndMaximizeStep Value: 4803.342505
+Iteration 06, M-Step Inducing Points finished with negative lower bound 4803.378729
+Iteration 07, E-Step
+Start __setupAndMaximizeStep Value: 4803.342505
+Iteration: 0, Value: 4803.342505
+Iteration: 10, Value: 4801.867353
+Iteration: 20, Value: 4799.478685
+Iteration: 30, Value: 4798.002421
+Iteration: 40, Value: 4796.840972
+Iteration: 50, Value: 4795.779869
+Iteration: 60, Value: 4794.786256
+Iteration: 70, Value: 4793.842035
+Iteration: 80, Value: 4792.937477
+Iteration: 90, Value: 4792.067456
+End __setupAndMaximizeStep Value: 4791.229073
+Iteration 07, E-Step finished with negative lower bound 4791.311549
+Iteration 07, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4791.229073
+Iteration: 0, Value: 4791.229073
+Iteration: 10, Value: 4790.250807
+Iteration: 20, Value: 4789.837060
+Iteration: 30, Value: 4789.550498
+Iteration: 40, Value: 4789.303001
+Iteration: 50, Value: 4789.093704
+Iteration: 60, Value: 4788.910588
+Iteration: 70, Value: 4788.749456
+Iteration: 80, Value: 4788.607274
+Iteration: 90, Value: 4788.481195
+End __setupAndMaximizeStep Value: 4788.369378
+Iteration 07, M-Step Model Params finished with negative lower bound 4788.379962
+Iteration 07, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4788.369378
+Iteration: 0, Value: 4788.369378
+Iteration: 10, Value: 4788.446565
+Iteration: 20, Value: 4788.338589
+Iteration: 30, Value: 4788.287273
+Iteration: 40, Value: 4788.268519
+Iteration: 50, Value: 4788.253183
+Iteration: 60, Value: 4788.238579
+Iteration: 70, Value: 4788.223962
+Iteration: 80, Value: 4788.209152
+Iteration: 90, Value: 4788.194361
+End __setupAndMaximizeStep Value: 4788.179705
+Iteration 07, M-Step Kernel Params finished with negative lower bound 4788.181159
+Iteration 07, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4788.179705
+Iteration: 0, Value: 4788.179705
+Iteration: 10, Value: 4817.135557
+Iteration: 20, Value: 4797.873251
+Iteration: 30, Value: 4792.743028
+Iteration: 40, Value: 4790.135402
+Iteration: 50, Value: 4789.015441
+Iteration: 60, Value: 4787.854276
+Iteration: 70, Value: 4786.928414
+Iteration: 80, Value: 4786.204235
+Iteration: 90, Value: 4785.688384
+End __setupAndMaximizeStep Value: 4785.340445
+Iteration 07, M-Step Inducing Points finished with negative lower bound 4785.367727
+Iteration 08, E-Step
+Start __setupAndMaximizeStep Value: 4785.340445
+Iteration: 0, Value: 4785.340445
+Iteration: 10, Value: 4784.649470
+Iteration: 20, Value: 4782.435480
+Iteration: 30, Value: 4781.160580
+Iteration: 40, Value: 4780.172160
+Iteration: 50, Value: 4779.271931
+Iteration: 60, Value: 4778.429523
+Iteration: 70, Value: 4777.631189
+Iteration: 80, Value: 4776.868810
+Iteration: 90, Value: 4776.138543
+End __setupAndMaximizeStep Value: 4775.438014
+Iteration 08, E-Step finished with negative lower bound 4775.506788
+Iteration 08, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4775.438014
+Iteration: 0, Value: 4775.438014
+Iteration: 10, Value: 4774.685485
+Iteration: 20, Value: 4774.460574
+Iteration: 30, Value: 4774.307326
+Iteration: 40, Value: 4774.183535
+Iteration: 50, Value: 4774.083132
+Iteration: 60, Value: 4773.998959
+Iteration: 70, Value: 4773.928741
+Iteration: 80, Value: 4773.869642
+Iteration: 90, Value: 4773.819654
+End __setupAndMaximizeStep Value: 4773.777252
+Iteration 08, M-Step Model Params finished with negative lower bound 4773.781189
+Iteration 08, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4773.777252
+Iteration: 0, Value: 4773.777252
+Iteration: 10, Value: 4773.893655
+Iteration: 20, Value: 4773.751231
+Iteration: 30, Value: 4773.696025
+Iteration: 40, Value: 4773.680832
+Iteration: 50, Value: 4773.666776
+Iteration: 60, Value: 4773.652952
+Iteration: 70, Value: 4773.639432
+Iteration: 80, Value: 4773.625934
+Iteration: 90, Value: 4773.612318
+End __setupAndMaximizeStep Value: 4773.598752
+Iteration 08, M-Step Kernel Params finished with negative lower bound 4773.600110
+Iteration 08, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4773.598752
+Iteration: 0, Value: 4773.598752
+Iteration: 10, Value: 4813.902759
+Iteration: 20, Value: 4784.053568
+Iteration: 30, Value: 4778.960613
+Iteration: 40, Value: 4776.010601
+Iteration: 50, Value: 4774.551662
+Iteration: 60, Value: 4773.553452
+Iteration: 70, Value: 4772.710821
+Iteration: 80, Value: 4772.080627
+Iteration: 90, Value: 4771.634423
+End __setupAndMaximizeStep Value: 4771.327515
+Iteration 08, M-Step Inducing Points finished with negative lower bound 4771.354422
+Iteration 09, E-Step
+Start __setupAndMaximizeStep Value: 4771.327515
+Iteration: 0, Value: 4771.327515
+Iteration: 10, Value: 4770.865426
+Iteration: 20, Value: 4768.677923
+Iteration: 30, Value: 4767.474533
+Iteration: 40, Value: 4766.581453
+Iteration: 50, Value: 4765.786703
+Iteration: 60, Value: 4765.053648
+Iteration: 70, Value: 4764.367069
+Iteration: 80, Value: 4763.717209
+Iteration: 90, Value: 4763.100192
+End __setupAndMaximizeStep Value: 4762.513364
+Iteration 09, E-Step finished with negative lower bound 4762.570760
+Iteration 09, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4762.513364
+Iteration: 0, Value: 4762.513364
+Iteration: 10, Value: 4761.964477
+Iteration: 20, Value: 4761.866726
+Iteration: 30, Value: 4761.799823
+Iteration: 40, Value: 4761.754986
+Iteration: 50, Value: 4761.721595
+Iteration: 60, Value: 4761.693992
+Iteration: 70, Value: 4761.671971
+Iteration: 80, Value: 4761.654070
+Iteration: 90, Value: 4761.639726
+End __setupAndMaximizeStep Value: 4761.628330
+Iteration 09, M-Step Model Params finished with negative lower bound 4761.629351
+Iteration 09, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4761.628330
+Iteration: 0, Value: 4761.628330
+Iteration: 10, Value: 4761.788991
+Iteration: 20, Value: 4761.614760
+Iteration: 30, Value: 4761.557526
+Iteration: 40, Value: 4761.545696
+Iteration: 50, Value: 4761.532266
+Iteration: 60, Value: 4761.519136
+Iteration: 70, Value: 4761.506449
+Iteration: 80, Value: 4761.494068
+Iteration: 90, Value: 4761.481656
+End __setupAndMaximizeStep Value: 4761.469203
+Iteration 09, M-Step Kernel Params finished with negative lower bound 4761.470458
+Iteration 09, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4761.469203
+Iteration: 0, Value: 4761.469203
+Iteration: 10, Value: 4804.258129
+Iteration: 20, Value: 4772.438529
+Iteration: 30, Value: 4768.117732
+Iteration: 40, Value: 4764.814100
+Iteration: 50, Value: 4763.132829
+Iteration: 60, Value: 4762.088452
+Iteration: 70, Value: 4761.281850
+Iteration: 80, Value: 4760.607353
+Iteration: 90, Value: 4760.069223
+End __setupAndMaximizeStep Value: 4759.681053
+Iteration 09, M-Step Inducing Points finished with negative lower bound 4759.714406
+Iteration 10, E-Step
+Start __setupAndMaximizeStep Value: 4759.681053
+Iteration: 0, Value: 4759.681053
+Iteration: 10, Value: 4759.605223
+Iteration: 20, Value: 4757.824686
+Iteration: 30, Value: 4756.786201
+Iteration: 40, Value: 4756.093767
+Iteration: 50, Value: 4755.470328
+Iteration: 60, Value: 4754.892092
+Iteration: 70, Value: 4754.347171
+Iteration: 80, Value: 4753.830392
+Iteration: 90, Value: 4753.338477
+End __setupAndMaximizeStep Value: 4752.870286
+Iteration 10, E-Step finished with negative lower bound 4752.916090
+Iteration 10, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4752.870286
+Iteration: 0, Value: 4752.870286
+Iteration: 10, Value: 4752.450123
+Iteration: 20, Value: 4752.412587
+Iteration: 30, Value: 4752.382781
+Iteration: 40, Value: 4752.366640
+Iteration: 50, Value: 4752.356137
+Iteration: 60, Value: 4752.349396
+Iteration: 70, Value: 4752.345309
+Iteration: 80, Value: 4752.342841
+Iteration: 90, Value: 4752.341458
+End __setupAndMaximizeStep Value: 4752.340729
+Iteration 10, M-Step Model Params finished with negative lower bound 4752.340782
+Iteration 10, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4752.340729
+Iteration: 0, Value: 4752.340729
+Iteration: 10, Value: 4752.534732
+Iteration: 20, Value: 4752.335874
+Iteration: 30, Value: 4752.275662
+Iteration: 40, Value: 4752.266330
+Iteration: 50, Value: 4752.253660
+Iteration: 60, Value: 4752.241411
+Iteration: 70, Value: 4752.229656
+Iteration: 80, Value: 4752.218392
+Iteration: 90, Value: 4752.207153
+End __setupAndMaximizeStep Value: 4752.195842
+Iteration 10, M-Step Kernel Params finished with negative lower bound 4752.196986
+Iteration 10, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4752.195842
+Iteration: 0, Value: 4752.195842
+Iteration: 10, Value: 4798.420453
+Iteration: 20, Value: 4762.568841
+Iteration: 30, Value: 4760.395062
+Iteration: 40, Value: 4756.543450
+Iteration: 50, Value: 4754.747930
+Iteration: 60, Value: 4753.595900
+Iteration: 70, Value: 4752.694742
+Iteration: 80, Value: 4752.008401
+Iteration: 90, Value: 4751.453483
+End __setupAndMaximizeStep Value: 4751.018358
+Iteration 10, M-Step Inducing Points finished with negative lower bound 4751.056816
+Iteration 11, E-Step
+Start __setupAndMaximizeStep Value: 4751.018358
+Iteration: 0, Value: 4751.018358
+Iteration: 10, Value: 4751.127514
+Iteration: 20, Value: 4749.463276
+Iteration: 30, Value: 4748.632564
+Iteration: 40, Value: 4748.045625
+Iteration: 50, Value: 4747.525413
+Iteration: 60, Value: 4747.047960
+Iteration: 70, Value: 4746.603119
+Iteration: 80, Value: 4746.183739
+Iteration: 90, Value: 4745.787764
+End __setupAndMaximizeStep Value: 4745.413203
+Iteration 11, E-Step finished with negative lower bound 4745.449755
+Iteration 11, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4745.413203
+Iteration: 0, Value: 4745.413203
+Iteration: 10, Value: 4745.097721
+Iteration: 20, Value: 4745.077116
+Iteration: 30, Value: 4745.063474
+Iteration: 40, Value: 4745.060369
+Iteration: 50, Value: 4745.058793
+Iteration: 60, Value: 4745.058339
+Iteration: 70, Value: 4745.058166
+Iteration: 80, Value: 4745.058127
+Iteration: 90, Value: 4745.058096
+End __setupAndMaximizeStep Value: 4745.058087
+Iteration 11, M-Step Model Params finished with negative lower bound 4745.058087
+Iteration 11, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4745.058087
+Iteration: 0, Value: 4745.058087
+Iteration: 10, Value: 4745.272548
+Iteration: 20, Value: 4745.055266
+Iteration: 30, Value: 4744.992773
+Iteration: 40, Value: 4744.984550
+Iteration: 50, Value: 4744.972940
+Iteration: 60, Value: 4744.961408
+Iteration: 70, Value: 4744.950636
+Iteration: 80, Value: 4744.940351
+Iteration: 90, Value: 4744.930119
+End __setupAndMaximizeStep Value: 4744.919806
+Iteration 11, M-Step Kernel Params finished with negative lower bound 4744.920847
+Iteration 11, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4744.919806
+Iteration: 0, Value: 4744.919806
+Iteration: 10, Value: 4801.327966
+Iteration: 20, Value: 4757.063672
+Iteration: 30, Value: 4754.837078
+Iteration: 40, Value: 4748.810351
+Iteration: 50, Value: 4747.909824
+Iteration: 60, Value: 4746.453376
+Iteration: 70, Value: 4745.593492
+Iteration: 80, Value: 4744.909757
+Iteration: 90, Value: 4744.363350
+End __setupAndMaximizeStep Value: 4743.957522
+Iteration 11, M-Step Inducing Points finished with negative lower bound 4743.991748
+Iteration 12, E-Step
+Start __setupAndMaximizeStep Value: 4743.957522
+Iteration: 0, Value: 4743.957522
+Iteration: 10, Value: 4744.247387
+Iteration: 20, Value: 4742.696478
+Iteration: 30, Value: 4741.928267
+Iteration: 40, Value: 4741.427590
+Iteration: 50, Value: 4740.990880
+Iteration: 60, Value: 4740.587014
+Iteration: 70, Value: 4740.209319
+Iteration: 80, Value: 4739.852988
+Iteration: 90, Value: 4739.516622
+End __setupAndMaximizeStep Value: 4739.199507
+Iteration 12, E-Step finished with negative lower bound 4739.230387
+Iteration 12, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4739.199507
+Iteration: 0, Value: 4739.199507
+Iteration: 10, Value: 4738.953642
+Iteration: 20, Value: 4738.929888
+Iteration: 30, Value: 4738.921056
+Iteration: 40, Value: 4738.918777
+Iteration: 50, Value: 4738.917566
+Iteration: 60, Value: 4738.917246
+Iteration: 70, Value: 4738.917158
+Iteration: 80, Value: 4738.917099
+Iteration: 90, Value: 4738.917078
+End __setupAndMaximizeStep Value: 4738.917074
+Iteration 12, M-Step Model Params finished with negative lower bound 4738.917074
+Iteration 12, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4738.917074
+Iteration: 0, Value: 4738.917074
+Iteration: 10, Value: 4739.176181
+Iteration: 20, Value: 4738.923419
+Iteration: 30, Value: 4738.859755
+Iteration: 40, Value: 4738.854631
+Iteration: 50, Value: 4738.843108
+Iteration: 60, Value: 4738.831978
+Iteration: 70, Value: 4738.821777
+Iteration: 80, Value: 4738.812304
+Iteration: 90, Value: 4738.803028
+End __setupAndMaximizeStep Value: 4738.793667
+Iteration 12, M-Step Kernel Params finished with negative lower bound 4738.794607
+Iteration 12, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4738.793667
+Iteration: 0, Value: 4738.793667
+Iteration: 10, Value: 4785.025184
+Iteration: 20, Value: 4754.586274
+Iteration: 30, Value: 4747.579146
+Iteration: 40, Value: 4743.014243
+Iteration: 50, Value: 4741.499164
+Iteration: 60, Value: 4740.343303
+Iteration: 70, Value: 4739.464034
+Iteration: 80, Value: 4738.848287
+Iteration: 90, Value: 4738.335542
+End __setupAndMaximizeStep Value: 4737.921981
+Iteration 12, M-Step Inducing Points finished with negative lower bound 4737.958675
+Iteration 13, E-Step
+Start __setupAndMaximizeStep Value: 4737.921981
+Iteration: 0, Value: 4737.921981
+Iteration: 10, Value: 4738.222652
+Iteration: 20, Value: 4736.788816
+Iteration: 30, Value: 4736.096902
+Iteration: 40, Value: 4735.663467
+Iteration: 50, Value: 4735.291797
+Iteration: 60, Value: 4734.955202
+Iteration: 70, Value: 4734.643417
+Iteration: 80, Value: 4734.351973
+Iteration: 90, Value: 4734.078793
+End __setupAndMaximizeStep Value: 4733.822770
+Iteration 13, E-Step finished with negative lower bound 4733.847632
+Iteration 13, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4733.822770
+Iteration: 0, Value: 4733.822770
+Iteration: 10, Value: 4733.587143
+Iteration: 20, Value: 4733.561612
+Iteration: 30, Value: 4733.552614
+Iteration: 40, Value: 4733.550419
+Iteration: 50, Value: 4733.549602
+Iteration: 60, Value: 4733.549189
+Iteration: 70, Value: 4733.549066
+Iteration: 80, Value: 4733.549019
+Iteration: 90, Value: 4733.549004
+End __setupAndMaximizeStep Value: 4733.548997
+Iteration 13, M-Step Model Params finished with negative lower bound 4733.548997
+Iteration 13, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4733.548997
+Iteration: 0, Value: 4733.548997
+Iteration: 10, Value: 4733.834461
+Iteration: 20, Value: 4733.560888
+Iteration: 30, Value: 4733.492573
+Iteration: 40, Value: 4733.488238
+Iteration: 50, Value: 4733.477296
+Iteration: 60, Value: 4733.466592
+Iteration: 70, Value: 4733.456962
+Iteration: 80, Value: 4733.448093
+Iteration: 90, Value: 4733.439431
+End __setupAndMaximizeStep Value: 4733.430677
+Iteration 13, M-Step Kernel Params finished with negative lower bound 4733.431556
+Iteration 13, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4733.430677
+Iteration: 0, Value: 4733.430677
+Iteration: 10, Value: 4798.288008
+Iteration: 20, Value: 4745.667817
+Iteration: 30, Value: 4744.649339
+Iteration: 40, Value: 4739.042749
+Iteration: 50, Value: 4736.453170
+Iteration: 60, Value: 4735.383700
+Iteration: 70, Value: 4734.504453
+Iteration: 80, Value: 4733.813582
+Iteration: 90, Value: 4733.296450
+End __setupAndMaximizeStep Value: 4732.883441
+Iteration 13, M-Step Inducing Points finished with negative lower bound 4732.921527
+Iteration 14, E-Step
+Start __setupAndMaximizeStep Value: 4732.883441
+Iteration: 0, Value: 4732.883441
+Iteration: 10, Value: 4733.449002
+Iteration: 20, Value: 4732.037802
+Iteration: 30, Value: 4731.417597
+Iteration: 40, Value: 4731.056113
+Iteration: 50, Value: 4730.758144
+Iteration: 60, Value: 4730.498052
+Iteration: 70, Value: 4730.261459
+Iteration: 80, Value: 4730.041563
+Iteration: 90, Value: 4729.836487
+End __setupAndMaximizeStep Value: 4729.643757
+Iteration 14, E-Step finished with negative lower bound 4729.662545
+Iteration 14, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4729.643757
+Iteration: 0, Value: 4729.643757
+Iteration: 10, Value: 4729.424435
+Iteration: 20, Value: 4729.400171
+Iteration: 30, Value: 4729.391560
+Iteration: 40, Value: 4729.389526
+Iteration: 50, Value: 4729.388862
+Iteration: 60, Value: 4729.388458
+Iteration: 70, Value: 4729.388318
+Iteration: 80, Value: 4729.388275
+Iteration: 90, Value: 4729.388261
+End __setupAndMaximizeStep Value: 4729.388256
+Iteration 14, M-Step Model Params finished with negative lower bound 4729.388256
+Iteration 14, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4729.388256
+Iteration: 0, Value: 4729.388256
+Iteration: 10, Value: 4729.705595
+Iteration: 20, Value: 4729.403073
+Iteration: 30, Value: 4729.331487
+Iteration: 40, Value: 4729.328445
+Iteration: 50, Value: 4729.317661
+Iteration: 60, Value: 4729.307043
+Iteration: 70, Value: 4729.297754
+Iteration: 80, Value: 4729.289313
+Iteration: 90, Value: 4729.281140
+End __setupAndMaximizeStep Value: 4729.272880
+Iteration 14, M-Step Kernel Params finished with negative lower bound 4729.273705
+Iteration 14, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4729.272880
+Iteration: 0, Value: 4729.272880
+Iteration: 10, Value: 4784.925336
+Iteration: 20, Value: 4744.040317
+Iteration: 30, Value: 4739.460926
+Iteration: 40, Value: 4735.136132
+Iteration: 50, Value: 4732.495110
+Iteration: 60, Value: 4731.054442
+Iteration: 70, Value: 4730.256161
+Iteration: 80, Value: 4729.632135
+Iteration: 90, Value: 4729.133106
+End __setupAndMaximizeStep Value: 4728.759828
+Iteration 14, M-Step Inducing Points finished with negative lower bound 4728.791651
+Iteration 15, E-Step
+Start __setupAndMaximizeStep Value: 4728.759828
+Iteration: 0, Value: 4728.759828
+Iteration: 10, Value: 4729.531067
+Iteration: 20, Value: 4728.041155
+Iteration: 30, Value: 4727.459630
+Iteration: 40, Value: 4727.171632
+Iteration: 50, Value: 4726.933736
+Iteration: 60, Value: 4726.723851
+Iteration: 70, Value: 4726.531911
+Iteration: 80, Value: 4726.354848
+Iteration: 90, Value: 4726.190488
+End __setupAndMaximizeStep Value: 4726.038036
+Iteration 15, E-Step finished with negative lower bound 4726.052776
+Iteration 15, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4726.038036
+Iteration: 0, Value: 4726.038036
+Iteration: 10, Value: 4725.820536
+Iteration: 20, Value: 4725.794576
+Iteration: 30, Value: 4725.784411
+Iteration: 40, Value: 4725.781949
+Iteration: 50, Value: 4725.781038
+Iteration: 60, Value: 4725.780698
+Iteration: 70, Value: 4725.780596
+Iteration: 80, Value: 4725.780531
+Iteration: 90, Value: 4725.780512
+End __setupAndMaximizeStep Value: 4725.780508
+Iteration 15, M-Step Model Params finished with negative lower bound 4725.780509
+Iteration 15, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4725.780508
+Iteration: 0, Value: 4725.780508
+Iteration: 10, Value: 4726.134934
+Iteration: 20, Value: 4725.794046
+Iteration: 30, Value: 4725.718625
+Iteration: 40, Value: 4725.717375
+Iteration: 50, Value: 4725.706375
+Iteration: 60, Value: 4725.695638
+Iteration: 70, Value: 4725.686507
+Iteration: 80, Value: 4725.678356
+Iteration: 90, Value: 4725.670559
+End __setupAndMaximizeStep Value: 4725.662691
+Iteration 15, M-Step Kernel Params finished with negative lower bound 4725.663471
+Iteration 15, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4725.662691
+Iteration: 0, Value: 4725.662691
+Iteration: 10, Value: 4786.708906
+Iteration: 20, Value: 4739.224221
+Iteration: 30, Value: 4736.726384
+Iteration: 40, Value: 4730.824393
+Iteration: 50, Value: 4728.696788
+Iteration: 60, Value: 4727.533428
+Iteration: 70, Value: 4726.755081
+Iteration: 80, Value: 4726.171333
+Iteration: 90, Value: 4725.720334
+End __setupAndMaximizeStep Value: 4725.377580
+Iteration 15, M-Step Inducing Points finished with negative lower bound 4725.407818
+Iteration 16, E-Step
+Start __setupAndMaximizeStep Value: 4725.377580
+Iteration: 0, Value: 4725.377580
+Iteration: 10, Value: 4726.089023
+Iteration: 20, Value: 4724.736485
+Iteration: 30, Value: 4724.216076
+Iteration: 40, Value: 4723.954546
+Iteration: 50, Value: 4723.751628
+Iteration: 60, Value: 4723.583894
+Iteration: 70, Value: 4723.434909
+Iteration: 80, Value: 4723.300534
+Iteration: 90, Value: 4723.178265
+End __setupAndMaximizeStep Value: 4723.066510
+Iteration 16, E-Step finished with negative lower bound 4723.077266
+Iteration 16, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4723.066510
+Iteration: 0, Value: 4723.066510
+Iteration: 10, Value: 4722.868688
+Iteration: 20, Value: 4722.844132
+Iteration: 30, Value: 4722.834525
+Iteration: 40, Value: 4722.831803
+Iteration: 50, Value: 4722.831137
+Iteration: 60, Value: 4722.830813
+Iteration: 70, Value: 4722.830723
+Iteration: 80, Value: 4722.830670
+Iteration: 90, Value: 4722.830652
+End __setupAndMaximizeStep Value: 4722.830647
+Iteration 16, M-Step Model Params finished with negative lower bound 4722.830647
+Iteration 16, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4722.830647
+Iteration: 0, Value: 4722.830647
+Iteration: 10, Value: 4723.215092
+Iteration: 20, Value: 4722.845252
+Iteration: 30, Value: 4722.764256
+Iteration: 40, Value: 4722.764562
+Iteration: 50, Value: 4722.753704
+Iteration: 60, Value: 4722.743062
+Iteration: 70, Value: 4722.734121
+Iteration: 80, Value: 4722.726321
+Iteration: 90, Value: 4722.718914
+End __setupAndMaximizeStep Value: 4722.711434
+Iteration 16, M-Step Kernel Params finished with negative lower bound 4722.712175
+Iteration 16, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4722.711434
+Iteration: 0, Value: 4722.711434
+Iteration: 10, Value: 4794.329433
+Iteration: 20, Value: 4736.234184
+Iteration: 30, Value: 4732.895010
+Iteration: 40, Value: 4727.568257
+Iteration: 50, Value: 4724.932203
+Iteration: 60, Value: 4723.662583
+Iteration: 70, Value: 4723.131506
+Iteration: 80, Value: 4722.733487
+Iteration: 90, Value: 4722.491605
+End __setupAndMaximizeStep Value: 4722.316054
+Iteration 16, M-Step Inducing Points finished with negative lower bound 4722.330851
+Iteration 17, E-Step
+Start __setupAndMaximizeStep Value: 4722.316054
+Iteration: 0, Value: 4722.316054
+Iteration: 10, Value: 4723.160373
+Iteration: 20, Value: 4721.815643
+Iteration: 30, Value: 4721.331817
+Iteration: 40, Value: 4721.107588
+Iteration: 50, Value: 4720.942443
+Iteration: 60, Value: 4720.810818
+Iteration: 70, Value: 4720.696406
+Iteration: 80, Value: 4720.593408
+Iteration: 90, Value: 4720.499059
+End __setupAndMaximizeStep Value: 4720.412480
+Iteration 17, E-Step finished with negative lower bound 4720.420811
+Iteration 17, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4720.412480
+Iteration: 0, Value: 4720.412480
+Iteration: 10, Value: 4720.241690
+Iteration: 20, Value: 4720.216051
+Iteration: 30, Value: 4720.207380
+Iteration: 40, Value: 4720.204163
+Iteration: 50, Value: 4720.203481
+Iteration: 60, Value: 4720.203201
+Iteration: 70, Value: 4720.203109
+Iteration: 80, Value: 4720.203066
+Iteration: 90, Value: 4720.203052
+End __setupAndMaximizeStep Value: 4720.203046
+Iteration 17, M-Step Model Params finished with negative lower bound 4720.203047
+Iteration 17, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4720.203046
+Iteration: 0, Value: 4720.203046
+Iteration: 10, Value: 4720.615990
+Iteration: 20, Value: 4720.222712
+Iteration: 30, Value: 4720.135718
+Iteration: 40, Value: 4720.136007
+Iteration: 50, Value: 4720.125919
+Iteration: 60, Value: 4720.115238
+Iteration: 70, Value: 4720.106669
+Iteration: 80, Value: 4720.099234
+Iteration: 90, Value: 4720.092198
+End __setupAndMaximizeStep Value: 4720.085084
+Iteration 17, M-Step Kernel Params finished with negative lower bound 4720.085786
+Iteration 17, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4720.085084
+Iteration: 0, Value: 4720.085084
+Iteration: 10, Value: 4792.167878
+Iteration: 20, Value: 4733.284103
+Iteration: 30, Value: 4730.780403
+Iteration: 40, Value: 4724.834259
+Iteration: 50, Value: 4722.505535
+Iteration: 60, Value: 4721.231248
+Iteration: 70, Value: 4720.626083
+Iteration: 80, Value: 4720.199856
+Iteration: 90, Value: 4719.904187
+End __setupAndMaximizeStep Value: 4719.720483
+Iteration 17, M-Step Inducing Points finished with negative lower bound 4719.734777
+Iteration 18, E-Step
+Start __setupAndMaximizeStep Value: 4719.720483
+Iteration: 0, Value: 4719.720483
+Iteration: 10, Value: 4720.431969
+Iteration: 20, Value: 4719.187014
+Iteration: 30, Value: 4718.761102
+Iteration: 40, Value: 4718.575218
+Iteration: 50, Value: 4718.438613
+Iteration: 60, Value: 4718.325049
+Iteration: 70, Value: 4718.224321
+Iteration: 80, Value: 4718.132186
+Iteration: 90, Value: 4718.046403
+End __setupAndMaximizeStep Value: 4717.965647
+Iteration 18, E-Step finished with negative lower bound 4717.973521
+Iteration 18, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4717.965647
+Iteration: 0, Value: 4717.965647
+Iteration: 10, Value: 4717.823899
+Iteration: 20, Value: 4717.800348
+Iteration: 30, Value: 4717.794163
+Iteration: 40, Value: 4717.791816
+Iteration: 50, Value: 4717.791303
+Iteration: 60, Value: 4717.791141
+Iteration: 70, Value: 4717.791042
+Iteration: 80, Value: 4717.790997
+Iteration: 90, Value: 4717.790984
+End __setupAndMaximizeStep Value: 4717.790982
+Iteration 18, M-Step Model Params finished with negative lower bound 4717.790982
+Iteration 18, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4717.790982
+Iteration: 0, Value: 4717.790982
+Iteration: 10, Value: 4718.231950
+Iteration: 20, Value: 4717.815521
+Iteration: 30, Value: 4717.725732
+Iteration: 40, Value: 4717.726799
+Iteration: 50, Value: 4717.716854
+Iteration: 60, Value: 4717.706333
+Iteration: 70, Value: 4717.698079
+Iteration: 80, Value: 4717.691013
+Iteration: 90, Value: 4717.684394
+End __setupAndMaximizeStep Value: 4717.677699
+Iteration 18, M-Step Kernel Params finished with negative lower bound 4717.678358
+Iteration 18, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4717.677699
+Iteration: 0, Value: 4717.677699
+Iteration: 10, Value: 4787.992825
+Iteration: 20, Value: 4730.233272
+Iteration: 30, Value: 4727.359579
+Iteration: 40, Value: 4722.234889
+Iteration: 50, Value: 4720.262190
+Iteration: 60, Value: 4719.013353
+Iteration: 70, Value: 4718.366276
+Iteration: 80, Value: 4717.839180
+Iteration: 90, Value: 4717.443610
+End __setupAndMaximizeStep Value: 4717.286302
+Iteration 18, M-Step Inducing Points finished with negative lower bound 4717.298964
+Iteration 19, E-Step
+Start __setupAndMaximizeStep Value: 4717.286302
+Iteration: 0, Value: 4717.286302
+Iteration: 10, Value: 4718.189388
+Iteration: 20, Value: 4716.886459
+Iteration: 30, Value: 4716.472662
+Iteration: 40, Value: 4716.317959
+Iteration: 50, Value: 4716.210914
+Iteration: 60, Value: 4716.126850
+Iteration: 70, Value: 4716.054977
+Iteration: 80, Value: 4715.988735
+Iteration: 90, Value: 4715.926256
+End __setupAndMaximizeStep Value: 4715.866650
+Iteration 19, E-Step finished with negative lower bound 4715.872518
+Iteration 19, M-Step Model Params
+Start __setupAndMaximizeStep Value: 4715.866650
+Iteration: 0, Value: 4715.866650
+Iteration: 10, Value: 4715.754357
+Iteration: 20, Value: 4715.733676
+Iteration: 30, Value: 4715.728480
+Iteration: 40, Value: 4715.727137
+Iteration: 50, Value: 4715.726774
+Iteration: 60, Value: 4715.726629
+Iteration: 70, Value: 4715.726535
+Iteration: 80, Value: 4715.726508
+Iteration: 90, Value: 4715.726501
+End __setupAndMaximizeStep Value: 4715.726498
+Iteration 19, M-Step Model Params finished with negative lower bound 4715.726498
+Iteration 19, M-Step Kernel Params
+Start __setupAndMaximizeStep Value: 4715.726498
+Iteration: 0, Value: 4715.726498
+Iteration: 10, Value: 4716.198745
+Iteration: 20, Value: 4715.753319
+Iteration: 30, Value: 4715.659676
+Iteration: 40, Value: 4715.661365
+Iteration: 50, Value: 4715.651342
+Iteration: 60, Value: 4715.640972
+Iteration: 70, Value: 4715.632936
+Iteration: 80, Value: 4715.626195
+Iteration: 90, Value: 4715.619963
+End __setupAndMaximizeStep Value: 4715.613653
+Iteration 19, M-Step Kernel Params finished with negative lower bound 4715.614273
+Iteration 19, M-Step Inducing Points
+Start __setupAndMaximizeStep Value: 4715.613653
+Iteration: 0, Value: 4715.613653
+Iteration: 10, Value: 4776.578426
+Iteration: 20, Value: 4731.375758
+Iteration: 30, Value: 4722.849906
+Iteration: 40, Value: 4720.608498
+Iteration: 50, Value: 4718.542822
+Iteration: 60, Value: 4717.547801
+Iteration: 70, Value: 4716.851032
+Iteration: 80, Value: 4716.237784
+Iteration: 90, Value: 4715.586529
+End __setupAndMaximizeStep Value: 4715.234805
+Iteration 19, M-Step Inducing Points finished with negative lower bound 4715.239021
