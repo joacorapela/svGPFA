@@ -13,7 +13,7 @@ from inducingPointsPrior import InducingPointsPrior
 
 def test_buildQSigma():
     tol = 1e-5
-    dataFilename = os.path.expanduser('~/dev/research/gatsby/svGPFA/code/test/data/get_full_from_lowplusdiag.mat')
+    dataFilename = os.path.expanduser('data/get_full_from_lowplusdiag.mat')
 
     mat = loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[1]
@@ -30,7 +30,7 @@ def test_buildQSigma():
 
 def test_evalSumAcrossLatentsTrials():
     tol = 1e-5
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[1]

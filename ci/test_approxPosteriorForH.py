@@ -13,7 +13,7 @@ from kernels import PeriodicKernel, ExponentialQuadraticKernel
 
 def test_getMeansAndVariances_allNeuronsAllTimes():
     tol = 5e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat["Z"].shape[0]
@@ -55,7 +55,7 @@ def test_getMeansAndVariances_allNeuronsAllTimes():
 
 def test_buildKFactors_allNeuronsAllTimes():
     tol = 5e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat["Z"].shape[0]
@@ -98,7 +98,7 @@ def test_buildKFactors_allNeuronsAllTimes():
 
 def test_getMeansAndVariances_allNeuronsAssociatedTimes():
     tol = 1e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat["Z"].shape[0]
@@ -154,7 +154,7 @@ def test_getMeansAndVariances_allNeuronsAssociatedTimes():
 
 def test_buildKFactors_allNeuronsAssociatedTimes():
     tol = 5e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat["Z"].shape[0]
@@ -199,7 +199,7 @@ def test_buildKFactors_allNeuronsAssociatedTimes():
 
 def test_predict_allNeuronsAllTimes():
     tol = 5e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/predictNew_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/predictNew_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat["Z"].shape[0]

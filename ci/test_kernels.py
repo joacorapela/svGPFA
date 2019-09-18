@@ -9,7 +9,7 @@ from kernels import ExponentialQuadraticKernel, PeriodicKernel
 
 def test_exponentialQuadraticKernel():
     tol = 1e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/rbfKernel.mat")
+    dataFilename = os.path.expanduser("data/rbfKernel.mat")
 
     mat = loadmat(dataFilename)
     Z = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
@@ -26,7 +26,7 @@ def test_exponentialQuadraticKernel():
 
 def test_exponentialQuadraticKernelDiag():
     tol = 1e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Kdiag_rbfKernel.mat")
+    dataFilename = os.path.expanduser("data/Kdiag_rbfKernel.mat")
 
     mat = loadmat(dataFilename)
     t = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
@@ -43,7 +43,7 @@ def test_exponentialQuadraticKernelDiag():
 
 def test_periodicKernel():
     tol = 1e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/PeriodicKernel.mat")
+    dataFilename = os.path.expanduser("data/PeriodicKernel.mat")
 
     mat = loadmat(dataFilename)
     Z = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
@@ -61,7 +61,7 @@ def test_periodicKernel():
 
 def test_periodicKernelDiag():
     tol = 1e-6
-    dataFilename = os.path.expanduser("~/dev/research/gatsby/svGPFA/code/test/data/Kdiag_PeriodicKernel.mat")
+    dataFilename = os.path.expanduser("data/Kdiag_PeriodicKernel.mat")
 
     mat = loadmat(dataFilename)
     t = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
