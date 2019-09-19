@@ -35,11 +35,11 @@ install:
   # the first package to install (for every conda install command) otherwise
   # numpy may be automatically upgraded.
 
-  - conda install --yes numpy=$NUMPY scipy=$SCIPY pytorch matplotlib pytest
+  - conda install --yes numpy=$NUMPY scipy=$SCIPY matplotlib pytest
 
   # You can also install some dependencies with pip if not available in conda
 
-  # - pip install ...
+  - pip install --progress-bar off pytorch
 
 script:
 
