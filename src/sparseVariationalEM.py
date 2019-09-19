@@ -1,6 +1,7 @@
 
 import pdb
 import torch
+from utils import clock
 
 class SparseVariationalEM:
 
@@ -9,6 +10,7 @@ class SparseVariationalEM:
         self.__eLL = eLL
         self.__kernelMatricesStore= kernelMatricesStore
 
+    @clock
     def maximize(self, emMaxNIter=20, 
             eStepMaxNIter=100, eStepTol=1e-3, eStepLR=1e-3, eStepNIterDisplay=10,
             mStepModelParamsMaxNIter=100, mStepModelParamsTol=1e-3, mStepModelParamsLR=1e-3,  mStepModelParamsNIterDisplay=10,
