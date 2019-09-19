@@ -13,7 +13,7 @@ from kernels import PeriodicKernel, ExponentialQuadraticKernel
 
 def test_getMeansAndVariances_allNeuronsAllTimes():
     tol = 5e-6
-    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat["Z"].shape[0]
@@ -248,8 +248,8 @@ def test_predict_allNeuronsAllTimes():
     # pdb.set_trace()
 
 if __name__=="__main__":
-    test_getMeansAndVariances_allNeuronsAllTimes()
+    # test_getMeansAndVariances_allNeuronsAllTimes()
     # test_buildKFactors_allNeuronsAllTimes()
     # test_getMeansAndVariances_allNeuronsAssociatedTimes()
     # test_buildKFactors_allNeuronsAssociatedTimes()
-    # test_predict_allNeuronsAllTimes()
+    test_predict_allNeuronsAllTimes()
