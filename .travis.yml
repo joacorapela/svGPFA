@@ -1,5 +1,9 @@
 language: python
 
+env:
+  global
+    - PYTHONPATH="/home/travis/build/joacorapela/svGPFA/src"
+
 matrix:
   include:
 
