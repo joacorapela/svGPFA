@@ -13,7 +13,7 @@ from inducingPointsPrior import InducingPointsPrior
 
 def test_evalSumAcrossLatentsTrials():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[1]

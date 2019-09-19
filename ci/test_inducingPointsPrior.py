@@ -7,7 +7,7 @@ from inducingPointsPrior import InducingPointsPrior
 
 def test_buildQSigma():
     tol = 1e-5
-    dataFilename = os.path.expanduser('data/get_full_from_lowplusdiag.mat')
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/get_full_from_lowplusdiag.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[1]

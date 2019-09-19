@@ -13,7 +13,7 @@ from kernels import PeriodicKernel, ExponentialQuadraticKernel
 def test_eval():
     tol = 1e-5
     tolKzzi = 6e-2
-    dataFilename = os.path.expanduser("data/BuildKernelMatrices.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
     mat = loadmat(dataFilename)
     nLatents = mat['Z'].shape[0]
@@ -36,7 +36,7 @@ def test_eval():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    dataFilename = os.path.expanduser("data/BuildKernelMatrices_fromSpikes.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices_fromSpikes.mat")
     mat = loadmat(dataFilename)
     Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]

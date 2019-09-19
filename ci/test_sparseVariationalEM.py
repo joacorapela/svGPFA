@@ -17,7 +17,7 @@ from sparseVariationalEM import SparseVariationalEM
 
 def test_eStep_pointProcess():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/Estep_Update_all_PointProcess_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Update_all_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -69,7 +69,7 @@ def test_eStep_pointProcess():
 # def test_eStep_poisson():
 #     tol = 1e-5
 #     verbose = True
-#     dataFilename = os.path.expanduser("data/Estep_Update_all_svGPFA.mat")
+#     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Update_all_svGPFA.mat")
 # 
 #     mat = loadmat(dataFilename)
 #     nLatent = mat['q_mu'].shape[1]
@@ -114,7 +114,7 @@ def test_eStep_pointProcess():
 
 def test_mStepModelParams_pointProcess():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/Mstep_Update_Iterative_PointProcess_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Mstep_Update_Iterative_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -165,7 +165,7 @@ def test_mStepModelParams_pointProcess():
 
 def test_mStepKernelParams_pointProcess():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/hyperMstep_Update.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/hyperMstep_Update.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -216,7 +216,7 @@ def test_mStepKernelParams_pointProcess():
 
 def test_mStepInducingPoints_pointProcess():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/inducingPointsMstep_all.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/inducingPointsMstep_all.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
@@ -267,7 +267,7 @@ def test_mStepInducingPoints_pointProcess():
 
 def test_maximize_pointProcess():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/variationalEM.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])

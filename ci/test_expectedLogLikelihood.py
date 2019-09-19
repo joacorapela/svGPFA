@@ -14,7 +14,7 @@ from expectedLogLikelihood import PointProcessExpectedLogLikelihood, PoissonExpe
 
 def test_evalSumAcrossTrialsAndNeurons_pointProcess():
     tol = 3e-4
-    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -62,7 +62,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcess():
 
 def test_evalSumAcrossTrialsAndNeurons_poisson():
     tol = 3e-4
-    dataFilename = os.path.expanduser("data/Estep_Objective_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatent = len(mat['q_mu'])
@@ -110,7 +110,7 @@ def test_evalSumAcrossTrialsAndNeurons_poisson():
 
 def test_evalSumAcrossTrialsAndNeurons_withKFactors_pointProcess():
     tol = 3e-4
-    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])

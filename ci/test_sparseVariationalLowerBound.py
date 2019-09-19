@@ -16,7 +16,7 @@ from sparseVariationalLowerBound import SparseVariationalLowerBound
 
 def test_eval_pointProcess():
     tol = 3e-4
-    dataFilename = os.path.expanduser("data/Estep_Objective_PointProcess_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -67,7 +67,7 @@ def test_eval_pointProcess():
 
 def test_eval_poisson():
     tol = 1e-5
-    dataFilename = os.path.expanduser("data/Estep_Objective_svGPFA.mat")
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_svGPFA.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['q_mu'])
