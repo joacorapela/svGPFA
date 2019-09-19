@@ -45,6 +45,9 @@ install:
 
   - pip install --progress-bar off torch
 
+before_script:
+  - export PYTHONPATH=$PYTHONPATH:/home/travis/build/joacorapela/svGPFA/src
+
 script:
 
   - pytest  # will run all tests in the package
