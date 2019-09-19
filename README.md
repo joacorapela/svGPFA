@@ -1,4 +1,4 @@
-# Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA)
+# Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA) [![Build Status](https://travis-ci.com/joacorapela/gaussianProcesses.svg?branch=master)](https://travis-ci.com/joacorapela/svGPFA)
 
 Tested with [Python 3.5.2](https://www.python.org/downloads/release/python-352/) and [Pytorch 1.2.0](https://pytorch.org/).
 
