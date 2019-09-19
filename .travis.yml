@@ -1,0 +1,14 @@
+language: python
+
+python:
+    - "3.5.2"
+
+env:
+    global
+        - PYTHONPATH="/home/travis/build/joacorapela/svGPFA/src"
+
+install:
+    - pip install -r requirements.txt
+
+script:
+    - pytest
