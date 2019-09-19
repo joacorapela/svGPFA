@@ -27,7 +27,7 @@ install:
   # Replace dep1 dep2 ... with your dependencies
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION scipy pytorch
   - conda activate test-environment
-  - python setup.py install
+  # - python setup.py install
 
 script:
   - pytest
