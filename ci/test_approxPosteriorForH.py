@@ -245,7 +245,7 @@ def test_predict_allNeuronsAllTimes():
     qHVarError = math.sqrt(((var_h-qHVar)**2).mean())
     assert(qHVarError<tol)
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
 if __name__=="__main__":
     # test_getMeansAndVariances_allNeuronsAllTimes()
