@@ -9,3 +9,4 @@ todo.txt
 .ipynb*
 doc/design/*bak*
 .*lck*
+ci/Untitled*.ipynb
