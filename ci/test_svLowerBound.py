@@ -19,7 +19,7 @@ from svLowerBound import SVLowerBound
 
 def test_eval_pointProcess():
     tol = 3e-4
-    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(yNonStackedFilename)

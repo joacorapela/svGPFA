@@ -17,7 +17,7 @@ from expectedLogLikelihood import PointProcessELLExpLink, PointProcessELLQuad
 
 def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     tol = 3e-4
-    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(yNonStackedFilename)
@@ -99,7 +99,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
 
 def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     tol = 3e-4
-    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(yNonStackedFilename)
