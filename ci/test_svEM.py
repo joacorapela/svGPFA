@@ -20,7 +20,7 @@ from svEM import SVEM
 
 def test_eStep_pointProcess():
     tol = 1e-5
-    yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Update_all_PointProcess_svGPFA.mat")
 
     mat = loadmat(yNonStackedFilename)
@@ -168,7 +168,7 @@ def test_eStep_poisson():
 
 def test_mStepModelParams_pointProcess():
     tol = 1e-5
-    yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Mstep_Update_Iterative_PointProcess_svGPFA.mat")
 
     mat = loadmat(yNonStackedFilename)
@@ -252,7 +252,7 @@ def test_mStepModelParams_pointProcess():
 
 def test_mStepKernelParams_pointProcess():
     tol = 1e-5
-    yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/hyperMstep_Update.mat")
 
     mat = loadmat(yNonStackedFilename)
@@ -389,7 +389,7 @@ def test_mStepKernelParams_poisson():
 
 def test_mStepIndPoints_pointProcess():
     tol = 1e-5
-    yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/inducingPointsMstep_all.mat")
 
     mat = loadmat(yNonStackedFilename)
@@ -473,7 +473,7 @@ def test_mStepIndPoints_pointProcess():
 
 def test_maximize_pointProcess():
     tol = 1e-5
-    yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
+    yNonStackedFilename = os.path.join(os.path.dirname("__file__"), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
     mat = loadmat(yNonStackedFilename)
