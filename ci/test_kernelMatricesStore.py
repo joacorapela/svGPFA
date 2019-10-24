@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import numpy as np
 import torch
 # from inducingPointsPrior import InducingPointsPrior
-from kernelMatricesStore import KernelMatricesStore
+from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 from kernels import PeriodicKernel, ExponentialQuadraticKernel
 
 def test_eval():
@@ -42,37 +42,52 @@ def test_eval():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKtt_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kernelsMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setKernels(kernels=kernels)
+    indPointsLocsKMS.setIndPointsLocs(locs=Z)
+    indPointsLocsKMS.buildKernelsMatrices()
 
-    Kzz = kernelsMatricesStore.getKzz()
+    Kzz = indPointsLocsKMS.getKzz()
     for k in range(len(Kzz)):
         error = math.sqrt(((Kzz[k]-leasKzz[k])**2).flatten().mean())
         assert(error<tol)
 
-    Kzzi = kernelsMatricesStore.getKzzi()
+    Kzzi = indPointsLocsKMS.getKzzi()
     for k in range(len(Kzzi)):
         error = math.sqrt(((Kzzi[k]-leasKzzi[k])**2).flatten().mean())
         assert(error<tolKzzi)
 
-    Ktz_allNeuronsAllTimes = kernelsMatricesStore.getKtz_allNeuronsAllTimes()
-    for k in range(len(Ktz_allNeuronsAllTimes)):
-        error = math.sqrt(((Ktz_allNeuronsAllTimes[k]-leasKtz[k])**2).flatten().mean())
+    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
+    indPointsLocsAndAllTimesKMS.setIndPointsLocs(locs=Z)
+    indPointsLocsAndAllTimesKMS.setTimes(times=t)
+    indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
+
+    Ktz_allTimes = indPointsLocsAndAllTimesKMS.getKtz()
+    for k in range(len(Ktz_allTimes)):
+        error = math.sqrt(((Ktz_allTimes[k]-leasKtz[k])**2).flatten().mean())
         assert(error<tol)
 
-    Ktt_allNeuronsAllTimes = kernelsMatricesStore.getKtt_allNeuronsAllTimes()
-    error = math.sqrt(((Ktt_allNeuronsAllTimes-leasKtt)**2).flatten().mean())
+    Ktt_allTimes = indPointsLocsAndAllTimesKMS.getKtt()
+    error = math.sqrt(((Ktt_allTimes-leasKtt)**2).flatten().mean())
     assert(error<tol)
 
-    Ktz_allNeuronsAssociatedTimes = kernelsMatricesStore.getKtz_allNeuronsAssociatedTimes()
+    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
+    indPointsLocsAndAssocTimesKMS.setKernels(kernels=kernels)
+    indPointsLocsAndAssocTimesKMS.setIndPointsLocs(locs=Z)
+    indPointsLocsAndAssocTimesKMS.setTimes(times=Y)
+    indPointsLocsAndAssocTimesKMS.buildKernelsMatrices()
+
+    Ktz_associatedTimes = indPointsLocsAndAssocTimesKMS.getKtz()
     for k in range(nLatents):
         for tr in range(nTrials):
-            error = math.sqrt(((Ktz_allNeuronsAssociatedTimes[k][tr]-leasKtz_spikes[k][tr])**2).flatten().mean())
+            error = math.sqrt(((Ktz_associatedTimes[k][tr]-leasKtz_spikes[k][tr])**2).flatten().mean())
         assert(error<tol)
 
-    Ktt_allNeuronsAssociatedTimes = kernelsMatricesStore.getKtt_allNeuronsAssociatedTimes()
+    Ktt_associatedTimes = indPointsLocsAndAssocTimesKMS.getKtt()
     for k in range(nLatents):
         for tr in range(nTrials):
-            error = math.sqrt(((Ktt_allNeuronsAssociatedTimes[k][tr]-leasKtt_spikes[k][tr])**2).flatten().mean())
+            error = math.sqrt(((Ktt_associatedTimes[k][tr]-leasKtt_spikes[k][tr])**2).flatten().mean())
             assert(error<tol)
 
 if __name__=='__main__':

@@ -4,19 +4,19 @@ import torch
 
 class KLDivergence:
 
-    def __init__(self, kernelMatricesStore, inducingPointsPrior):
-        self.__kernelMatricesStore = kernelMatricesStore
-        self.__inducingPointsPrior = inducingPointsPrior
+    def __init__(self, indPointsLocsKMS, svPosteriorOnIndPoints):
+        self._indPointsLocsKMS = indPointsLocsKMS
+        self._svPosteriorOnIndPoints = svPosteriorOnIndPoints
 
     def evalSumAcrossLatentsAndTrials(self):
         klDiv = 0
-        qSigma = self.__inducingPointsPrior.buildQSigma()
-        for k in range(len(self.__kernelMatricesStore.getKzzi())):
-            klDivK = self.__evalSumAcrossTrials(Kzzi=self.__kernelMatricesStore.getKzzi()[k], qMu=self.__inducingPointsPrior.getQMu()[k], qSigma=qSigma[k])
+        qSigma = self._svPosteriorOnIndPoints.buildQSigma()
+        for k in range(len(self._indPointsLocsKMS.getKzzi())):
+            klDivK = self._evalSumAcrossTrials(Kzzi=self._indPointsLocsKMS.getKzzi()[k], qMu=self._svPosteriorOnIndPoints.getQMu()[k], qSigma=qSigma[k])
             klDiv += klDivK
         return klDiv
 
-    def __evalSumAcrossTrials(self, Kzzi, qMu, qSigma):
+    def _evalSumAcrossTrials(self, Kzzi, qMu, qSigma):
         # ESS \in nTrials x nInd x nInd
         ESS = qSigma + torch.matmul(qMu, qMu.permute(0,2,1))
         nTrials = qMu.shape[0]

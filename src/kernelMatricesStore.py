@@ -1,39 +1,48 @@
 
 import pdb
 import torch
+from abc import ABC, abstractmethod
 from utils import pinv3D
 
-class KernelMatricesStore:
+class KernelMatricesStore(ABC):
 
-    def __init__(self, kernels, Z, t, Y):
-        # Z[k] \in nTrials x nInd[k] x 1
-        self.__kernels = kernels
-        self.__Z = Z
-        self.__t = t
-        self.__Y = Y
-        self.buildKernelMatrices()
+    @abstractmethod
+    def buildKernelsMatrices(self):
+        pass
 
-    def buildKernelMatrices(self):
-        self.__buildZKernelMatrices()
-        self.__buildZTKernelMatrices_allNeuronsAllTimes(t=self.__t)
-        self.__buildZTKernelMatrices_allNeuronsAssociatedTimes(Y=self.__Y)
+    def setKernels(self, kernels):
+        self._kernels = kernels
+
+    def setInitialParams(self, initialParams):
+        self._Z = initialParams["inducingPointsLocs0"]
+        for k in range(len(self._kernels)):
+            self._kernels[k].setParams(initialParams["kernelsParams0"][k])
+
+    def setIndPointsLocs(self, indPointsLocs):
+        self._Z = indPointsLocs
+
+    def getIndPointsLocs(self):
+        return self._Z
 
     def getKernels(self):
-        # this method should not exist. It is here only for a temporary patch.
-        return self.__kernels
+        return self._kernels
 
-    def getZ(self):
-        return self.__Z
-
-    def getY(self):
-        # this method should not exist. It is here only for a temporary patch.
-        return self.__Y
-
-    def getKernelsVariableParameters(self):
+    def getKernelsParams(self):
         answer = []
-        for i in range(len(self.__kernels)):
-            answer.append(self.__kernels[i].getVariableParameters())
+        for i in range(len(self._kernels)):
+            answer.append(self._kernels[i].getParams())
         return answer
+
+class IndPointsLocsKMS(KernelMatricesStore):
+
+    def buildKernelsMatrices(self, epsilon=1e-5):
+        nLatent = len(self._kernels)
+        self._Kzz = [[None] for k in range(nLatent)]
+        self._Kzzi = [[None] for k in range(nLatent)]
+
+        for k in range(nLatent):
+            self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._Z[k])+epsilon*torch.eye(n=self._Z[k].shape[1], dtype=torch.double)
+            self._Kzzi[k] = pinv3D(self._Kzz[k])
 
     def getKzz(self):
         return self._Kzz
@@ -41,44 +50,39 @@ class KernelMatricesStore:
     def getKzzi(self):
         return self._Kzzi
 
-    def getKtz_allNeuronsAllTimes(self):
-        return self._Ktz_allNeuronsAllTimes
+class IndPointsLocsAndTimesKMS(KernelMatricesStore):
 
-    def getKtt_allNeuronsAllTimes(self):
-        return self._Ktt_allNeuronsAllTimes
+    def setTimes(self, times):
+        self._t = times
 
-    def getKtz_allNeuronsAssociatedTimes(self):
-        return self._Ktz_allNeuronsAssociatedTimes
+    def getKtz(self):
+        return self._Ktz
 
-    def getKtt_allNeuronsAssociatedTimes(self):
-        return self._Ktt_allNeuronsAssociatedTimes
+    def getKtt(self):
+        return self._Ktt
 
-    def __buildZKernelMatrices(self, epsilon=1e-5):
-        nLatent = len(self.__kernels)
-        self._Kzz = [[None] for k in range(nLatent)]
-        self._Kzzi = [[None] for k in range(nLatent)]
+class IndPointsLocsAndAllTimesKMS(IndPointsLocsAndTimesKMS):
 
-        for k in range(nLatent):
-            self._Kzz[k] = self.__kernels[k].buildKernelMatrix(X1=self.__Z[k])+epsilon*torch.eye(n=self.__Z[k].shape[1], dtype=torch.double)
-            self._Kzzi[k] = pinv3D(self._Kzz[k])
-
-    def __buildZTKernelMatrices_allNeuronsAllTimes(self, t):
+    def buildKernelsMatrices(self):
         # t \in nTrials x nQuad x 1
-        nLatent = len(self.__Z)
-        self._Ktz_allNeuronsAllTimes = [[None] for k in range(nLatent)]
-        self._Ktt_allNeuronsAllTimes = torch.zeros(t.shape[0], t.shape[1], nLatent, dtype=torch.double)
+        nLatent = len(self._Z)
+        self._Ktz = [[None] for k in range(nLatent)]
+        self._Ktt = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent, 
+                                dtype=torch.double)
         for k in range(nLatent):
-            self._Ktz_allNeuronsAllTimes[k] = self.__kernels[k].buildKernelMatrix(X1=t, X2=self.__Z[k])
-            self._Ktt_allNeuronsAllTimes[:,:,k] = self.__kernels[k].buildKernelMatrixDiag(X=t).squeeze()
+            self._Ktz[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._Z[k])
+            self._Ktt[:,:,k] = self._kernels[k].buildKernelMatrixDiag(X=self._t).squeeze()
 
-    def __buildZTKernelMatrices_allNeuronsAssociatedTimes(self, Y):
-        # Y[tr] \in nSpikes of all neurons in trial tr
-        nLatent = len(self.__Z)
-        nTrial = self.__Z[0].shape[0]
-        self._Ktz_allNeuronsAssociatedTimes = [[[None] for tr in range(nTrial)] for k in range(nLatent)]
-        self._Ktt_allNeuronsAssociatedTimes = [[[None] for tr in  range(nTrial)] for k in range(nLatent)]
+class IndPointsLocsAndAssocTimesKMS(IndPointsLocsAndTimesKMS):
+
+    def buildKernelsMatrices(self):
+        nLatent = len(self._Z)
+        nTrial = self._Z[0].shape[0]
+        self._Ktz = [[[None] for tr in range(nTrial)] for k in range(nLatent)]
+        self._Ktt = [[[None] for tr in  range(nTrial)] for k in range(nLatent)]
 
         for k in range(nLatent):
             for tr in range(nTrial):
-                self._Ktz_allNeuronsAssociatedTimes[k][tr] = self.__kernels[k].buildKernelMatrix(X1=Y[tr], X2=self.__Z[k][tr,:,:])
-                self._Ktt_allNeuronsAssociatedTimes[k][tr] = self.__kernels[k].buildKernelMatrixDiag(X=Y[tr])
+                self._Ktz[k][tr] = self._kernels[k].buildKernelMatrix(X1=self._t[tr], X2=self._Z[k][tr,:,:])
+                self._Ktt[k][tr] = self._kernels[k].buildKernelMatrixDiag(X=self._t[tr])
+
