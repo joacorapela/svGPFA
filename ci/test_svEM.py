@@ -109,7 +109,7 @@ def test_eStep_pointProcess():
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
 '''
 def test_eStep_poisson():
@@ -163,7 +163,7 @@ def test_eStep_poisson():
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
  
-    pdb.set_trace()
+    # pdb.set_trace()
 '''
 
 def test_mStepModelParams_pointProcess():
@@ -549,7 +549,7 @@ def test_maximize_pointProcess():
                            quadParams=quadParams, optimParams=optimParams)
     assert(maxRes['lowerBound']>leasLowerBound)
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
 if __name__=='__main__':
     test_eStep_pointProcess() # passed
