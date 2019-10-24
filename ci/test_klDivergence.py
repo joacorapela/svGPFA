@@ -6,10 +6,10 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
+from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
 from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import KernelMatricesStore
+from kernelMatricesStore import IndPointsLocsKMS
 from klDivergence import KLDivergence
-from inducingPointsPrior import InducingPointsPrior
 
 def test_evalSumAcrossLatentsTrials():
     tol = 1e-5
@@ -18,29 +18,42 @@ def test_evalSumAcrossLatentsTrials():
     mat = loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[1]
     nTrials = mat['Z'][0,0].shape[2]
-    Kzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qMu = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    t = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    Z = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
+    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     matKLDiv = torch.from_numpy(mat['KLd'])
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
     kernels = [[None] for k in range(nLatents)]
+    kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
-        if np.char.equal(kernelNames[0,k][0], 'PeriodicKernel'):
-            kernels[k] = PeriodicKernel(scale=1.0, lengthScale=float(hprs[k,0][0]), period=float(hprs[k,0][1]))
-        elif np.char.equal(kernelNames[0,k][0], 'rbfKernel'):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0, lengthScale=float(hprs[k,0][0]))
+        if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
+            kernels[k] = PeriodicKernel(scale=1.0)
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
+                                              float(hprs[k,0][1])], 
+                                             dtype=torch.double)
+        elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
+            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
+                                             dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    kernelMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
-    qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-    klDiv = KLDivergence(kernelMatricesStore=kernelMatricesStore, inducingPointsPrior=qU)
+    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    kmsParams0 = {"kernelsParams0": kernelsParams0,
+                  "inducingPointsLocs0": Z0}
+
+    indPointsLocsKMS = IndPointsLocsKMS()
+    qU = SVPosteriorOnIndPoints()
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+                         svPosteriorOnIndPoints=qU)
+
+    qU.setInitialParams(initialParams=qUParams0)
+    indPointsLocsKMS.setKernels(kernels=kernels)
+    indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
+    indPointsLocsKMS.buildKernelsMatrices()
     klDivEval = klDiv.evalSumAcrossLatentsAndTrials()
 
     klError = abs(matKLDiv-klDivEval)
@@ -48,5 +61,4 @@ def test_evalSumAcrossLatentsTrials():
     assert(klError<tol)
 
 if __name__=="__main__":
-    # test_buildQSigma()
     test_evalSumAcrossLatentsTrials()
