@@ -38,11 +38,11 @@ def test_eStep_pointProcess():
     nLowerBound = mat['nLowerBound'][0,0]
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    kernelNames = mat["kernelNames"]
+    hprs = mat["hprs"]
 
     linkFunction = torch.exp
 
-    kernelNames = mat["kernelNames"]
-    hprs = mat["hprs"]
     kernels = [[None] for k in range(nLatents)]
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
@@ -88,7 +88,7 @@ def test_eStep_pointProcess():
     klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM(lowerBound=svlb)
+    svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": b0}
@@ -104,12 +104,14 @@ def test_eStep_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._eStep(maxNIter=1500, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
+    res = svEM._eStep(model=svlb, maxNIter=1500, tol=1e-3, lr=1e-3, 
+                      verbose=True, nIterDisplay=100)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
 
     pdb.set_trace()
 
+'''
 def test_eStep_poisson():
     tol = 1e-5
     verbose = True
@@ -162,6 +164,7 @@ def test_eStep_poisson():
     assert(res["lowerBound"]-(-nLowerBound)>0)
  
     pdb.set_trace()
+'''
 
 def test_mStepModelParams_pointProcess():
     tol = 1e-5
@@ -223,7 +226,7 @@ def test_mStepModelParams_pointProcess():
     klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM(lowerBound=svlb)
+    svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": b0}
@@ -241,7 +244,7 @@ def test_mStepModelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepModelParams(maxNIter=3000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
+    res = svEM._mStepModelParams(model=svlb, maxNIter=3000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 
     assert(abs(res["lowerBound"]-(-nLowerBound))<tol)
 
@@ -307,7 +310,7 @@ def test_mStepKernelParams_pointProcess():
     klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM(lowerBound=svlb)
+    svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": b0}
@@ -325,12 +328,13 @@ def test_mStepKernelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepKernelParams(maxNIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+    res = svEM._mStepKernelParams(model=svlb, maxNIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
 
     assert(res["lowerBound"]>(-nLowerBound))
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
+'''
 def test_mStepKernelParams_poisson():
     tol = 1e-5
     dataFilename = os.path.join(os.path.dirname(__file__), "data/hyperMstep_Update.mat")
@@ -381,6 +385,7 @@ def test_mStepKernelParams_poisson():
     assert(res["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
+'''
 
 def test_mStepIndPoints_pointProcess():
     tol = 1e-5
@@ -442,7 +447,7 @@ def test_mStepIndPoints_pointProcess():
     klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM(lowerBound=svlb)
+    svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": b0}
@@ -460,7 +465,7 @@ def test_mStepIndPoints_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepIndPoints(maxNIter=100, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+    res = svEM._mStepIndPoints(model=svlb, maxNIter=100, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
 
     assert(res["lowerBound"]>(-nLowerBound))
 
@@ -526,7 +531,7 @@ def test_maximize_pointProcess():
     klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM(lowerBound=svlb)
+    svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": b0}
@@ -537,19 +542,19 @@ def test_maximize_pointProcess():
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints, 
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":1, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
+    optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
 
-    maxRes = svEM.maximize(measurements=YNonStacked, kernels=kernels, 
-                           initialParams=initialParams, quadParams=quadParams,
-                           optimParams=optimParams)
+    maxRes = svEM.maximize(model=svlb, measurements=YNonStacked, 
+                           kernels=kernels, initialParams=initialParams, 
+                           quadParams=quadParams, optimParams=optimParams)
     assert(maxRes['lowerBound']>leasLowerBound)
 
     pdb.set_trace()
 
 if __name__=='__main__':
-    # test_eStep_pointProcess() # passed
+    test_eStep_pointProcess() # passed
     # test_eStep_poisson() # not tested
-    # test_mStepModelParams_pointProcess() # passed
-    # test_mStepKernelParams_pointProcess() # passed
-    # test_mStepIndPoints_pointProcess() # passed
+    test_mStepModelParams_pointProcess() # passed
+    test_mStepKernelParams_pointProcess() # passed
+    test_mStepIndPoints_pointProcess() # passed
     test_maximize_pointProcess() # passed

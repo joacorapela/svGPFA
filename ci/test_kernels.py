@@ -16,8 +16,11 @@ def test_exponentialQuadraticKernel():
     leasK = torch.from_numpy(mat['G']).type(torch.DoubleTensor).permute(2,0,1)
     lengthScale = float(mat['lengthscale'][0,0])
     scale = 1.0
+    params = [lengthScale]
 
-    kernel = ExponentialQuadraticKernel(scale=scale, lengthScale=lengthScale)
+    kernel = ExponentialQuadraticKernel(scale=scale) 
+    kernel.setParams(params=params)
+
     K = kernel.buildKernelMatrix(X1=Z)
 
     error = math.sqrt(((K-leasK)**2).flatten().mean())
@@ -31,10 +34,13 @@ def test_exponentialQuadraticKernelDiag():
     mat = loadmat(dataFilename)
     t = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
     leasKDiag = torch.from_numpy(mat['Gdiag']).type(torch.DoubleTensor).permute(2,0,1)
-    scale = float(mat['variance'][0,0])
     lengthScale = float(mat['lengthscale'][0,0])
+    scale = float(mat['variance'][0,0])
+    params = [lengthScale]
 
-    kernel = ExponentialQuadraticKernel(scale=scale, lengthScale=lengthScale)
+    kernel = ExponentialQuadraticKernel(scale=scale)
+    kernel.setParams(params=params)
+
     KDiag = kernel.buildKernelMatrixDiag(X=t)
 
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
@@ -51,8 +57,11 @@ def test_periodicKernel():
     lengthScale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
     scale = 1.0
+    params = [lengthScale, period]
 
-    kernel = PeriodicKernel(scale=scale, lengthScale=lengthScale, period=period)
+    kernel = PeriodicKernel(scale=scale)
+    kernel.setParams(params=params)
+
     K = kernel.buildKernelMatrix(X1=Z)
 
     error = math.sqrt(((K-leasK)**2).flatten().mean())
@@ -66,11 +75,14 @@ def test_periodicKernelDiag():
     mat = loadmat(dataFilename)
     t = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
     leasKDiag = torch.from_numpy(mat['Gdiag']).type(torch.DoubleTensor).permute(2,0,1)
-    scale = float(mat['variance'][0,0])
     lengthScale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
+    scale = float(mat['variance'][0,0])
+    params = [lengthScale, period]
 
-    kernel = PeriodicKernel(scale=scale, lengthScale=lengthScale, period=period)
+    kernel = PeriodicKernel(scale=scale)
+    kernel.setParams(params=params)
+
     KDiag = kernel.buildKernelMatrixDiag(X=t)
 
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
