@@ -10,3 +10,8 @@ todo.txt
 doc/design/*bak*
 .*lck*
 ci/Untitled*.ipynb
+/scripts/data/*
+/ci/data/*
+/ipynb/data/*
+/scripts/*
+/notes.txt
