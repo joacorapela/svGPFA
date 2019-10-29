@@ -3,6 +3,7 @@ import pdb
 from abc import ABC, abstractmethod
 import torch
 from kernelMatricesStore import IndPointsLocsAndAllTimesKMS
+import utils
 
 class SVPosteriorOnLatents(ABC):
 
@@ -74,16 +75,15 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
     def computeMeansAndVars(self):
         Kzz = self._indPointsLocsKMS.getKzz()
-        Kzzi = self._indPointsLocsKMS.getKzzi()
+        KzzChol = self._indPointsLocsKMS.getKzzChol()
         Ktz = self._indPointsLocsAndTimesKMS.getKtz()
         Ktt = self._indPointsLocsAndTimesKMS.getKtt()
         return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, 
-                                                             Kzzi=Kzzi, 
+                                                             KzzChol=KzzChol, 
                                                              Ktz=Ktz, 
                                                              Ktt=Ktt)
 
-    def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, Kzzi, Ktz, 
-                                                      Ktt):
+    def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, Ktt):
         nTrials = Ktt.shape[0]
         nQuad = Ktt.shape[1]
         nLatent = Ktt.shape[2]
@@ -94,11 +94,13 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         for k in range(len(self._svPosteriorOnIndPoints.getQMu())):
             # Ak \in nTrials x nInd[k] x 1 
-            Ak = torch.matmul(Kzzi[k], self._svPosteriorOnIndPoints.getQMu()[k]) 
+            Ak = torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k],
+                                      KzzChol[k]) 
             qKMu[:,:,k] = torch.squeeze(torch.matmul(Ktz[k], Ak))
 
             # Bkf \in nTrials x nInd[k] x nQuad
-            Bkf = torch.matmul(Kzzi[k], Ktz[k].transpose(dim0=1, dim1=2))
+            Bkf = torch.cholesky_solve(Ktz[k].transpose(dim0=1, dim1=2),
+                                       KzzChol[k])
             # mm1f \in nTrials x nInd[k] x nQuad
             mm1f = torch.matmul(qSigma[k]-Kzz[k], Bkf)
             # aux1 \in nTrials x nInd[k] x nQuad
@@ -133,19 +135,20 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
 
     def computeMeansAndVars(self):
         Kzz = self._indPointsLocsKMS.getKzz()
-        Kzzi = self._indPointsLocsKMS.getKzzi()
+        KzzChol = self._indPointsLocsKMS.getKzzChol()
         Ktz = self._indPointsLocsAndTimesKMS.getKtz()
         Ktt = self._indPointsLocsAndTimesKMS.getKtt()
         return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, 
-                                                             Kzzi=Kzzi, 
+                                                             KzzChol=KzzChol, 
                                                              Ktz=Ktz, 
                                                              Ktt=Ktt)
 
-    def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, Kzzi, Ktz, Ktt):
+    def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, Ktt):
         nTrials = len(Ktt[0])
         nLatent = len(self._svPosteriorOnIndPoints.getQMu())
         # Ak[k] \in nTrial x nInd[k] x 1
-        Ak = [torch.matmul(Kzzi[k], self._svPosteriorOnIndPoints.getQMu()[k]) for k in range(nLatent)]
+        Ak = [torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k], 
+                                   KzzChol[k]) for k in range(nLatent)]
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         qKMu = [[None] for tr in range(nTrials)]
         qKVar = [[None] for tr in range(nTrials)]
@@ -157,7 +160,9 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
             for k in range(nLatent):
                 qKMu[trialIndex][:,k] = torch.squeeze(torch.mm(input=Ktz[k][trialIndex], mat2=Ak[k][trialIndex,:,:]))
                 # Bfk \in nInd[k] x nSpikesForTrial[trialIndex]
-                Bfk = torch.matmul(Kzzi[k][trialIndex,:,:], Ktz[k][trialIndex].transpose(dim0=0, dim1=1))
+                Bfk = torch.cholesky_solve(
+                    Ktz[k][trialIndex].transpose(dim0=0, dim1=1),
+                    KzzChol[k][trialIndex,:,:])
                 # mm1f \in nInd[k] x nSpikesForTrial[trialIndex]
                 mm1f = torch.matmul(qSigma[k][trialIndex,:,:]-Kzz[k][trialIndex,:,:], Bfk)
                 # qKVar[trialIndex] \in nSpikesForTrial[trialIndex] x nLatent
