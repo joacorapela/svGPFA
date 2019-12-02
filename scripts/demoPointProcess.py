@@ -11,6 +11,7 @@ import svGPFAModelFactory
 from svEM import SVEM
 
 def main(argv):
+    figFilename = os.path.expanduser("figures/trueAndEstimatedLatents.png")
     yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), 
                                 "data/demo_PointProcess.mat")
@@ -71,7 +72,7 @@ def main(argv):
                             quadParams=quadParams, optimParams=optimParams)
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
     indPointsLocs = model.getIndPointsLocs()
-    plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatents)
+    plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatents, figFilename=figFilename)
 
     pdb.set_trace()
 
