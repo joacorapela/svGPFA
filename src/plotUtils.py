@@ -1,7 +1,8 @@
 
 import matplotlib.pyplot as plt
+import numpy as np
 
-def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, trialToPlot=0):
+def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, trialToPlot=0, figFilename=None):
     nLatents = muK.shape[2]
     timesToPlot = times.numpy()
     f, axes = plt.subplots(nLatents, 1, sharex=True)
@@ -19,5 +20,7 @@ def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, tr
     axes[-1].set_xlabel("Sample")
     axes[-1].legend()
     plt.xlim(left=np.min(timesToPlot)-1, right=np.max(timesToPlot)+1)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
     plt.show()
 
