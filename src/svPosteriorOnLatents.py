@@ -96,6 +96,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
             # Ak \in nTrials x nInd[k] x 1 
             Ak = torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k],
                                       KzzChol[k]) 
+            # mu_k \in  nTrial x nQuad x nLatent
             qKMu[:,:,k] = torch.squeeze(torch.matmul(Ktz[k], Ak))
 
             # Bkf \in nTrials x nInd[k] x nQuad
