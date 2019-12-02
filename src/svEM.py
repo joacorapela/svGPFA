@@ -89,7 +89,7 @@ class SVEM:
         evalFunc = lambda: \
             model.evalELLSumAcrossTrialsAndNeurons(
                 svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-        displayFmt = "Iteration: %d, negative sum of expected log likelihood: %f"
+        displayFmt = "Step: %d, negative sum of expected log likelihood: %f"
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, maxNIter=maxNIter, tol=tol, lr=lr, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
         return answer
 
@@ -112,7 +112,7 @@ class SVEM:
         updateModelFunc = model.buildKernelsMatrices
         return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, lr=lr, verbose=verbose, nIterDisplay=nIterDisplay)
 
-    def _setupAndMaximizeStep(self, x, evalFunc, maxNIter, tol, lr, verbose, nIterDisplay, displayFmt="Iteration: %d, negative lower bound: %f", updateModelFunc=None):
+    def _setupAndMaximizeStep(self, x, evalFunc, maxNIter, tol, lr, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f", updateModelFunc=None):
         for i in range(len(x)):
             x[i].requires_grad = True 
         optimizer = torch.optim.Adam(x, lr=lr)
@@ -122,7 +122,7 @@ class SVEM:
         return maxRes
 
     def _maximizeStep(self, evalFunc, updateModelFunc, optimizer, maxNIter,
-            tol, verbose, nIterDisplay, displayFmt="Iteration: %d, negative lower bound: %f"):
+            tol, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f"):
         prevEval = -float("inf")
         converged = False
         iterCount = 0
