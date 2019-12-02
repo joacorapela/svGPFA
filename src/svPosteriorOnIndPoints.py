@@ -1,5 +1,5 @@
 import torch
-from utils import build3DdiagFromDiagVector, flattenListsOfArrays
+from utils import build3DdiagFromDiagVector
 
 class SVPosteriorOnIndPoints:
 
