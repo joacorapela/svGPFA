@@ -21,12 +21,10 @@ class Kernel(ABC):
         return self._params
 
 class ExponentialQuadraticKernel(Kernel):
-    def __init__(self, scale):
-        self._scale = scale
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale = self._scale
-        lengthScale = self._params[0]
+        scale = self._params[0]
+        lengthScale = self._params[1]
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -37,18 +35,15 @@ class ExponentialQuadraticKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale = self._scale
-        covMatrixDiag = self._scale**2*torch.ones(X.shape, dtype=torch.double)
+        scale = self._params[0]
+        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=torch.double)
         return covMatrixDiag
 
 class PeriodicKernel(Kernel):
-    def __init__(self, scale):
-        self._scale = scale
-
     def buildKernelMatrix(self, X1, X2=None):
-        scale = self._scale
-        lengthScale = self._params[0]
-        period = self._params[1]
+        scale = self._params[0]
+        lengthScale = self._params[1]
+        period = self._params[2]
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -60,7 +55,7 @@ class PeriodicKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale = self._scale
-        covMatrixDiag = self._scale**2*torch.ones(X.shape, dtype=torch.double)
+        scale = self._params[0]
+        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=torch.double)
         return covMatrixDiag
 
