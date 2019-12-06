@@ -2,6 +2,7 @@
 import pdb
 import torch
 import matplotlib.pyplot as plt
+import numpy as np
 
 def plotLowerBoundHist(lowerBoundHist, xlabel="Iteration Number", ylabel="Lower Bound", marker="x", linestyle="-", figFilename=None):
     plt.plot(lowerBoundHist, marker=marker, linestyle=linestyle)
