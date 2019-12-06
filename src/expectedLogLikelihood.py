@@ -111,19 +111,21 @@ class PointProcessELL(ExpectedLogLikelihood):
                                                             neuronForSpikeIndex)
 
     def __stackSpikeTimes(self, spikeTimes): 
-        # measurements list[nTrials,1][nCells,1][nSpikes,1]=spikeTime[trial,cell,spikeN]
+        # spikeTimes list[nTrials][nNeurons][nSpikes]
+        nNeurons = len(spikeTimes)
+
         nTrials = len(spikeTimes)
         stackedSpikeTimes = [[] for i in range(nTrials)]
         neuronForSpikeIndex = [[] for i in range(nTrials)]
         for trialIndex in range(nTrials):
             stackedSpikeTimes[trialIndex] = torch.tensor(
                 [spikeTime 
-                 for neuronIndex in range(len(spikeTimes[trialIndex,0])) 
-                 for spikeTime in spikeTimes[trialIndex,0][neuronIndex,0]])
+                 for neuronIndex in range(len(spikeTimes[trialIndex])) 
+                 for spikeTime in spikeTimes[trialIndex][neuronIndex]])
             neuronForSpikeIndex[trialIndex] = torch.tensor(
                 [neuronIndex 
-                 for neuronIndex in range(len(spikeTimes[trialIndex,0])) 
-                 for spikeTime in spikeTimes[trialIndex,0][neuronIndex,0]])
+                 for neuronIndex in range(len(spikeTimes[trialIndex])) 
+                 for spikeTime in spikeTimes[trialIndex][neuronIndex]])
         return stackedSpikeTimes, neuronForSpikeIndex
 
     def setIndPointsLocs(self, locs):
