@@ -27,8 +27,8 @@ class KLDivergence:
         nTrials = qMu.shape[0]
         answer = 0
         for trial in range(nTrials):
-            _, logdetKzz = Kzz[trial,:,:].slogdet()
-            _, logdetQSigma = qSigma[trial,:,:].slogdet()
+            _, logdetKzz = Kzz[trial,:,:].slogdet() # O(n^3)
+            _, logdetQSigma = qSigma[trial,:,:].slogdet() # O(n^3)
             traceTerm = torch.trace(
                 torch.cholesky_solve(ESS[trial,:,:], KzzChol[trial,:,:]))
             trialKL = .5*(traceTerm+logdetKzz-logdetQSigma-ESS.shape[1])
