@@ -11,6 +11,4 @@ todo.txt
 doc/design/*bak*
 .*lck*
 ci/Untitled*.ipynb
-/scripts/data/*
-/scripts/*
 /notes.txt
