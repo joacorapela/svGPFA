@@ -1,3 +1,5 @@
+
+import pdb
 import probs.sampler
 
 class GPFASimulator:
@@ -38,8 +40,10 @@ class GPFASimulator:
         eSim = EmbeddingSimulator(latents=latents, C=C, d=d)
         sampler = probs.sampler.Sampler()
         for r in range(nTrials):
+            print("Processing trial {:d}".format(r))
             spikeTimes[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
+                print("Processing neuron {:d}".format(n))
                 eFun = eSim.getEmbeddingFunctionForNeuronAndTrial(n=n, r=r)
                 def intensityFun(t, linkFunction=linkFunction,
                                  embeddingFun=eFun):
