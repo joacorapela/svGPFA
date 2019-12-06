@@ -2,6 +2,7 @@
 *.swp
 *~
 *.html
+.nfs*
 toRsync*
 fromRsync*
 nextRefractoring.txt
