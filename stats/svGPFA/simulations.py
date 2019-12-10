@@ -1,11 +1,11 @@
 
 import pdb
-import probs.sampler
+import stats.sampler
 
 class GPFASimulator:
 
     def simulate(self, nNeurons, trialsLengths, latents, C, d,
-                 linkFunction, dt):
+                 linkFunction, dt, latentsEpsilon=1e-5):
         '''
         Simulates spikes for N=nNeurons neurons and R=len(trialLengths) trials
         using K=len(latents) per trial.
@@ -37,8 +37,9 @@ class GPFASimulator:
         nTrials = len(trialsLengths)
         nLatents = len(latents)
         spikeTimes = [[] for n in range(nTrials)]
-        eSim = EmbeddingSimulator(latents=latents, C=C, d=d)
-        sampler = probs.sampler.Sampler()
+        eSim = EmbeddingSimulator(latents=latents, C=C, d=d, 
+                                  latentsEpsilon=latentsEpsilon)
+        sampler = stats.sampler.Sampler()
         for r in range(nTrials):
             print("Processing trial {:d}".format(r))
             spikeTimes[r] = [[] for r in range(nNeurons)]
@@ -48,23 +49,28 @@ class GPFASimulator:
                 def intensityFun(t, linkFunction=linkFunction,
                                  embeddingFun=eFun):
                     return(linkFunction(embeddingFun(t=t)))
-                spikeTimes[r][n] = sampler.sampleInhomogeneousPP_timeRescaling(
-                    intensityFun=intensityFun, T=trialsLengths[r],
-                    dt=dt)
+                spikeTimes[r][n] = \
+                    sampler.sampleInhomogeneousPP_timeRescaling(
+                        intensityFun=intensityFun, T=trialsLengths[r],
+                        dt=dt)
         return(spikeTimes)
 
 class EmbeddingSimulator:
 
-    def __init__(self, latents, C, d):
+    def __init__(self, latents, C, d, latentsEpsilon):
         self._latents = latents
         self._C = C
         self._d = d
+        self._latentsEpsilon = latentsEpsilon
 
     def getEmbeddingFunctionForNeuronAndTrial(self, n, r):
         def embeddingFun(t):
             answer = 0.0
             for k in range(len(self._latents[0])):
-                answer += self._C[n,k]*self._latents[r][k](t)+self._d[n]
+                answer += (self._C[n, k]*
+                           self._latents[r][k](t,
+                                               epsilon=self._latentsEpsilon)+
+                           self._d[n])
             return answer
         return embeddingFun
 

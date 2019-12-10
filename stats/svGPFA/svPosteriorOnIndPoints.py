@@ -1,5 +1,5 @@
 import torch
-from utils import build3DdiagFromDiagVector
+from .utils import build3DdiagFromDiagVector
 
 class SVPosteriorOnIndPoints:
 

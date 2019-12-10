@@ -2,7 +2,7 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
-from kernelMatricesStore import KernelMatricesStore
+from .kernelMatricesStore import KernelMatricesStore
 
 class SVEmbedding(ABC):
 

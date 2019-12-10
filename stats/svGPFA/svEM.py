@@ -1,7 +1,7 @@
 
 import pdb
 import torch
-from utils import clock
+from .utils import clock
 
 class SVEM:
 

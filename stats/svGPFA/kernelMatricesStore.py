@@ -2,7 +2,7 @@
 import pdb
 import torch
 from abc import ABC, abstractmethod
-from utils import chol3D
+from .utils import chol3D
 
 class KernelMatricesStore(ABC):
 

@@ -1,13 +1,13 @@
 
-from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
+from .kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
                                 IndPointsLocsAndAssocTimesKMS
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
+from .svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from .svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
                                  SVPosteriorOnLatentsAssocTimes
-from svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
-from expectedLogLikelihood import PointProcessELLExpLink
-from klDivergence import KLDivergence
-from svLowerBound import SVLowerBound
+from .svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
+from .expectedLogLikelihood import PointProcessELLExpLink
+from .klDivergence import KLDivergence
+from .svLowerBound import SVLowerBound
 
 PointProcess = 0
 Poisson = 1

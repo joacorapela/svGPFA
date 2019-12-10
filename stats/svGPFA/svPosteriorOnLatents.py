@@ -2,8 +2,7 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
-from kernelMatricesStore import IndPointsLocsAndAllTimesKMS
-import utils
+from .kernelMatricesStore import IndPointsLocsAndAllTimesKMS
 
 class SVPosteriorOnLatents(ABC):
 
