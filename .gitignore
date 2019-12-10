@@ -14,5 +14,5 @@ ci/Untitled*.ipynb
 /notes.txt
 scripts/figures/*
 scripts/results/*
-stats/gaussianProcesses/kernels.py
+src/stats/gaussianProcesses/kernels.py
 
