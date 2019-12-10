@@ -20,6 +20,30 @@ class Kernel(ABC):
     def getParams(self):
         return self._params
 
+'''
+class AddDiagKernel(Kernel):
+    def __init__(self, kernel, epsilon=1e-5):
+        self.__kernel = kernel
+        self.__epsilon = epsilon
+
+    def buildKernelMatrix(self, X1, X2=None):
+        covMatrix = self.__kernel.buildKernelMatrix(X1=X1, X2=X2)
+        covMatrixPlusDiag = (covMatrix + 
+                             self.__epsilon*torch.eye(n=covMatrix.shape[0], 
+                                                      dtype=torch.double))
+        return covMatrixPlusDiag
+
+    def buildKernelMatrixDiag(self, X):
+        return self.__kernel.buildKernelMatrixDiag(X=X)
+
+    def setParams(self, params):
+        self.__kernel.setParams(params)
+
+    def getParams(self):
+        params = self.__kernel.getParams()
+        return params
+'''
+
 class ExponentialQuadraticKernel(Kernel):
 
     def buildKernelMatrix(self, X1, X2=None):
