@@ -1,22 +1,23 @@
 
 import pdb
 import sys
+import os
 import math
+import random
 import torch
 import matplotlib.pyplot as plt
 import pickle
-sys.path.append("../src")
-import simulations
-import kernels
-import stats.gaussianProcesses.core
+import configparser
+sys.path.append("..")
+import stats.svGPFA.simulations
+import stats.kernels
+import stats.gaussianProcesses.eval
 
-def getLatents(k0Scale=.1, k0LengthScale=1.5, k0Period=1/2.5,
-               k1Scale=.1, k1LengthScale=1.2, k1Period=1/2.5,
-               k2Scale=.1, k2LengthScale=1):
-    K = 3
-    R = 5
-
-    latents = [[] for r in range(R)]
+def getLatents(nLatents, nTrials,
+               k0Scale, k0LengthScale, k0Period,
+               k1Scale, k1LengthScale, k1Period,
+               k2Scale, k2LengthScale):
+    latents = [[] for r in range(nTrials)]
     def meanLatentK0(t):
         answer = 0.8*torch.exp(-2*(torch.sin(math.pi*abs(t)*2.5)**2)/5)*torch.sin(2*math.pi*2.5*t)
         return answer
@@ -28,19 +29,19 @@ def getLatents(k0Scale=.1, k0LengthScale=1.5, k0Period=1/2.5,
         return answer
     meanLatentsAll = [meanLatentK0, meanLatentK1, meanLatentK2]
 
-    kernel0 = kernels.PeriodicKernel()
+    kernel0 = stats.kernels.PeriodicKernel()
     kernel0.setParams(params=[k0Scale, k0LengthScale, k0Period])
-    kernel1 = kernels.PeriodicKernel()
+    kernel1 = stats.kernels.PeriodicKernel()
     kernel1.setParams(params=[k1Scale, k1LengthScale, k1Period])
-    kernel2 = kernels.ExponentialQuadraticKernel()
+    kernel2 = stats.kernels.ExponentialQuadraticKernel()
     kernel2.setParams(params=[k2Scale, k2LengthScale])
     kernelsAll = [kernel0, kernel1, kernel2]
 
-    latentsForTrial = [[] for r in range(K)]
-    for k in range(K):
-        latentsForTrial[k] = stats.gaussianProcesses.core.GaussianProcess(mean=meanLatentsAll[k], kernel=kernelsAll[k])
+    latentsForTrial = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        latentsForTrial[k] = stats.gaussianProcesses.eval.GaussianProcess(mean=meanLatentsAll[k], kernel=kernelsAll[k])
         # latentsForTrial[k] = meanLatentsAll[k]
-    for r in range(R):
+    for r in range(nTrials):
         latents[r] = latentsForTrial
     return latents
 
@@ -61,17 +62,17 @@ def getLatentSamples(latent, trialLength, dt):
     answer = {"t": t, "mean": mean, "std": std}
     return answer
 
-def plotLatents(latents, trialsLengths, dt, figFilename, alpha=0.5, marker="x",
-               xlabel="Time (sec)", ylabel="Amplitude"):
-    R = len(latents)
-    K = len(latents[0])
-    f, axs = plt.subplots(R,K, sharex=True, sharey=True)
-    for r in range(R):
+def plotLatents(latents, latentsEpsilon, trialsLengths, dt, figFilename, alpha=0.5, 
+                marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
+    nTrials = len(latents)
+    nLatents = len(latents[0])
+    f, axs = plt.subplots(nTrials,nLatents, sharex=True, sharey=True)
+    for r in range(nTrials):
         t = torch.arange(0, trialsLengths[r], dt)
-        for k in range(K):
+        for k in range(nLatents):
             mean = latents[r][k].mean(t)
             std = latents[r][k].std(t)
-            axs[r,k].plot(t, latents[r][k](t), marker=marker)
+            axs[r,k].plot(t, latents[r][k](t, epsilon=latentsEpsilon), marker=marker)
             axs[r,k].fill_between(t, mean-1.96*std, mean+1.96*std, alpha=alpha)
             axs[r,k].set_xlabel(xlabel)
             axs[r,k].set_ylabel(ylabel)
@@ -85,45 +86,90 @@ def plotSpikeTimes(spikeTimes, figFilename, trialToPlot, xlabel="Time (sec)",
     plt.ylabel(ylabel)
     plt.savefig(figFilename)
 
+def removeFirsSpike(spikeTimes):
+    nTrials = len(spikeTimes)
+    nNeurons = len(spikeTimes[0])
+    sSpikeTimes = [[] for n in range(nTrials)]
+    for r in range(nTrials):
+        sSpikeTimes[r] = [[] for r in range(nNeurons)]
+        for n in range(nNeurons):
+            sSpikeTimes[r][n] = spikeTimes[r][n][1:]
+    return(sSpikeTimes)
+
 def main(argv):
     nNeurons = 50
-    nTrial = 5
-    trialsLengths = [20]*nTrial
-    dtSimulate = 1e-2
-    dtLatentsFig = 1e-2
-    # dtSimulate = 1e-1
-    # dtLatentsFig = 1e-1
+    nTrials = 5
+    nLatents = 3
+    trialsLengths = [20]*nTrials
+    dtSimulate = 1e-1
+    dtLatentsFig = 1e-1
     spikeTrialToPlot = 0
-    k0Scale, k0LengthScale, k0Period = 0.1, 1.5, 1/2.5
-    k1Scale, k1LengthScale, k1Period =.1, 1.2, 1/2.5,
-    k2Scale, k2LengthScale = .1, 1
-    latentsPickleFilename = "results/latents_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.pickle".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
-    spikeTimesPickleFilename = "results/spikeTimes_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.pickle".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
-    latentsFigFilename = "figures/latents_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.png".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
-    spikeTimesFigFilename = "figures/spikeTimes_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.png".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
+    k0Scale, k0LengthScale, k0Period = 1, 1.5, 1/2.5
+    k1Scale, k1LengthScale, k1Period = 1, 1.2, 1/2.5
+    k2Scale, k2LengthScale = 1, 1
+    latentsEpsilon = 1e-3
 
-    latents = getLatents(k0Scale=.1, k0LengthScale=1.5, k0Period=1/2.5,
-                         k1Scale=.1, k1LengthScale=1.2, k1Period=1/2.5,
-                         k2Scale=.1, k2LengthScale=1)
-    nLatents = len(latents[0])
+    randomPrefixUsed = True
+    while randomPrefixUsed:
+        randomPrefix = "{:08d}".format(random.randint(0, 10**8))
+        metaDataFilename = \
+            "results/{:s}_simulation_metaData.ini".format(randomPrefix)
+        if not os.path.exists(metaDataFilename):
+           randomPrefixUsed = False
+
+    config = configparser.ConfigParser()
+    config["latents_params"] = {"nLatents": nLatents,
+                                "latentsEpsilon": latentsEpsilon}
+    config["spikes_params"] = {"nTrials": nTrials,
+                               "nNeurons": nNeurons}
+    config["kernels_params"] = {"k0Scale": k0Scale,
+                                "k0LengthScale": k0LengthScale,
+                                "k0Period": k0Period,
+                                "k1Scale": k1Scale,
+                                "k1LengthScale": k1LengthScale,
+                                "k1Period": k1Period,
+                                "k2Scale": k2Scale,
+                                "k2LengthScale": k2LengthScale}
+    config["simulation_params"] = {"dt": dtSimulate,
+                                   "trialLengths": trialsLengths}
+
+    with open(metaDataFilename, "w") as f:
+        config.write(f)
+
+    latentsFilename = \
+        "results/{:s}_simulation_latents.pickle".format(randomPrefix)
+    spikeTimesFilename = \
+        "results/{:s}_simulation_spikeTimes.pickle".format(randomPrefix)
+    latentsFigFilename = \
+        "figures/{:s}_simulation_latents.png".format(randomPrefix)
+    spikeTimesFigFilename = \
+        "figures/{:s}_simulation_spikeTimes.png".format(randomPrefix)
+
+    latents = getLatents(nLatents=nLatents, nTrials=nTrials,
+                         k0Scale=k0Scale, k0LengthScale=k0LengthScale, 
+                         k0Period=k0Period,
+                         k1Scale=k1Scale, k1LengthScale=k1LengthScale, 
+                         k1Period=k1Period,
+                         k2Scale=k2Scale, k2LengthScale=k2LengthScale)
     C = .4*torch.randn(size=(nNeurons, nLatents))*torch.tensor([1, 1.2, 1.3])
     d = -.1*torch.ones(nNeurons)
-    simulator = simulations.GPFASimulator()
+    simulator = stats.svGPFA.simulations.GPFASimulator()
     spikeTimes = simulator.simulate(nNeurons=nNeurons,
                                     trialsLengths=trialsLengths,
                                     latents=latents, C=C, d=d,
-                                    linkFunction=torch.exp, dt=dtSimulate)
+                                    linkFunction=torch.exp, dt=dtSimulate, 
+                                    latentsEpsilon=latentsEpsilon)
 
-    latentsSamples = getLatentsSamples(latents=latents, trialsLengths=trialsLengths, dt=dtSimulate)
+    latentsSamples = getLatentsSamples(latents=latents, 
+                                       trialsLengths=trialsLengths, 
+                                       dt=dtSimulate)
 
-    with open(latentsPickleFilename, "wb") as f: pickle.dump(latentsSamples, f)
-    with open(spikeTimesPickleFilename, "wb") as f: pickle.dump(spikeTimes, f)
+    with open(latentsFilename, "wb") as f: pickle.dump(latentsSamples, f)
+    with open(spikeTimesFilename, "wb") as f: pickle.dump(spikeTimes, f)
 
-    plotLatents(latents=latents, trialsLengths=trialsLengths, dt=dtLatentsFig,
-                figFilename=latentsFigFilename)
+    plotLatents(latents=latents, latentsEpsilon=latentsEpsilon, trialsLengths=trialsLengths, dt=dtLatentsFig, figFilename=latentsFigFilename)
     plt.figure()
-    plotSpikeTimes(spikeTimes=spikeTimes, trialToPlot=spikeTrialToPlot,
-                   figFilename=spikeTimesFigFilename)
+    plotSpikeTimes(spikeTimes=spikeTimes, trialToPlot=spikeTrialToPlot, figFilename=spikeTimesFigFilename)
 
     pdb.set_trace()
 
