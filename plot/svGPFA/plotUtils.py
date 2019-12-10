@@ -23,6 +23,7 @@ def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents,
         plt.savefig(fname=figFilename)
     for k in range(nLatents):
         trueMeanToPlot = trueLatents[trialToPlot][k]["mean"].squeeze()
+        trueSampledToPlot = trueLatents[trialToPlot][k]["mean"].squeeze()
         trueCIToPlot = 1.96*(trueLatents[trialToPlot][k]["std"].squeeze())
         hatMeanToPlot = muK[trialToPlot,:,k]
         positiveMSE = torch.mean((trueMeanToPlot-hatMeanToPlot)**2)
