@@ -20,9 +20,10 @@ OtherLink = 1001
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModel(conditionalDist=PointProcess, 
+    def buildModel(conditionalDist=PointProcess,
                    linkFunction=ExponentialLink,
-                   embeddingType=LinearEmbedding):
+                   embeddingType=LinearEmbedding,
+                   kernels=kernels):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
@@ -32,12 +33,12 @@ class SVGPFAModelFactory:
                     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
                     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
                     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-                        svPosteriorOnIndPoints=qU, 
-                        indPointsLocsKMS=indPointsLocsKMS, 
+                        svPosteriorOnIndPoints=qU,
+                        indPointsLocsKMS=indPointsLocsKMS,
                         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
                     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-                        svPosteriorOnIndPoints=qU, 
-                        indPointsLocsKMS=indPointsLocsKMS, 
+                        svPosteriorOnIndPoints=qU,
+                        indPointsLocsKMS=indPointsLocsKMS,
                         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
                     qHAllTimes = LinearSVEmbeddingAllTimes(
                         svPosteriorOnLatents=qKAllTimes)
@@ -46,9 +47,10 @@ class SVGPFAModelFactory:
                     eLL = PointProcessELLExpLink(
                         svEmbeddingAllTimes=qHAllTimes,
                         svEmbeddingAssocTimes=qHAssocTimes)
-                    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+                    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                                          svPosteriorOnIndPoints=qU)
                     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
+                    svlb.setKernels(kernels=kernels)
                 else:
                     raise ValueError("Invalid linkFunction=%s"%
                                      repr(linkFunction))

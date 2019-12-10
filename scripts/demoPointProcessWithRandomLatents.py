@@ -96,13 +96,13 @@ def main(argv):
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
-        embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding)
+        embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
+        kernels=kernels)
 
     with open(spikeTimesFilename, "rb") as f: spikeTimes = pickle.load(f)
 
     svEM = stats.svGPFA.svEM.SVEM()
     lowerBoundHist = svEM.maximize(model=model, measurements=spikeTimes,
-                                   kernels=kernels,
                                    initialParams=initialParams,
                                    quadParams=quadParams,
                                    optimParams=optimParams)
