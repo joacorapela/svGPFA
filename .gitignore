@@ -12,3 +12,7 @@ doc/design/*bak*
 .*lck*
 ci/Untitled*.ipynb
 /notes.txt
+scripts/figures/*
+scripts/results/*
+stats/gaussianProcesses/kernels.py
+
