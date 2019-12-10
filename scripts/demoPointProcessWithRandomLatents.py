@@ -1,34 +1,59 @@
-
 import sys
 import os
 import pdb
+import random
 from scipy.io import loadmat
 import torch
 import numpy as np
 import pickle
-import plotUtils
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-import svGPFAModelFactory
-from svEM import SVEM
+import configparser
+import matplotlib.pyplot as plt
+sys.path.append(os.path.expanduser("~/dev/research/programs/src/python"))
+import stats.kernels
+import stats.svGPFA.svGPFAModelFactory
+import stats.svGPFA.svEM
+import stats.svGPFA.plotUtils
 
 def main(argv):
-    k0Scale, k0LengthScale, k0Period = 0.1, 1.5, 1/2.5
-    k1Scale, k1LengthScale, k1Period =.1, 1.2, 1/2.5,
-    k2Scale, k2LengthScale = .1, 1
-    latentsFilename = "results/latents_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.pickle".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
-    spikeTimesFilename = "results/spikeTimes_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.pickle".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
-    dataFilename = os.path.join(os.path.dirname(__file__),
-                                "data/demo_PointProcess.mat")
-    modelSaveFilename = os.path.join(os.path.dirname(__file__),
-                                     "results/estimatedsvGPFAModel.pickle")
-    figFilename = os.path.join(os.path.dirname(__file__),
-                               "figures/estimatedLatents.png")
+    trialToPlot = 2
+    simPrefix = "00000001_simulation"
+    optimParams = {"emMaxNIter":200, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
+    initDataFilename = os.path.join("data/demo_PointProcess.mat")
 
-    with open(spikeTimesFilename, "rb") as f: spikeTimes = pickle.load(f)
+    estimConfig = configparser.ConfigParser()
+    estimConfig["simulation_params"] = {"simPrefix": simPrefix}
+    estimConfig["optim_params"] = optimParams
+    estimConfig["initial_params"] = {"initDataFilename": initDataFilename}
 
-    mat = loadmat(dataFilename)
-    nLatents = len(mat['Z0'])
-    nTrials = mat['Z0'][0,0].shape[2]
+    simConfigFilename = "results/{:s}_metaData.ini".format(simPrefix)
+    simConfig = configparser.ConfigParser()
+    simConfig.read(simConfigFilename)
+    nLatents = int(simConfig["latents_params"]["nLatents"])
+    nTrials = int(simConfig["spikes_params"]["nTrials"])
+
+    estimationPrefixUsed = True
+    while estimationPrefixUsed:
+        estimationPrefix = "{:08d}".format(random.randint(0, 10**8))
+        metaDataFilename = \
+            "results/{:s}_estimation_metaData.csv".format(estimationPrefix)
+        if not os.path.exists(metaDataFilename):
+           estimationPrefixUsed = False
+    estimMetaDataFilename = \
+        "results/{:s}_estimation_metaData.ini".format(estimationPrefix)
+    modelSaveFilename = \
+        "results/{:s}_estimatedModel.pickle".format(estimationPrefix)
+    latentsFilename = "results/{:s}_latents.pickle".format(simPrefix)
+    spikeTimesFilename = \
+        "results/{:s}_spikeTimes.pickle".format(simPrefix)
+
+    latentsFigFilename = "figures/{:s}_estimatedLatents.png".format(estimationPrefix)
+    lowerBoundHistFigFilename = \
+        "figures/{:s}_lowerBoundHist.png".format(estimationPrefix)
+
+    with open(estimMetaDataFilename, "w") as f:
+        estimConfig.write(f)
+
+    mat = loadmat(initDataFilename)
     qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
@@ -40,22 +65,18 @@ def main(argv):
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
     testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
-    trialToPlot = 2
-    # trueLatents = [[torch.from_numpy(mat['trueLatents'][tr,k]).type(torch.DoubleTensor) for tr in range(nTrials)] for k in range(nLatents)]
 
     kernels = [[None] for k in range(nLatents)]
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
-        # kernels[k] = ExponentialQuadraticKernel()
-        # kernelsParams0[k] = torch.tensor([1e-3,.1])
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel()
+            kernels[k] = stats.kernels.PeriodicKernel()
             kernelsParams0[k] = torch.tensor([1.0,
                                               float(hprs0[k,0][0]),
                                               float(hprs0[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel()
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel()
             kernelsParams0[k] = torch.tensor([1.0,
                                               float(hprs0[k,0][0])],
                                              dtype=torch.double)
@@ -71,26 +92,32 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":100, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
 
-    model = svGPFAModelFactory.SVGPFAModelFactory.buildModel(
-        conditionalDist=svGPFAModelFactory.PointProcess,
-        linkFunction=svGPFAModelFactory.ExponentialLink,
-        embeddingType=svGPFAModelFactory.LinearEmbedding)
+    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
+        conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
+        linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
+        embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding)
 
-    svEM = SVEM()
-    lowerboundHist = svEM.maximize(model=model, measurements=spikeTimes,
-                                   kernels=kernels, initialParams=initialParams,
-                            quadParams=quadParams, optimParams=optimParams)
-    resultsToSave = {"lowerBoundHist": lowerboundHist, "model": model}
+    with open(spikeTimesFilename, "rb") as f: spikeTimes = pickle.load(f)
+
+    svEM = stats.svGPFA.svEM.SVEM()
+    lowerBoundHist = svEM.maximize(model=model, measurements=spikeTimes,
+                                   kernels=kernels,
+                                   initialParams=initialParams,
+                                   quadParams=quadParams,
+                                   optimParams=optimParams)
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load( f)
 
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
     indPointsLocs = model.getIndPointsLocs()
-    plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=figFilename)
+    stats.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
+    plt.figure()
+    stats.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
+
 
     pdb.set_trace()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main(sys.argv)
