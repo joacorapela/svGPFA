@@ -6,14 +6,17 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
+sys.path.append("../src")
+from stats.svGPFA.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
                                 IndPointsLocsAndAssocTimesKMS
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-                                 SVPosteriorOnLatentsAssocTimes
-from svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
-from expectedLogLikelihood import PointProcessELLExpLink, PointProcessELLQuad
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
+        SVPosteriorOnLatentsAssocTimes
+from stats.svGPFA.svEmbedding import LinearSVEmbeddingAllTimes, \
+        LinearSVEmbeddingAssocTimes
+from stats.svGPFA.expectedLogLikelihood import PointProcessELLExpLink, \
+        PointProcessELLQuad
 
 def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     tol = 3e-4
