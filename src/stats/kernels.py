@@ -15,41 +15,17 @@ class Kernel(ABC):
         pass
 
     def getParams(self):
-        params = self._params[self._freeParams]
+        params = self._params[self._freeParams.nonzero(as_tuple=True)[0]]
         return params
 
     def setParams(self, params):
         self._params[self._freeParams] = params
 
-'''
-class AddDiagKernel(Kernel):
-    def __init__(self, kernel, epsilon=1e-5):
-        self.__kernel = kernel
-        self.__epsilon = epsilon
-
-    def buildKernelMatrix(self, X1, X2=None):
-        covMatrix = self.__kernel.buildKernelMatrix(X1=X1, X2=X2)
-        covMatrixPlusDiag = (covMatrix + 
-                             self.__epsilon*torch.eye(n=covMatrix.shape[0], 
-                                                      dtype=torch.double))
-        return covMatrixPlusDiag
-
-    def buildKernelMatrixDiag(self, X):
-        return self.__kernel.buildKernelMatrixDiag(X=X)
-
-    def setParams(self, params):
-        self.__kernel.setParams(params)
-
-    def getParams(self):
-        params = self.__kernel.getParams()
-        return params
-'''
-
 class ExponentialQuadraticKernel(Kernel):
 
-    def __init__(self, scale=None, lengthScale=None):
-        self._params = [None, None]
-        self._freeParams = [True, True]
+    def __init__(self, scale=None, lengthScale=None, dtype=torch.double):
+        self._params = torch.zeros(2, dtype=dtype)
+        self._freeParams = torch.tensor([True, True])
         if scale is not None:
             self._params[0] = scale
             self._freeParams[0] = False
@@ -71,13 +47,14 @@ class ExponentialQuadraticKernel(Kernel):
 
     def buildKernelMatrixDiag(self, X):
         scale = self._params[0]
-        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=torch.double)
+        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype)
         return covMatrixDiag
 
 class PeriodicKernel(Kernel):
-    def __init__(self, scale=None, lengthScale=None, period=None):
-        self._params = [None, None, None]
-        self._freeParams = [True, True, True]
+    def __init__(self, scale=None, lengthScale=None, period=None,
+                 dtype=torch.double):
+        self._params = torch.zeros(3, dtype=dtype)
+        self._freeParams = torch.tensor([True, True, True])
         if scale is not None:
             self._params[0] = scale
             self._freeParams[0] = False
@@ -104,6 +81,30 @@ class PeriodicKernel(Kernel):
 
     def buildKernelMatrixDiag(self, X):
         scale = self._params[0]
-        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=torch.double)
+        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype)
         return covMatrixDiag
+
+'''
+class AddDiagKernel(Kernel):
+    def __init__(self, kernel, epsilon=1e-5):
+        self.__kernel = kernel
+        self.__epsilon = epsilon
+
+    def buildKernelMatrix(self, X1, X2=None):
+        covMatrix = self.__kernel.buildKernelMatrix(X1=X1, X2=X2)
+        covMatrixPlusDiag = (covMatrix +
+                             self.__epsilon*torch.eye(n=covMatrix.shape[0],
+                                                      dtype=X1.dtype))
+        return covMatrixPlusDiag
+
+    def buildKernelMatrixDiag(self, X):
+        return self.__kernel.buildKernelMatrixDiag(X=X)
+
+    def setParams(self, params):
+        self.__kernel.setParams(params)
+
+    def getParams(self):
+        params = self.__kernel.getParams()
+        return params
+'''
 
