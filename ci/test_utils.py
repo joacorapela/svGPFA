@@ -5,7 +5,8 @@ import pdb
 import math
 from scipy.io import loadmat
 import torch
-import utils
+sys.path.append("../src")
+import stats.svGPFA.utils
 
 def test_getDiagIndicesIn3DArray():
     N = 3

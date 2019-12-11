@@ -6,10 +6,11 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import IndPointsLocsKMS
-from klDivergence import KLDivergence
+sys.path.append("../src")
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS
+from stats.svGPFA.klDivergence import KLDivergence
 
 def test_evalSumAcrossLatentsTrials():
     tol = 1e-5

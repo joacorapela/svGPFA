@@ -5,7 +5,8 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-from kernels import ExponentialQuadraticKernel, PeriodicKernel
+sys.path.append("../src")
+from stats.kernels import ExponentialQuadraticKernel, PeriodicKernel
 
 def test_exponentialQuadraticKernel():
     tol = 1e-6

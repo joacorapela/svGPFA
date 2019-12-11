@@ -7,17 +7,20 @@ from scipy.io import loadmat
 import torch
 import numpy as np
 import time
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
-                                IndPointsLocsAndAssocTimesKMS
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-                                 SVPosteriorOnLatentsAssocTimes
-from svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
-from expectedLogLikelihood import PointProcessELLExpLink, PointProcessELLQuad
-from klDivergence import KLDivergence
-from svLowerBound import SVLowerBound
-from svEM import SVEM
+sys.path.append("../src")
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, \
+        IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
+        SVPosteriorOnLatentsAssocTimes
+from stats.svGPFA.svEmbedding import LinearSVEmbeddingAllTimes, \
+        LinearSVEmbeddingAssocTimes
+from stats.svGPFA.expectedLogLikelihood import PointProcessELLExpLink, \
+        PointProcessELLQuad
+from stats.svGPFA.klDivergence import KLDivergence
+from stats.svGPFA.svLowerBound import SVLowerBound
+from stats.svGPFA.svEM import SVEM
 
 def test_eStep_pointProcess():
     tol = 1e-5

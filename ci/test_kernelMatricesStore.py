@@ -6,9 +6,9 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-# from inducingPointsPrior import InducingPointsPrior
-from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
+sys.path.append("../src")
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 
 def test_eval_IndPointsLocsKMS():
     tol = 1e-5
