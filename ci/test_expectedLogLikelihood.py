@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import numpy as np
 import torch
 sys.path.append("../src")
-from stats.svGPFA.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
 from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
                                 IndPointsLocsAndAssocTimesKMS
 from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
