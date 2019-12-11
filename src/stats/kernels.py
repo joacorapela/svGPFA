@@ -14,11 +14,12 @@ class Kernel(ABC):
     def buildKernelMatrixDiag(self, X):
         pass
 
-    def setParams(self, params):
-        self._params = params
-
     def getParams(self):
-        return self._params
+        params = self._params[self._freeParams]
+        return params
+
+    def setParams(self, params):
+        self._params[self._freeParams] = params
 
 '''
 class AddDiagKernel(Kernel):
@@ -46,6 +47,16 @@ class AddDiagKernel(Kernel):
 
 class ExponentialQuadraticKernel(Kernel):
 
+    def __init__(self, scale=None, lengthScale=None):
+        self._params = [None, None]
+        self._freeParams = [True, True]
+        if scale is not None:
+            self._params[0] = scale
+            self._freeParams[0] = False
+        if lengthScale is not None:
+            self._params[1] = lengthScale
+            self._freeParams[1]=False
+
     def buildKernelMatrix(self, X1, X2=None):
         scale = self._params[0]
         lengthScale = self._params[1]
@@ -64,6 +75,19 @@ class ExponentialQuadraticKernel(Kernel):
         return covMatrixDiag
 
 class PeriodicKernel(Kernel):
+    def __init__(self, scale=None, lengthScale=None, period=None):
+        self._params = [None, None, None]
+        self._freeParams = [True, True, True]
+        if scale is not None:
+            self._params[0] = scale
+            self._freeParams[0] = False
+        if lengthScale is not None:
+            self._params[1] = lengthScale
+            self._freeParams[1] = False
+        if period is not None:
+            self._params[2] = period
+            self._freeParams[2] = False
+
     def buildKernelMatrix(self, X1, X2=None):
         scale = self._params[0]
         lengthScale = self._params[1]
