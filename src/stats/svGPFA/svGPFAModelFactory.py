@@ -20,10 +20,7 @@ OtherLink = 1001
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModel(conditionalDist=PointProcess,
-                   linkFunction=ExponentialLink,
-                   embeddingType=LinearEmbedding,
-                   kernels=kernels):
+    def buildModel(conditionalDist, linkFunction, embeddingType, kernels):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
