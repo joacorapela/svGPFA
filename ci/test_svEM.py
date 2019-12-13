@@ -27,9 +27,6 @@ def test_eStep_pointProcess():
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Update_all_PointProcess_svGPFA.mat")
 
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
-
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
@@ -45,6 +42,14 @@ def test_eStep_pointProcess():
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernels = [[None] for k in range(nLatents)]
@@ -52,8 +57,8 @@ def test_eStep_pointProcess():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -69,7 +74,7 @@ def test_eStep_pointProcess():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     qU = SVPosteriorOnIndPoints()
@@ -77,19 +82,19 @@ def test_eStep_pointProcess():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
     eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = SVEM()
@@ -108,7 +113,7 @@ def test_eStep_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._eStep(model=svlb, maxNIter=1500, tol=1e-3, lr=1e-3, 
+    res = svEM._eStep(model=svlb, maxNIter=1500, tol=1e-3, lr=1e-3,
                       verbose=True, nIterDisplay=100)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
@@ -120,7 +125,7 @@ def test_eStep_poisson():
     tol = 1e-5
     verbose = True
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Update_all_svGPFA.mat")
- 
+
     mat = loadmat(dataFilename)
     nLatents = mat['q_mu'].shape[1]
     nTrials = mat['q_mu'][0,0].shape[2]
@@ -129,7 +134,7 @@ def test_eStep_poisson():
     qSDiag = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     t_tmp = torch.from_numpy(mat['tt']).type(torch.DoubleTensor).squeeze()
     Z = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Y = torch.from_numpy(mat['Y']).type(torch.DoubleTensor).permute(2,0,1) 
+    Y = torch.from_numpy(mat['Y']).type(torch.DoubleTensor).permute(2,0,1)
     C = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
     b = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
     nLowerBound = mat['nLowerBound'][0,0]
@@ -166,17 +171,14 @@ def test_eStep_poisson():
     res = svEM._SparseVariationalEM__eStep(maxNIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
- 
+
     # pdb.set_trace()
 '''
 
 def test_mStepModelParams_pointProcess():
-    tol = 1e-5
+    tol = 1e-4
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Mstep_Update_Iterative_PointProcess_svGPFA.mat")
-
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -191,6 +193,14 @@ def test_mStepModelParams_pointProcess():
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernelNames = mat["kernelNames"]
@@ -200,8 +210,8 @@ def test_mStepModelParams_pointProcess():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -215,19 +225,19 @@ def test_mStepModelParams_pointProcess():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
     eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = SVEM()
@@ -239,7 +249,7 @@ def test_mStepModelParams_pointProcess():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
@@ -259,9 +269,6 @@ def test_mStepKernelParams_pointProcess():
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/hyperMstep_Update.mat")
 
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
-
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
@@ -275,6 +282,14 @@ def test_mStepKernelParams_pointProcess():
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernelNames = mat["kernelNames"]
@@ -284,8 +299,8 @@ def test_mStepKernelParams_pointProcess():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -299,19 +314,19 @@ def test_mStepKernelParams_pointProcess():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
     eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = SVEM()
@@ -323,7 +338,7 @@ def test_mStepKernelParams_pointProcess():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
@@ -396,9 +411,6 @@ def test_mStepIndPoints_pointProcess():
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/inducingPointsMstep_all.mat")
 
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
-
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
@@ -412,6 +424,14 @@ def test_mStepIndPoints_pointProcess():
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernelNames = mat["kernelNames"]
@@ -421,8 +441,8 @@ def test_mStepIndPoints_pointProcess():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -436,19 +456,19 @@ def test_mStepIndPoints_pointProcess():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
     eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = SVEM()
@@ -460,7 +480,7 @@ def test_mStepIndPoints_pointProcess():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
@@ -480,9 +500,6 @@ def test_maximize_pointProcess():
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
-
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
@@ -495,6 +512,14 @@ def test_maximize_pointProcess():
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernelNames = mat["kernelNames"]
@@ -505,8 +530,8 @@ def test_maximize_pointProcess():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -520,21 +545,22 @@ def test_maximize_pointProcess():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
     eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svlb.setKernels(kernels=kernels)
     svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
@@ -544,12 +570,12 @@ def test_maximize_pointProcess():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
 
-    maxRes = svEM.maximize(model=svlb, measurements=YNonStacked, 
-                           kernels=kernels, initialParams=initialParams, 
+    maxRes = svEM.maximize(model=svlb, measurements=YNonStacked,
+                           initialParams=initialParams,
                            quadParams=quadParams, optimParams=optimParams)
     assert(maxRes['lowerBound']>leasLowerBound)
 
@@ -559,11 +585,12 @@ if __name__=='__main__':
     # test_eStep_pointProcess() # passed
     # test_eStep_poisson() # not tested
     # test_mStepModelParams_pointProcess() # passed
-    # test_mStepKernelParams_pointProcess() # passed
-    # test_mStepIndPoints_pointProcess() # passed
-    t0 = time.perf_counter()
-    test_maximize_pointProcess() # passed
-    elapsed = time.perf_counter()-t0
-    print(elapsed)
+    test_mStepKernelParams_pointProcess() # passed
+    test_mStepIndPoints_pointProcess() # passed
+
+    # t0 = time.perf_counter()
+    # test_maximize_pointProcess() # passed
+    # elapsed = time.perf_counter()-t0
+    # print(elapsed)
 
     pdb.set_trace()
