@@ -15,27 +15,32 @@ class Kernel(ABC):
         pass
 
     def getParams(self):
-        params = self._params[self._freeParams.nonzero(as_tuple=True)[0]]
-        return params
+        return self._params
 
     def setParams(self, params):
-        self._params[self._freeParams] = params
+        self._params = params
 
 class ExponentialQuadraticKernel(Kernel):
 
     def __init__(self, scale=None, lengthScale=None, dtype=torch.double):
-        self._params = torch.zeros(2, dtype=dtype)
-        self._freeParams = torch.tensor([True, True])
+        paramIsNone = torch.tensor([scale is None, lengthScale is None])
+        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype)
+
         if scale is not None:
-            self._params[0] = scale
-            self._freeParams[0] = False
+            self._scale = scale
+            self._scaleFixed = True
+        else:
+            self._scaleFixed = False
+
         if lengthScale is not None:
-            self._params[1] = lengthScale
-            self._freeParams[1]=False
+            self._lengthScale = lengthScale
+            self._lengthScaleFixed = True
+        else:
+            self._lengthScaleFixed = False
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale = self._params[0]
-        lengthScale = self._params[1]
+        scale, lengthScale = self._getAllParams(params=self._params)
+
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -46,29 +51,50 @@ class ExponentialQuadraticKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale = self._params[0]
+        scale, lengthScale = self._getAllParams(params=self._params)
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype)
         return covMatrixDiag
 
+    def _getAllParams(self, params):
+        if not self._scaleFixed and not self._lengthScaleFixed:
+            scale = self._params[0]
+            lengthScale = self._params[1]
+        elif self._scaleFixed and not self._lengthScaleFixed:
+            scale = self._scale
+            lengthScale = self._params[0]
+        elif not self._scaleFixed and self._lengthScaleFixed:
+            scale = self._params[0]
+            lengthScale = self._lengthScale
+        else:
+            raise ValueError("Scale and lengthScale cannot be both fixed")
+
+        return scale, lengthScale
+
 class PeriodicKernel(Kernel):
-    def __init__(self, scale=None, lengthScale=None, period=None,
-                 dtype=torch.double):
-        self._params = torch.zeros(3, dtype=dtype)
-        self._freeParams = torch.tensor([True, True, True])
+    def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double):
+        paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])
+        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype)
+
         if scale is not None:
-            self._params[0] = scale
-            self._freeParams[0] = False
+            self._scale = scale
+            self._scaleFixed = True
+        else:
+            self._scaleFixed = False
+
         if lengthScale is not None:
-            self._params[1] = lengthScale
-            self._freeParams[1] = False
+            self._lengthScale = lengthScale
+            self._lengthScaleFixed = True
+        else:
+            self._lengthScaleFixed = False
+
         if period is not None:
-            self._params[2] = period
-            self._freeParams[2] = False
+            self._period = period
+            self._periodFixed = True
+        else:
+            self._periodFixed = False
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale = self._params[0]
-        lengthScale = self._params[1]
-        period = self._params[2]
+        scale, lengthScale, period = self._getAllParams(params=self._params)
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -80,9 +106,43 @@ class PeriodicKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale = self._params[0]
+        scale, lengthScale, period = self._getAllParams(params=self._params)
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype)
         return covMatrixDiag
+
+    def _getAllParams(self, params):
+        if not self._scaleFixed and not self._lengthScaleFixed and not self._periodFixed:
+            scale = self._params[0]
+            lengthScale = self._params[1]
+            period = self._params[2]
+        elif self._scaleFixed and not self._lengthScaleFixed and not self._periodFixed:
+            scale = self._scale
+            lengthScale = self._params[0]
+            period = self._params[1]
+        elif not self._scaleFixed and self._lengthScaleFixed and not self._periodFixed:
+            scale = self._params[0]
+            lengthScale = self._lengthScale
+            period = self._params[1]
+        elif self._scaleFixed and self._lengthScaleFixed and not self._periodFixed:
+            scale = self._params[0]
+            lengthScale = self._params[1]
+            period = self._period
+        elif self._scaleFixed and self._lengthScaleFixed and not self._periodFixed:
+            scale = self._scale
+            lengthScale = self._lengthScale
+            period = self._params[0]
+        elif self._scaleFixed and not self._lengthScaleFixed and self._periodFixed:
+            scale = self._scale
+            lengthScale = self._params[0]
+            period = self.period
+        elif not self._scaleFixed and self._lengthScaleFixed and self._periodFixed:
+            scale = self._params[0]
+            lengthScale = self._lengthScale
+            period = self._period
+        else:
+            raise ValueError("Scale and lengthScale cannot be both fixed")
+
+        return scale, lengthScale, period
 
 '''
 class AddDiagKernel(Kernel):
