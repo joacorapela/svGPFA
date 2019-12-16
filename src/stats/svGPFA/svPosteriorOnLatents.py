@@ -6,7 +6,7 @@ from .kernelMatricesStore import IndPointsLocsAndAllTimesKMS
 
 class SVPosteriorOnLatents(ABC):
 
-    def __init__(self, svPosteriorOnIndPoints, indPointsLocsKMS, 
+    def __init__(self, svPosteriorOnIndPoints, indPointsLocsKMS,
                  indPointsLocsAndTimesKMS):
         self._svPosteriorOnIndPoints = svPosteriorOnIndPoints
         self._indPointsLocsKMS = indPointsLocsKMS
@@ -53,7 +53,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
         # test times \in nTestTimes but should be in nTrials x nTestTimes
         newTimesReformatted = torch.matmul(
-            torch.ones(nTrials, dtype=torch.double).reshape(-1, 1), 
+            torch.ones(nTrials, dtype=newTimes.dtype).reshape(-1, 1),
             newTimes.reshape(1,-1))
         newTimesReformatted = newTimesReformatted.unsqueeze(2)
 
@@ -65,8 +65,8 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
 
         svPosteriorOnLatents = SVPosteriorOnLatentsAllTimes(
-            svPosteriorOnIndPoints=self._svPosteriorOnIndPoints, 
-            indPointsLocsKMS=self._indPointsLocsKMS, 
+            svPosteriorOnIndPoints=self._svPosteriorOnIndPoints,
+            indPointsLocsKMS=self._indPointsLocsKMS,
             indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
         qKMu, qKVar = svPosteriorOnLatents.computeMeansAndVars()
 
@@ -77,9 +77,9 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         KzzChol = self._indPointsLocsKMS.getKzzChol()
         Ktz = self._indPointsLocsAndTimesKMS.getKtz()
         Ktt = self._indPointsLocsAndTimesKMS.getKtt()
-        return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, 
-                                                             KzzChol=KzzChol, 
-                                                             Ktz=Ktz, 
+        return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz,
+                                                             KzzChol=KzzChol,
+                                                             Ktz=Ktz,
                                                              Ktt=Ktt)
 
     def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, Ktt):
@@ -87,14 +87,14 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         nQuad = Ktt.shape[1]
         nLatent = Ktt.shape[2]
 
-        qKMu = torch.empty((nTrials, nQuad, nLatent), dtype=torch.double)
-        qKVar = torch.empty((nTrials, nQuad, nLatent), dtype=torch.double)
+        qKMu = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype)
+        qKVar = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype)
 
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         for k in range(len(self._svPosteriorOnIndPoints.getQMu())):
-            # Ak \in nTrials x nInd[k] x 1 
+            # Ak \in nTrials x nInd[k] x 1
             Ak = torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k],
-                                      KzzChol[k]) 
+                                      KzzChol[k])
             # mu_k \in  nTrial x nQuad x nLatent
             qKMu[:,:,k] = torch.squeeze(torch.matmul(Ktz[k], Ak))
 
@@ -138,16 +138,16 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
         KzzChol = self._indPointsLocsKMS.getKzzChol()
         Ktz = self._indPointsLocsAndTimesKMS.getKtz()
         Ktt = self._indPointsLocsAndTimesKMS.getKtt()
-        return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, 
-                                                             KzzChol=KzzChol, 
-                                                             Ktz=Ktz, 
+        return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz,
+                                                             KzzChol=KzzChol,
+                                                             Ktz=Ktz,
                                                              Ktt=Ktt)
 
     def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, Ktt):
         nTrials = len(Ktt[0])
         nLatent = len(self._svPosteriorOnIndPoints.getQMu())
         # Ak[k] \in nTrial x nInd[k] x 1
-        Ak = [torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k], 
+        Ak = [torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k],
                                    KzzChol[k]) for k in range(nLatent)]
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         qKMu = [[None] for tr in range(nTrials)]
@@ -155,8 +155,10 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
         for trialIndex in range(nTrials):
             nSpikesForTrial = Ktt[0][trialIndex].shape[0]
             # qKMu[trialIndex] \in nSpikesForTrial[trialIndex] x nLatent
-            qKMu[trialIndex] = torch.empty((nSpikesForTrial, nLatent), dtype=torch.double)
-            qKVar[trialIndex] = torch.empty((nSpikesForTrial, nLatent), dtype=torch.double)
+            qKMu[trialIndex] = torch.empty((nSpikesForTrial, nLatent),
+                                           dtype=Kzz[0].dtype)
+            qKVar[trialIndex] = torch.empty((nSpikesForTrial, nLatent),
+                                            dtype=Kzz[0].dtype)
             for k in range(nLatent):
                 qKMu[trialIndex][:,k] = torch.squeeze(torch.mm(input=Ktz[k][trialIndex], mat2=Ak[k][trialIndex,:,:]))
                 # Bfk \in nInd[k] x nSpikesForTrial[trialIndex]
@@ -167,7 +169,7 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
                 mm1f = torch.matmul(qSigma[k][trialIndex,:,:]-Kzz[k][trialIndex,:,:], Bfk)
                 # qKVar[trialIndex] \in nSpikesForTrial[trialIndex] x nLatent
                 qKVar[trialIndex][:,k] = torch.squeeze(Ktt[k][trialIndex])+torch.sum(a=Bfk*mm1f, axis=0)
-        
+
         return qKMu, qKVar
 
     def buildKernelsMatrices(self):
