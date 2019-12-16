@@ -8,22 +8,21 @@ import numpy as np
 import pickle
 import configparser
 import matplotlib.pyplot as plt
-sys.path.append(os.path.expanduser("~/dev/research/programs/src/python"))
+sys.path.append(os.path.expanduser("../src"))
 import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
-import stats.svGPFA.plotUtils
+import plot.svGPFA.plotUtils
 
 def main(argv):
-    trialToPlot = 2
-    simPrefix = "00000001_simulation"
-    optimParams = {"emMaxNIter":200, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    initDataFilename = os.path.join("data/demo_PointProcess.mat")
+    if len(argv)!=3:
+        print("Usage {:s} <random prefix> <trial to plot>".format(argv[0]))
+        return
 
-    estimConfig = configparser.ConfigParser()
-    estimConfig["simulation_params"] = {"simPrefix": simPrefix}
-    estimConfig["optim_params"] = optimParams
-    estimConfig["initial_params"] = {"initDataFilename": initDataFilename}
+    simPrefix = argv[1]
+    trialToPlot = int(argv[2])
+    optimParams = {"emMaxNIter":30, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
+    initDataFilename = os.path.join("data/demo_PointProcess.mat")
 
     simConfigFilename = "results/{:s}_metaData.ini".format(simPrefix)
     simConfig = configparser.ConfigParser()
@@ -38,6 +37,7 @@ def main(argv):
             "results/{:s}_estimation_metaData.csv".format(estimationPrefix)
         if not os.path.exists(metaDataFilename):
            estimationPrefixUsed = False
+
     estimMetaDataFilename = \
         "results/{:s}_estimation_metaData.ini".format(estimationPrefix)
     modelSaveFilename = \
@@ -49,9 +49,6 @@ def main(argv):
     latentsFigFilename = "figures/{:s}_estimatedLatents.png".format(estimationPrefix)
     lowerBoundHistFigFilename = \
         "figures/{:s}_lowerBoundHist.png".format(estimationPrefix)
-
-    with open(estimMetaDataFilename, "w") as f:
-        estimConfig.write(f)
 
     mat = loadmat(initDataFilename)
     qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
@@ -106,15 +103,23 @@ def main(argv):
                                    initialParams=initialParams,
                                    quadParams=quadParams,
                                    optimParams=optimParams)
+
+    estimConfig = configparser.ConfigParser()
+    estimConfig["simulation_params"] = {"simPrefix": simPrefix}
+    estimConfig["optim_params"] = optimParams
+    estimConfig["initial_params"] = {"initDataFilename": initDataFilename}
+    with open(estimMetaDataFilename, "w") as f:
+        estimConfig.write(f)
+
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load( f)
 
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
     indPointsLocs = model.getIndPointsLocs()
-    stats.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
+    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
     plt.figure()
-    stats.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
+    plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
 
 
     pdb.set_trace()
