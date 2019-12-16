@@ -32,12 +32,12 @@ def test_evalSumAcrossLatentsTrials():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([double(hprs[k,0][0]), 
-                                              double(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([double(hprs[k,0][0])],
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
@@ -48,7 +48,7 @@ def test_evalSumAcrossLatentsTrials():
 
     indPointsLocsKMS = IndPointsLocsKMS()
     qU = SVPosteriorOnIndPoints()
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
 
     qU.setInitialParams(initialParams=qUParams0)
