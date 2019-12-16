@@ -15,7 +15,7 @@ def main(argv):
         print("Usage {:s} <random prefix> <trial to plot>".format(argv[0]))
         return
 
-    randomPrefix = "{:8d}".format(int(argv[1]))
+    randomPrefix = argv[1]
     trialToPlot = int(argv[2])
     eLatentsFigFilename = "figures/{:s}_latents.png".format(randomPrefix)
     dataFilename = "data/demo_PointProcess.mat"
