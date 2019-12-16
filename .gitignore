@@ -8,7 +8,8 @@ fromRsync*
 nextRefractoring.txt
 todo.txt
 .ipynb*
-doc/design/*bak*
+docs/*
+!docs/design/svGPFA.vpp
 .*lck*
 ci/Untitled*.ipynb
 /notes.txt
