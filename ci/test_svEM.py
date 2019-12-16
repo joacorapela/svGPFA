@@ -574,10 +574,11 @@ def test_maximize_pointProcess():
                   "legQuadWeights": legQuadWeights}
     optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
 
-    maxRes = svEM.maximize(model=svlb, measurements=YNonStacked,
-                           initialParams=initialParams,
-                           quadParams=quadParams, optimParams=optimParams)
-    assert(maxRes['lowerBound']>leasLowerBound)
+    lowerBoundHist = svEM.maximize(model=svlb, measurements=YNonStacked,
+                                   initialParams=initialParams,
+                                   quadParams=quadParams,
+                                   optimParams=optimParams)
+    assert(lowerBoundHist[-1]>leasLowerBound)
 
     # pdb.set_trace()
 
