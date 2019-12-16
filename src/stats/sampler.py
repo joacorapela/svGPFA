@@ -14,7 +14,7 @@ class Sampler:
         intensityFun: function
                       Intensity function of the point process.
 
-        T: float
+        T: double
            The returned samples of the point process will be in [0, T]
 
         nGrid: integer
@@ -59,7 +59,7 @@ class Sampler:
         intensityFun: function
                       Intensity function of the point process.
 
-        T: float
+        T: double
            The returned samples of the point process will be in [0, T]
 
         nGrid: integer
