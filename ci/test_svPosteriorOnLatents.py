@@ -36,8 +36,8 @@ def test_computeMeansAndVars_allTimes():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -49,8 +49,8 @@ def test_computeMeansAndVars_allTimes():
     qU = SVPosteriorOnIndPoints()
     indPointsLocsKMS = IndPointsLocsKMS()
     indPointsLocsAndTimesKMS = IndPointsLocsAndAllTimesKMS()
-    qK = SVPosteriorOnLatentsAllTimes(svPosteriorOnIndPoints=qU, 
-                                      indPointsLocsKMS=indPointsLocsKMS, 
+    qK = SVPosteriorOnLatentsAllTimes(svPosteriorOnIndPoints=qU,
+                                      indPointsLocsKMS=indPointsLocsKMS,
                                       indPointsLocsAndTimesKMS=
                                        indPointsLocsAndTimesKMS)
 
@@ -98,8 +98,8 @@ def test_computeMeansAndVars_assocTimes():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -111,8 +111,8 @@ def test_computeMeansAndVars_assocTimes():
     qU = SVPosteriorOnIndPoints()
     indPointsLocsKMS = IndPointsLocsKMS()
     indPointsLocsAndTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qK = SVPosteriorOnLatentsAssocTimes(svPosteriorOnIndPoints=qU, 
-                                        indPointsLocsKMS=indPointsLocsKMS, 
+    qK = SVPosteriorOnLatentsAssocTimes(svPosteriorOnIndPoints=qU,
+                                        indPointsLocsKMS=indPointsLocsKMS,
                                         indPointsLocsAndTimesKMS=
                                          indPointsLocsAndTimesKMS)
 
