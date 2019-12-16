@@ -43,7 +43,7 @@ class IndPointsLocsKMS(KernelMatricesStore):
         for k in range(nLatent):
             self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._Z[k])+
                             epsilon*torch.eye(n=self._Z[k].shape[1],
-                                              dtype=torch.double))
+                                              dtype=self._Z[k].dtype))
             # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._Z[k])
             self._KzzChol[k] = chol3D(self._Kzz[k]) # O(n^3)
 
@@ -71,7 +71,7 @@ class IndPointsLocsAndAllTimesKMS(IndPointsLocsAndTimesKMS):
         nLatent = len(self._Z)
         self._Ktz = [[None] for k in range(nLatent)]
         self._Ktt = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent, 
-                                dtype=torch.double)
+                                dtype=self._t.dtype)
         for k in range(nLatent):
             self._Ktz[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._Z[k])
             self._Ktt[:,:,k] = self._kernels[k].buildKernelMatrixDiag(X=self._t).squeeze()
