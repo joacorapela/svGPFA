@@ -260,7 +260,7 @@ class PoissonELLQuad(PoissonELL):
     def __init__(self, svEmbeddingAllTime, linkFunction):
         super().__init__(svEmbeddingAllTime=svEmbeddingAllTime)
         self._linkFunction=linkFunction
-        
+
     def _getELinkAndELogLinkValues(self, eMean, eVar):
         # intval = permute(mtimesx(m.wwHerm',permute(m.link(qHmeanAtQuad + sqrt(2*qHMVarAtQuad).*permute(m.xxHerm,[2 3 4 1])),[4 1 2 3])),[2 3 4 1]);
 
