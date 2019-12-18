@@ -19,8 +19,6 @@ def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents,
     f, axes = plt.subplots(nLatents, 1, sharex=True)
     title = "Trial {:d}".format(trialToPlot)
     axes[0].set_title(title)
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
     for k in range(nLatents):
         trueMeanToPlot = trueLatents[trialToPlot][k]["mean"].squeeze()
         trueSampledToPlot = trueLatents[trialToPlot][k]["mean"].squeeze()
@@ -41,6 +39,8 @@ def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents,
     axes[-1].set_xlabel("Sample")
     axes[-1].legend()
     plt.xlim(left=torch.min(timesToPlot)-1, right=torch.max(timesToPlot)+1)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
     plt.show()
 
 def plotEstimatedLatents(times, muK, varK, indPointsLocs, trialToPlot=0, figFilename=None):
@@ -62,4 +62,3 @@ def plotEstimatedLatents(times, muK, varK, indPointsLocs, trialToPlot=0, figFile
     if figFilename is not None:
         plt.savefig(fname=figFilename)
     plt.show()
-
