@@ -12,7 +12,7 @@ docs/design/*bak*
 docs/Makefile*
 docs/build
 docs/make*
-docs/requirements.txt
+# docs/requirements.txt
 docs/source/*.bak
 docs/source/images
 # docs/*
