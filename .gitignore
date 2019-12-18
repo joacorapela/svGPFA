@@ -8,10 +8,20 @@ fromRsync*
 nextRefractoring.txt
 todo.txt
 .ipynb*
-docs/*
-!docs/design/svGPFA.vpp
+docs/design/*bak*
+docs/Makefile*
+docs/build
+docs/make*
+docs/requirements.txt
+docs/source/*.bak
+docs/source/images
+# docs/*
+# !docs/design/svGPFA.vpp
+# !docs/source/*.rst
+# !docs/source/*.dic
 .*lck*
 ci/Untitled*.ipynb
+ipynb/results
 /notes.txt
 scripts/figures/*
 scripts/results/*
