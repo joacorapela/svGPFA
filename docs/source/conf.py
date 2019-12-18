@@ -32,6 +32,7 @@ release = '0.0.1'
 # ones.
 extensions = ['autoapi.extension', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.ifconfig', 'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.autosummary']
 
+autoapi_type = 'python'
 autoapi_dirs = ['../../src/']
 
 # Add any paths that contain templates here, relative to this directory.
