@@ -14,7 +14,7 @@ docs/build
 docs/make*
 # docs/requirements.txt
 docs/source/*.bak
-docs/source/images
+# docs/source/images
 # docs/*
 # !docs/design/svGPFA.vpp
 # !docs/source/*.rst
