@@ -35,6 +35,10 @@ extensions = ['autoapi.extension', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', '
 autoapi_type = 'python'
 autoapi_dirs = ['../../src/']
 
+# Added this line because when building the project in readthedocs I get
+# an error contents.rst not found
+master_doc = 'index'
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
