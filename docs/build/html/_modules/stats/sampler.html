@@ -161,9 +161,9 @@
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 
-<div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../autoapi/stats/sampler/index.html#stats.sampler.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">:</span>
+<div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../stats.html#stats.sampler.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">:</span>
 
-<div class="viewcode-block" id="Sampler.sampleInhomogeneousPP_thinning"><a class="viewcode-back" href="../../autoapi/stats/sampler/index.html#stats.sampler.Sampler.sampleInhomogeneousPP_thinning">[docs]</a>    <span class="k">def</span> <span class="nf">sampleInhomogeneousPP_thinning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intensityFun</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
+<div class="viewcode-block" id="Sampler.sampleInhomogeneousPP_thinning"><a class="viewcode-back" href="../../stats.html#stats.sampler.Sampler.sampleInhomogeneousPP_thinning">[docs]</a>    <span class="k">def</span> <span class="nf">sampleInhomogeneousPP_thinning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intensityFun</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</span>
 
@@ -208,7 +208,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span><span class="p">({</span><span class="s2">&quot;inhomogeneous&quot;</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;homogeneous&quot;</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span></div>
 
-<div class="viewcode-block" id="Sampler.sampleInhomogeneousPP_timeRescaling"><a class="viewcode-back" href="../../autoapi/stats/sampler/index.html#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">[docs]</a>    <span class="k">def</span> <span class="nf">sampleInhomogeneousPP_timeRescaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intensityFun</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
+<div class="viewcode-block" id="Sampler.sampleInhomogeneousPP_timeRescaling"><a class="viewcode-back" href="../../stats.html#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">[docs]</a>    <span class="k">def</span> <span class="nf">sampleInhomogeneousPP_timeRescaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intensityFun</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Time rescaling algorithm to sample from an inhomogeneous point process. Chapter 2 from Uri Eden papers/numericalMethods/uri-eden-point-process-notes.pdf</span>
 

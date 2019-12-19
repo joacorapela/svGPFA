@@ -1,8 +1,7 @@
-src
-===
+stats
+=====
 
 .. toctree::
    :maxdepth: 4
 
-   plot
    stats
