@@ -34,7 +34,7 @@ release = '0.0.1'
 extensions = ['autoapi.extension', 'sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.ifconfig', 'sphinx.ext.viewcode', 'sphinx.ext.inheritance_diagram', 'sphinx.ext.autosummary']
 
 autoapi_type = 'python'
-autoapi_dirs = ['/nfs/nhome/live/rapela/dev/research/gatsby-swc/gatsby/svGPFA/master/src/']
+autoapi_dirs = ['../../src/']
 
 # Added this line because when building the project in readthedocs I get
 # an error contents.rst not found
