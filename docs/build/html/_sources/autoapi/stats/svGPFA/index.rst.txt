@@ -1,0 +1,25 @@
+:mod:`stats.svGPFA`
+===================
+
+.. py:module:: stats.svGPFA
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   expectedLogLikelihood/index.rst
+   kernelMatricesStore/index.rst
+   klDivergence/index.rst
+   simulations/index.rst
+   svEM/index.rst
+   svEmbedding/index.rst
+   svGPFAModelFactory/index.rst
+   svLowerBound/index.rst
+   svPosteriorOnIndPoints/index.rst
+   svPosteriorOnLatents/index.rst
+   utils/index.rst
+
+

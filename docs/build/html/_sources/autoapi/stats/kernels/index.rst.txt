@@ -1,0 +1,66 @@
+:mod:`stats.kernels`
+====================
+
+.. py:module:: stats.kernels
+
+
+Module Contents
+---------------
+
+.. py:class:: Kernel
+
+   Bases: :class:`abc.ABC`
+
+   .. method:: buildKernelMatrix(self, X1, X2=None)
+      :abstractmethod:
+
+
+
+   .. method:: buildKernelMatrixDiag(self, X)
+      :abstractmethod:
+
+
+
+   .. method:: getParams(self)
+
+
+
+   .. method:: setParams(self, params)
+
+
+
+
+.. py:class:: ExponentialQuadraticKernel(scale=None, lengthScale=None, dtype=torch.double)
+
+   Bases: :class:`stats.kernels.Kernel`
+
+   .. method:: buildKernelMatrix(self, X1, X2=None)
+
+
+
+   .. method:: buildKernelMatrixDiag(self, X)
+
+
+
+   .. method:: _getAllParams(self, params)
+
+
+
+
+.. py:class:: PeriodicKernel(scale=None, lengthScale=None, period=None, dtype=torch.double)
+
+   Bases: :class:`stats.kernels.Kernel`
+
+   .. method:: buildKernelMatrix(self, X1, X2=None)
+
+
+
+   .. method:: buildKernelMatrixDiag(self, X)
+
+
+
+   .. method:: _getAllParams(self, params)
+
+
+
+

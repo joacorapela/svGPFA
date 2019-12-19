@@ -1,0 +1,63 @@
+:mod:`stats.gaussianProcesses.kernels`
+======================================
+
+.. py:module:: stats.gaussianProcesses.kernels
+
+
+Module Contents
+---------------
+
+.. py:class:: Kernel
+
+   Bases: :class:`object`
+
+   .. attribute:: __metaclass__
+      
+
+      
+
+   .. method:: _k(self, x1, x2, params)
+      :abstractmethod:
+
+
+
+   .. method:: _kGrad(self, x1, x2, params, i)
+      :abstractmethod:
+
+
+
+   .. method:: buildKSample(self, x1, x2, params)
+
+
+
+   .. method:: buildKSampleGrad(self, x1, x2, params)
+
+
+
+
+.. py:class:: SquaredExponentialKernel
+
+   Bases: :class:`stats.gaussianProcesses.kernels.Kernel`
+
+   .. method:: _k(self, x1, x2, params)
+
+
+
+   .. method:: _kGrad(self, x1, x2, params)
+
+
+
+
+.. py:class:: PeriodicRandomFunctionKernel
+
+   Bases: :class:`stats.gaussianProcesses.kernels.Kernel`
+
+   .. method:: _k(self, x1, x2, params)
+
+
+
+   .. method:: _kGrad(self, x1, x2, params)
+
+
+
+

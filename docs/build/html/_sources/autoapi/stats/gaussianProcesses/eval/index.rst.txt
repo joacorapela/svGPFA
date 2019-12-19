@@ -1,0 +1,30 @@
+:mod:`stats.gaussianProcesses.eval`
+===================================
+
+.. py:module:: stats.gaussianProcesses.eval
+
+
+Module Contents
+---------------
+
+.. py:class:: GaussianProcess(mean, kernel)
+
+   Bases: :class:`object`
+
+   .. method:: __call__(self, t, epsilon=1e-05)
+
+
+
+   .. method:: eval(self, t, epsilon=1e-05)
+
+
+
+   .. method:: mean(self, t)
+
+
+
+   .. method:: std(self, t)
+
+
+
+

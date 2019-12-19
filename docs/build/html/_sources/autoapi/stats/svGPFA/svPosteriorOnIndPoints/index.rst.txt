@@ -1,0 +1,28 @@
+:mod:`stats.svGPFA.svPosteriorOnIndPoints`
+==========================================
+
+.. py:module:: stats.svGPFA.svPosteriorOnIndPoints
+
+
+Module Contents
+---------------
+
+.. py:class:: SVPosteriorOnIndPoints
+
+   .. method:: setInitialParams(self, initialParams)
+
+
+
+   .. method:: getParams(self)
+
+
+
+   .. method:: getQMu(self)
+
+
+
+   .. method:: buildQSigma(self)
+
+
+
+

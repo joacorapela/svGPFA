@@ -1,0 +1,450 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stats.svGPFA.expectedLogLikelihood &mdash; svGPFA 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> svGPFA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../introduction.html">Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../plot.html">plot package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../stats.html">stats package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">svGPFA</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="xref py py-mod docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../../../_sources/autoapi/stats/svGPFA/expectedLogLikelihood/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-stats.svGPFA.expectedLogLikelihood">
+<span id="stats-svgpfa-expectedloglikelihood"></span><h1><a class="reference internal" href="../../../../stats.svGPFA.html#module-stats.svGPFA.expectedLogLikelihood" title="stats.svGPFA.expectedLogLikelihood"><code class="xref py py-mod docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood</span></code></a><a class="headerlink" href="#module-stats.svGPFA.expectedLogLikelihood" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">ExpectedLogLikelihood</code><span class="sig-paren">(</span><em class="sig-param">svEmbeddingAllTimes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons">
+<em class="property">abstract </em><code class="sig-name descname">evalSumAcrossTrialsAndNeurons</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">svPosteriorOnLatentsStats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices">
+<em class="property">abstract </em><code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats">
+<em class="property">abstract </em><code class="sig-name descname">computeSVPosteriorOnLatentsStats</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setMeasurements">
+<em class="property">abstract </em><code class="sig-name descname">setMeasurements</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">measurements</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setMeasurements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs">
+<em class="property">abstract </em><code class="sig-name descname">setIndPointsLocs</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">locs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setIndPointsLocs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setKernels">
+<em class="property">abstract </em><code class="sig-name descname">setKernels</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">kernels</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setKernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams">
+<em class="property">abstract </em><code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setQuadParams">
+<em class="property">abstract </em><code class="sig-name descname">setQuadParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quadParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setQuadParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setQuadParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams">
+<code class="sig-name descname">getSVPosteriorOnIndPointsParams</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams">
+<code class="sig-name descname">getSVEmbeddingParams</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.getSVEmbeddingParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getIndPointsLocs">
+<code class="sig-name descname">getIndPointsLocs</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.getIndPointsLocs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getKernelsParams">
+<code class="sig-name descname">getKernelsParams</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.getKernelsParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.predictLatents">
+<code class="sig-name descname">predictLatents</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">newTimes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.predictLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.predictLatents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PointProcessELL</code><span class="sig-paren">(</span><em class="sig-param">svEmbeddingAllTimes</em>, <em class="sig-param">svEmbeddingAssocTimes</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood" title="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.evalSumAcrossTrialsAndNeurons">
+<code class="sig-name descname">evalSumAcrossTrialsAndNeurons</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">svPosteriorOnLatentsStats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.evalSumAcrossTrialsAndNeurons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.evalSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.buildKernelsMatrices">
+<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeSVPosteriorOnLatentsStats">
+<code class="sig-name descname">computeSVPosteriorOnLatentsStats</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.computeSVPosteriorOnLatentsStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.setMeasurements">
+<code class="sig-name descname">setMeasurements</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">measurements</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.setMeasurements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.__stackSpikeTimes">
+<code class="sig-name descname">__stackSpikeTimes</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">spikeTimes</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.__stackSpikeTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.setIndPointsLocs">
+<code class="sig-name descname">setIndPointsLocs</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">locs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.setIndPointsLocs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.setKernels">
+<code class="sig-name descname">setKernels</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">kernels</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.setKernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.setInitialParams">
+<code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.setQuadParams">
+<code class="sig-name descname">setQuadParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quadParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.setQuadParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setQuadParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL._getELinkValues">
+<em class="property">abstract </em><code class="sig-name descname">_getELinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL._getELinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL._getELinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL._getELogLinkValues">
+<em class="property">abstract </em><code class="sig-name descname">_getELogLinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL._getELogLinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL._getELogLinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PointProcessELLExpLink</code><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLExpLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL" title="stats.svGPFA.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.PointProcessELL</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink._getELinkValues">
+<code class="sig-name descname">_getELinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLExpLink._getELinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink._getELinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink._getELogLinkValues">
+<code class="sig-name descname">_getELogLinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLExpLink._getELogLinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink._getELogLinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PointProcessELLQuad</code><span class="sig-paren">(</span><em class="sig-param">svEmbeddingAllTimes</em>, <em class="sig-param">svEmbeddingAssocTimes</em>, <em class="sig-param">linkFunction</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLQuad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL" title="stats.svGPFA.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.PointProcessELL</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad.setQuadParams">
+<code class="sig-name descname">setQuadParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">quadParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLQuad.setQuadParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad.setQuadParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad._getELinkValues">
+<code class="sig-name descname">_getELinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLQuad._getELinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad._getELinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad._getELogLinkValues">
+<code class="sig-name descname">_getELogLinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLQuad._getELogLinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad._getELogLinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PoissonELL</code><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood" title="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons">
+<code class="sig-name descname">evalSumAcrossTrialsAndNeurons</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">svPosteriorOnLatentsStats=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.evalSumAcrossTrialsAndNeurons"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.buildKernelsMatrices">
+<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.computeSVPostOnLatentsStats">
+<code class="sig-name descname">computeSVPostOnLatentsStats</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.computeSVPostOnLatentsStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.computeSVPostOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.setMeasurements">
+<code class="sig-name descname">setMeasurements</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">measurements</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.setMeasurements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.setIndPointsLocs">
+<code class="sig-name descname">setIndPointsLocs</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">locs</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.setIndPointsLocs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.setKernels">
+<code class="sig-name descname">setKernels</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">kernels</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.setKernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.setInitialParams">
+<code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL.setMiscParams">
+<code class="sig-name descname">setMiscParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">miscParams</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL.setMiscParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL.setMiscParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELL._getELinkAndELogLinkValues">
+<em class="property">abstract </em><code class="sig-name descname">_getELinkAndELogLinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELL._getELinkAndELogLinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELL._getELinkAndELogLinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PoissonELLExpLink</code><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELLExpLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL" title="stats.svGPFA.expectedLogLikelihood.PoissonELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.PoissonELL</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink._getELinkAndELogLinkValues">
+<code class="sig-name descname">_getELinkAndELogLinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELLExpLink._getELinkAndELogLinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink._getELinkAndELogLinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELLQuad">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PoissonELLQuad</code><span class="sig-paren">(</span><em class="sig-param">svEmbeddingAllTime</em>, <em class="sig-param">linkFunction</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELLQuad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELLQuad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL" title="stats.svGPFA.expectedLogLikelihood.PoissonELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.PoissonELL</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PoissonELLQuad._getELinkAndELogLinkValues">
+<code class="sig-name descname">_getELinkAndELogLinkValues</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">eMean</em>, <em class="sig-param">eVar</em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/stats/svGPFA/expectedLogLikelihood.html#PoissonELLQuad._getELinkAndELogLinkValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PoissonELLQuad._getELinkAndELogLinkValues" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Lea Duncker and Maneesh Sahani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

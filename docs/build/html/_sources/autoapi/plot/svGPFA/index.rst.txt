@@ -1,0 +1,15 @@
+:mod:`plot.svGPFA`
+==================
+
+.. py:module:: plot.svGPFA
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   plotUtils/index.rst
+
+

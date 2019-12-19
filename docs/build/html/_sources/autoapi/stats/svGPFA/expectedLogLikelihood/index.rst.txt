@@ -1,0 +1,215 @@
+:mod:`stats.svGPFA.expectedLogLikelihood`
+=========================================
+
+.. py:module:: stats.svGPFA.expectedLogLikelihood
+
+
+Module Contents
+---------------
+
+.. py:class:: ExpectedLogLikelihood(svEmbeddingAllTimes)
+
+   Bases: :class:`abc.ABC`
+
+   .. method:: evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None)
+      :abstractmethod:
+
+
+
+   .. method:: buildKernelsMatrices(self)
+      :abstractmethod:
+
+
+
+   .. method:: computeSVPosteriorOnLatentsStats(self)
+      :abstractmethod:
+
+
+
+   .. method:: setMeasurements(self, measurements)
+      :abstractmethod:
+
+
+
+   .. method:: setIndPointsLocs(self, locs)
+      :abstractmethod:
+
+
+
+   .. method:: setKernels(self, kernels)
+      :abstractmethod:
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+      :abstractmethod:
+
+
+
+   .. method:: setQuadParams(self, quadParams)
+      :abstractmethod:
+
+
+
+   .. method:: getSVPosteriorOnIndPointsParams(self)
+
+
+
+   .. method:: getSVEmbeddingParams(self)
+
+
+
+   .. method:: getIndPointsLocs(self)
+
+
+
+   .. method:: getKernelsParams(self)
+
+
+
+   .. method:: predictLatents(self, newTimes)
+
+
+
+
+.. py:class:: PointProcessELL(svEmbeddingAllTimes, svEmbeddingAssocTimes)
+
+   Bases: :class:`stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood`
+
+   .. method:: evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None)
+
+
+
+   .. method:: buildKernelsMatrices(self)
+
+
+
+   .. method:: computeSVPosteriorOnLatentsStats(self)
+
+
+
+   .. method:: setMeasurements(self, measurements)
+
+
+
+   .. method:: __stackSpikeTimes(self, spikeTimes)
+
+
+
+   .. method:: setIndPointsLocs(self, locs)
+
+
+
+   .. method:: setKernels(self, kernels)
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+
+
+
+   .. method:: setQuadParams(self, quadParams)
+
+
+
+   .. method:: _getELinkValues(self, eMean, eVar)
+      :abstractmethod:
+
+
+
+   .. method:: _getELogLinkValues(self, eMean, eVar)
+      :abstractmethod:
+
+
+
+
+.. py:class:: PointProcessELLExpLink
+
+   Bases: :class:`stats.svGPFA.expectedLogLikelihood.PointProcessELL`
+
+   .. method:: _getELinkValues(self, eMean, eVar)
+
+
+
+   .. method:: _getELogLinkValues(self, eMean, eVar)
+
+
+
+
+.. py:class:: PointProcessELLQuad(svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction)
+
+   Bases: :class:`stats.svGPFA.expectedLogLikelihood.PointProcessELL`
+
+   .. method:: setQuadParams(self, quadParams)
+
+
+
+   .. method:: _getELinkValues(self, eMean, eVar)
+
+
+
+   .. method:: _getELogLinkValues(self, eMean, eVar)
+
+
+
+
+.. py:class:: PoissonELL
+
+   Bases: :class:`stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood`
+
+   .. method:: evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None)
+
+
+
+   .. method:: buildKernelsMatrices(self)
+
+
+
+   .. method:: computeSVPostOnLatentsStats(self)
+
+
+
+   .. method:: setMeasurements(self, measurements)
+
+
+
+   .. method:: setIndPointsLocs(self, locs)
+
+
+
+   .. method:: setKernels(self, kernels)
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+
+
+
+   .. method:: setMiscParams(self, miscParams)
+
+
+
+   .. method:: _getELinkAndELogLinkValues(self, eMean, eVar)
+      :abstractmethod:
+
+
+
+
+.. py:class:: PoissonELLExpLink
+
+   Bases: :class:`stats.svGPFA.expectedLogLikelihood.PoissonELL`
+
+   .. method:: _getELinkAndELogLinkValues(self, eMean, eVar)
+
+
+
+
+.. py:class:: PoissonELLQuad(svEmbeddingAllTime, linkFunction)
+
+   Bases: :class:`stats.svGPFA.expectedLogLikelihood.PoissonELL`
+
+   .. method:: _getELinkAndELogLinkValues(self, eMean, eVar)
+
+
+
+

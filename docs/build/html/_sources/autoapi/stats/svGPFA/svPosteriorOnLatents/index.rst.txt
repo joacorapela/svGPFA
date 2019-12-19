@@ -1,0 +1,117 @@
+:mod:`stats.svGPFA.svPosteriorOnLatents`
+========================================
+
+.. py:module:: stats.svGPFA.svPosteriorOnLatents
+
+
+Module Contents
+---------------
+
+.. py:class:: SVPosteriorOnLatents(svPosteriorOnIndPoints, indPointsLocsKMS, indPointsLocsAndTimesKMS)
+
+   Bases: :class:`abc.ABC`
+
+   .. method:: computeMeansAndVars(self)
+      :abstractmethod:
+
+
+
+   .. method:: buildKernelsMatrices(self)
+      :abstractmethod:
+
+
+
+   .. method:: setKernels(self)
+      :abstractmethod:
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+      :abstractmethod:
+
+
+
+   .. method:: setTimes(self, times)
+
+
+
+   .. method:: setIndPointsLocs(self, indPointsLocs)
+      :abstractmethod:
+
+
+
+   .. method:: getSVPosteriorOnIndPointsParams(self)
+
+
+
+   .. method:: getKernelsParams(self)
+
+
+
+   .. method:: getIndPointsLocs(self)
+
+
+
+
+.. py:class:: SVPosteriorOnLatentsAllTimes
+
+   Bases: :class:`stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents`
+
+   .. method:: predict(self, newTimes)
+
+
+
+   .. method:: computeMeansAndVars(self)
+
+
+
+   .. method:: __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, Ktt)
+
+
+
+   .. method:: buildKernelsMatrices(self)
+
+
+
+   .. method:: setKernels(self, kernels)
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+
+
+
+   .. method:: setIndPointsLocs(self, indPointsLocs)
+
+
+
+
+.. py:class:: SVPosteriorOnLatentsAssocTimes
+
+   Bases: :class:`stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents`
+
+   .. method:: computeMeansAndVars(self)
+
+
+
+   .. method:: __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, Ktt)
+
+
+
+   .. method:: buildKernelsMatrices(self)
+
+
+
+   .. method:: setKernels(self, kernels)
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+
+
+
+   .. method:: setIndPointsLocs(self, indPointsLocs)
+
+
+
+

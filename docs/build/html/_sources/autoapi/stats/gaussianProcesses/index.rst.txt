@@ -1,0 +1,17 @@
+:mod:`stats.gaussianProcesses`
+==============================
+
+.. py:module:: stats.gaussianProcesses
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   eval/index.rst
+   kernels/index.rst
+   learn/index.rst
+
+

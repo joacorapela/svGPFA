@@ -1,0 +1,42 @@
+:mod:`stats.svGPFA.svGPFAModelFactory`
+======================================
+
+.. py:module:: stats.svGPFA.svGPFAModelFactory
+
+
+Module Contents
+---------------
+
+.. data:: PointProcess
+   :annotation: = 0
+
+   
+
+.. data:: Poisson
+   :annotation: = 1
+
+   
+
+.. data:: LinearEmbedding
+   :annotation: = 100
+
+   
+
+.. data:: ExponentialLink
+   :annotation: = 1000
+
+   
+
+.. data:: OtherLink
+   :annotation: = 1001
+
+   
+
+.. py:class:: SVGPFAModelFactory
+
+   .. method:: buildModel(conditionalDist, linkFunction, embeddingType, kernels)
+      :staticmethod:
+
+
+
+

@@ -1,0 +1,15 @@
+:mod:`plot`
+===========
+
+.. py:module:: plot
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   svGPFA/index.rst
+
+

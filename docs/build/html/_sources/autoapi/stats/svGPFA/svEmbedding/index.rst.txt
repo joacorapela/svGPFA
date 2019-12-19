@@ -1,0 +1,104 @@
+:mod:`stats.svGPFA.svEmbedding`
+===============================
+
+.. py:module:: stats.svGPFA.svEmbedding
+
+
+Module Contents
+---------------
+
+.. py:class:: SVEmbedding(svPosteriorOnLatents)
+
+   Bases: :class:`abc.ABC`
+
+   .. method:: computeMeansAndVars(self, svPosteriorOnLatentsStats=None)
+
+
+
+   .. method:: computeSVPosteriorOnLatentsStats(self)
+
+
+
+   .. method:: buildKernelsMatrices(self)
+
+
+
+   .. method:: setInitialParams(self, initialParams)
+      :abstractmethod:
+
+
+
+   .. method:: setIndPointsLocs(self, indPointsLocs)
+
+
+
+   .. method:: setKernels(self, kernels)
+
+
+
+   .. method:: setTimes(self, times)
+
+
+
+   .. method:: getParams(self)
+      :abstractmethod:
+
+
+
+   .. method:: getSVPosteriorOnIndPointsParams(self)
+
+
+
+   .. method:: getIndPointsLocs(self)
+
+
+
+   .. method:: getKernelsParams(self)
+
+
+
+   .. method:: _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars)
+      :abstractmethod:
+
+
+
+
+.. py:class:: LinearSVEmbedding
+
+   Bases: :class:`stats.svGPFA.svEmbedding.SVEmbedding`
+
+   .. method:: setInitialParams(self, initialParams)
+
+
+
+   .. method:: getParams(self)
+
+
+
+
+.. py:class:: LinearSVEmbeddingAllTimes
+
+   Bases: :class:`stats.svGPFA.svEmbedding.LinearSVEmbedding`
+
+   .. method:: _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars)
+
+
+
+   .. method:: predictLatents(self, newTimes)
+
+
+
+
+.. py:class:: LinearSVEmbeddingAssocTimes
+
+   Bases: :class:`stats.svGPFA.svEmbedding.LinearSVEmbedding`
+
+   .. method:: setNeuronForSpikeIndex(self, neuronForSpikeIndex)
+
+
+
+   .. method:: _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars)
+
+
+
+

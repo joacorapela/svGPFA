@@ -1,0 +1,48 @@
+:mod:`stats.svGPFA.simulations`
+===============================
+
+.. py:module:: stats.svGPFA.simulations
+
+
+Module Contents
+---------------
+
+.. py:class:: GPFASimulator
+
+   .. method:: simulate(self, nNeurons, trialsLengths, latents, C, d, linkFunction, dt, latentsEpsilon=1e-05)
+
+
+      Simulates spikes for N=nNeurons neurons and R=len(trialLengths) trials
+      using K=len(latents) per trial.
+
+      Parameters
+      ----------
+
+      nNeurons: int
+                number of neurons to simulate.
+      trialsLengths: numpy array \in R^R
+                     trialsLengths[r] is the duration, T_r, of the rth trial
+      latents: list of length K
+          len(latents[k])=R and contains kth latent processes (i.e., Gaussian
+          processes) for all R trials.
+      C: numpy ndarray \in R^{N       imes K}
+      d: numpy array \in R^N
+      linkFunction: function
+                    function to map embedding values to point-process
+                    intensity values.
+
+      Returns
+      -------
+
+      list[n][r]
+          containing a list of spike times for neuron n in trial r
+
+
+
+.. py:class:: EmbeddingSimulator(latents, C, d, latentsEpsilon)
+
+   .. method:: getEmbeddingFunctionForNeuronAndTrial(self, n, r)
+
+
+
+

@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stats.svGPFA.utils &mdash; svGPFA 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> svGPFA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../plot.html">plot package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../stats.html">stats package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">svGPFA</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>stats.svGPFA.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for stats.svGPFA.utils</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">pdb</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">def j_cholesky_solve(b, u, upper=False):</span>
+<span class="sd">    # solves (uu^T) * c = b</span>
+<span class="sd">    # first compute the forward substitution   u   * y = b</span>
+<span class="sd">    # second compute the backward substitution u^T * c = y</span>
+<span class="sd">    if upper==True:</span>
+<span class="sd">        raise NotIpmplemented(&quot;option upper=True has not been implemented yet&quot;)</span>
+<span class="sd">    if b.ndim==2 and u.ndim=2:</span>
+<span class="sd">        return j_cholesky_solve2D(b=b, u=u)</span>
+<span class="sd">    elif b.dim=3 and u.ndim=3:</span>
+
+<span class="sd">    else:</span>
+<span class="sd">        raise ValueError(&quot;Incorrect number of dimensions in b and/or u&quot;)</span>
+
+<span class="sd">    y = forwardSubstitution(b=b, u=u)</span>
+<span class="sd">    c = backSubstitution(b=y, u=u.T)</span>
+<span class="sd">    return c</span>
+
+<span class="sd">def forwardSubstitution(b, u):</span>
+<span class="sd">    # solves u * y = b where u is a lower triangular matrix</span>
+<span class="sd">    # u \in n x n</span>
+<span class="sd">    # y \in n x k</span>
+<span class="sd">    # b \in n x k</span>
+<span class="sd">    n = u.shape[0]</span>
+<span class="sd">    k = b.shape[1]</span>
+<span class="sd">    y = torch.zeros((n, k))</span>
+<span class="sd">    for j in range(k):</span>
+<span class="sd">        y[0,j] = b[0,j]/u[0,0]</span>
+<span class="sd">        for i in range(n):</span>
+<span class="sd">            y[i,j] = b[i,j]</span>
+<span class="sd">            for l in range(i):</span>
+<span class="sd">                y[i,j] -= u[i,l]*y[l,j]</span>
+<span class="sd">            y[i,j] /= u[i,i]</span>
+<span class="sd">    return y</span>
+
+<span class="sd">def backSubstitution(b, u):</span>
+<span class="sd">    # solves u * y = b where u is an upper triangular matrix</span>
+<span class="sd">    # u \in n x n</span>
+<span class="sd">    # y \in n x k</span>
+<span class="sd">    # b \in n x k</span>
+<span class="sd">    n = u.shape[0]</span>
+<span class="sd">    k = b.shape[1]</span>
+<span class="sd">    y = torch.zeros((n, k))</span>
+<span class="sd">    for j in range(k):</span>
+<span class="sd">        y[n-1,j] = b[n-1,j]/u[n-1,n-1]</span>
+<span class="sd">        for i in range(n-2, -1, -1):</span>
+<span class="sd">            y[i,j] = b[i,j]</span>
+<span class="sd">            for l in range(i+1, n):</span>
+<span class="sd">                y[i,j] -= u[i,l]*y[l,j]</span>
+<span class="sd">            y[i,j] /= u[i,i]</span>
+<span class="sd">    return y</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="getDiagIndicesIn3DArray"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.getDiagIndicesIn3DArray">[docs]</a><span class="k">def</span> <span class="nf">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="n">frameDiagIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">frameStartIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span>
+    <span class="c1"># torch way of computing an outer sum</span>
+    <span class="n">diagIndices</span> <span class="o">=</span> <span class="p">(</span><span class="n">frameDiagIndices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">frameStartIndices</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">answer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">diagIndices</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+<div class="viewcode-block" id="build3DdiagFromDiagVector"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.build3DdiagFromDiagVector">[docs]</a><span class="k">def</span> <span class="nf">build3DdiagFromDiagVector</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="n">N</span><span class="o">*</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">diagIndices</span> <span class="o">=</span> <span class="n">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">D</span><span class="p">[</span><span class="n">diagIndices</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">reshapedD</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">reshapedD</span></div>
+
+<div class="viewcode-block" id="flattenListsOfArrays"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.flattenListsOfArrays">[docs]</a><span class="k">def</span> <span class="nf">flattenListsOfArrays</span><span class="p">(</span><span class="o">*</span><span class="n">lists</span><span class="p">):</span>
+    <span class="n">aListOfArrays</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">arraysList</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">arraysList</span><span class="p">:</span>
+            <span class="n">aListOfArrays</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">aListOfArrays</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="chol3D"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.chol3D">[docs]</a><span class="k">def</span> <span class="nf">chol3D</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+    <span class="n">Kchol</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">Kchol</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:])</span>
+    <span class="k">return</span> <span class="n">Kchol</span></div>
+
+<div class="viewcode-block" id="clock"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.clock">[docs]</a><span class="k">def</span> <span class="nf">clock</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clocked</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">arg_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arg_str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kargs</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="n">karg_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">karg_str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">arg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">karg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">,</span><span class="si">%s</span><span class="s1">) -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">arg_str</span><span class="p">,</span> <span class="n">karg_str</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">arg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">) -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">arg_str</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">karg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">) -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">karg_str</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">() -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">clocked</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Lea Duncker and Maneesh Sahani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stats package &mdash; svGPFA 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="stats.gaussianProcesses package" href="stats.gaussianProcesses.html" />
+    <link rel="prev" title="plot.svGPFA package" href="plot.svGPFA.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> svGPFA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Code:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="plot.html">plot package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">stats package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="stats.gaussianProcesses.html">stats.gaussianProcesses package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats.kernels">stats.kernels module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats.sampler">stats.sampler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats.kernels.ExponentialQuadraticKernel">ExponentialQuadraticKernel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">buildKernelMatrix</a></li>
+</ul>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">buildKernelMatrixDiag</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats.kernels.Kernel">Kernel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.buildKernelMatrix">buildKernelMatrix</a></li>
+</ul>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.buildKernelMatrixDiag">buildKernelMatrixDiag</a></li>
+</ul>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.getParams">getParams</a></li>
+</ul>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.setParams">setParams</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats.kernels.PeriodicKernel">PeriodicKernel</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.PeriodicKernel.buildKernelMatrix">buildKernelMatrix</a></li>
+</ul>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag">buildKernelMatrixDiag</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l3"><a class="reference internal" href="#stats.sampler.Sampler">Sampler</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning">sampleInhomogeneousPP_thinning</a></li>
+</ul>
+<ul>
+<li class="toctree-l4"><a class="reference internal" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">sampleInhomogeneousPP_timeRescaling</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">svGPFA</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>stats package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/stats.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="stats-package">
+<h1>stats package<a class="headerlink" href="#stats-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="stats.gaussianProcesses.html">stats.gaussianProcesses package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.eval">stats.gaussianProcesses.eval module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.kernels">stats.gaussianProcesses.kernels module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.learn">stats.gaussianProcesses.learn module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.expectedLogLikelihood">stats.svGPFA.expectedLogLikelihood module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.kernelMatricesStore">stats.svGPFA.kernelMatricesStore module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.klDivergence">stats.svGPFA.klDivergence module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.simulations">stats.svGPFA.simulations module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEM">stats.svGPFA.svEM module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEmbedding">stats.svGPFA.svEmbedding module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svGPFAModelFactory">stats.svGPFA.svGPFAModelFactory module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svLowerBound">stats.svGPFA.svLowerBound module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svPosteriorOnIndPoints">stats.svGPFA.svPosteriorOnIndPoints module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svPosteriorOnLatents">stats.svGPFA.svPosteriorOnLatents module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.utils">stats.svGPFA.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-stats.kernels">
+<span id="stats-kernels-module"></span><h2>stats.kernels module<a class="headerlink" href="#module-stats.kernels" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="stats.kernels.ExponentialQuadraticKernel">
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">dtype=torch.float64</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="autoapi/stats/kernels/index.html#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
+<dl class="method">
+<dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">
+<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">
+<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.kernels.Kernel">
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">Kernel</code><a class="reference internal" href="_modules/stats/kernels.html#Kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="method">
+<dt id="stats.kernels.Kernel.buildKernelMatrix">
+<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.Kernel.buildKernelMatrixDiag">
+<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.Kernel.getParams">
+<code class="sig-name descname">getParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.getParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.Kernel.setParams">
+<code class="sig-name descname">setParams</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.setParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.setParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.kernels.PeriodicKernel">
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">period=None</em>, <em class="sig-param">dtype=torch.float64</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="autoapi/stats/kernels/index.html#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
+<dl class="method">
+<dt id="stats.kernels.PeriodicKernel.buildKernelMatrix">
+<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.PeriodicKernel.buildKernelMatrixDiag">
+<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-stats.sampler">
+<span id="stats-sampler-module"></span><h2>stats.sampler module<a class="headerlink" href="#module-stats.sampler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="stats.sampler.Sampler">
+<em class="property">class </em><code class="sig-prename descclassname">stats.sampler.</code><code class="sig-name descname">Sampler</code><a class="reference internal" href="_modules/stats/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="stats.sampler.Sampler.sampleInhomogeneousPP_thinning">
+<code class="sig-name descname">sampleInhomogeneousPP_thinning</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_thinning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</p>
+<dl class="simple">
+<dt>intensityFun: function</dt><dd><p>Intensity function of the point process.</p>
+</dd>
+<dt>T: double</dt><dd><p>The returned samples of the point process will be in [0, T]</p>
+</dd>
+<dt>nGrid: integer</dt><dd><p>number of points in the grid used to search for the maximum of intensityFun.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>inhomogeneous: list</dt><dd><p>samples of the inhomogeneous point process with intensity function intensityFun.</p>
+</dd>
+<dt>homogeneous: list</dt><dd><p>samples of the homogeneous that was filtered to generate the inhomogeneous point process.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">
+<code class="sig-name descname">sampleInhomogeneousPP_timeRescaling</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_timeRescaling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time rescaling algorithm to sample from an inhomogeneous point process. Chapter 2 from Uri Eden papers/numericalMethods/uri-eden-point-process-notes.pdf</p>
+<dl class="simple">
+<dt>intensityFun: function</dt><dd><p>Intensity function of the point process.</p>
+</dd>
+<dt>T: double</dt><dd><p>The returned samples of the point process will be in [0, T]</p>
+</dd>
+<dt>nGrid: integer</dt><dd><p>number of points in the grid used to search for spike times.</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>list</dt><dd><p>samples of the inhomogeneous point process with intensity function intensityFun.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-stats">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-stats" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="stats.gaussianProcesses.html" class="btn btn-neutral float-right" title="stats.gaussianProcesses package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="plot.svGPFA.html" class="btn btn-neutral float-left" title="plot.svGPFA package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Lea Duncker and Maneesh Sahani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
