@@ -164,68 +164,68 @@
 <h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="stats.kernels.Kernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">Kernel</code><a class="reference internal" href="../../../_modules/stats/kernels.html#Kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">Kernel</code><a class="headerlink" href="#stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <dl class="method">
 <dt id="stats.kernels.Kernel.buildKernelMatrix">
-<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#Kernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.Kernel.buildKernelMatrixDiag">
-<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#Kernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.Kernel.getParams">
-<code class="sig-name descname">getParams</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#Kernel.getParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.getParams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getParams</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.getParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.Kernel.setParams">
-<code class="sig-name descname">setParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#Kernel.setParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.setParams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.setParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="stats.kernels.ExponentialQuadraticKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">dtype=torch.double</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#ExponentialQuadraticKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">dtype=torch.double</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../../stats.html#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">
-<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">
-<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel._getAllParams">
-<code class="sig-name descname">_getAllParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#ExponentialQuadraticKernel._getAllParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel._getAllParams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_getAllParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel._getAllParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="stats.kernels.PeriodicKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">period=None</em>, <em class="sig-param">dtype=torch.double</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#PeriodicKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">period=None</em>, <em class="sig-param">dtype=torch.double</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="../../../stats.html#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel.buildKernelMatrix">
-<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel.buildKernelMatrixDiag">
-<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel._getAllParams">
-<code class="sig-name descname">_getAllParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/stats/kernels.html#PeriodicKernel._getAllParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel._getAllParams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">_getAllParams</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel._getAllParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
