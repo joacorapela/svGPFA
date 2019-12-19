@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>stats.svGPFA.expectedLogLikelihood &mdash; svGPFA 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> svGPFA
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Overview</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../plot.html">plot package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../stats.html">stats package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">svGPFA</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>stats.svGPFA.expectedLogLikelihood</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for stats.svGPFA.expectedLogLikelihood</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">pdb</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="c1"># import warnings</span>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood">[docs]</a><span class="k">class</span> <span class="nc">ExpectedLogLikelihood</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svEmbeddingAllTimes</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span> <span class="o">=</span> <span class="n">svEmbeddingAllTimes</span>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">evalSumAcrossTrialsAndNeurons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.buildKernelsMatrices"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">buildKernelsMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">computeSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.setMeasurements"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setMeasurements">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">setMeasurements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurements</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.setIndPointsLocs"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">setIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.setKernels"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setKernels">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">setKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernels</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.setInitialParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">setInitialParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialParams</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.setQuadParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setQuadParams">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">setQuadParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quadParams</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams">[docs]</a>    <span class="k">def</span> <span class="nf">getSVPosteriorOnIndPointsParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">getSVPosteriorOnIndPointsParams</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.getSVEmbeddingParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams">[docs]</a>    <span class="k">def</span> <span class="nf">getSVEmbeddingParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">getParams</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.getIndPointsLocs"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getIndPointsLocs">[docs]</a>    <span class="k">def</span> <span class="nf">getIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">getIndPointsLocs</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.getKernelsParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getKernelsParams">[docs]</a>    <span class="k">def</span> <span class="nf">getKernelsParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">getKernelsParams</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ExpectedLogLikelihood.predictLatents"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.predictLatents">[docs]</a>    <span class="k">def</span> <span class="nf">predictLatents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newTimes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">newTimes</span><span class="o">=</span><span class="n">newTimes</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="PointProcessELL"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL">[docs]</a><span class="k">class</span> <span class="nc">PointProcessELL</span><span class="p">(</span><span class="n">ExpectedLogLikelihood</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svEmbeddingAllTimes</span><span class="p">,</span> <span class="n">svEmbeddingAssocTimes</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">svEmbeddingAllTimes</span><span class="o">=</span><span class="n">svEmbeddingAllTimes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span> <span class="o">=</span> <span class="n">svEmbeddingAssocTimes</span>
+
+<div class="viewcode-block" id="PointProcessELL.evalSumAcrossTrialsAndNeurons"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.evalSumAcrossTrialsAndNeurons">[docs]</a>    <span class="k">def</span> <span class="nf">evalSumAcrossTrialsAndNeurons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">svPosteriorOnLatentsStats</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">svPosteriorOnLatentsStatsAllTimes</span> <span class="o">=</span> \
+             <span class="n">svPosteriorOnLatentsStats</span><span class="p">[</span><span class="s2">&quot;allTimes&quot;</span><span class="p">]</span>
+            <span class="n">svPosteriorOnLatentsStatsAssocTimes</span> <span class="o">=</span> \
+             <span class="n">svPosteriorOnLatentsStats</span><span class="p">[</span><span class="s2">&quot;assocTimes&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">svPosteriorOnLatentsStatsAllTimes</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">svPosteriorOnLatentsStatsAssocTimes</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">eMeanAllTimes</span><span class="p">,</span> <span class="n">eVarAllTimes</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">computeMeansAndVars</span><span class="p">(</span>
+                <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStatsAllTimes</span><span class="p">)</span>
+        <span class="n">eMeanAssocTimes</span><span class="p">,</span> <span class="n">eVarAssocTimes</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">computeMeansAndVars</span><span class="p">(</span>
+                <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStatsAssocTimes</span><span class="p">)</span>
+        <span class="n">eLinkValues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getELinkValues</span><span class="p">(</span><span class="n">eMean</span><span class="o">=</span><span class="n">eMeanAllTimes</span><span class="p">,</span> 
+                                           <span class="n">eVar</span><span class="o">=</span><span class="n">eVarAllTimes</span><span class="p">)</span>
+        <span class="n">eLogLinkValues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getELogLinkValues</span><span class="p">(</span><span class="n">eMean</span><span class="o">=</span><span class="n">eMeanAssocTimes</span><span class="p">,</span> 
+                                                 <span class="n">eVar</span><span class="o">=</span><span class="n">eVarAssocTimes</span><span class="p">)</span>
+        <span class="c1"># self._legQuadWeights \in nTrials x nQuadHerm x 1</span>
+        <span class="c1"># aux0 \in nTrials x 1 x nQuadHerm</span>
+        <span class="n">aux0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_legQuadWeights</span><span class="p">,</span> <span class="n">dim0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim1</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># eLinkValues \in  nTrials x nQuadHerm x nNeurons</span>
+        <span class="c1"># aux1 \in  nTrials x 1 x nNeurons</span>
+        <span class="n">aux1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">aux0</span><span class="p">,</span> <span class="n">eLinkValues</span><span class="p">)</span>
+        <span class="n">sELLTerm1</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">aux1</span><span class="p">)</span>
+        <span class="n">sELLTerm2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">eLogLinkValues</span><span class="p">)</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">sELLTerm1</span><span class="o">+</span><span class="n">sELLTerm2</span></div>
+
+<div class="viewcode-block" id="PointProcessELL.buildKernelsMatrices"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.buildKernelsMatrices">[docs]</a>    <span class="k">def</span> <span class="nf">buildKernelsMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PointProcessELL.computeSVPosteriorOnLatentsStats"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeSVPosteriorOnLatentsStats">[docs]</a>    <span class="k">def</span> <span class="nf">computeSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">allTimesStats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span>\
+            <span class="n">computeSVPosteriorOnLatentsStats</span><span class="p">()</span>
+        <span class="n">assocTimesStats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span>\
+            <span class="n">computeSVPosteriorOnLatentsStats</span><span class="p">()</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;allTimes&quot;</span><span class="p">:</span> <span class="n">allTimesStats</span><span class="p">,</span> <span class="s2">&quot;assocTimes&quot;</span><span class="p">:</span> <span class="n">assocTimesStats</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+<div class="viewcode-block" id="PointProcessELL.setMeasurements"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setMeasurements">[docs]</a>    <span class="k">def</span> <span class="nf">setMeasurements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurements</span><span class="p">):</span>
+
+        <span class="n">stackedSpikeTimes</span><span class="p">,</span> <span class="n">neuronForSpikeIndex</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stackSpikeTimes</span><span class="p">(</span><span class="n">spikeTimes</span><span class="o">=</span><span class="n">measurements</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">setTimes</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">stackedSpikeTimes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">setNeuronForSpikeIndex</span><span class="p">(</span><span class="n">neuronForSpikeIndex</span><span class="o">=</span>
+                                                            <span class="n">neuronForSpikeIndex</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__stackSpikeTimes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spikeTimes</span><span class="p">):</span> 
+        <span class="c1"># spikeTimes list[nTrials][nNeurons][nSpikes]</span>
+        <span class="n">nNeurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikeTimes</span><span class="p">)</span>
+
+        <span class="n">nTrials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikeTimes</span><span class="p">)</span>
+        <span class="n">stackedSpikeTimes</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nTrials</span><span class="p">)]</span>
+        <span class="n">neuronForSpikeIndex</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nTrials</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">trialIndex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nTrials</span><span class="p">):</span>
+            <span class="n">stackedSpikeTimes</span><span class="p">[</span><span class="n">trialIndex</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">spikeTime</span> 
+                 <span class="k">for</span> <span class="n">neuronIndex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikeTimes</span><span class="p">[</span><span class="n">trialIndex</span><span class="p">]))</span> 
+                 <span class="k">for</span> <span class="n">spikeTime</span> <span class="ow">in</span> <span class="n">spikeTimes</span><span class="p">[</span><span class="n">trialIndex</span><span class="p">][</span><span class="n">neuronIndex</span><span class="p">]])</span>
+            <span class="n">neuronForSpikeIndex</span><span class="p">[</span><span class="n">trialIndex</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">neuronIndex</span> 
+                 <span class="k">for</span> <span class="n">neuronIndex</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spikeTimes</span><span class="p">[</span><span class="n">trialIndex</span><span class="p">]))</span> 
+                 <span class="k">for</span> <span class="n">spikeTime</span> <span class="ow">in</span> <span class="n">spikeTimes</span><span class="p">[</span><span class="n">trialIndex</span><span class="p">][</span><span class="n">neuronIndex</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">stackedSpikeTimes</span><span class="p">,</span> <span class="n">neuronForSpikeIndex</span>
+
+<div class="viewcode-block" id="PointProcessELL.setIndPointsLocs"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setIndPointsLocs">[docs]</a>    <span class="k">def</span> <span class="nf">setIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">setIndPointsLocs</span><span class="p">(</span><span class="n">locs</span><span class="o">=</span><span class="n">locs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">setIndPointsLocs</span><span class="p">(</span><span class="n">locs</span><span class="o">=</span><span class="n">locs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PointProcessELL.setKernels"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setKernels">[docs]</a>    <span class="k">def</span> <span class="nf">setKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernels</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">setKernels</span><span class="p">(</span><span class="n">kernels</span><span class="o">=</span><span class="n">kernels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">setKernels</span><span class="p">(</span><span class="n">kernels</span><span class="o">=</span><span class="n">kernels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PointProcessELL.setInitialParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setInitialParams">[docs]</a>    <span class="k">def</span> <span class="nf">setInitialParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialParams</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">setInitialParams</span><span class="p">(</span><span class="n">initialParams</span><span class="o">=</span><span class="n">initialParams</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span>\
+            <span class="n">setInitialParams</span><span class="p">(</span><span class="n">initialParams</span><span class="o">=</span><span class="n">initialParams</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PointProcessELL.setQuadParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.setQuadParams">[docs]</a>    <span class="k">def</span> <span class="nf">setQuadParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quadParams</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">setTimes</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">quadParams</span><span class="p">[</span><span class="s2">&quot;legQuadPoints&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_legQuadWeights</span> <span class="o">=</span> <span class="n">quadParams</span><span class="p">[</span><span class="s2">&quot;legQuadWeights&quot;</span><span class="p">]</span></div>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_getELinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_getELogLinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="PointProcessELLExpLink"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink">[docs]</a><span class="k">class</span> <span class="nc">PointProcessELLExpLink</span><span class="p">(</span><span class="n">PointProcessELL</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_getELinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="c1"># eLinkValues \in nTrials x nQuadLeg x nNeurons</span>
+        <span class="n">eLinkValues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">eMean</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">eVar</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eLinkValues</span>
+
+    <span class="k">def</span> <span class="nf">_getELogLinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="n">eLogLink</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">eMean</span><span class="p">[</span><span class="n">trial</span><span class="p">])</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eMean</span><span class="p">))])</span>
+        <span class="k">return</span> <span class="n">eLogLink</span></div>
+
+<div class="viewcode-block" id="PointProcessELLQuad"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad">[docs]</a><span class="k">class</span> <span class="nc">PointProcessELLQuad</span><span class="p">(</span><span class="n">PointProcessELL</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svEmbeddingAllTimes</span><span class="p">,</span> <span class="n">svEmbeddingAssocTimes</span><span class="p">,</span> <span class="n">linkFunction</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">svEmbeddingAllTimes</span><span class="o">=</span><span class="n">svEmbeddingAllTimes</span><span class="p">,</span> 
+                         <span class="n">svEmbeddingAssocTimes</span><span class="o">=</span><span class="n">svEmbeddingAssocTimes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linkFunction</span> <span class="o">=</span> <span class="n">linkFunction</span>
+
+<div class="viewcode-block" id="PointProcessELLQuad.setQuadParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELLQuad.setQuadParams">[docs]</a>    <span class="k">def</span> <span class="nf">setQuadParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quadParams</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">setQuadParams</span><span class="p">(</span><span class="n">quadParams</span><span class="o">=</span><span class="n">quadParams</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadWeights</span> <span class="o">=</span> <span class="n">quadParams</span><span class="p">[</span><span class="s2">&quot;hermQuadWeights&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadPoints</span> <span class="o">=</span> <span class="n">quadParams</span><span class="p">[</span><span class="s2">&quot;hermQuadPoints&quot;</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_getELinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="c1"># aux2 \in  nTrials x nQuadLeg x nNeurons</span>
+        <span class="n">aux2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">eVar</span><span class="p">)</span>
+        <span class="c1"># aux3 \in nTrials x nQuadLeg x nNeurons x nQuadLeg</span>
+        <span class="n">aux3</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,l-&gt;ijkl&#39;</span><span class="p">,</span> <span class="n">aux2</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadPoints</span><span class="p">))</span>
+        <span class="c1"># aux4 \in nQuad x nQuadLeg x nTrials x nQuadLeg</span>
+        <span class="n">aux4</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">aux3</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">eMean</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+        <span class="c1"># aux5 \in nQuad x nQuadLeg x nTrials x nQuadLeg</span>
+        <span class="n">aux5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linkFunction</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">aux4</span><span class="p">)</span>
+        <span class="c1"># intval \in  nTrials x nQuadHerm x nNeurons</span>
+        <span class="n">eLinkValues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijkl,l-&gt;ijk&#39;</span><span class="p">,</span> <span class="n">aux5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadWeights</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">eLinkValues</span>
+
+    <span class="k">def</span> <span class="nf">_getELogLinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="c1"># log_link = cellvec(cellfun(@(x,y) log(m.link(x + sqrt(2*y).* m.xxHerm&#39;))*m.wwHerm,mu_h_Spikes,var_h_Spikes,&#39;uni&#39;,0));</span>
+        <span class="c1"># aux1[trial] \in nSpikes[trial]</span>
+        <span class="n">aux1</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">eVar</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">eVar</span><span class="p">))]</span>
+        <span class="c1"># aux2[trial] \in nSpikes[trial] x nQuadLeg</span>
+        <span class="n">aux2</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;i,j-&gt;ij&#39;</span><span class="p">,</span> <span class="n">aux1</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadPoints</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux1</span><span class="p">))]</span>
+        <span class="c1"># aux3[trial] \in nSpikes[trial] x nQuadLeg</span>
+        <span class="n">aux3</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">aux2</span><span class="p">[</span><span class="n">trial</span><span class="p">],</span> 
+                          <span class="n">other</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">eMean</span><span class="p">[</span><span class="n">trial</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span> 
+                <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux2</span><span class="p">))]</span>
+        <span class="c1"># aux4[trial] \in nSpikes[trial] x nQuadLeg</span>
+        <span class="n">aux4</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_linkFunction</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">aux3</span><span class="p">[</span><span class="n">trial</span><span class="p">]))</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux3</span><span class="p">))]</span>
+        <span class="c1"># aux5[trial] \in nSpikes[trial] x 1</span>
+        <span class="n">aux5</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">tensordot</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">aux4</span><span class="p">[</span><span class="n">trial</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadWeights</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">aux4</span><span class="p">))]</span>
+        <span class="n">eLogLinkValues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">tensors</span><span class="o">=</span><span class="n">aux5</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eLogLinkValues</span></div>
+
+
+<div class="viewcode-block" id="PoissonELL"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL">[docs]</a><span class="k">class</span> <span class="nc">PoissonELL</span><span class="p">(</span><span class="n">ExpectedLogLikelihood</span><span class="p">):</span>
+
+<div class="viewcode-block" id="PoissonELL.evalSumAcrossTrialsAndNeurons"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons">[docs]</a>    <span class="k">def</span> <span class="nf">evalSumAcrossTrialsAndNeurons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span>\
+            <span class="n">computeMeansAndVars</span><span class="p">(</span><span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStats</span><span class="p">)</span>
+        <span class="n">eLink</span><span class="p">,</span> <span class="n">eLogLink</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getELinkAndELogLinkValues</span><span class="p">(</span><span class="n">eMean</span><span class="o">=</span><span class="n">eMean</span><span class="p">,</span> 
+                                                           <span class="n">eVar</span><span class="o">=</span><span class="n">eVar</span><span class="p">)</span>
+        <span class="n">sELLTerm1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binWidth</span><span class="o">*</span><span class="n">eLinkValues</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">sELLTerm2</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_measurements</span><span class="o">*</span><span class="n">eLogLinkValues</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">sELLTerm1</span><span class="o">+</span><span class="n">sELLTerm2</span></div>
+
+<div class="viewcode-block" id="PoissonELL.buildKernelsMatrices"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.buildKernelsMatrices">[docs]</a>    <span class="k">def</span> <span class="nf">buildKernelsMatrices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="PoissonELL.computeSVPostOnLatentsStats"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.computeSVPostOnLatentsStats">[docs]</a>    <span class="k">def</span> <span class="nf">computeSVPostOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">computeSVPostOnLatentsStats</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+<div class="viewcode-block" id="PoissonELL.setMeasurements"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.setMeasurements">[docs]</a>    <span class="k">def</span> <span class="nf">setMeasurements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measurements</span><span class="p">):</span>
+        <span class="c1"># measurements \in nTrials x nNeurons x maxNBins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_measurements</span> <span class="o">=</span> <span class="n">measurements</span></div>
+
+<div class="viewcode-block" id="PoissonELL.setIndPointsLocs"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.setIndPointsLocs">[docs]</a>    <span class="k">def</span> <span class="nf">setIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span><span class="n">setIndPointsLocs</span><span class="p">(</span><span class="n">locs</span><span class="o">=</span><span class="n">locs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAssocTimes</span><span class="o">.</span><span class="n">setIndPointsLocs</span><span class="p">(</span><span class="n">locs</span><span class="o">=</span><span class="n">locs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoissonELL.setKernels"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.setKernels">[docs]</a>    <span class="k">def</span> <span class="nf">setKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernels</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span>\
+            <span class="n">setKernels</span><span class="p">(</span><span class="n">kernels</span><span class="o">=</span><span class="n">kernels</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoissonELL.setInitialParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.setInitialParams">[docs]</a>    <span class="k">def</span> <span class="nf">setInitialParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialParams</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svEmbeddingAllTimes</span><span class="o">.</span>\
+            <span class="n">setInitialParams</span><span class="p">(</span><span class="n">initialParams</span><span class="o">=</span><span class="n">initialParams</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PoissonELL.setMiscParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.setMiscParams">[docs]</a>    <span class="k">def</span> <span class="nf">setMiscParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">miscParams</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_binWidth</span> <span class="o">=</span> <span class="n">miscParams</span><span class="p">[</span><span class="s2">&quot;binWidth&quot;</span><span class="p">]</span></div>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_getELinkAndELogLinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="PoissonELLExpLink"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink">[docs]</a><span class="k">class</span> <span class="nc">PoissonELLExpLink</span><span class="p">(</span><span class="n">PoissonELL</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">_getELinkAndELogLinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="c1"># intval \in nTrials x nQuadLeg x nNeurons</span>
+        <span class="n">eLinkValues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">eMean</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">eVar</span><span class="p">)</span>
+        <span class="n">eLogLink</span> <span class="o">=</span> <span class="n">eMean</span>
+        <span class="k">return</span> <span class="n">eLink</span><span class="p">,</span> <span class="n">eLogLink</span></div>
+
+<div class="viewcode-block" id="PoissonELLQuad"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELLQuad">[docs]</a><span class="k">class</span> <span class="nc">PoissonELLQuad</span><span class="p">(</span><span class="n">PoissonELL</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svEmbeddingAllTime</span><span class="p">,</span> <span class="n">linkFunction</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">svEmbeddingAllTime</span><span class="o">=</span><span class="n">svEmbeddingAllTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_linkFunction</span><span class="o">=</span><span class="n">linkFunction</span>
+
+    <span class="k">def</span> <span class="nf">_getELinkAndELogLinkValues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eMean</span><span class="p">,</span> <span class="n">eVar</span><span class="p">):</span>
+        <span class="c1"># intval = permute(mtimesx(m.wwHerm&#39;,permute(m.link(qHmeanAtQuad + sqrt(2*qHMVarAtQuad).*permute(m.xxHerm,[2 3 4 1])),[4 1 2 3])),[2 3 4 1]);</span>
+
+        <span class="c1"># aux2 \in  nTrials x maxNBins x nNeurons</span>
+        <span class="n">aux2</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">eVar</span><span class="p">)</span>
+        <span class="c1"># aux3 \in nTrials x maxNBins x nNeurons x nQuadLeg</span>
+        <span class="n">aux3</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijk,l-&gt;ijkl&#39;</span><span class="p">,</span> <span class="n">aux2</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadPoints</span><span class="p">))</span>
+        <span class="c1"># aux4 \in maxNTrials x maxNBins x nNeurons x nQuadLeg</span>
+        <span class="n">aux4</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">aux3</span><span class="p">,</span> <span class="n">other</span><span class="o">=</span><span class="n">eMean</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+        <span class="c1"># aux5a \in maxNTrials x maxNBins x nNeurons x nQuadLeg</span>
+        <span class="n">aux5a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_linkFunction</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">aux4</span><span class="p">)</span>
+        <span class="n">aux5b</span> <span class="o">=</span> <span class="n">aux5a</span><span class="o">.</span><span class="n">log</span><span class="p">()</span>
+        <span class="c1"># intval \in  maxNTrials x maxNBins x nQuadLeg</span>
+        <span class="n">eLinkValues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijkl,l-&gt;ijk&#39;</span><span class="p">,</span> <span class="n">aux5b</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadWeights</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+        <span class="n">eLoglinkValues</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s1">&#39;ijkl,l-&gt;ijk&#39;</span><span class="p">,</span> <span class="n">aux5a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hermQuadWeights</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">eLinkValues</span><span class="p">,</span> <span class="n">eLogLinkValues</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Lea Duncker and Maneesh Sahani
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

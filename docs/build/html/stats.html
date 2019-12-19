@@ -103,52 +103,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stats.kernels">stats.kernels module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stats.sampler">stats.sampler module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats">Module contents</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#stats.kernels.ExponentialQuadraticKernel">ExponentialQuadraticKernel</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">buildKernelMatrix</a></li>
-</ul>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">buildKernelMatrixDiag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-stats">Module contents</a></li>
 </ul>
 </li>
-</ul>
-<ul>
-<li class="toctree-l3"><a class="reference internal" href="#stats.kernels.Kernel">Kernel</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.buildKernelMatrix">buildKernelMatrix</a></li>
-</ul>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.buildKernelMatrixDiag">buildKernelMatrixDiag</a></li>
-</ul>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.getParams">getParams</a></li>
-</ul>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.Kernel.setParams">setParams</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l3"><a class="reference internal" href="#stats.kernels.PeriodicKernel">PeriodicKernel</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.PeriodicKernel.buildKernelMatrix">buildKernelMatrix</a></li>
-</ul>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag">buildKernelMatrixDiag</a></li>
-</ul>
-</li>
-</ul>
-<ul>
-<li class="toctree-l3"><a class="reference internal" href="#stats.sampler.Sampler">Sampler</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning">sampleInhomogeneousPP_thinning</a></li>
-</ul>
-<ul>
-<li class="toctree-l4"><a class="reference internal" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">sampleInhomogeneousPP_timeRescaling</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="autoapi/index.html">API Reference</a></li>
 </ul>
 
             
@@ -253,58 +210,58 @@
 <span id="stats-kernels-module"></span><h2>stats.kernels module<a class="headerlink" href="#module-stats.kernels" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="stats.kernels.ExponentialQuadraticKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">dtype=torch.float64</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">dtype=torch.float64</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">
-<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">
-<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="stats.kernels.Kernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">Kernel</code><a class="headerlink" href="#stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">Kernel</code><a class="reference internal" href="_modules/stats/kernels.html#Kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <dl class="method">
 <dt id="stats.kernels.Kernel.buildKernelMatrix">
-<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.Kernel.buildKernelMatrixDiag">
-<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<em class="property">abstract </em><code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.Kernel.getParams">
-<code class="sig-name descname">getParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.getParams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">getParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.getParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.getParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.Kernel.setParams">
-<code class="sig-name descname">setParams</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.Kernel.setParams" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">setParams</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.setParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.setParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="stats.kernels.PeriodicKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">period=None</em>, <em class="sig-param">dtype=torch.float64</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">period=None</em>, <em class="sig-param">dtype=torch.float64</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel.buildKernelMatrix">
-<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel.buildKernelMatrixDiag">
-<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -314,11 +271,11 @@
 <span id="stats-sampler-module"></span><h2>stats.sampler module<a class="headerlink" href="#module-stats.sampler" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="stats.sampler.Sampler">
-<em class="property">class </em><code class="sig-prename descclassname">stats.sampler.</code><code class="sig-name descname">Sampler</code><a class="headerlink" href="#stats.sampler.Sampler" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.sampler.</code><code class="sig-name descname">Sampler</code><a class="reference internal" href="_modules/stats/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="stats.sampler.Sampler.sampleInhomogeneousPP_thinning">
-<code class="sig-name descname">sampleInhomogeneousPP_thinning</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sampleInhomogeneousPP_thinning</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_thinning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning" title="Permalink to this definition">¶</a></dt>
 <dd><p>Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</p>
 <dl class="simple">
 <dt>intensityFun: function</dt><dd><p>Intensity function of the point process.</p>
@@ -338,7 +295,7 @@
 
 <dl class="method">
 <dt id="stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">
-<code class="sig-name descname">sampleInhomogeneousPP_timeRescaling</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sampleInhomogeneousPP_timeRescaling</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_timeRescaling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time rescaling algorithm to sample from an inhomogeneous point process. Chapter 2 from Uri Eden papers/numericalMethods/uri-eden-point-process-notes.pdf</p>
 <dl class="simple">
 <dt>intensityFun: function</dt><dd><p>Intensity function of the point process.</p>
