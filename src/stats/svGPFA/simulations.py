@@ -6,33 +6,31 @@ class GPFASimulator:
 
     def simulate(self, nNeurons, trialsLengths, latents, C, d,
                  linkFunction, dt, latentsEpsilon=1e-5):
-        '''
-        Simulates spikes for N=nNeurons neurons and R=len(trialLengths) trials
-        using K=len(latents) per trial.
 
-        Parameters
-        ----------
+        """ Simulates spikes for N=nNeurons neurons and R=len(trialLengths)
+        trials using K=len(latents) latents.
 
-        nNeurons: int
-                  number of neurons to simulate.
-        trialsLengths: numpy array \in R^R
-                       trialsLengths[r] is the duration, T_r, of the rth trial
-        latents: list of length K
-            len(latents[k])=R and contains kth latent processes (i.e., Gaussian
-            processes) for all R trials.
-        C: numpy ndarray \in R^{N\times K}
-        d: numpy array \in R^N
-        linkFunction: function
-                      function to map embedding values to point-process
-                      intensity values.
+        :param: nNeurons: number of neurons to simulate
+        :type: nNeurons: int
 
-        Returns
-        -------
+        :param: trialsLengths: trialsLengths[r] is the duration of the rth trial
+        :type: trialsLengths: numpy array.
 
-        list[n][r]
-            containing a list of spike times for neuron n in trial r
+        :param: latents: len(latents[k])=R and contains kth latent processes (i.e., Gaussian processes) for all R trials.
+        :type: latents: list of length K
 
-        ''' 
+        :param: C: matrix mapping latent to neural activity
+        :type: C: numpy ndarray :math:`\in R^{N \\times K}`
+
+        :param: d: constant in mapping latent to neural activity
+        :type: d: numpy array :math:`\in R^N`
+
+        :params: linkFunction: function mapping embedding values to point-process intensity values.
+        :type: linkFunction: function
+
+        :return: list where list[n][r] contains the of spike times for neuron n in trial r
+
+        """
         nNeurons = C.shape[0]
         nTrials = len(trialsLengths)
         nLatents = len(latents)

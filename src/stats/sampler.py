@@ -5,29 +5,20 @@ import torch
 class Sampler:
 
     def sampleInhomogeneousPP_thinning(self, intensityFun, T, dt=.03):
-        '''
-        Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.
+        """ Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.
 
-        Parameters
-        ----------
+        :param: intensityFun: Intensity function of the point process.
+        :type: intensityFun: function
 
-        intensityFun: function
-                      Intensity function of the point process.
+        :param: T: the returned samples of the point process :math:`\in [0, T]`
+        :type: T: double
 
-        T: double
-           The returned samples of the point process will be in [0, T]
+        :param: nGrid: number of points in the grid used to search for the maximum of intensityFun.
+        :type: nGrid: integer
 
-        nGrid: integer
-               number of points in the grid used to search for the maximum of intensityFun.
-
-        Returns
-        -------
-
-        inhomogeneous: list
-            samples of the inhomogeneous point process with intensity function intensityFun.
-        homogeneous: list
-            samples of the homogeneous that was filtered to generate the inhomogeneous point process.
-        '''
+        :return: (inhomogeneous, homogeneous): samples of the inhomogeneous and homogenous point process with intensity function intensityFun.
+        :rtype: tuple containing two lists
+        """
         n = m = 0
         t = [0]
         s = [0]
@@ -50,27 +41,21 @@ class Sampler:
             return({"inhomogeneous": t[1:-1], "homogeneous": s[1:-1]})
 
     def sampleInhomogeneousPP_timeRescaling(self, intensityFun, T, dt=.03):
-        '''
-        Time rescaling algorithm to sample from an inhomogeneous point process. Chapter 2 from Uri Eden papers/numericalMethods/uri-eden-point-process-notes.pdf
+        """ Time rescaling algorithm to sample from an inhomogeneous point
+        process. Chapter 2 from Uri Eden's Point Process Notes.
 
-        Parameters
-        ----------
+        :param: intensityFun: intensity function of the point process.
+        :type: intensityFun: function
 
-        intensityFun: function
-                      Intensity function of the point process.
+        :param: T: the returned samples of the point process :math:`\in [0, T]`
+        :type: T: double
 
-        T: double
-           The returned samples of the point process will be in [0, T]
+        :param: dt: spike-time resolution.
+        :type: dt: float
 
-        nGrid: integer
-               number of points in the grid used to search for spike times.
-
-        Returns
-        -------
-
-        list
-            samples of the inhomogeneous point process with intensity function intensityFun.
-        '''
+        :return: samples of the inhomogeneous point process with intensity function intensityFun.
+        :rtype: list
+        """
         t = torch.linspace(0, T, round(T/dt))
         gridEval = intensityFun(t)
         s = [0]
