@@ -528,26 +528,47 @@
 <dl class="method">
 <dt id="stats.svGPFA.simulations.GPFASimulator.simulate">
 <code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param">nNeurons</em>, <em class="sig-param">trialsLengths</em>, <em class="sig-param">latents</em>, <em class="sig-param">C</em>, <em class="sig-param">d</em>, <em class="sig-param">linkFunction</em>, <em class="sig-param">dt</em>, <em class="sig-param">latentsEpsilon=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/simulations.html#GPFASimulator.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.simulations.GPFASimulator.simulate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simulates spikes for N=nNeurons neurons and R=len(trialLengths) trials
-using K=len(latents) per trial.</p>
-<dl class="simple">
-<dt>nNeurons: int</dt><dd><p>number of neurons to simulate.</p>
+<dd><p>Simulates spikes for N=nNeurons neurons and R=len(trialLengths)
+trials using K=len(latents) latents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>nNeurons: number of neurons to simulate</p>
 </dd>
-<dt>trialsLengths: numpy array in R^R</dt><dd><p>trialsLengths[r] is the duration, T_r, of the rth trial</p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>nNeurons: int</p>
 </dd>
-<dt>latents: list of length K</dt><dd><p>len(latents[k])=R and contains kth latent processes (i.e., Gaussian
-processes) for all R trials.</p>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>trialsLengths: trialsLengths[r] is the duration of the rth trial</p>
 </dd>
-</dl>
-<p>C: numpy ndarray in R^{N       imes K}
-d: numpy array in R^N
-linkFunction: function</p>
-<blockquote>
-<div><p>function to map embedding values to point-process
-intensity values.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>list[n][r]</dt><dd><p>containing a list of spike times for neuron n in trial r</p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>trialsLengths: numpy array.</p>
+</dd>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>latents: len(latents[k])=R and contains kth latent processes (i.e., Gaussian processes) for all R trials.</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>latents: list of length K</p>
+</dd>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>C: matrix mapping latent to neural activity</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>C: numpy ndarray <span class="math notranslate nohighlight">\(\in R^{N \times K}\)</span></p>
+</dd>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>d: constant in mapping latent to neural activity</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>d: numpy array <span class="math notranslate nohighlight">\(\in R^N\)</span></p>
+</dd>
+<dt class="field-odd">Params</dt>
+<dd class="field-odd"><p>linkFunction: function mapping embedding values to point-process intensity values.</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>linkFunction: function</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list where list[n][r] contains the of spike times for neuron n in trial r</p>
 </dd>
 </dl>
 </dd></dl>

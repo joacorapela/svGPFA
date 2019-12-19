@@ -163,29 +163,20 @@
 <div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../stats.html#stats.sampler.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">:</span>
 
 <div class="viewcode-block" id="Sampler.sampleInhomogeneousPP_thinning"><a class="viewcode-back" href="../../stats.html#stats.sampler.Sampler.sampleInhomogeneousPP_thinning">[docs]</a>    <span class="k">def</span> <span class="nf">sampleInhomogeneousPP_thinning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intensityFun</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</span>
+        <span class="sd">&quot;&quot;&quot; Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="sd">        :param: intensityFun: Intensity function of the point process.</span>
+<span class="sd">        :type: intensityFun: function</span>
 
-<span class="sd">        intensityFun: function</span>
-<span class="sd">                      Intensity function of the point process.</span>
+<span class="sd">        :param: T: the returned samples of the point process :math:`\in [0, T]`</span>
+<span class="sd">        :type: T: double</span>
 
-<span class="sd">        T: double</span>
-<span class="sd">           The returned samples of the point process will be in [0, T]</span>
+<span class="sd">        :param: nGrid: number of points in the grid used to search for the maximum of intensityFun.</span>
+<span class="sd">        :type: nGrid: integer</span>
 
-<span class="sd">        nGrid: integer</span>
-<span class="sd">               number of points in the grid used to search for the maximum of intensityFun.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-
-<span class="sd">        inhomogeneous: list</span>
-<span class="sd">            samples of the inhomogeneous point process with intensity function intensityFun.</span>
-<span class="sd">        homogeneous: list</span>
-<span class="sd">            samples of the homogeneous that was filtered to generate the inhomogeneous point process.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        :return: (inhomogeneous, homogeneous): samples of the inhomogeneous and homogenous point process with intensity function intensityFun.</span>
+<span class="sd">        :rtype: tuple containing two lists</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">m</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -208,27 +199,21 @@
             <span class="k">return</span><span class="p">({</span><span class="s2">&quot;inhomogeneous&quot;</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;homogeneous&quot;</span><span class="p">:</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]})</span></div>
 
 <div class="viewcode-block" id="Sampler.sampleInhomogeneousPP_timeRescaling"><a class="viewcode-back" href="../../stats.html#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">[docs]</a>    <span class="k">def</span> <span class="nf">sampleInhomogeneousPP_timeRescaling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intensityFun</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dt</span><span class="o">=.</span><span class="mi">03</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Time rescaling algorithm to sample from an inhomogeneous point process. Chapter 2 from Uri Eden papers/numericalMethods/uri-eden-point-process-notes.pdf</span>
+        <span class="sd">&quot;&quot;&quot; Time rescaling algorithm to sample from an inhomogeneous point</span>
+<span class="sd">        process. Chapter 2 from Uri Eden&#39;s Point Process Notes.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+<span class="sd">        :param: intensityFun: intensity function of the point process.</span>
+<span class="sd">        :type: intensityFun: function</span>
 
-<span class="sd">        intensityFun: function</span>
-<span class="sd">                      Intensity function of the point process.</span>
+<span class="sd">        :param: T: the returned samples of the point process :math:`\in [0, T]`</span>
+<span class="sd">        :type: T: double</span>
 
-<span class="sd">        T: double</span>
-<span class="sd">           The returned samples of the point process will be in [0, T]</span>
+<span class="sd">        :param: dt: spike-time resolution.</span>
+<span class="sd">        :type: dt: float</span>
 
-<span class="sd">        nGrid: integer</span>
-<span class="sd">               number of points in the grid used to search for spike times.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-
-<span class="sd">        list</span>
-<span class="sd">            samples of the inhomogeneous point process with intensity function intensityFun.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        :return: samples of the inhomogeneous point process with intensity function intensityFun.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="n">dt</span><span class="p">))</span>
         <span class="n">gridEval</span> <span class="o">=</span> <span class="n">intensityFun</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>

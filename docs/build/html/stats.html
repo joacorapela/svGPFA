@@ -277,18 +277,30 @@
 <dt id="stats.sampler.Sampler.sampleInhomogeneousPP_thinning">
 <code class="sig-name descname">sampleInhomogeneousPP_thinning</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_thinning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning" title="Permalink to this definition">¶</a></dt>
 <dd><p>Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</p>
-<dl class="simple">
-<dt>intensityFun: function</dt><dd><p>Intensity function of the point process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>intensityFun: Intensity function of the point process.</p>
 </dd>
-<dt>T: double</dt><dd><p>The returned samples of the point process will be in [0, T]</p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>intensityFun: function</p>
 </dd>
-<dt>nGrid: integer</dt><dd><p>number of points in the grid used to search for the maximum of intensityFun.</p>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>T: the returned samples of the point process <span class="math notranslate nohighlight">\(\in [0, T]\)</span></p>
 </dd>
-</dl>
-<dl class="simple">
-<dt>inhomogeneous: list</dt><dd><p>samples of the inhomogeneous point process with intensity function intensityFun.</p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>T: double</p>
 </dd>
-<dt>homogeneous: list</dt><dd><p>samples of the homogeneous that was filtered to generate the inhomogeneous point process.</p>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>nGrid: number of points in the grid used to search for the maximum of intensityFun.</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>nGrid: integer</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(inhomogeneous, homogeneous): samples of the inhomogeneous and homogenous point process with intensity function intensityFun.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple containing two lists</p>
 </dd>
 </dl>
 </dd></dl>
@@ -296,17 +308,32 @@
 <dl class="method">
 <dt id="stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">
 <code class="sig-name descname">sampleInhomogeneousPP_timeRescaling</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_timeRescaling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling" title="Permalink to this definition">¶</a></dt>
-<dd><p>Time rescaling algorithm to sample from an inhomogeneous point process. Chapter 2 from Uri Eden papers/numericalMethods/uri-eden-point-process-notes.pdf</p>
-<dl class="simple">
-<dt>intensityFun: function</dt><dd><p>Intensity function of the point process.</p>
+<dd><p>Time rescaling algorithm to sample from an inhomogeneous point
+process. Chapter 2 from Uri Eden’s Point Process Notes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>intensityFun: intensity function of the point process.</p>
 </dd>
-<dt>T: double</dt><dd><p>The returned samples of the point process will be in [0, T]</p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>intensityFun: function</p>
 </dd>
-<dt>nGrid: integer</dt><dd><p>number of points in the grid used to search for spike times.</p>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>T: the returned samples of the point process <span class="math notranslate nohighlight">\(\in [0, T]\)</span></p>
 </dd>
-</dl>
-<dl class="simple">
-<dt>list</dt><dd><p>samples of the inhomogeneous point process with intensity function intensityFun.</p>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>T: double</p>
+</dd>
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>dt: spike-time resolution.</p>
+</dd>
+<dt class="field-even">Type</dt>
+<dd class="field-even"><p>dt: float</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>samples of the inhomogeneous point process with intensity function intensityFun.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
 </dd>
 </dl>
 </dd></dl>

@@ -164,33 +164,31 @@
 
 <div class="viewcode-block" id="GPFASimulator.simulate"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.simulations.GPFASimulator.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nNeurons</span><span class="p">,</span> <span class="n">trialsLengths</span><span class="p">,</span> <span class="n">latents</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span>
                  <span class="n">linkFunction</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">latentsEpsilon</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Simulates spikes for N=nNeurons neurons and R=len(trialLengths) trials</span>
-<span class="sd">        using K=len(latents) per trial.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+        <span class="sd">&quot;&quot;&quot; Simulates spikes for N=nNeurons neurons and R=len(trialLengths)</span>
+<span class="sd">        trials using K=len(latents) latents.</span>
 
-<span class="sd">        nNeurons: int</span>
-<span class="sd">                  number of neurons to simulate.</span>
-<span class="sd">        trialsLengths: numpy array \in R^R</span>
-<span class="sd">                       trialsLengths[r] is the duration, T_r, of the rth trial</span>
-<span class="sd">        latents: list of length K</span>
-<span class="sd">            len(latents[k])=R and contains kth latent processes (i.e., Gaussian</span>
-<span class="sd">            processes) for all R trials.</span>
-<span class="sd">        C: numpy ndarray \in R^{N\times K}</span>
-<span class="sd">        d: numpy array \in R^N</span>
-<span class="sd">        linkFunction: function</span>
-<span class="sd">                      function to map embedding values to point-process</span>
-<span class="sd">                      intensity values.</span>
+<span class="sd">        :param: nNeurons: number of neurons to simulate</span>
+<span class="sd">        :type: nNeurons: int</span>
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        :param: trialsLengths: trialsLengths[r] is the duration of the rth trial</span>
+<span class="sd">        :type: trialsLengths: numpy array.</span>
 
-<span class="sd">        list[n][r]</span>
-<span class="sd">            containing a list of spike times for neuron n in trial r</span>
+<span class="sd">        :param: latents: len(latents[k])=R and contains kth latent processes (i.e., Gaussian processes) for all R trials.</span>
+<span class="sd">        :type: latents: list of length K</span>
 
-<span class="sd">        &#39;&#39;&#39;</span> 
+<span class="sd">        :param: C: matrix mapping latent to neural activity</span>
+<span class="sd">        :type: C: numpy ndarray :math:`\in R^{N \\times K}`</span>
+
+<span class="sd">        :param: d: constant in mapping latent to neural activity</span>
+<span class="sd">        :type: d: numpy array :math:`\in R^N`</span>
+
+<span class="sd">        :params: linkFunction: function mapping embedding values to point-process intensity values.</span>
+<span class="sd">        :type: linkFunction: function</span>
+
+<span class="sd">        :return: list where list[n][r] contains the of spike times for neuron n in trial r</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">nNeurons</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">nTrials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsLengths</span><span class="p">)</span>
         <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latents</span><span class="p">)</span>
