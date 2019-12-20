@@ -17,7 +17,7 @@ def main(argv):
 
     randomPrefix = argv[1]
     trialToPlot = int(argv[2])
-    eLatentsFigFilename = "figures/{:s}_estimatedLatents.png".format(randomPrefix)
+    eLatentsFigFilename = "figures/{:s}_trial{:d}_estimatedLatents.png".format(randomPrefix, trialToPlot)
     dataFilename = "data/demo_PointProcess.mat"
 
     modelSaveFilename = \
