@@ -17,7 +17,7 @@ equations in `Duncker and Sahani, 2018 <https://papers.nips.cc/paper/8245-tempor
 
   #. Similarly, the subclasses :class:`~stats.svGPFA.expectedLogLikelihood.PoissonELL`, :class:`~stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink` and :class:`~stats.svGPFA.expectedLogLikelihood.PoissonELLQuad` implement the functionality of :class:`~stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood` for Poisson observations.
 
-* The concrete class :class:`~stats.svGPFA.klDivergence.KLDivergence` corresponds to the second term of the right-hand-side of ``Eq.4`` and implements the KL divergence between the prior on inducing points, :math:`p(\mathbf{u}_k^{(r)})`, the posterior on inducing points, :math:`q(\mathbf{u}_k^{(r)})`.
+* The concrete class :class:`~stats.svGPFA.klDivergence.KLDivergence` corresponds to the second term of the right-hand-side of ``Eq.4`` and implements the KL divergence between the prior on inducing points, :math:`p(\mathbf{u}_k^{(r)})`, and the posterior on inducing points, :math:`q(\mathbf{u}_k^{(r)})`.
 
 * :class:`~stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood` uses :class:`~stats.svGPFA.svEmbedding.SVEmbedding`, which calculates the mean and variance of the svGPFA embedding (:math:`h_n^{(r)}` in ``Eq.1``), given in ``Eq.5``. :class:`~stats.svGPFA.svEmbedding.SVEmbedding` is an abstract class, which has :class:`~stats.svGPFA.svEmbedding.LinearSVEmbedding` as abstract sublcass. Two concrete subclasses of :class:`~stats.svGPFA.svEmbedding.LinearSVEmbedding` are provided, which optimize the calculation of the embedding for two different uses in ``Eq.7``. 
 
