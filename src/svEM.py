@@ -11,11 +11,11 @@ class SVEM:
         defaultOptimParams = {"emMaxNIter":20,
                               "eStepMaxNIter":100, 
                               "eStepTol":1e-3, 
-                              "eStepLR":1e-3, 
+                              "eStepLR":1, 
                               "eStepNIterDisplay":10, 
                               "mStepModelParamsMaxNIter":100, 
                               "mStepModelParamsTol":1e-3, 
-                              "mStepModelParamsLR":1e-3,  
+                              "mStepModelParamsLR":1,  
                               "mStepModelParamsNIterDisplay":10, 
                               "mStepKernelParamsMaxNIter":100, 
                               "mStepKernelParamsTol":1e-3, 
@@ -23,7 +23,7 @@ class SVEM:
                               "mStepKernelParamsNIterDisplay":10, 
                               "mStepIndPointsMaxNIter":100, 
                               "mStepIndPointsTol":1e-3, 
-                              "mStepIndPointsLR":1e-3, 
+                              "mStepIndPointsLR":1, 
                               "mStepIndPointsNIterDisplay":10, 
                               "verbose":True}
         optimParams = {**defaultOptimParams, **optimParams}
@@ -82,7 +82,8 @@ class SVEM:
     def _eStep(self, model, maxNIter, tol, lr, verbose, nIterDisplay):
         x = model.getSVPosteriorOnIndPointsParams()
         evalFunc = model.eval
-        return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, maxNIter=maxNIter, tol=tol, lr=lr, verbose=verbose, nIterDisplay=nIterDisplay)
+        optimizer = torch.optim.LBFGS(x)
+        return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay)
 
     def _mStepModelParams(self, model, maxNIter, tol, lr, verbose, 
                           nIterDisplay):
@@ -92,7 +93,8 @@ class SVEM:
             model.evalELLSumAcrossTrialsAndNeurons(
                 svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
         displayFmt = "Step: %d, negative sum of expected log likelihood: %f"
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, maxNIter=maxNIter, tol=tol, lr=lr, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
+        optimizer = torch.optim.LBFGS(x)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
         return answer
 
     def _mStepKernelParams(self, model, maxNIter, tol, lr, verbose, 
@@ -102,8 +104,9 @@ class SVEM:
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
+        optimizer = torch.optim.Adam(x, lr=lr)
         updateModelFunc = None
-        return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, lr=lr, verbose=verbose, nIterDisplay=nIterDisplay)
+        return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay)
 
     def _mStepIndPoints(self, model, maxNIter, tol, lr, verbose, nIterDisplay):
         x = model.getIndPointsLocs()
@@ -111,13 +114,13 @@ class SVEM:
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
+        optimizer = torch.optim.LBFGS(x)
         updateModelFunc = model.buildKernelsMatrices
-        return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, lr=lr, verbose=verbose, nIterDisplay=nIterDisplay)
+        return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay)
 
-    def _setupAndMaximizeStep(self, x, evalFunc, maxNIter, tol, lr, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f", updateModelFunc=None):
+    def _setupAndMaximizeStep(self, x, evalFunc, maxNIter, tol, lr, verbose, nIterDisplay, optimizer, displayFmt="Step: %d, negative lower bound: %f", updateModelFunc=None):
         for i in range(len(x)):
             x[i].requires_grad = True 
-        optimizer = torch.optim.Adam(x, lr=lr)
         maxRes = self._maximizeStep(evalFunc=evalFunc, updateModelFunc=updateModelFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
         for i in range(len(x)):
             x[i].requires_grad = False
