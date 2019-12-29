@@ -91,9 +91,10 @@ def main(argv):
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
+    # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
+    optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10}
 
     model = svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=svGPFAModelFactory.PointProcess, 
