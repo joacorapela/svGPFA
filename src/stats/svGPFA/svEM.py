@@ -40,7 +40,6 @@ class SVEM:
                 model=model,
                 maxNIter=optimParams["eStepMaxNIter"],
                 tol=optimParams["eStepTol"],
-                lr=optimParams["eStepLR"],
                 verbose=optimParams["verbose"],
                 nIterDisplay=optimParams["eStepNIterDisplay"])
             print("Iteration %02d, E-Step end: %f"%(iter, -maxRes['lowerBound']))
@@ -49,7 +48,6 @@ class SVEM:
                 model=model,
                 maxNIter=optimParams["mStepModelParamsMaxNIter"],
                 tol=optimParams["mStepModelParamsTol"],
-                lr=optimParams["mStepModelParamsLR"],
                 verbose=optimParams["verbose"],
                 nIterDisplay=optimParams["mStepModelParamsNIterDisplay"])
             print("Iteration %02d, M-Step Model Params end: %f"%
@@ -69,7 +67,6 @@ class SVEM:
                 model=model,
                 maxNIter=optimParams["mStepIndPointsMaxNIter"],
                 tol=optimParams["mStepIndPointsTol"],
-                lr=optimParams["mStepIndPointsLR"],
                 verbose=optimParams["verbose"],
                 nIterDisplay=optimParams["mStepIndPointsNIterDisplay"])
             print("Iteration %02d, M-Step Ind Points end: %f"%
@@ -78,13 +75,13 @@ class SVEM:
             lowerBoundHist.append(-maxRes['lowerBound'])
         return lowerBoundHist
 
-    def _eStep(self, model, maxNIter, tol, lr, verbose, nIterDisplay):
+    def _eStep(self, model, maxNIter, tol, verbose, nIterDisplay):
         x = model.getSVPosteriorOnIndPointsParams()
         evalFunc = model.eval
         optimizer = torch.optim.LBFGS(x)
         return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay)
 
-    def _mStepModelParams(self, model, maxNIter, tol, lr, verbose,
+    def _mStepModelParams(self, model, maxNIter, tol, verbose,
                           nIterDisplay):
         x = model.getSVEmbeddingParams()
         svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
@@ -107,7 +104,7 @@ class SVEM:
         updateModelFunc = None
         return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay)
 
-    def _mStepIndPoints(self, model, maxNIter, tol, lr, verbose, nIterDisplay):
+    def _mStepIndPoints(self, model, maxNIter, tol, verbose, nIterDisplay):
         x = model.getIndPointsLocs()
         def evalFunc():
             model.buildKernelsMatrices()
@@ -117,10 +114,9 @@ class SVEM:
         updateModelFunc = model.buildKernelsMatrices
         return self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, updateModelFunc=updateModelFunc, maxNIter=maxNIter, tol=tol, optimizer=optimizer, verbose=verbose, nIterDisplay=nIterDisplay)
 
-    def _setupAndMaximizeStep(self, x, evalFunc, maxNIter, tol, lr, verbose, nIterDisplay, optimizer, displayFmt="Step: %d, negative lower bound: %f", updateModelFunc=None):
+    def _setupAndMaximizeStep(self, x, evalFunc, maxNIter, tol, verbose, nIterDisplay, optimizer, displayFmt="Step: %d, negative lower bound: %f", updateModelFunc=None):
         for i in range(len(x)):
             x[i].requires_grad = True
-        optimizer = torch.optim.Adam(x, lr=lr)
         maxRes = self._maximizeStep(evalFunc=evalFunc, updateModelFunc=updateModelFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
         for i in range(len(x)):
             x[i].requires_grad = False
