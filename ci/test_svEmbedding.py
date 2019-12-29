@@ -6,13 +6,15 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
-                                IndPointsLocsAndAssocTimesKMS
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-                                 SVPosteriorOnLatentsAssocTimes
-from svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
+sys.path.append("../src")
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, \
+        IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
+        SVPosteriorOnLatentsAssocTimes
+from stats.svGPFA.svEmbedding import LinearSVEmbeddingAllTimes, \
+        LinearSVEmbeddingAssocTimes
 
 def test_computeMeansAndVars_allTimes():
     tol = 5e-6

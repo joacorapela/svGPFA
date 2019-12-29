@@ -19,7 +19,7 @@ def main(argv):
     C0 = np.load(parser.get('initialValues', 'C0Filename'))
     d0 = np.load(parser.get('initialValues', 'd0Filename'))
     kernelParams0 = np.fromstring(parser.get('initialValues', 'kernelParams0'),
-                                   dtype='float', sep=',')
+                                   dtype='double', sep=',')
     maxIter = int(parser.get('sparseEstimation', 'maxIter')
     tol = float(parser.get('sparseEstimation', 'tol')
 

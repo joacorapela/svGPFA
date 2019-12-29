@@ -6,22 +6,22 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
+sys.path.append("../src")
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
                                 IndPointsLocsAndAssocTimesKMS
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-                                 SVPosteriorOnLatentsAssocTimes
-from svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
-from expectedLogLikelihood import PointProcessELLExpLink, PointProcessELLQuad
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
+        SVPosteriorOnLatentsAssocTimes
+from stats.svGPFA.svEmbedding import LinearSVEmbeddingAllTimes, \
+        LinearSVEmbeddingAssocTimes
+from stats.svGPFA.expectedLogLikelihood import PointProcessELLExpLink, \
+        PointProcessELLQuad
 
 def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     tol = 3e-4
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
-
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
@@ -41,6 +41,14 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernels = [[None] for k in range(nLatents)]
@@ -48,8 +56,8 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -65,7 +73,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints, 
+    quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     qU = SVPosteriorOnIndPoints()
@@ -73,12 +81,12 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
@@ -102,9 +110,6 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
-    mat = loadmat(yNonStackedFilename)
-    YNonStacked = mat['YNonStacked']
-
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
@@ -123,6 +128,14 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
+    yMat = loadmat(yNonStackedFilename)
+    YNonStacked_tmp = yMat['YNonStacked']
+    nNeurons = YNonStacked_tmp[0,0].shape[0]
+    YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
+    for r in range(nTrials):
+        for n in range(nNeurons):
+            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+
     linkFunction = torch.exp
 
     kernels = [[None] for k in range(nLatents)]
@@ -130,8 +143,8 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -147,9 +160,9 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
                      "kernelsMatricesStore": kmsParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"hermQuadPoints": hermQuadPoints, 
+    quadParams = {"hermQuadPoints": hermQuadPoints,
                   "hermQuadWeights": hermQuadWeights,
-                  "legQuadPoints": legQuadPoints, 
+                  "legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
 
@@ -158,12 +171,12 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
     qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU, 
-        indPointsLocsKMS=indPointsLocsKMS, 
+        svPosteriorOnIndPoints=qU,
+        indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
     qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
     qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=

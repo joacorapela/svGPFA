@@ -5,30 +5,44 @@ import pdb
 from scipy.io import loadmat
 import torch
 import pickle
-import plotUtils
+import configparser
+sys.path.append(os.path.expanduser("~/dev/research/programs/src/python"))
+import plot.svGPFA.plotUtils
+import matplotlib.pyplot as plt
 
 def main(argv):
-    k0Scale, k0LengthScale, k0Period = 0.1, 1.5, 1/2.5
-    k1Scale, k1LengthScale, k1Period =.1, 1.2, 1/2.5,
-    k2Scale, k2LengthScale = .1, 1
-    trialToPlot = 0
-    modelSaveFilename = os.path.join(os.path.dirname(__file__),
-                                     "results/estimatedsvGPFAModel.pickle")
-    latentsFilename = "results/latents_k0Scale{:.2f}_k0LengthScale{:.2f}_k0Period{:.2f}_k1Scale{:.2f}_k1LengthScale{:.2f}_k1Period{:.2f}_k2Scale{:.2f}_k2LengthScale{:.2f}.pickle".format(k0Scale, k0LengthScale, k0Period, k1Scale, k1LengthScale, k1Period, k2Scale, k2LengthScale)
-    dataFilename = os.path.join(os.path.dirname(__file__),
-                                "data/demo_PointProcess.mat")
-    figFilename = os.path.join(os.path.dirname(__file__),
-                               "figures/estimatedLatents.png")
+    if len(argv)!=3:
+        print("Usage {:s} <random prefix> <trial to plot>".format(argv[0]))
+        return
 
-    with open(modelSaveFilename, "rb") as f: model = pickle.load(f)
+    randomPrefix = argv[1]
+    trialToPlot = int(argv[2])
+    eLatentsFigFilename = "figures/{:s}_estimatedLatents.png".format(randomPrefix)
+    dataFilename = "data/demo_PointProcess.mat"
+
+    modelSaveFilename = \
+        "results/{:s}_estimatedModel.pickle".format(randomPrefix)
+    lowerBoundHistFigFilename = \
+        "figures/{:s}_lowerBoundHist.png".format(randomPrefix)
+
+    estConfigFilename = "results/{:s}_estimation_metaData.ini".format(randomPrefix)
+    estConfig = configparser.ConfigParser()
+    estConfig.read(estConfigFilename)
+    simPrefix = estConfig["simulation_params"]["simprefix"]
+    latentsFilename = "results/{:s}_latents.pickle".format(simPrefix)
+
+    with open(modelSaveFilename, "rb") as f: savedResults = pickle.load(f)
+    model = savedResults["model"]
+    lowerBoundHist = savedResults["lowerBoundHist"]
+    plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
+
     with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load(f)
-
     mat = loadmat(dataFilename)
     testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
 
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
     indPointsLocs = model.getIndPointsLocs()
-    plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=figFilename)
+    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=eLatentsFigFilename)
 
     pdb.set_trace()
 

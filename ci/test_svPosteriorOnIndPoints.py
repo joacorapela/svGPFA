@@ -3,7 +3,8 @@ import sys
 import os
 from scipy.io import loadmat
 import torch
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+sys.path.append("../src")
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
 
 def test_buildQSigma():
     tol = 1e-5

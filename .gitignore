@@ -1,14 +1,29 @@
 *.pyc
 *.swp
 *~
-*.html
+# *.html
 .nfs*
 toRsync*
 fromRsync*
 nextRefractoring.txt
 todo.txt
 .ipynb*
-doc/design/*bak*
+docs/design/*bak*
+# docs/Makefile*
+# docs/build
+# docs/make*
+# docs/requirements.txt
+docs/source/*.bak
+# docs/source/images
+# docs/*
+# !docs/design/svGPFA.vpp
+# !docs/source/*.rst
+# !docs/source/*.dic
 .*lck*
 ci/Untitled*.ipynb
+ipynb/results
 /notes.txt
+scripts/figures/*
+scripts/results/*
+src/stats/gaussianProcesses/kernels.py
+

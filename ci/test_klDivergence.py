@@ -6,10 +6,11 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-from svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from kernels import PeriodicKernel, ExponentialQuadraticKernel
-from kernelMatricesStore import IndPointsLocsKMS
-from klDivergence import KLDivergence
+sys.path.append("../src")
+from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
+from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
+from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS
+from stats.svGPFA.klDivergence import KLDivergence
 
 def test_evalSumAcrossLatentsTrials():
     tol = 1e-5
@@ -31,8 +32,8 @@ def test_evalSumAcrossLatentsTrials():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -47,7 +48,7 @@ def test_evalSumAcrossLatentsTrials():
 
     indPointsLocsKMS = IndPointsLocsKMS()
     qU = SVPosteriorOnIndPoints()
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS, 
+    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
 
     qU.setInitialParams(initialParams=qUParams0)

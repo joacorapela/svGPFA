@@ -73,9 +73,12 @@ def main(argv):
     kernels = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], 'PeriodicKernel'):
-            kernels[k] = PeriodicKernel(scale=1.0, lengthScale=float(hprs[k,0][0]), period=float(hprs[k,0][1]))
+            kernels[k] = PeriodicKernel(scale=1.0,
+                                        lengthScale=float(hprs[k,0][0]),
+                                        period=float(hprs[k,0][1]))
         elif np.char.equal(kernelNames[0,k][0], 'rbfKernel'):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0, lengthScale=float(hprs[k,0][0]))
+            kernels[k] = ExponentialQuadraticKernel(scale=1.0,
+                                                    lengthScale=float(hprs[k,0][0]))
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
