@@ -35,15 +35,18 @@ class KernelMatricesStore(ABC):
 
 class IndPointsLocsKMS(KernelMatricesStore):
 
-    def buildKernelsMatrices(self, epsilon=1e-5):
+    def __init__(self, epsilon=1e-5):
+        self._epsilon = epsilon
+
+    def buildKernelsMatrices(self):
         nLatent = len(self._kernels)
         self._Kzz = [[None] for k in range(nLatent)]
         self._KzzChol = [[None] for k in range(nLatent)]
 
         for k in range(nLatent):
             self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._Z[k])+
-                            epsilon*torch.eye(n=self._Z[k].shape[1],
-                                              dtype=self._Z[k].dtype))
+                            self._epsilon*torch.eye(n=self._Z[k].shape[1],
+                                                    dtype=self._Z[k].dtype))
             # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._Z[k])
             self._KzzChol[k] = chol3D(self._Kzz[k]) # O(n^3)
 
@@ -52,6 +55,9 @@ class IndPointsLocsKMS(KernelMatricesStore):
 
     def getKzzChol(self):
         return self._KzzChol
+
+    def getEpsilon(self):
+        return self._epsilon
 
 class IndPointsLocsAndTimesKMS(KernelMatricesStore):
 
