@@ -22,7 +22,6 @@ def main(argv):
     # load data and initial values
     simPrefix = argv[1]
     trialToPlot = int(argv[2])
-    optimParams = {"emMaxNIter":30, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
     initDataFilename = os.path.join("data/demo_PointProcess.mat")
     spikeTimesFilename = \
         "results/{:s}_spikeTimes.pickle".format(simPrefix)
@@ -46,6 +45,7 @@ def main(argv):
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
     testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
+    indPointsLocsKMSEpsilon = 1e-2
 
     # create kernels
     kernels = [[None] for k in range(nLatents)]
@@ -82,14 +82,15 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10}
+    optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels)
+        kernels=kernels,
+        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
