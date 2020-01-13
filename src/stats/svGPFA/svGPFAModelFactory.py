@@ -25,13 +25,13 @@ OtherLink = 1001
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModel(conditionalDist, linkFunction, embeddingType, kernels):
+    def buildModel(conditionalDist, linkFunction, embeddingType, kernels, indPointsLocsKMSEpsilon=1e-3):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
                 if linkFunction==ExponentialLink:
                     qU = SVPosteriorOnIndPoints()
-                    indPointsLocsKMS = IndPointsLocsKMS()
+                    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
                     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
                     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
                     qKAllTimes = SVPosteriorOnLatentsAllTimes(
