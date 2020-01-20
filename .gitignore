@@ -1,6 +1,7 @@
 *.pyc
 *.swp
 *~
+slurm-*
 # *.html
 .nfs*
 toRsync*
