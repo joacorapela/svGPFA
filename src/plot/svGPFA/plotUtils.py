@@ -73,8 +73,8 @@ def plotEstimatedLatents(times, muK, varK, indPointsLocs, trialToPlot=0, figFile
     plt.show()
 
 def plotTruePythonAndMatlabLatents(tTimes, tLatents,
-                                   pTimes, pMuK, pVarK, 
-                                   mTimes, mMuK, mVarK, 
+                                   pTimes, pMuK, pVarK,
+                                   mTimes, mMuK, mVarK,
                                    trialToPlot=0, figFilenamePattern=None):
     figFilename = figFilenamePattern.format(trialToPlot)
     nLatents = mMuK.shape[2]
@@ -99,9 +99,9 @@ def plotTruePythonAndMatlabLatents(tTimes, tLatents,
         mCIToPlot = 1.96*(mVarK[trialToPlot,:,k].sqrt())
 
         axes[k].plot(tTimes, trueToPlot, label="True", color="black")
-        axes[k].plot(pTimes, pMeanToPlot.detach().numpy(), label="Python", color="darkblue")
+        axes[k].plot(pTimes, pMeanToPlot, label="Python", color="darkblue")
         axes[k].plot(mTimes, mMeanToPlot, label="Matlab", color="darkorange")
-        axes[k].fill_between(pTimes, (pMeanToPlot-pCIToPlot).detach().numpy(), (pMeanToPlot+pCIToPlot).detach().numpy(), color="blue")
+        axes[k].fill_between(pTimes, (pMeanToPlot-pCIToPlot), (pMeanToPlot+pCIToPlot), color="blue")
         axes[k].fill_between(mTimes, mMeanToPlot-mCIToPlot, mMeanToPlot+mCIToPlot, color="orange")
         axes[k].set_ylabel("Latent %d"%(k))
     axes[-1].set_xlabel("Sample")
@@ -141,26 +141,28 @@ def plotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
         negativeMSE = torch.mean((trueToPlot+mMeanToPlot)**2)
         if negativeMSE<positiveMSE:
             mMeanToPlot = -mMeanToPlot
-        mCIToPlot = 1.96*(mVarK[trialToPlot,:,k].sqrt().numpy())
+        mCIToPlot = 1.96*(mVarK[trialToPlot,:,k].sqrt())
 
         tLatentToPlot = tLatents[trialToPlot,:,k]
 
-        x1 = pTimes.numpy()
-        x1_rev = x1[::-1]
-        y1 = pMeanToPlot.detach().numpy()
-        y1_upper = y1 + pCIToPlot.detach().numpy()
-        y1_lower = y1 - pCIToPlot.detach().numpy()
-        y1_lower = y1_lower[::-1]
+        x1 = pTimes
+        x1_rev = x1.flip(dims=[0])
+        y1 = pMeanToPlot
+        y1_upper = y1 + pCIToPlot
+        y1_lower = y1 - pCIToPlot
+        # y1_lower = y1_lower[::-1] # negative stride not supported in pytorch
+        y1_lower = y1_lower.flip(dims=[0])
 
-        x2 = mTimes.numpy()
-        x2_rev = x2[::-1]
-        y2 = mMeanToPlot.detach().numpy()
+        x2 = mTimes
+        x2_rev = x2.flip(dims=[0])
+        y2 = mMeanToPlot
         y2_upper = y2 + mCIToPlot
         y2_lower = y2 - mCIToPlot
-        y2_lower = y2_lower[::-1]
+        # y2_lower = y2_lower[::-1] # negative stride not supported in pytorch
+        y2_lower = y2_lower.flip(dims=[0])
 
-        x3 = tTimes.numpy()
-        y3 = tLatentToPlot.numpy()
+        x3 = tTimes
+        y3 = tLatentToPlot
 
         trace1 = go.Scatter(
             x=np.concatenate((x1, x1_rev)),
@@ -212,6 +214,7 @@ def plotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
         fig.add_trace(trace4, row=k+1, col=1)
         fig.add_trace(trace5, row=k+1, col=1)
         fig.update_yaxes(title_text=ylabelPattern.format(k+1), row=k+1, col=1)
+        # pdb.set_trace()
 
     fig.update_layout(title_text=title)
     fig.update_xaxes(title_text=xlabel, row=3, col=1)
