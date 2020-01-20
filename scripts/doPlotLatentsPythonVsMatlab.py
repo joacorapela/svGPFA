@@ -49,20 +49,24 @@ def main(argv):
     with open(pModelSaveFilename, "rb") as f: res = pickle.load(f)
     pModel = res["model"]
 
-    pTestMuK, pTestVarK = pModel.predictLatents(newTimes=mTimes)
-    pTimes = mTimes
+    with torch.no_grad():
+        pTestMuK, pTestVarK = pModel.predictLatents(newTimes=mTimes)
+        pTimes = mTimes
 
-    plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatentsPlotly(tTimes=tTimes,
-                                                               tLatents=tLatents,
-                                                               pTimes=pTimes,
-                                                               pMuK=pTestMuK,
-                                                               pVarK=pTestVarK,
-                                                               mTimes=mTimes,
-                                                               mMuK=mMeanLatents,
-                                                               mVarK=mVarLatents,
-                                                               trialToPlot=trialToPlot,
-                                                               staticFigFilenamePattern=staticFigFilenamePattern,
-                                                               dynamicFigFilenamePattern=dynamicFigFilenamePattern)
+        plot.svGPFA.plotUtils.\
+            plotTruePythonAndMatlabLatentsPlotly(tTimes=tTimes,
+                                                  tLatents=tLatents,
+                                                  pTimes=pTimes,
+                                                  pMuK=pTestMuK,
+                                                  pVarK=pTestVarK,
+                                                  mTimes=mTimes,
+                                                  mMuK=mMeanLatents,
+                                                  mVarK=mVarLatents,
+                                                  trialToPlot=trialToPlot,
+                                                  staticFigFilenamePattern=
+                                                   staticFigFilenamePattern,
+                                                  dynamicFigFilenamePattern=
+                                                   dynamicFigFilenamePattern)
 
     pdb.set_trace()
 
