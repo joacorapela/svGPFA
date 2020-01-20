@@ -1,10 +1,12 @@
 
 import pdb
 import torch
+import torch.nn as nn
 
-class SVLowerBound:
+class SVLowerBound(nn.Module):
 
     def __init__(self, eLL, klDiv):
+        super(SVLowerBound, self).__init__()
         self._eLL = eLL
         self._klDiv = klDiv
 

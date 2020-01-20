@@ -22,9 +22,9 @@ class Kernel(ABC):
 
 class ExponentialQuadraticKernel(Kernel):
 
-    def __init__(self, scale=None, lengthScale=None, dtype=torch.double):
+    def __init__(self, scale=None, lengthScale=None, dtype=torch.double, device=torch.device("cpu")):
         paramIsNone = torch.tensor([scale is None, lengthScale is None])
-        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype)
+        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device)
 
         if scale is not None:
             self._scale = scale
@@ -52,7 +52,7 @@ class ExponentialQuadraticKernel(Kernel):
 
     def buildKernelMatrixDiag(self, X):
         scale, lengthScale = self._getAllParams(params=self._params)
-        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype)
+        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
     def _getAllParams(self, params):
@@ -71,9 +71,9 @@ class ExponentialQuadraticKernel(Kernel):
         return scale, lengthScale
 
 class PeriodicKernel(Kernel):
-    def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double):
+    def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
         paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])
-        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype)
+        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device)
 
         if scale is not None:
             self._scale = scale
@@ -107,7 +107,7 @@ class PeriodicKernel(Kernel):
 
     def buildKernelMatrixDiag(self, X):
         scale, lengthScale, period = self._getAllParams(params=self._params)
-        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype)
+        covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
     def _getAllParams(self, params):
@@ -154,7 +154,8 @@ class AddDiagKernel(Kernel):
         covMatrix = self.__kernel.buildKernelMatrix(X1=X1, X2=X2)
         covMatrixPlusDiag = (covMatrix +
                              self.__epsilon*torch.eye(n=covMatrix.shape[0],
-                                                      dtype=X1.dtype))
+                                                      dtype=X1.dtype,
+                                                      device=X.device))
         return covMatrixPlusDiag
 
     def buildKernelMatrixDiag(self, X):

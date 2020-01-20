@@ -1,7 +1,11 @@
 import torch
+import torch.nn as nn
 from .utils import build3DdiagFromDiagVector
 
-class SVPosteriorOnIndPoints:
+class SVPosteriorOnIndPoints(nn.Module):
+
+    def __init__(self):
+        super(SVPosteriorOnIndPoints, self).__init__()
 
     def setInitialParams(self, initialParams):
         self._qMu = initialParams["qMu0"]

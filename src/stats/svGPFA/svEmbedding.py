@@ -2,19 +2,21 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
+import torch.nn as nn
 from .kernelMatricesStore import KernelMatricesStore
 
-class SVEmbedding(ABC):
+class SVEmbedding(ABC, nn.Module):
 
     def __init__(self, svPosteriorOnLatents):
-        self._svPosteriorOnLatents = svPosteriorOnLatents 
+        super(SVEmbedding, self).__init__()
+        self._svPosteriorOnLatents = svPosteriorOnLatents
 
     def computeMeansAndVars(self, svPosteriorOnLatentsStats=None):
         if svPosteriorOnLatentsStats is None:
             svPosteriorOnLatentsStats = \
                 self._svPosteriorOnLatents.computeMeansAndVars()
         means, vars = self._getMeansAndVarsGivenSVPosteriorOnLatentsStats(
-            means=svPosteriorOnLatentsStats[0], 
+            means=svPosteriorOnLatentsStats[0],
             vars=svPosteriorOnLatentsStats[1])
         return means, vars
 
@@ -40,7 +42,7 @@ class SVEmbedding(ABC):
     @abstractmethod
     def getParams(self):
         pass
-   
+
     def getSVPosteriorOnIndPointsParams(self):
         return self._svPosteriorOnLatents.getSVPosteriorOnIndPointsParams()
 
@@ -51,7 +53,7 @@ class SVEmbedding(ABC):
         return self._svPosteriorOnLatents.getKernelsParams()
 
     @abstractmethod
-    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, 
+    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means,
                                                         vars):
         pass
 
@@ -65,10 +67,10 @@ class LinearSVEmbedding(SVEmbedding):
 
     def getParams(self):
         return [self._C, self._d]
-    
+
 class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
-    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, 
+    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means,
                                                         vars):
         qHMu = torch.matmul(means, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
         qHVar = torch.matmul(vars, (torch.t(self._C))**2)

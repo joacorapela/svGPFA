@@ -1,6 +1,7 @@
 
 import sys
 import os
+import time
 import pdb
 from scipy.io import loadmat
 import pickle
@@ -13,23 +14,33 @@ import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
 
 def main(argv):
+    if len(argv)!=2:
+        print("Usage {:s} <device name>".format(argv[0]))
+        sys.exit(0)
+    deviceName = argv[1]
+    if not torch.cuda.is_available():
+        deviceName = "cpu"
+    device = torch.device(deviceName)
+    print("Using {:s}".format(deviceName))
+
     tol = 1e-5
     ppSimulationFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessSimulation.mat")
     initDataFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessInitialConditions.mat")
-    lowerBoundHistFigFilename = "figures/leasLowerBoundHist.png"
-    modelSaveFilename = "results/estimationResLeasSimulation.pickle"
+    lowerBoundHistFigFilename = "figures/leasLowerBoundHist_{:s}.png".format(deviceName)
+    modelSaveFilename = "results/estimationResLeasSimulation_{:s}.pickle".format(deviceName)
 
     mat = loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
+    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
+    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor).to(device)
+    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().to(device)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).to(device)
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).to(device)
+    print("Loaded initial parameters")
 
     yMat = loadmat(ppSimulationFilename)
     YNonStacked_tmp = yMat['Y']
@@ -37,7 +48,8 @@ def main(argv):
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).to(device)
+    print("Loaded initial data")
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
@@ -52,6 +64,7 @@ def main(argv):
             kernels[k] = stats.kernels.ExponentialQuadraticKernel()
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
+    print("Created kernels")
 
     # create initial parameters
     kernelsParams0 = [[None] for k in range(nLatents)]
@@ -60,11 +73,11 @@ def main(argv):
             kernelsParams0[k] = torch.tensor([1.0,
                                               float(hprs0[k,0][0]),
                                               float(hprs0[k,0][1])],
-                                             dtype=torch.double)
+                                             dtype=torch.double).to(device)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernelsParams0[k] = torch.tensor([1.0,
                                               float(hprs0[k,0][0])],
-                                             dtype=torch.double)
+                                             dtype=torch.double).to(device)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
@@ -77,7 +90,9 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    # optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":5, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    print("Created initial params")
 
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
@@ -85,18 +100,26 @@ def main(argv):
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels,
         indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    print("Created model")
+
+    model.to(device)
 
     # maximize lower bound
+    print("About to start to maximize")
     svEM = stats.svGPFA.svEM.SVEM()
+    tStart = time.time()
     lowerBoundHist, elapsedTimeHist = \
         svEM.maximize(model=model,
                       measurements=YNonStacked,
                       initialParams=initialParams,
                       quadParams=quadParams,
                       optimParams=optimParams)
+    tElapsed = time.time()-tStart
+    print("Ended maximize in {:.2f} seconds".format(tElapsed))
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+
     # plot lower bound history
     plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, elapsedTimeHist=elapsedTimeHist, figFilename=lowerBoundHistFigFilename)
 

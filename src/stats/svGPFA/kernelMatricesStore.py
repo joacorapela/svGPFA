@@ -1,10 +1,14 @@
 
 import pdb
 import torch
+import torch.nn as nn
 from abc import ABC, abstractmethod
 from .utils import chol3D
 
-class KernelMatricesStore(ABC):
+class KernelMatricesStore(ABC, nn.Module):
+
+    def __init__(self):
+        super(KernelMatricesStore, self).__init__()
 
     @abstractmethod
     def buildKernelsMatrices(self):
@@ -36,6 +40,7 @@ class KernelMatricesStore(ABC):
 class IndPointsLocsKMS(KernelMatricesStore):
 
     def __init__(self, epsilon=1e-5):
+        super(IndPointsLocsKMS, self).__init__()
         self._epsilon = epsilon
 
     def buildKernelsMatrices(self):
@@ -46,7 +51,8 @@ class IndPointsLocsKMS(KernelMatricesStore):
         for k in range(nLatent):
             self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._Z[k])+
                             self._epsilon*torch.eye(n=self._Z[k].shape[1],
-                                                    dtype=self._Z[k].dtype))
+                                                    dtype=self._Z[k].dtype,
+                                                    device=self._Z[k].device))
             # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._Z[k])
             self._KzzChol[k] = chol3D(self._Kzz[k]) # O(n^3)
 
@@ -76,8 +82,8 @@ class IndPointsLocsAndAllTimesKMS(IndPointsLocsAndTimesKMS):
         # t \in nTrials x nQuad x 1
         nLatent = len(self._Z)
         self._Ktz = [[None] for k in range(nLatent)]
-        self._Ktt = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent, 
-                                dtype=self._t.dtype)
+        self._Ktt = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent,
+                                dtype=self._t.dtype, device=self._t.device)
         for k in range(nLatent):
             self._Ktz[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._Z[k])
             self._Ktt[:,:,k] = self._kernels[k].buildKernelMatrixDiag(X=self._t).squeeze()

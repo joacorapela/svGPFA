@@ -125,9 +125,9 @@ class SVEM:
         return maxRes
 
     def _maximizeStep(self, evalFunc, optimizer, maxNIter, tol, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f"):
-        iterCount = 0
+        iterCount = 1
         lowerBoundHist = []
-        curEval = torch.tensor([float("inf")])
+        curEval = None
         converged = False
         while not converged and iterCount<maxNIter:
             def closure():
@@ -146,7 +146,7 @@ class SVEM:
             optimizer.step(closure)
             # print("outside closure curEval={:f}".format(curEval))
             # pdb.set_trace()
-            if curEval<prevEval and prevEval-curEval<tol:
+            if iterCount>1 and curEval<prevEval and prevEval-curEval<tol:
                 converged = True
             if verbose and iterCount%nIterDisplay==0:
                 print(displayFmt%(iterCount, curEval))

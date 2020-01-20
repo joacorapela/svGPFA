@@ -2,12 +2,14 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
+import torch.nn as nn
 from .kernelMatricesStore import IndPointsLocsAndAllTimesKMS
 
-class SVPosteriorOnLatents(ABC):
+class SVPosteriorOnLatents(ABC, nn.Module):
 
     def __init__(self, svPosteriorOnIndPoints, indPointsLocsKMS,
                  indPointsLocsAndTimesKMS):
+        super(SVPosteriorOnLatents, self).__init__()
         self._svPosteriorOnIndPoints = svPosteriorOnIndPoints
         self._indPointsLocsKMS = indPointsLocsKMS
         self._indPointsLocsAndTimesKMS=indPointsLocsAndTimesKMS
@@ -53,7 +55,9 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
         # test times \in nTestTimes but should be in nTrials x nTestTimes
         newTimesReformatted = torch.matmul(
-            torch.ones(nTrials, dtype=newTimes.dtype).reshape(-1, 1),
+            torch.ones(nTrials, 
+                dtype=newTimes.dtype, 
+                device=newTimes.device).reshape(-1, 1),
             newTimes.reshape(1,-1))
         newTimesReformatted = newTimesReformatted.unsqueeze(2)
 
@@ -87,8 +91,10 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         nQuad = Ktt.shape[1]
         nLatent = Ktt.shape[2]
 
-        qKMu = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype)
-        qKVar = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype)
+        qKMu = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype, 
+            device=Kzz[0].device)
+        qKVar = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype,
+            device=Kzz[0].device)
 
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         for k in range(len(self._svPosteriorOnIndPoints.getQMu())):
@@ -156,9 +162,11 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
             nSpikesForTrial = Ktt[0][trialIndex].shape[0]
             # qKMu[trialIndex] \in nSpikesForTrial[trialIndex] x nLatent
             qKMu[trialIndex] = torch.empty((nSpikesForTrial, nLatent),
-                                           dtype=Kzz[0].dtype)
+                                           dtype=Kzz[0].dtype,
+                                           device=Kzz[0].device)
             qKVar[trialIndex] = torch.empty((nSpikesForTrial, nLatent),
-                                            dtype=Kzz[0].dtype)
+                                            dtype=Kzz[0].dtype,
+                                            device=Kzz[0].device)
             for k in range(nLatent):
                 qKMu[trialIndex][:,k] = torch.squeeze(torch.mm(input=Ktz[k][trialIndex], mat2=Ak[k][trialIndex,:,:]))
                 # Bfk \in nInd[k] x nSpikesForTrial[trialIndex]
