@@ -22,7 +22,7 @@ def main(argv):
     # load data and initial values
     simPrefix = argv[1]
     trialToPlot = int(argv[2])
-    initDataFilename = os.path.join("data/demo_PointProcess.mat")
+    initDataFilename = os.path.join("data/pointProcessInitialConditions.mat")
     spikeTimesFilename = \
         "results/{:s}_spikeTimes.pickle".format(simPrefix)
     with open(spikeTimesFilename, "rb") as f: spikeTimes = pickle.load(f)
@@ -94,10 +94,9 @@ def main(argv):
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist = svEM.maximize(model=model, measurements=spikeTimes,
-                                   initialParams=initialParams,
-                                   quadParams=quadParams,
-                                   optimParams=optimParams)
+    lowerBoundHist, elapsedTimeHist  = svEM.maximize(
+        model=model, measurements=spikeTimes, initialParams=initialParams,
+        quadParams=quadParams, optimParams=optimParams)
 
     # save estimated values
     estimationPrefixUsed = True
@@ -123,7 +122,7 @@ def main(argv):
     with open(estimMetaDataFilename, "w") as f:
         estimConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "model": model}
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load( f)
 
