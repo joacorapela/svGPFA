@@ -3,6 +3,8 @@ import sys
 import os
 import time
 import pdb
+import argparse
+import cProfile, pstats
 from scipy.io import loadmat
 import pickle
 import torch
@@ -14,10 +16,17 @@ import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
 
 def main(argv):
-    if len(argv)!=2:
-        print("Usage {:s} <device name>".format(argv[0]))
-        sys.exit(0)
-    deviceName = argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("deviceName", help="name of device (cpu or cuda)")
+    parser.add_argument("--profile", help="perform profiling",
+        action="store_true")
+    args = parser.parse_args()
+    if args.profile:
+        profile = True
+    else:
+        profile = False
+
+    deviceName = args.deviceName
     if not torch.cuda.is_available():
         deviceName = "cpu"
     device = torch.device(deviceName)
@@ -28,6 +37,7 @@ def main(argv):
     initDataFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessInitialConditions.mat")
     lowerBoundHistFigFilename = "figures/leasLowerBoundHist_{:s}.png".format(deviceName)
     modelSaveFilename = "results/estimationResLeasSimulation_{:s}.pickle".format(deviceName)
+    profilerFilenamePattern = "results/demoPointProcessLeasSimulation_{:d}Iter.pstats"
 
     mat = loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
@@ -40,7 +50,6 @@ def main(argv):
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().to(device)
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).to(device)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).to(device)
-    print("Loaded initial parameters")
 
     yMat = loadmat(ppSimulationFilename)
     YNonStacked_tmp = yMat['Y']
@@ -49,7 +58,6 @@ def main(argv):
     for r in range(nTrials):
         for n in range(nNeurons):
             YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).to(device)
-    print("Loaded initial data")
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
@@ -64,7 +72,6 @@ def main(argv):
             kernels[k] = stats.kernels.ExponentialQuadraticKernel()
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
-    print("Created kernels")
 
     # create initial parameters
     kernelsParams0 = [[None] for k in range(nLatents)]
@@ -91,8 +98,7 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
-    optimParams = {"emMaxNIter":5, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
-    print("Created initial params")
+    optimParams = {"emMaxNIter":30, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
 
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
@@ -100,13 +106,14 @@ def main(argv):
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels,
         indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
-    print("Created model")
 
     model.to(device)
 
     # maximize lower bound
-    print("About to start to maximize")
     svEM = stats.svGPFA.svEM.SVEM()
+    if profile:
+        pr = cProfile.Profile()
+        pr.enable()
     tStart = time.time()
     lowerBoundHist, elapsedTimeHist = \
         svEM.maximize(model=model,
@@ -115,7 +122,16 @@ def main(argv):
                       quadParams=quadParams,
                       optimParams=optimParams)
     tElapsed = time.time()-tStart
-    print("Ended maximize in {:.2f} seconds".format(tElapsed))
+    print("Completed maximize in {:.2f} seconds".format(tElapsed))
+
+    if profile:
+        pr.disable()
+        profilerFilename = profilerFilenamePattern.format(optimParams["emMaxNIter"])
+        s = open(profilerFilename, "w")
+        sortby = "cumulative"
+        ps = pstats.Stats(pr, stream=s)
+        ps.strip_dirs().sort_stats(sortby).print_stats()
+        s.close()
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
