@@ -8,7 +8,7 @@ import torch
 import matplotlib.pyplot as plt
 import pickle
 import configparser
-sys.path.append("..")
+sys.path.append("../src")
 import stats.svGPFA.simulations
 import stats.kernels
 import stats.gaussianProcesses.eval
@@ -62,8 +62,7 @@ def getLatentSamples(latent, trialLength, dt):
     answer = {"t": t, "mean": mean, "std": std}
     return answer
 
-def plotLatents(latents, latentsEpsilon, trialsLengths, dt, figFilename, alpha=0.5, 
-                marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
+def plotLatents(latents, latentsEpsilon, trialsLengths, dt, figFilename, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
     nTrials = len(latents)
     nLatents = len(latents[0])
     f, axs = plt.subplots(nTrials,nLatents, sharex=True, sharey=True)
@@ -104,9 +103,9 @@ def main(argv):
     dtSimulate = 1e-1
     dtLatentsFig = 1e-1
     spikeTrialToPlot = 0
-    k0Scale, k0LengthScale, k0Period = 1, 1.5, 1/2.5
-    k1Scale, k1LengthScale, k1Period = 1, 1.2, 1/2.5
-    k2Scale, k2LengthScale = 1, 1
+    k0Scale, k0LengthScale, k0Period = .1, 1.5, 1/2.5
+    k1Scale, k1LengthScale, k1Period = .1, 1.2, 1/2.5
+    k2Scale, k2LengthScale = .1, 1
     latentsEpsilon = 1e-3
 
     randomPrefixUsed = True
