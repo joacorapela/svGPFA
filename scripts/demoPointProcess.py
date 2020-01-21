@@ -22,10 +22,16 @@ def main(argv):
     # load data and initial values
     simPrefix = argv[1]
     trialToPlot = int(argv[2])
+    nTestPoints = 2000
     initDataFilename = os.path.join("data/pointProcessInitialConditions.mat")
     spikeTimesFilename = \
         "results/{:s}_spikeTimes.pickle".format(simPrefix)
     with open(spikeTimesFilename, "rb") as f: spikeTimes = pickle.load(f)
+
+    for i in range(len(spikeTimes)):
+        for j in range(len(spikeTimes[i])):
+            spikeTimes[i][j] = torch.stack(spikeTimes[i][j])
+    testTimes = torch.linspace(0, torch.max(spikeTimes[0][0]), nTestPoints)
 
     simConfigFilename = "results/{:s}_metaData.ini".format(simPrefix)
     simConfig = configparser.ConfigParser()
@@ -44,7 +50,7 @@ def main(argv):
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
-    testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
+    # testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
     indPointsLocsKMSEpsilon = 1e-2
 
     # create kernels
@@ -82,7 +88,7 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":30, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
@@ -122,7 +128,7 @@ def main(argv):
     with open(estimMetaDataFilename, "w") as f:
         estimConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, model": model}
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load( f)
 
