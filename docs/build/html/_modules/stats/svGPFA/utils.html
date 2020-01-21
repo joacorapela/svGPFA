@@ -186,7 +186,7 @@
 <span class="sd">    # b \in n x k</span>
 <span class="sd">    n = u.shape[0]</span>
 <span class="sd">    k = b.shape[1]</span>
-<span class="sd">    y = torch.zeros((n, k))</span>
+<span class="sd">    y = torch.zeros((n, k), device=b.device)</span>
 <span class="sd">    for j in range(k):</span>
 <span class="sd">        y[0,j] = b[0,j]/u[0,0]</span>
 <span class="sd">        for i in range(n):</span>
@@ -203,7 +203,7 @@
 <span class="sd">    # b \in n x k</span>
 <span class="sd">    n = u.shape[0]</span>
 <span class="sd">    k = b.shape[1]</span>
-<span class="sd">    y = torch.zeros((n, k))</span>
+<span class="sd">    y = torch.zeros((n, k), device=b.device)</span>
 <span class="sd">    for j in range(k):</span>
 <span class="sd">        y[n-1,j] = b[n-1,j]/u[n-1,n-1]</span>
 <span class="sd">        for i in range(n-2, -1, -1):</span>
@@ -214,9 +214,9 @@
 <span class="sd">    return y</span>
 <span class="sd">&#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="getDiagIndicesIn3DArray"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.getDiagIndicesIn3DArray">[docs]</a><span class="k">def</span> <span class="nf">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-    <span class="n">frameDiagIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">frameStartIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">M</span><span class="p">)</span><span class="o">*</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span>
+<div class="viewcode-block" id="getDiagIndicesIn3DArray"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.getDiagIndicesIn3DArray">[docs]</a><span class="k">def</span> <span class="nf">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)):</span>
+    <span class="n">frameDiagIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">frameStartIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">*</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span>
     <span class="c1"># torch way of computing an outer sum</span>
     <span class="n">diagIndices</span> <span class="o">=</span> <span class="p">(</span><span class="n">frameDiagIndices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">frameStartIndices</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="n">answer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">diagIndices</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
@@ -225,7 +225,7 @@
 <div class="viewcode-block" id="build3DdiagFromDiagVector"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.build3DdiagFromDiagVector">[docs]</a><span class="k">def</span> <span class="nf">build3DdiagFromDiagVector</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
     <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="n">N</span><span class="o">*</span><span class="n">M</span><span class="p">)</span>
     <span class="n">diagIndices</span> <span class="o">=</span> <span class="n">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
-    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="n">D</span><span class="p">[</span><span class="n">diagIndices</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="n">reshapedD</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">reshapedD</span></div>
@@ -238,7 +238,7 @@
     <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">aListOfArrays</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="chol3D"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.utils.chol3D">[docs]</a><span class="k">def</span> <span class="nf">chol3D</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
-    <span class="n">Kchol</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">Kchol</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
         <span class="n">Kchol</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:])</span>
     <span class="k">return</span> <span class="n">Kchol</span></div>

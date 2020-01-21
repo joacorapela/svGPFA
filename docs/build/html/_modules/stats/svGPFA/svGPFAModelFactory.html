@@ -183,13 +183,13 @@
 <div class="viewcode-block" id="SVGPFAModelFactory"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory">[docs]</a><span class="k">class</span> <span class="nc">SVGPFAModelFactory</span><span class="p">:</span>
 
 <div class="viewcode-block" id="SVGPFAModelFactory.buildModel"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">buildModel</span><span class="p">(</span><span class="n">conditionalDist</span><span class="p">,</span> <span class="n">linkFunction</span><span class="p">,</span> <span class="n">embeddingType</span><span class="p">,</span> <span class="n">kernels</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">buildModel</span><span class="p">(</span><span class="n">conditionalDist</span><span class="p">,</span> <span class="n">linkFunction</span><span class="p">,</span> <span class="n">embeddingType</span><span class="p">,</span> <span class="n">kernels</span><span class="p">,</span> <span class="n">indPointsLocsKMSEpsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">conditionalDist</span><span class="o">==</span><span class="n">PointProcess</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">embeddingType</span><span class="o">==</span><span class="n">LinearEmbedding</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">linkFunction</span><span class="o">==</span><span class="n">ExponentialLink</span><span class="p">:</span>
                     <span class="n">qU</span> <span class="o">=</span> <span class="n">SVPosteriorOnIndPoints</span><span class="p">()</span>
-                    <span class="n">indPointsLocsKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsKMS</span><span class="p">()</span>
+                    <span class="n">indPointsLocsKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsKMS</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="n">indPointsLocsKMSEpsilon</span><span class="p">)</span>
                     <span class="n">indPointsLocsAndAllTimesKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsAndAllTimesKMS</span><span class="p">()</span>
                     <span class="n">indPointsLocsAndAssocTimesKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsAndAssocTimesKMS</span><span class="p">()</span>
                     <span class="n">qKAllTimes</span> <span class="o">=</span> <span class="n">SVPosteriorOnLatentsAllTimes</span><span class="p">(</span>

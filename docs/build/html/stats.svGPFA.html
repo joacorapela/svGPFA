@@ -196,7 +196,7 @@
 <dl class="class">
 <dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">ExpectedLogLikelihood</code><span class="sig-paren">(</span><em class="sig-param">svEmbeddingAllTimes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices">
 <em class="property">abstract </em><code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
@@ -433,11 +433,16 @@
 
 <dl class="class">
 <dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS">
-<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">IndPointsLocsKMS</code><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">IndPointsLocsKMS</code><span class="sig-paren">(</span><em class="sig-param">epsilon=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore" title="stats.svGPFA.kernelMatricesStore.KernelMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.kernelMatricesStore.KernelMatricesStore</span></code></a></p>
 <dl class="method">
 <dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.buildKernelsMatrices">
-<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><em class="sig-param">epsilon=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getEpsilon">
+<code class="sig-name descname">getEpsilon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.getEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getEpsilon" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -455,7 +460,7 @@
 <dl class="class">
 <dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">KernelMatricesStore</code><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.buildKernelsMatrices">
 <em class="property">abstract </em><code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
@@ -499,7 +504,7 @@
 <dl class="class">
 <dt id="stats.svGPFA.klDivergence.KLDivergence">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.klDivergence.</code><code class="sig-name descname">KLDivergence</code><span class="sig-paren">(</span><em class="sig-param">indPointsLocsKMS</em>, <em class="sig-param">svPosteriorOnIndPoints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/klDivergence.html#KLDivergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.klDivergence.KLDivergence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials">
 <code class="sig-name descname">evalSumAcrossLatentsAndTrials</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/klDivergence.html#KLDivergence.evalSumAcrossLatentsAndTrials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials" title="Permalink to this definition">¶</a></dt>
@@ -633,7 +638,7 @@ trials using K=len(latents) latents.</p>
 <dl class="class">
 <dt id="stats.svGPFA.svEmbedding.SVEmbedding">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svEmbedding.</code><code class="sig-name descname">SVEmbedding</code><span class="sig-paren">(</span><em class="sig-param">svPosteriorOnLatents</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#SVEmbedding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.SVEmbedding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svEmbedding.SVEmbedding.buildKernelsMatrices">
 <code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#SVEmbedding.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.SVEmbedding.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
@@ -725,7 +730,7 @@ trials using K=len(latents) latents.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel">
-<em class="property">static </em><code class="sig-name descname">buildModel</code><span class="sig-paren">(</span><em class="sig-param">conditionalDist</em>, <em class="sig-param">linkFunction</em>, <em class="sig-param">embeddingType</em>, <em class="sig-param">kernels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svGPFAModelFactory.html#SVGPFAModelFactory.buildModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">buildModel</code><span class="sig-paren">(</span><em class="sig-param">conditionalDist</em>, <em class="sig-param">linkFunction</em>, <em class="sig-param">embeddingType</em>, <em class="sig-param">kernels</em>, <em class="sig-param">indPointsLocsKMSEpsilon=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svGPFAModelFactory.html#SVGPFAModelFactory.buildModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -736,7 +741,7 @@ trials using K=len(latents) latents.</p>
 <dl class="class">
 <dt id="stats.svGPFA.svLowerBound.SVLowerBound">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svLowerBound.</code><code class="sig-name descname">SVLowerBound</code><span class="sig-paren">(</span><em class="sig-param">eLL</em>, <em class="sig-param">klDiv</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svLowerBound.SVLowerBound.buildKernelsMatrices">
 <code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
@@ -815,7 +820,7 @@ trials using K=len(latents) latents.</p>
 <dl class="class">
 <dt id="stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svPosteriorOnIndPoints.</code><code class="sig-name descname">SVPosteriorOnIndPoints</code><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnIndPoints.html#SVPosteriorOnIndPoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.buildQSigma">
 <code class="sig-name descname">buildQSigma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnIndPoints.html#SVPosteriorOnIndPoints.buildQSigma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.buildQSigma" title="Permalink to this definition">¶</a></dt>
@@ -844,7 +849,7 @@ trials using K=len(latents) latents.</p>
 <dl class="class">
 <dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svPosteriorOnLatents.</code><code class="sig-name descname">SVPosteriorOnLatents</code><span class="sig-paren">(</span><em class="sig-param">svPosteriorOnIndPoints</em>, <em class="sig-param">indPointsLocsKMS</em>, <em class="sig-param">indPointsLocsAndTimesKMS</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.buildKernelsMatrices">
 <em class="property">abstract </em><code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatents.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
@@ -984,7 +989,7 @@ trials using K=len(latents) latents.</p>
 
 <dl class="function">
 <dt id="stats.svGPFA.utils.getDiagIndicesIn3DArray">
-<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">getDiagIndicesIn3DArray</code><span class="sig-paren">(</span><em class="sig-param">N</em>, <em class="sig-param">M</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#getDiagIndicesIn3DArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.getDiagIndicesIn3DArray" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">getDiagIndicesIn3DArray</code><span class="sig-paren">(</span><em class="sig-param">N</em>, <em class="sig-param">M</em>, <em class="sig-param">device=torch.device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#getDiagIndicesIn3DArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.getDiagIndicesIn3DArray" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

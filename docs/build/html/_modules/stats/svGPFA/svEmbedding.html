@@ -160,19 +160,21 @@
 <span class="kn">import</span> <span class="nn">pdb</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">from</span> <span class="nn">.kernelMatricesStore</span> <span class="k">import</span> <span class="n">KernelMatricesStore</span>
 
-<div class="viewcode-block" id="SVEmbedding"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.SVEmbedding">[docs]</a><span class="k">class</span> <span class="nc">SVEmbedding</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<div class="viewcode-block" id="SVEmbedding"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.SVEmbedding">[docs]</a><span class="k">class</span> <span class="nc">SVEmbedding</span><span class="p">(</span><span class="n">ABC</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svPosteriorOnLatents</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_svPosteriorOnLatents</span> <span class="o">=</span> <span class="n">svPosteriorOnLatents</span> 
+        <span class="nb">super</span><span class="p">(</span><span class="n">SVEmbedding</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_svPosteriorOnLatents</span> <span class="o">=</span> <span class="n">svPosteriorOnLatents</span>
 
 <div class="viewcode-block" id="SVEmbedding.computeMeansAndVars"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.SVEmbedding.computeMeansAndVars">[docs]</a>    <span class="k">def</span> <span class="nf">computeMeansAndVars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">svPosteriorOnLatentsStats</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">svPosteriorOnLatentsStats</span> <span class="o">=</span> \
                 <span class="bp">self</span><span class="o">.</span><span class="n">_svPosteriorOnLatents</span><span class="o">.</span><span class="n">computeMeansAndVars</span><span class="p">()</span>
         <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getMeansAndVarsGivenSVPosteriorOnLatentsStats</span><span class="p">(</span>
-            <span class="n">means</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+            <span class="n">means</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStats</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
             <span class="nb">vars</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStats</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">means</span><span class="p">,</span> <span class="nb">vars</span></div>
 
@@ -198,7 +200,7 @@
 <div class="viewcode-block" id="SVEmbedding.getParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.SVEmbedding.getParams">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
-   
+
 <div class="viewcode-block" id="SVEmbedding.getSVPosteriorOnIndPointsParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.SVEmbedding.getSVPosteriorOnIndPointsParams">[docs]</a>    <span class="k">def</span> <span class="nf">getSVPosteriorOnIndPointsParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svPosteriorOnLatents</span><span class="o">.</span><span class="n">getSVPosteriorOnIndPointsParams</span><span class="p">()</span></div>
 
@@ -209,7 +211,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_svPosteriorOnLatents</span><span class="o">.</span><span class="n">getKernelsParams</span><span class="p">()</span></div>
 
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">_getMeansAndVarsGivenSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">_getMeansAndVarsGivenSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span>
                                                         <span class="nb">vars</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
@@ -223,10 +225,10 @@
 
 <div class="viewcode-block" id="LinearSVEmbedding.getParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.LinearSVEmbedding.getParams">[docs]</a>    <span class="k">def</span> <span class="nf">getParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]</span></div></div>
-    
+
 <div class="viewcode-block" id="LinearSVEmbeddingAllTimes"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes">[docs]</a><span class="k">class</span> <span class="nc">LinearSVEmbeddingAllTimes</span><span class="p">(</span><span class="n">LinearSVEmbedding</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">_getMeansAndVarsGivenSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> 
+    <span class="k">def</span> <span class="nf">_getMeansAndVarsGivenSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span>
                                                         <span class="nb">vars</span><span class="p">):</span>
         <span class="n">qHMu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">means</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">t</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="p">))</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">)))</span> <span class="c1"># using broadcasting</span>
         <span class="n">qHVar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">t</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_C</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>

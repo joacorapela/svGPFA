@@ -159,10 +159,12 @@
 <span></span>
 <span class="kn">import</span> <span class="nn">pdb</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
-<div class="viewcode-block" id="KLDivergence"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.klDivergence.KLDivergence">[docs]</a><span class="k">class</span> <span class="nc">KLDivergence</span><span class="p">:</span>
+<div class="viewcode-block" id="KLDivergence"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.klDivergence.KLDivergence">[docs]</a><span class="k">class</span> <span class="nc">KLDivergence</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indPointsLocsKMS</span><span class="p">,</span> <span class="n">svPosteriorOnIndPoints</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">KLDivergence</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_indPointsLocsKMS</span> <span class="o">=</span> <span class="n">indPointsLocsKMS</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_svPosteriorOnIndPoints</span> <span class="o">=</span> <span class="n">svPosteriorOnIndPoints</span>
 

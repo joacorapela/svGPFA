@@ -159,10 +159,12 @@
 <span></span>
 <span class="kn">import</span> <span class="nn">pdb</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
-<div class="viewcode-block" id="SVLowerBound"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound">[docs]</a><span class="k">class</span> <span class="nc">SVLowerBound</span><span class="p">:</span>
+<div class="viewcode-block" id="SVLowerBound"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound">[docs]</a><span class="k">class</span> <span class="nc">SVLowerBound</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eLL</span><span class="p">,</span> <span class="n">klDiv</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SVLowerBound</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span> <span class="o">=</span> <span class="n">eLL</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_klDiv</span> <span class="o">=</span> <span class="n">klDiv</span>
 
