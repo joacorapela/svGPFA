@@ -37,9 +37,9 @@ def main(argv):
     plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
 
     with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load(f)
-    mat = loadmat(dataFilename)
-    testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
 
+    nTestPoints = len(trueLatentsSamples[0][0]["t"])
+    testTimes = torch.linspace(0, torch.max(trueLatentsSamples[0][0]["t"]), nTestPoints)
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
     indPointsLocs = model.getIndPointsLocs()
     plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=eLatentsFigFilename)
