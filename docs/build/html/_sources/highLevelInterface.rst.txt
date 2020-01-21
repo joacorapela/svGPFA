@@ -33,7 +33,7 @@ To estimate a sparse variational Gaussian process factor analysis model we:
 
        plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist)
 
-    .. image:: images/24219004_lowerBoundHist.png
+    .. image:: images/77594376_lowerBoundHist.png
 
 and model parameters (e.g., latents).
 
@@ -41,7 +41,7 @@ and model parameters (e.g., latents).
 
        plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot)
 
-   .. image:: images/24219004_estimatedLatents.png
+   .. image:: images/77594376_trial0_estimatedLatents.png
 
 
 Please refer to the following `notebook
