@@ -9,7 +9,7 @@ from plotly.subplots import make_subplots
 import plotly.io as pio
 import plotly.offline
 
-def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIteNumber="Iteration Number", xlabelElapsedTime="Elapsed Time (sec)", ylabel="Lower Bound", marker="x", linestyle="-", figFilename=None):
+def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="Iteration Number", xlabelElapsedTime="Elapsed Time (sec)", ylabel="Lower Bound", marker="x", linestyle="-", figFilename=None):
     if elapsedTimeHist is None:
         plt.plot(lowerBoundHist, marker=marker, linestyle=linestyle)
         plt.xlabel(xlabelIterNumber)
