@@ -173,7 +173,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="KernelMatricesStore.setKernels"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setKernels">[docs]</a>    <span class="k">def</span> <span class="nf">setKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kernels</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">kernels</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_kernels</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="KernelMatricesStore.setInitialParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setInitialParams">[docs]</a>    <span class="k">def</span> <span class="nf">setInitialParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialParams</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_Z</span> <span class="o">=</span> <span class="n">initialParams</span><span class="p">[</span><span class="s2">&quot;inducingPointsLocs0&quot;</span><span class="p">]</span>

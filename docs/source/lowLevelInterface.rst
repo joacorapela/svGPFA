@@ -3,8 +3,8 @@ Low-level interface
 
 The class :class:`~stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory` creates
 an svGPFA model and an instance of the class :class:`~stats.svGPFA.svEM.SVEM`
-optimizes its parameters.  Please refer to the `svGPFA class diagram
-<https://github.com/joacorapela/svGPFA/blob/master/docs/design/Classes.pdf>`_.
+optimizes its parameters.  Please refer to the svGPFA `class 
+<https://github.com/joacorapela/svGPFA/blob/master/docs/design/Classes.pdf>`_ and `interaction <https://github.com/joacorapela/svGPFA/blob/master/docs/design/Interaction.pdf>`_ diagrams.
 
 There is a one-to-one mapping between classes in the stats.svGPFA package and
 equations in `Duncker and Sahani, 2018 <https://papers.nips.cc/paper/8245-temporal-alignment-and-latent-gaussian-process-factor-inference-in-population-spike-trains>`_.
