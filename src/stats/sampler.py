@@ -22,17 +22,20 @@ class Sampler:
         n = m = 0
         t = [0]
         s = [0]
-        gridEval = intensityFun(torch.linspace(0, T, round(T/dt)))
+        gridTimes = torch.linspace(0, T, round(T/dt))
+        gridEval = intensityFun(gridTimes)
         lambdaMax = gridEval.max()
         while s[m]<T:
             u = torch.rand()
             w = -torch.log(u)/lambdaMax    # w~exponential(lambdaMax)
             s.append(s[m]+w)               # {sm} homogeneous Poisson process
             D = random.uniform(0, 1)
-            if D<=intensityFun(s[m+1])/lambdaMax:   # accepting with probability
-                                                    # intensityF(s[m+1])/lambdaMax
-                t.append(s[m+1])                    # {tn} inhomogeneous Poisson
-                                                    # process
+            gridPointNewPoissonSpike = (gridTimes-s[m+1]).argmin()
+            approxIntensityAtNewPoissonSpike = intensityFun[gridPointNewPoissonSpike]
+            if D<=approxIntensityNewPoissonSpike/lambdaMax:   # accepting with probability
+                                                              # intensityF(s[m+1])/lambdaMax
+                t.append(s[m+1])                              # {tn} inhomogeneous Poisson
+                                                              # process
                 n += 1
             m += 1
         if t[n]<=T:
