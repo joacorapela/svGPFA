@@ -145,9 +145,9 @@ def main(argv):
         "figures/{:s}_simulation_spikeTimes.png".format(randomPrefix)
 
     latents = getLatents(nLatents=nLatents, nTrials=nTrials,
-                         k0Scale=k0Scale, k0LengthScale=k0LengthScale, 
+                         k0Scale=k0Scale, k0LengthScale=k0LengthScale,
                          k0Period=k0Period,
-                         k1Scale=k1Scale, k1LengthScale=k1LengthScale, 
+                         k1Scale=k1Scale, k1LengthScale=k1LengthScale,
                          k1Period=k1Period,
                          k2Scale=k2Scale, k2LengthScale=k2LengthScale)
     C = .4*torch.randn(size=(nNeurons, nLatents))*torch.tensor([1, 1.2, 1.3])
@@ -156,11 +156,11 @@ def main(argv):
     spikeTimes = simulator.simulate(nNeurons=nNeurons,
                                     trialsLengths=trialsLengths,
                                     latents=latents, C=C, d=d,
-                                    linkFunction=torch.exp, dt=dtSimulate, 
+                                    linkFunction=torch.exp, dt=dtSimulate,
                                     latentsEpsilon=latentsEpsilon)
 
-    latentsSamples = getLatentsSamples(latents=latents, 
-                                       trialsLengths=trialsLengths, 
+    latentsSamples = getLatentsSamples(latents=latents,
+                                       trialsLengths=trialsLengths,
                                        dt=dtSimulate)
 
     with open(latentsFilename, "wb") as f: pickle.dump(latentsSamples, f)
