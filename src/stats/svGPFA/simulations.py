@@ -1,13 +1,13 @@
 
 import pdb
+import torch
 import stats.sampler
 
 class GPFASimulator:
 
-    def simulate(self, nNeurons, trialsLengths, latents, C, d,
-                 linkFunction, dt, latentsEpsilon=1e-5):
+    def simulate(self, trialsTimes, latentsSamples, C, d, linkFunction):
 
-        """ Simulates spikes for N=nNeurons neurons and R=len(trialLengths)
+        """ Simulates spikes for N=C.shape[0] neurons and R=len(trialLengths)
         trials using K=len(latents) latents.
 
         :param: nNeurons: number of neurons to simulate
@@ -32,43 +32,16 @@ class GPFASimulator:
 
         """
         nNeurons = C.shape[0]
-        nTrials = len(trialsLengths)
-        nLatents = len(latents)
+        nLatents = C.shape[1]
+        nTrials = len(trialsTimes)
         spikeTimes = [[] for n in range(nTrials)]
-        eSim = EmbeddingSimulator(latents=latents, C=C, d=d, 
-                                  latentsEpsilon=latentsEpsilon)
         sampler = stats.sampler.Sampler()
         for r in range(nTrials):
+            embeddings = torch.matmul(C, latentsSamples[r]) + d
             print("Processing trial {:d}".format(r))
             spikeTimes[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 print("Processing neuron {:d}".format(n))
-                eFun = eSim.getEmbeddingFunctionForNeuronAndTrial(n=n, r=r)
-                def intensityFun(t, linkFunction=linkFunction,
-                                 embeddingFun=eFun):
-                    return(linkFunction(embeddingFun(t=t)))
-                spikeTimes[r][n] = \
-                    sampler.sampleInhomogeneousPP_timeRescaling(
-                        intensityFun=intensityFun, T=trialsLengths[r],
-                        dt=dt)
+                spikeTimes[r][n] = sampler.sampleInhomogeneousPP_timeRescaling(intensityTimes=trialsTimes[r], intensityValues=embeddings[n,:], T=trialsTimes[r].max())
         return(spikeTimes)
-
-class EmbeddingSimulator:
-
-    def __init__(self, latents, C, d, latentsEpsilon):
-        self._latents = latents
-        self._C = C
-        self._d = d
-        self._latentsEpsilon = latentsEpsilon
-
-    def getEmbeddingFunctionForNeuronAndTrial(self, n, r):
-        def embeddingFun(t):
-            answer = 0.0
-            for k in range(len(self._latents[0])):
-                answer += (self._C[n, k]*
-                           self._latents[r][k](t,
-                                               epsilon=self._latentsEpsilon)+
-                           self._d[n])
-            return answer
-        return embeddingFun
 
