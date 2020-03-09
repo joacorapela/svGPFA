@@ -13,45 +13,7 @@ sys.path.append("../src")
 import stats.svGPFA.simulations
 import stats.kernels
 import stats.gaussianProcesses.eval
-
-def getKernels(nLatents, nTrials, config):
-    kernels = [[] for r in range(nTrials)]
-    for r in range(nTrials):
-        kernels[r] = [[] for r in range(nLatents)]
-        for k in range(nLatents):
-            kernelType = config["kernel_params"]["kTypeLatent{:d}Trial{:d}".format(k, r)]
-            if kernelType=="periodic":
-                scale = float(config["kernel_params"]["kScaleLatent{:d}Trial{:d}".format(k, r)])
-                lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}Trial{:d}".format(k, r)])
-                period = float(config["kernel_params"]["kPeriodLatent{:d}Trial{:d}".format(k, r)])
-                kernel = stats.kernels.PeriodicKernel()
-                kernel.setParams(params=torch.Tensor([scale, lengthScale, period]))
-            elif kernelType=="exponentialQuadratic":
-                scale = float(config["kernel_params"]["kScaleLatent{:d}Trial{:d}".format(k, r)])
-                lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}Trial{:d}".format(k, r)])
-                kernel = stats.kernels.ExponentialQuadraticKernel()
-                kernel.setParams(params=torch.Tensor([scale, lengthScale]))
-            else:
-                raise ValueError("Invalid kernel type {:s} for latent {:d} and trial {:d}".format(kernelType, k, r))
-            kernels[r][k] = kernel
-    return kernels
-
-def getLatentsMeansFuncs(nLatents, nTrials, config):
-    def getLatentMeanFunc(ampl, tau, freq, phase):
-        mean = lambda t: ampl*torch.exp(-t/tau)*torch.cos(2*math.pi*freq*t + phase)
-        return mean
-
-    meansFuncs = [[] for r in range(nTrials)]
-    for r in range(nTrials):
-        meansFuncs[r] = [[] for r in range(nLatents)]
-        for k in range(nLatents):
-            ampl = float(config["latentMean_params"]["amplLatent{:d}Trial{:d}".format(k, r)])
-            tau = float(config["latentMean_params"]["tauLatent{:d}Trial{:d}".format(k, r)])
-            freq = float(config["latentMean_params"]["freqLatent{:d}Trial{:d}".format(k, r)])
-            phase = float(config["latentMean_params"]["phaseLatent{:d}Trial{:d}".format(k, r)])
-            meanFunc = getLatentMeanFunc(ampl=ampl, tau=tau, freq=freq, phase=phase)
-            meansFuncs[r][k] = meanFunc
-    return meansFuncs
+from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 
 def getLatentsSamples(meansFuncs, kernels, trialsTimes, latentsEpsilon, dtype):
     nTrials = len(kernels)
@@ -89,13 +51,6 @@ def getLatentsTimes(trialsLengths, dt):
         latentsTimes[r] = torch.linspace(0, trialsLengths[r], round(trialsLengths[i]/dt))
     return latentsTimes
 
-def getLinearEmbeddingParams(nNeurons, nLatents, config):
-    C = torch.DoubleTensor([float(str) for str in config["embedding_params"]["C"][1:-1].split(",")])
-    C = torch.reshape(C, (nNeurons, nLatents))
-    d = torch.DoubleTensor([float(str) for str in config["embedding_params"]["d"][1:-1].split(",")])
-    d = torch.reshape(d, (nNeurons, 1))
-    return C, d
-
 def getTrialsTimes(trialsLengths, dt):
     nTrials = len(trialsLengths)
     trialsTimes = [[] for r in range(nTrials)]
@@ -131,8 +86,8 @@ def plotSpikeTimes(spikesTimes, figFilename, trialToPlot, xlabel="Time (sec)",
     return f
 
 def main(argv):
-    simPrefix = "00000003_simulation"
-    simConfigFilename = "data/{:s}_metaData.ini".format(simPrefix)
+    simPrefix = "00000003"
+    simConfigFilename = "data/{:s}_simulation_metaData.ini".format(simPrefix)
     simConfig = configparser.ConfigParser()
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["control_variables"]["nLatents"])
@@ -148,17 +103,10 @@ def main(argv):
     while randomPrefixUsed:
         randomPrefix = "{:08d}".format(random.randint(0, 10**8))
         metaDataFilename = \
-            "results/{:s}_metaData.ini".format(randomPrefix)
+            "results/{:s}_simulation_metaData.ini".format(randomPrefix)
         if not os.path.exists(metaDataFilename):
            randomPrefixUsed = False
     simResFilename = "results/{:s}_simRes.pickle".format(randomPrefix)
-    latentsFigFilename = \
-        "figures/{:s}_simulation_latents.png".format(randomPrefix)
-    spikeTimesFigFilename = \
-        "figures/{:s}_simulation_spikeTimes.png".format(randomPrefix)
-
-    with open(metaDataFilename, "w") as f:
-        simConfig.write(f)
 
     with torch.no_grad():
         kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
@@ -178,10 +126,16 @@ def main(argv):
                                          C=C, d=d, linkFunction=torch.exp)
         latentsMeans, latentsSTDs = getLatentsMeansAndSTDs(meansFuncs=latentsMeansFuncs, kernels=kernels, trialsTimes=trialsTimes)
 
-    simRes = {"times": trialsTimes, "latents": latentsSamples, 
-              "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs, 
+    simRes = {"times": trialsTimes, "latents": latentsSamples,
+              "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs,
               "spikes": spikesTimes}
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
+
+    simResConfig = configparser.ConfigParser()
+    simResConfig["simulation_params"] = {"simConfiFilename": simConfigFilename}
+    simResConfig["simulation_results"] = {"simResFilename": simResFilename}
+    with open(metaDataFilename, "w") as f:
+        simResConfig.write(f)
 
     pLatents = plotLatents(trialsTimes=trialsTimes, latentsSamples=latentsSamples, latentsMeans=latentsMeans, latentsSTDs=latentsSTDs, figFilename=latentsFigFilename)
     # pLatents = ggplotly(pLatents)
