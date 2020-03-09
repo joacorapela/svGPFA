@@ -61,8 +61,8 @@ class LinearSVEmbedding(SVEmbedding):
 
     def setInitialParams(self, initialParams):
         svEmbeddingInitialParams = initialParams["svEmbedding"]
-        self._C = svEmbeddingInitialParams["C0"]
-        self._d = svEmbeddingInitialParams["d0"]
+        self._C = nn.Parameter(svEmbeddingInitialParams["C0"])
+        self._d = nn.Parameter(svEmbeddingInitialParams["d0"])
         self._svPosteriorOnLatents.setInitialParams(initialParams=initialParams)
 
     def getParams(self):
