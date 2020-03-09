@@ -55,8 +55,8 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
         # test times \in nTestTimes but should be in nTrials x nTestTimes
         newTimesReformatted = torch.matmul(
-            torch.ones(nTrials, 
-                dtype=newTimes.dtype, 
+            torch.ones(nTrials,
+                dtype=newTimes.dtype,
                 device=newTimes.device).reshape(-1, 1),
             newTimes.reshape(1,-1))
         newTimesReformatted = newTimesReformatted.unsqueeze(2)
@@ -91,7 +91,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         nQuad = Ktt.shape[1]
         nLatent = Ktt.shape[2]
 
-        qKMu = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype, 
+        qKMu = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype,
             device=Kzz[0].device)
         qKVar = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype,
             device=Kzz[0].device)
