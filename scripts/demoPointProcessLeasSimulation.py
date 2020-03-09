@@ -32,7 +32,7 @@ def main(argv):
     device = torch.device(deviceName)
     print("Using {:s}".format(deviceName))
 
-    tol = 1e-5
+    tol = 1e-3
     ppSimulationFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessSimulation.mat")
     initDataFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessInitialConditions.mat")
     lowerBoundHistFigFilename = "figures/leasLowerBoundHist_{:s}.png".format(deviceName)
@@ -97,8 +97,7 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    # optimParams = {"emMaxNIter":50, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
-    optimParams = {"emMaxNIter":30, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":5, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
 
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
@@ -106,6 +105,17 @@ def main(argv):
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels,
         indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+
+    # start debug code
+    # parametersList = []
+    # i = 0
+    # for parameter in model.parameters():
+    #     print("Inside for loop")
+    #     print(i, parameter)
+    #     parametersList.append(parameter)
+    # print("Outside for loop")
+    # pdb.set_trace()
+    # ned debug code
 
     model.to(device)
 
@@ -123,6 +133,18 @@ def main(argv):
                       optimParams=optimParams)
     tElapsed = time.time()-tStart
     print("Completed maximize in {:.2f} seconds".format(tElapsed))
+
+    # start debug code
+    # parametersList = []
+    # i = 0
+    # for parameter in model.parameters():
+    #     print("Inside for loop")
+    #     print(i, parameter)
+    #     parametersList.append(parameter)
+    #     i += 1
+    # print("Outside for loop")
+    # pdb.set_trace()
+    # end debug code
 
     if profile:
         pr.disable()
