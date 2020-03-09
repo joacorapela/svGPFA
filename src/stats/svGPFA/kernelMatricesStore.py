@@ -15,7 +15,7 @@ class KernelMatricesStore(ABC, nn.Module):
         pass
 
     def setKernels(self, kernels):
-        self._kernels = kernels
+        self._kernels = nn.ModuleList(kernels)
 
     def setInitialParams(self, initialParams):
         self._Z = initialParams["inducingPointsLocs0"]
