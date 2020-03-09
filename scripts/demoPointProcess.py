@@ -22,7 +22,10 @@ def main(argv):
     # load data and initial values
     simPrefix = argv[1]
     trialToPlot = int(argv[2])
+    nIndPointsPerLatent = (10, 11, 12)
     nTestPoints = 2000
+    Nmax = 500
+    initVariance = 0.01
     initDataFilename = os.path.join("data/pointProcessInitialConditions.mat")
     spikeTimesFilename = \
         "results/{:s}_spikeTimes.pickle".format(simPrefix)
@@ -38,12 +41,14 @@ def main(argv):
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["latents_params"]["nLatents"])
     nTrials = int(simConfig["spikes_params"]["nTrials"])
+    trialLengths = torch.IntTensor([int(str) for str in simConfig["simulation_params"]["trialLengths"][1:-1].split(",")])
+    dt = float(trialLengths.max())/Nmax
 
     mat = loadmat(initDataFilename)
-    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    # qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    # qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    # qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    # Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
@@ -52,6 +57,26 @@ def main(argv):
     hprs0 = mat["hprs0"]
     # testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
     indPointsLocsKMSEpsilon = 1e-2
+
+    # create initial conditions for svPosteriorOnIndPoints
+    qMu0 = [None]*nLatents
+    qSVec0 = [None]*nLatents
+    qSDiag0 = [None]*nLatents
+    for i in range(nLatents):
+        qMu0[i] = torch.zeros(nTrials, nIndPointsPerLatent[i], 1, dtype=torch.double)
+        qSVec0[i] = initVariance*torch.eye(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+        qSDiag0[i] = initVariance*torch.ones(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+
+    # create inducing points
+    Z0 = [None]*nLatents
+    for i in range(nLatents):
+        for j in range(nTrials):
+            Z0[i] = torch.empty((nTrials, nIndPointsPerLatent[i], 1), dtype=torch.double)
+    for i in range(nLatents):
+        for j in range(nTrials):
+            Z0[i][j,:,0] = torch.linspace(dt, trialLengths[j], nIndPointsPerLatent[i])
+
+    pdb.set_trace()
 
     # create kernels
     kernels = [[None] for k in range(nLatents)]
@@ -124,6 +149,7 @@ def main(argv):
     estimConfig = configparser.ConfigParser()
     estimConfig["simulation_params"] = {"simPrefix": simPrefix}
     estimConfig["optim_params"] = optimParams
+    estimConfig["estimation_params"] = {"nIndPointsPerLatent": nIndPointsPerLatent}
     estimConfig["initial_params"] = {"initDataFilename": initDataFilename}
     with open(estimMetaDataFilename, "w") as f:
         estimConfig.write(f)
