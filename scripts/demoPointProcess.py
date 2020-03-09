@@ -13,44 +13,48 @@ import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
+from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 
 def main(argv):
-    if len(argv)!=3:
-        print("Usage {:s} <random prefix> <trial to plot>".format(argv[0]))
+    if len(argv)!=4:
+        print("Usage {:s} <simulation number> <estimation number> <trial to plot>".format(argv[0]))
         return
 
     # load data and initial values
-    simPrefix = argv[1]
-    trialToPlot = int(argv[2])
-    nIndPointsPerLatent = (10, 11, 12)
-    nTestPoints = 2000
-    Nmax = 500
-    initVariance = 0.01
-    initDataFilename = os.path.join("data/pointProcessInitialConditions.mat")
-    spikeTimesFilename = \
-        "results/{:s}_spikeTimes.pickle".format(simPrefix)
-    with open(spikeTimesFilename, "rb") as f: spikeTimes = pickle.load(f)
+    simResNumber = int(argv[1])
+    estNumber = int(argv[2])
+    trialToPlot = int(argv[3])
 
-    for i in range(len(spikeTimes)):
-        for j in range(len(spikeTimes[i])):
-            spikeTimes[i][j] = torch.stack(spikeTimes[i][j])
+    simResConfigFilename = "results/{:08d}_simRes.ini".format(simResNumber)
+    simResConfig = configparser.ConfigParser()
+    simResConfig.read(simResConfigFilename)
+    simConfigFilename = simResConfig["simulation_params"]["simConfiFilename"]
+    simResFilename = simResConfig["simulation_results"]["simResFilename"]
+    with open(simResFilename, "rb") as f: simRes = pickle.load(f)
+    spikeTimes = simRes["spikes"]
+
+    estConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estNumber)
+    estConfig = configparser.ConfigParser()
+    nIndPointsPerLatent = torch.DoubleTensor([float(str) for str in estConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")])
+    nTestPoints = float(estConfig["control_variables"]["nTestPoints"])
+    firstIndPoint = float(estConfig["control_variables"]["firstIndPoint"])
+    initCondNoiseSTD = float(estConfig["control_variables"]["initCondNoiseSTD"])
+
+#     for i in range(len(spikeTimes)):
+#         for j in range(len(spikeTimes[i])):
+#             spikeTimes[i][j] = torch.stack(spikeTimes[i][j])
     testTimes = torch.linspace(0, torch.max(spikeTimes[0][0]), nTestPoints)
 
-    simConfigFilename = "results/{:s}_metaData.ini".format(simPrefix)
     simConfig = configparser.ConfigParser()
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["latents_params"]["nLatents"])
     nTrials = int(simConfig["spikes_params"]["nTrials"])
     trialLengths = torch.IntTensor([int(str) for str in simConfig["simulation_params"]["trialLengths"][1:-1].split(",")])
-    dt = float(trialLengths.max())/Nmax
 
-    mat = loadmat(initDataFilename)
-    # qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    # qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    # qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    # Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
+    C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
+
+    C0 = C + torch.randn(C.shape)*initCondNoiseSTD
+    d0 = d + torch.randn(d.shape)*initCondNoiseSTD
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     kernelNames = mat["kernelNames"]
@@ -74,7 +78,7 @@ def main(argv):
             Z0[i] = torch.empty((nTrials, nIndPointsPerLatent[i], 1), dtype=torch.double)
     for i in range(nLatents):
         for j in range(nTrials):
-            Z0[i][j,:,0] = torch.linspace(dt, trialLengths[j], nIndPointsPerLatent[i])
+            Z0[i][j,:,0] = torch.linspace(firstIndPoint, trialLengths[j], nIndPointsPerLatent[i])
 
     pdb.set_trace()
 
