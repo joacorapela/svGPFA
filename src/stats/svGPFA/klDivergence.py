@@ -15,9 +15,9 @@ class KLDivergence(nn.Module):
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         for k in range(len(self._indPointsLocsKMS.getKzzChol())):
             klDivK = self._evalSumAcrossTrials(
-                Kzz=self._indPointsLocsKMS.getKzz()[k], 
-                KzzChol=self._indPointsLocsKMS.getKzzChol()[k], 
-                qMu=self._svPosteriorOnIndPoints.getQMu()[k], 
+                Kzz=self._indPointsLocsKMS.getKzz()[k],
+                KzzChol=self._indPointsLocsKMS.getKzzChol()[k],
+                qMu=self._svPosteriorOnIndPoints.getQMu()[k],
                 qSigma=qSigma[k])
             klDiv += klDivK
         return klDiv
