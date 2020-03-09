@@ -4,7 +4,7 @@ import torch
 
 class Sampler:
 
-    def sampleInhomogeneousPP_thinning(self, intensityFun, T, dt=.03):
+    def sampleInhomogeneousPP_thinning(self, intensityTimes, intensityValues, T):
         """ Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.
 
         :param: intensityFun: Intensity function of the point process.
@@ -22,16 +22,14 @@ class Sampler:
         n = m = 0
         t = [0]
         s = [0]
-        gridTimes = torch.linspace(0, T, round(T/dt))
-        gridEval = intensityFun(gridTimes)
-        lambdaMax = gridEval.max()
+        lambdaMax = intensityValues.max()
         while s[m]<T:
             u = torch.rand()
             w = -torch.log(u)/lambdaMax    # w~exponential(lambdaMax)
             s.append(s[m]+w)               # {sm} homogeneous Poisson process
             D = random.uniform(0, 1)
-            gridPointNewPoissonSpike = (gridTimes-s[m+1]).argmin()
-            approxIntensityAtNewPoissonSpike = intensityFun[gridPointNewPoissonSpike]
+            intensityIndex = (intensityTimes-s[m+1]).argmin()
+            approxIntensityAtNewPoissonSpike = intensityValues[intensityIndex]
             if D<=approxIntensityNewPoissonSpike/lambdaMax:   # accepting with probability
                                                               # intensityF(s[m+1])/lambdaMax
                 t.append(s[m+1])                              # {tn} inhomogeneous Poisson
@@ -43,7 +41,7 @@ class Sampler:
         else:
             return({"inhomogeneous": t[1:-1], "homogeneous": s[1:-1]})
 
-    def sampleInhomogeneousPP_timeRescaling(self, intensityFun, T, dt=.03):
+    def sampleInhomogeneousPP_timeRescaling(self, intensityTimes, intensityValues, T):
         """ Time rescaling algorithm to sample from an inhomogeneous point
         process. Chapter 2 from Uri Eden's Point Process Notes.
 
@@ -59,19 +57,18 @@ class Sampler:
         :return: samples of the inhomogeneous point process with intensity function intensityFun.
         :rtype: list
         """
-        t = torch.linspace(0, T, round(T/dt))
-        gridEval = intensityFun(t)
         s = [0]
         i = 1
-        while i<(len(t)-1):
+        dt = intensityTimes[1]-intensityTimes[0]
+        while i<(len(intensityTimes)-1):
             u = torch.rand(1)
             z = -torch.log(u)/1.0    # z~exponential(1.0)
             anInt = 0
             j = i+1
-            while j<len(t) and anInt<=z:
-                anInt += gridEval[j]*dt
+            while j<len(intensityTimes) and anInt<=z:
+                anInt += intensityValues[j]*dt
                 j += 1
             if anInt>z:
-                s.append(t[j-1])
+                s.append(intensityTimes[j-1])
             i = j
         return s[1:]
