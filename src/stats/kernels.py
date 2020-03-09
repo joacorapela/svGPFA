@@ -3,8 +3,12 @@ import pdb
 from abc import ABC, abstractmethod
 import math
 import torch
+import torch.nn as nn
 
-class Kernel(ABC):
+class Kernel(ABC, nn.Module):
+
+    def __init__(self):
+        super(Kernel, self).__init__()
 
     @abstractmethod
     def buildKernelMatrix(self, X1, X2=None):
@@ -18,13 +22,14 @@ class Kernel(ABC):
         return self._params
 
     def setParams(self, params):
-        self._params = params
+        self._params = nn.Parameter(params)
 
 class ExponentialQuadraticKernel(Kernel):
 
     def __init__(self, scale=None, lengthScale=None, dtype=torch.double, device=torch.device("cpu")):
-        paramIsNone = torch.tensor([scale is None, lengthScale is None])
-        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device)
+        super(ExponentialQuadraticKernel, self).__init__()
+        # paramIsNone = torch.tensor([scale is None, lengthScale is None])
+        # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
 
         if scale is not None:
             self._scale = scale
@@ -72,8 +77,9 @@ class ExponentialQuadraticKernel(Kernel):
 
 class PeriodicKernel(Kernel):
     def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
-        paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])
-        self._params = torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device)
+        super(PeriodicKernel, self).__init__()
+        # paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])
+        # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
 
         if scale is not None:
             self._scale = scale
