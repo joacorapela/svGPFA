@@ -1,4 +1,5 @@
 
+import pdb
 import math
 import torch
 import stats.kernels
@@ -44,7 +45,7 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
 
 def getLinearEmbeddingParams(nNeurons, nLatents, config):
     C = torch.DoubleTensor([float(str) for str in config["embedding_params"]["C"][1:-1].split(",")])
-    C = torch.reshape(C, (nNeurons, nLatents))
+    C = torch.reshape(C, (nLatents, nNeurons)).transpose(0, 1)
     d = torch.DoubleTensor([float(str) for str in config["embedding_params"]["d"][1:-1].split(",")])
     d = torch.reshape(d, (nNeurons, 1))
     return C, d
