@@ -69,6 +69,6 @@ class Sampler:
                 anInt += intensityValues[j]*dt
                 j += 1
             if anInt>z:
-                s.append(intensityTimes[j-1])
+                s.append(intensityTimes[j-1].item())
             i = j
         return s[1:]
