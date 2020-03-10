@@ -1,4 +1,8 @@
 
+import math
+import torch
+import stats.kernels
+
 def getKernels(nLatents, nTrials, config):
     kernels = [[] for r in range(nTrials)]
     for r in range(nTrials):
