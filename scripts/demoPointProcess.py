@@ -14,6 +14,48 @@ import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
+import myMath.utils
+
+def getLegQuadPointsAndWeights(nQuad, trialsLengths):
+    nTrials = len(trialsLengths)
+    legQuadPoints = torch.empty((nTrials, nQuad, 1))
+    legQuadWeights = torch.empty((nTrials, nQuad, 1))
+    for r in range(nTrials):
+        leqQuadPoints[r,:,0], leqQuadWeights[r,:,0] = math.utils.leggaussVarLimits(n=nQuad, a=0, b=trialsLengths[r])
+    return legQuadPoints, legQuadWeights
+
+def getIndPointLocs0(nIndPointsPerLatent, trialsLengths):
+    nLatents = len(nIndPointsPerLatent)
+    nTrials = len(trialsLengths)
+
+    Z0 = [None]*nLatents
+    for i in range(nLatents):
+        Z0[i] = torch.empty((nTrials, nIndPointsPerLatent[i], 1), dtype=torch.double)
+    for i in range(nLatents):
+        for j in range(nTrials):
+            Z0[i][j,:,0] = torch.linspace(firstIndPoint, trialsLengths[j], nIndPointsPerLatent[i])
+    return Z0
+
+def getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent, nLatents, nTrials, scale):
+    qMu0 = [None]*nLatents
+    qSVec0 = [None]*nLatents
+    qSDiag0 = [None]*nLatents
+    for i in range(nLatents):
+        qMu0[i] = torch.zeros(nTrials, nIndPointsPerLatent[i], 1, dtype=torch.double)
+        qSVec0[i] = scale*torch.eye(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+        qSDiag0[i] = scale*torch.ones(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+    return qMu0, qSVec0, qSDiag0
+
+def getKernelsParams0(kernels, noiseSTD):
+    nTrials = len(kernels)
+    nLatents = len(kernels[0])
+    kernelsParams0 = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        kernelsParams0[r] = [[] for r in range(nLatents)]
+        for k in range(nLatents):
+            trueParams = kernels[r][k].getParams()
+            kernelsParams0[r][k] = noiseSTD*torch.randn(len(trueParams))*trueParams
+    return kernelsParams0
 
 def main(argv):
     if len(argv)!=4:
@@ -25,87 +67,47 @@ def main(argv):
     estNumber = int(argv[2])
     trialToPlot = int(argv[3])
 
-    simResConfigFilename = "results/{:08d}_simRes.ini".format(simResNumber)
+    simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simResConfig = configparser.ConfigParser()
     simResConfig.read(simResConfigFilename)
-    simConfigFilename = simResConfig["simulation_params"]["simConfiFilename"]
+    simConfigFilename = simResConfig["simulation_params"]["simConfigFilename"]
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikeTimes = simRes["spikes"]
 
     estConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estNumber)
     estConfig = configparser.ConfigParser()
+    estConfig.read(estConfigFilename)
     nIndPointsPerLatent = torch.DoubleTensor([float(str) for str in estConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")])
     nTestPoints = float(estConfig["control_variables"]["nTestPoints"])
     firstIndPoint = float(estConfig["control_variables"]["firstIndPoint"])
-    initCondNoiseSTD = float(estConfig["control_variables"]["initCondNoiseSTD"])
+    initCondEmbeddingSTD = float(estConfig["control_variables"]["initCondEmbeddingSTD"])
+    initCondIndPointsScale = float(estConfig["control_variables"]["initCondIndPointsScale"])
+    kernelsParams0NoiseSTD = float(estConfig["control_variables"]["kernelsParams0NoiseSTD"])
+    indPointsLocsKMSRegEpsilon = float(estConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
-#     for i in range(len(spikeTimes)):
-#         for j in range(len(spikeTimes[i])):
-#             spikeTimes[i][j] = torch.stack(spikeTimes[i][j])
     testTimes = torch.linspace(0, torch.max(spikeTimes[0][0]), nTestPoints)
 
     simConfig = configparser.ConfigParser()
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["latents_params"]["nLatents"])
     nTrials = int(simConfig["spikes_params"]["nTrials"])
-    trialLengths = torch.IntTensor([int(str) for str in simConfig["simulation_params"]["trialLengths"][1:-1].split(",")])
+    trialsLengths = torch.IntTensor([int(str) for str in simConfig["simulation_params"]["trialsLengths"][1:-1].split(",")])
 
     C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
-
     C0 = C + torch.randn(C.shape)*initCondNoiseSTD
     d0 = d + torch.randn(d.shape)*initCondNoiseSTD
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    kernelNames = mat["kernelNames"]
-    hprs0 = mat["hprs0"]
-    # testTimes = torch.from_numpy(mat['testTimes']).type(torch.DoubleTensor).squeeze()
-    indPointsLocsKMSEpsilon = 1e-2
 
-    # create initial conditions for svPosteriorOnIndPoints
-    qMu0 = [None]*nLatents
-    qSVec0 = [None]*nLatents
-    qSDiag0 = [None]*nLatents
-    for i in range(nLatents):
-        qMu0[i] = torch.zeros(nTrials, nIndPointsPerLatent[i], 1, dtype=torch.double)
-        qSVec0[i] = initVariance*torch.eye(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
-        qSDiag0[i] = initVariance*torch.ones(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+    legQuadPoints, legQuadWeights = getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
-    # create inducing points
-    Z0 = [None]*nLatents
-    for i in range(nLatents):
-        for j in range(nTrials):
-            Z0[i] = torch.empty((nTrials, nIndPointsPerLatent[i], 1), dtype=torch.double)
-    for i in range(nLatents):
-        for j in range(nTrials):
-            Z0[i][j,:,0] = torch.linspace(firstIndPoint, trialLengths[j], nIndPointsPerLatent[i])
+    kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
+    kernels = kernels[0] # the current code uses the same kernel for all trials
+    kernelsParams0 = getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
+    kernelsParams0 = kernelsParams0[0] # the current code uses the same kernel for all trials
 
-    pdb.set_trace()
+    qMu0, qSVec0, qSDiag0 = getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
 
-    # create kernels
-    kernels = [[None] for k in range(nLatents)]
-    for k in range(nLatents):
-        if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel()
-        elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = stats.kernels.ExponentialQuadraticKernel()
-        else:
-            raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
-
-    # create initial parameters
-    kernelsParams0 = [[None] for k in range(nLatents)]
-    for k in range(nLatents):
-        if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernelsParams0[k] = torch.tensor([1.0,
-                                              float(hprs0[k,0][0]),
-                                              float(hprs0[k,0][1])],
-                                             dtype=torch.double)
-        elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernelsParams0[k] = torch.tensor([1.0,
-                                              float(hprs0[k,0][0])],
-                                             dtype=torch.double)
-        else:
-            raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
+    Z0 = getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": b0}
@@ -117,7 +119,7 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    optimParams = {"emMaxNIter":30, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
