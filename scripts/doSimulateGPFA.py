@@ -2,7 +2,6 @@
 import pdb
 import sys
 import os
-import math
 import random
 import torch
 import plotly
@@ -11,7 +10,6 @@ import pickle
 import configparser
 sys.path.append("../src")
 import stats.svGPFA.simulations
-import stats.kernels
 import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 
@@ -107,6 +105,10 @@ def main(argv):
         if not os.path.exists(metaDataFilename):
            randomPrefixUsed = False
     simResFilename = "results/{:s}_simRes.pickle".format(randomPrefix)
+    latentsFigFilename = \
+        "figures/{:s}_simulation_latents.png".format(randomPrefix)
+    spikeTimesFigFilename = \
+        "figures/{:s}_simulation_spikeTimes.png".format(randomPrefix)
 
     with torch.no_grad():
         kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
@@ -132,7 +134,7 @@ def main(argv):
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
 
     simResConfig = configparser.ConfigParser()
-    simResConfig["simulation_params"] = {"simConfiFilename": simConfigFilename}
+    simResConfig["simulation_params"] = {"simConfigFilename": simConfigFilename}
     simResConfig["simulation_results"] = {"simResFilename": simResFilename}
     with open(metaDataFilename, "w") as f:
         simResConfig.write(f)
