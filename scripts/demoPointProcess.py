@@ -16,12 +16,12 @@ import plot.svGPFA.plotUtils
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 import myMath.utils
 
-def getLegQuadPointsAndWeights(nQuad, trialsLengths):
+def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
     nTrials = len(trialsLengths)
-    legQuadPoints = torch.empty((nTrials, nQuad, 1))
-    legQuadWeights = torch.empty((nTrials, nQuad, 1))
+    legQuadPoints = torch.empty((nTrials, nQuad, 1), dtype=dtype)
+    legQuadWeights = torch.empty((nTrials, nQuad, 1), dtype=dtype)
     for r in range(nTrials):
-        leqQuadPoints[r,:,0], leqQuadWeights[r,:,0] = math.utils.leggaussVarLimits(n=nQuad, a=0, b=trialsLengths[r])
+        legQuadPoints[r,:,0], legQuadWeights[r,:,0] = myMath.utils.leggaussVarLimits(n=nQuad, a=0, b=trialsLengths[r])
     return legQuadPoints, legQuadWeights
 
 def getIndPointLocs0(nIndPointsPerLatent, trialsLengths):
@@ -78,31 +78,33 @@ def main(argv):
     estConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estNumber)
     estConfig = configparser.ConfigParser()
     estConfig.read(estConfigFilename)
-    nIndPointsPerLatent = torch.DoubleTensor([float(str) for str in estConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")])
-    nTestPoints = float(estConfig["control_variables"]["nTestPoints"])
+    nIndPointsPerLatent = [int(str) for str in estConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
+    nTestPoints = int(estConfig["control_variables"]["nTestPoints"])
     firstIndPoint = float(estConfig["control_variables"]["firstIndPoint"])
     initCondEmbeddingSTD = float(estConfig["control_variables"]["initCondEmbeddingSTD"])
     initCondIndPointsScale = float(estConfig["control_variables"]["initCondIndPointsScale"])
     kernelsParams0NoiseSTD = float(estConfig["control_variables"]["kernelsParams0NoiseSTD"])
     indPointsLocsKMSRegEpsilon = float(estConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
+    nQuad = int(estConfig["control_variables"]["nQuad"])
 
-    testTimes = torch.linspace(0, torch.max(spikeTimes[0][0]), nTestPoints)
+    testTimes = torch.linspace(0, torch.max(torch.tensor(spikeTimes[0][0])), nTestPoints)
 
     simConfig = configparser.ConfigParser()
     simConfig.read(simConfigFilename)
-    nLatents = int(simConfig["latents_params"]["nLatents"])
-    nTrials = int(simConfig["spikes_params"]["nTrials"])
-    trialsLengths = torch.IntTensor([int(str) for str in simConfig["simulation_params"]["trialsLengths"][1:-1].split(",")])
+    nLatents = int(simConfig["control_variables"]["nLatents"])
+    nNeurons = int(simConfig["control_variables"]["nNeurons"])
+    trialsLengths = [int(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    nTrials = len(trialsLengths)
 
     C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
-    C0 = C + torch.randn(C.shape)*initCondNoiseSTD
-    d0 = d + torch.randn(d.shape)*initCondNoiseSTD
+    C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
+    d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
 
     legQuadPoints, legQuadWeights = getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
-    kernels = kernels[0] # the current code uses the same kernel for all trials
     kernelsParams0 = getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
+    kernels = kernels[0] # the current code uses the same kernel for all trials
     kernelsParams0 = kernelsParams0[0] # the current code uses the same kernel for all trials
 
     qMu0, qSVec0, qSDiag0 = getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
