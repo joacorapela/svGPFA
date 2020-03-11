@@ -42,6 +42,6 @@ class GPFASimulator:
             spikeTimes[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 print("Processing neuron {:d}".format(n))
-                spikeTimes[r][n] = sampler.sampleInhomogeneousPP_timeRescaling(intensityTimes=trialsTimes[r], intensityValues=embeddings[n,:], T=trialsTimes[r].max())
+                spikeTimes[r][n] = torch.tensor(sampler.sampleInhomogeneousPP_timeRescaling(intensityTimes=trialsTimes[r], intensityValues=embeddings[n,:], T=trialsTimes[r].max()), device=C.device)
         return(spikeTimes)
 
