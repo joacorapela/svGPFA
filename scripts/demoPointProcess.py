@@ -24,7 +24,7 @@ def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
         legQuadPoints[r,:,0], legQuadWeights[r,:,0] = myMath.utils.leggaussVarLimits(n=nQuad, a=0, b=trialsLengths[r])
     return legQuadPoints, legQuadWeights
 
-def getIndPointLocs0(nIndPointsPerLatent, trialsLengths):
+def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPoint):
     nLatents = len(nIndPointsPerLatent)
     nTrials = len(trialsLengths)
 
@@ -74,6 +74,9 @@ def main(argv):
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikeTimes = simRes["spikes"]
+    trueLatents = simRes["latents"]
+    trueLatentsMeans = simRes["latentsMeans"]
+    trueLatentsSTDs = simRes["latentsSTDs"]
 
     estConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estNumber)
     estConfig = configparser.ConfigParser()
@@ -109,10 +112,11 @@ def main(argv):
 
     qMu0, qSVec0, qSDiag0 = getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
 
-    Z0 = getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths)
+    Z0 = getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent,
+                          trialsLengths=trialsLengths, firstIndPoint=firstIndPoint)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
+    qHParams0 = {"C0": C0, "d0": d0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     initialParams = {"svPosteriorOnIndPoints": qUParams0,
@@ -129,7 +133,7 @@ def main(argv):
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels,
-        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+        indPointsLocsKMSEpsilon=indPointsLocsKMSRegEpsilon)
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
@@ -149,18 +153,15 @@ def main(argv):
         "results/{:s}_estimation_metaData.ini".format(estimationPrefix)
     modelSaveFilename = \
         "results/{:s}_estimatedModel.pickle".format(estimationPrefix)
-    latentsFilename = "results/{:s}_latents.pickle".format(simPrefix)
+    latentsFilename = "results/{:s}_latents.pickle".format(estimationPrefix)
     latentsFigFilename = "figures/{:s}_estimatedLatents.png".format(estimationPrefix)
-    lowerBoundHistFigFilename = \
-        "figures/{:s}_lowerBoundHist.png".format(estimationPrefix)
+    lowerBoundHistFigFilename = "figures/{:s}_lowerBoundHist.png".format(estimationPrefix)
 
     estimConfig = configparser.ConfigParser()
-    estimConfig["simulation_params"] = {"simPrefix": simPrefix}
+    estimConfig["simulation_params"] = {"simResNumber": simResNumber}
     estimConfig["optim_params"] = optimParams
-    estimConfig["estimation_params"] = {"nIndPointsPerLatent": nIndPointsPerLatent}
-    estimConfig["initial_params"] = {"initDataFilename": initDataFilename}
-    with open(estimMetaDataFilename, "w") as f:
-        estimConfig.write(f)
+    estimConfig["estimation_params"] = {"estNumber": estNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
+    with open(estimMetaDataFilename, "w") as f: estimConfig.write(f)
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
@@ -172,10 +173,11 @@ def main(argv):
     # predict latents at test times
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
 
-    # plot true and estimated latents
     plt.figure()
+
+    # plot true and estimated latents
     indPointsLocs = model.getIndPointsLocs()
-    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
+    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatents, trueLatentsMeans=trueLatentsMeans, trueLatentsSTDs=trueLatentsSTDs, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
 
     pdb.set_trace()
 
