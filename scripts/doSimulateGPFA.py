@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 import pickle
 import configparser
 sys.path.append("../src")
-import stats.svGPFA.simulations
+import simulations.svGPFA.simulations
 import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
+import plot.svGPFA.plotUtils
 
 def getLatentsSamples(meansFuncs, kernels, trialsTimes, latentsEpsilon, dtype):
     nTrials = len(kernels)
@@ -56,36 +57,14 @@ def getTrialsTimes(trialsLengths, dt):
         trialsTimes[r] = torch.linspace(0, trialsLengths[r], round(trialsLengths[r]/dt))
     return trialsTimes
 
-def plotLatents(trialsTimes, latentsSamples, latentsMeans, latentsSTDs, figFilename, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
-    nTrials = len(latentsSamples)
-    nLatents = latentsSamples[0].shape[0]
-    f, axs = plt.subplots(nTrials, nLatents, sharex=True, sharey=True)
-    for r in range(nTrials):
-        t = trialsTimes[r]
-        for k in range(nLatents):
-            latentSamples = latentsSamples[r][k,:]
-            mean = latentsMeans[r][k,:]
-            std = latentsSTDs[r][k,:]
-            axs[r,k].plot(t, latentSamples, marker=marker)
-            axs[r,k].fill_between(t, mean-1.96*std, mean+1.96*std, alpha=alpha)
-            axs[r,k].set_xlabel(xlabel)
-            axs[r,k].set_ylabel(ylabel)
-            axs[r,k].set_title("r={}, k={}".format(r, k))
-    plt.savefig(figFilename)
-    return f
-
-def plotSpikeTimes(spikesTimes, figFilename, trialToPlot, xlabel="Time (sec)",
-                   ylabel="Neuron"):
-    plt.eventplot(positions=spikesTimes[trialToPlot])
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.savefig(figFilename)
-    f = plt.gcf()
-    return f
-
 def main(argv):
-    simPrefix = "00000003"
-    simConfigFilename = "data/{:s}_simulation_metaData.ini".format(simPrefix)
+    if len(argv)!=2:
+        print("Usage {:s} <simulation config number>".format(argv[0]))
+        return
+
+    # load data and initial values
+    simConfigNumber = int(argv[1])
+    simConfigFilename = "data/{:08d}_simulation_metaData.ini".format(simConfigNumber)
     simConfig = configparser.ConfigParser()
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["control_variables"]["nLatents"])
@@ -94,7 +73,6 @@ def main(argv):
     nTrials = len(trialsLengths)
     dtSimulate = float(simConfig["control_variables"]["dt"])
     dtLatentsFig = 1e-1
-    spikeTrialToPlot = 0
     latentsEpsilon = 1e-3
 
     randomPrefixUsed = True
@@ -122,10 +100,8 @@ def main(argv):
                                            latentsEpsilon=latentsEpsilon,
                                            dtype=C.dtype)
 
-        simulator = stats.svGPFA.simulations.GPFASimulator()
-        spikesTimes = simulator.simulate(trialsTimes=trialsTimes,
-                                         latentsSamples=latentsSamples,
-                                         C=C, d=d, linkFunction=torch.exp)
+        simulator = simulations.svGPFA.simulations.GPFASimulator()
+        spikesTimes = simulator.simulate(trialsTimes=trialsTimes, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
         latentsMeans, latentsSTDs = getLatentsMeansAndSTDs(meansFuncs=latentsMeansFuncs, kernels=kernels, trialsTimes=trialsTimes)
 
     simRes = {"times": trialsTimes, "latents": latentsSamples,
@@ -139,13 +115,11 @@ def main(argv):
     with open(metaDataFilename, "w") as f:
         simResConfig.write(f)
 
-    pLatents = plotLatents(trialsTimes=trialsTimes, latentsSamples=latentsSamples, latentsMeans=latentsMeans, latentsSTDs=latentsSTDs, figFilename=latentsFigFilename)
+    pLatents = plot.svGPFA.plotUtils.getSimulatedLatentsPlot(trialsTimes=trialsTimes, latentsSamples=latentsSamples, latentsMeans=latentsMeans, latentsSTDs=latentsSTDs, figFilename=latentsFigFilename)
     # pLatents = ggplotly(pLatents)
     # pLatents.show()
 
-    plt.figure()
-
-    pSpkes = plotSpikeTimes(spikesTimes=spikesTimes, trialToPlot=spikeTrialToPlot, figFilename=spikeTimesFigFilename)
+    pSpikes = plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot(spikesTimes=spikesTimes, figFilename=spikeTimesFigFilename)
     # pSpikes = ggplotly(pSpikes)
     # pSpikes.show()
 
