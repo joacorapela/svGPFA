@@ -24,7 +24,7 @@ docs/source/*.bak
 ci/Untitled*.ipynb
 ipynb/results
 /notes.txt
-scripts/figures/*
-scripts/results/*
+# scripts/figures/*
+# scripts/results/*
 src/stats/gaussianProcesses/kernels.py
 
