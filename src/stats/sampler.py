@@ -62,7 +62,7 @@ class Sampler:
         dt = intensityTimes[1]-intensityTimes[0]
         while i<(len(intensityTimes)-1):
             u = torch.rand(1)
-            z = -torch.log(u)/1.0    # z~exponential(1.0)
+            z = -torch.log(u)   # z~exponential(1.0)
             anInt = 0
             j = i+1
             while j<len(intensityTimes) and anInt<=z:
@@ -71,4 +71,6 @@ class Sampler:
             if anInt>z:
                 s.append(intensityTimes[j-1].item())
             i = j
-        return s[1:]
+        answer = s[1:]
+        pdb.set_trace()
+        return answer
