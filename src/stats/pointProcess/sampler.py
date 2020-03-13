@@ -40,7 +40,7 @@ class Sampler:
             answer = {"inhomogeneous": t[1:], "homogeneous": s[1:]}
         else:
             answer = {"inhomogeneous": t[1:-1], "homogeneous": s[1:-1]}
-        pdb.set_trace()
+        return answer
 
     def sampleInhomogeneousPP_timeRescaling(self, intensityTimes, intensityValues, T):
         """ Time rescaling algorithm to sample from an inhomogeneous point
@@ -73,5 +73,4 @@ class Sampler:
                 s.append(intensityTimes[j-1].item())
             i = j
         answer = s[1:]
-        pdb.set_trace()
         return answer
