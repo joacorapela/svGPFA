@@ -1,0 +1,209 @@
+         8478188 function calls in 1180.265 seconds
+
+   Ordered by: cumulative time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    3.086    3.086 1180.320 1180.320 svEM.py:10(maximize)
+      120    0.005    0.000 1176.006    9.800 svEM.py:119(_setupAndMaximizeStep)
+      120    1.329    0.011 1176.001    9.800 svEM.py:127(_maximizeStep)
+     1964   45.055    0.023 1121.983    0.571 lbfgs.py:282(step)
+     9575   14.471    0.002 1083.900    0.113 svEM.py:133(closure)
+       30    0.001    0.000  752.841   25.095 svEM.py:110(_mStepIndPoints)
+     9575    0.127    0.000  475.683    0.050 tensor.py:138(backward)
+     9575    0.149    0.000  475.556    0.050 __init__.py:44(backward)
+     9575  474.806    0.050  474.806    0.050 {method 'run_backward' of 'torch._C._EngineBase' objects}
+     5400    0.072    0.000  397.285    0.074 svEM.py:112(evalFunc)
+     7435    4.388    0.001  392.423    0.053 svLowerBound.py:13(eval)
+     9575    1.226    0.000  313.079    0.033 expectedLogLikelihood.py:66(evalSumAcrossTrialsAndNeurons)
+    19150    0.334    0.000  302.359    0.016 svEmbedding.py:14(computeMeansAndVars)
+       30    0.001    0.000  198.248    6.608 svEM.py:84(_eStep)
+     9605    0.391    0.000  180.879    0.019 svPosteriorOnLatents.py:142(computeMeansAndVars)
+     9605   82.163    0.009  180.258    0.019 svPosteriorOnLatents.py:152(__computeMeansAndVarsGivenKernelMatrices)
+       30    0.001    0.000  173.551    5.785 svEM.py:90(_mStepModelParams)
+     7435    1.591    0.000  149.267    0.020 klDivergence.py:13(evalSumAcrossLatentsAndTrials)
+    22305   41.821    0.002  131.638    0.006 klDivergence.py:25(_evalSumAcrossTrials)
+     5796    0.091    0.000  124.989    0.022 svLowerBound.py:24(buildKernelsMatrices)
+     5796    0.124    0.000  124.870    0.022 expectedLogLikelihood.py:95(buildKernelsMatrices)
+    11592    0.093    0.000  124.674    0.011 svEmbedding.py:26(buildKernelsMatrices)
+     2140    0.014    0.000   75.716    0.035 svEM.py:93(<lambda>)
+     2140    1.308    0.001   75.702    0.035 svLowerBound.py:19(evalELLSumAcrossTrialsAndNeurons)
+     5796    0.043    0.000   75.126    0.013 svPosteriorOnLatents.py:183(buildKernelsMatrices)
+     5796    5.573    0.001   75.058    0.013 kernelMatricesStore.py:93(buildKernelsMatrices)
+   223050   69.726    0.000   69.726    0.000 {method 'slogdet' of 'torch._C._TensorBase' objects}
+     9605    0.398    0.000   64.386    0.007 svPosteriorOnLatents.py:79(computeMeansAndVars)
+     9605   13.458    0.001   63.779    0.007 svPosteriorOnLatents.py:89(__computeMeansAndVarsGivenKernelMatrices)
+    81144   43.971    0.001   61.139    0.001 kernels.py:96(buildKernelMatrix)
+   342045   57.115    0.000   57.115    0.000 {built-in method cholesky_solve}
+   332670   56.318    0.000   56.318    0.000 {built-in method matmul}
+    26645    7.976    0.000   54.297    0.002 svPosteriorOnIndPoints.py:25(buildQSigma)
+       30    0.001    0.000   52.487    1.750 svEM.py:101(_mStepKernelParams)
+      395    0.104    0.000   52.384    0.133 adam.py:49(step)
+     9575   42.860    0.004   51.141    0.005 svEmbedding.py:87(_getMeansAndVarsGivenSVPosteriorOnLatentsStats)
+     5796    0.128    0.000   49.389    0.009 svPosteriorOnLatents.py:122(buildKernelsMatrices)
+     5796    2.141    0.000   32.455    0.006 kernelMatricesStore.py:46(buildKernelsMatrices)
+      395    0.006    0.000   30.800    0.078 svEM.py:103(evalFunc)
+    79935    4.807    0.000   28.450    0.000 utils.py:67(build3DdiagFromDiagVector)
+    17388   12.374    0.001   20.829    0.001 utils.py:82(chol3D)
+   962714   20.545    0.000   20.545    0.000 {method 'dot' of 'torch._C._TensorBase' objects}
+    40572   15.621    0.000   20.474    0.001 kernels.py:41(buildKernelMatrix)
+    79935   10.075    0.000   19.141    0.000 utils.py:59(getDiagIndicesIn3DArray)
+     5796    1.517    0.000   16.732    0.003 kernelMatricesStore.py:81(buildKernelsMatrices)
+   971374   16.548    0.000   16.548    0.000 {method 'add_' of 'torch._C._TensorBase' objects}
+   287790   14.926    0.000   14.926    0.000 {built-in method sum}
+   131291   10.052    0.000   10.052    0.000 {built-in method exp}
+   144075    9.238    0.000    9.238    0.000 {built-in method mm}
+    86940    8.047    0.000    8.047    0.000 {built-in method cholesky}
+   364840    7.350    0.000    7.350    0.000 {built-in method squeeze}
+    69552    3.445    0.000    7.339    0.000 kernels.py:108(buildKernelMatrixDiag)
+    81144    7.138    0.000    7.138    0.000 {built-in method sin}
+   413685    6.956    0.000    6.956    0.000 {method 'reshape' of 'torch._C._TensorBase' objects}
+     9575    1.537    0.000    6.566    0.001 svEmbedding.py:73(_getMeansAndVarsGivenSVPosteriorOnLatentsStats)
+   150696    4.771    0.000    4.771    0.000 kernels.py:113(_getAllParams)
+     9575    3.508    0.000    4.689    0.000 expectedLogLikelihood.py:162(_getELinkValues)
+   207666    4.304    0.000    4.304    0.000 {method 'transpose' of 'torch._C._TensorBase' objects}
+   159870    3.392    0.000    3.392    0.000 {built-in method arange}
+     9605    0.309    0.000    3.375    0.000 svPosteriorOnLatents.py:156(<listcomp>)
+     9180    0.275    0.000    3.216    0.000 lbfgs.py:247(_gather_flat_grad)
+   103119    3.180    0.000    3.180    0.000 {built-in method zeros}
+    34776    1.687    0.000    3.150    0.000 kernels.py:53(buildKernelMatrixDiag)
+    79935    3.066    0.000    3.066    0.000 {method 'sort' of 'torch._C._TensorBase' objects}
+   111525    3.022    0.000    3.022    0.000 {built-in method trace}
+    18755    2.978    0.000    2.978    0.000 {built-in method cat}
+   143625    2.912    0.000    2.912    0.000 {method 'tolist' of 'torch._C._TensorBase' objects}
+   159870    2.811    0.000    2.811    0.000 {method 'flatten' of 'torch._C._TensorBase' objects}
+     7574    0.984    0.000    2.177    0.000 lbfgs.py:259(_add_grad)
+   115260    2.177    0.000    2.177    0.000 {built-in method empty}
+   104328    2.074    0.000    2.074    0.000 {built-in method ones}
+     9575    0.163    0.000    1.831    0.000 expectedLogLikelihood.py:167(_getELogLinkValues)
+   356941    1.740    0.000    1.740    0.000 module.py:571(__getattr__)
+    75348    1.588    0.000    1.588    0.000 kernels.py:58(_getAllParams)
+    89510    1.530    0.000    1.530    0.000 {built-in method transpose}
+       30    0.023    0.001    1.086    0.036 svLowerBound.py:27(computeSVPosteriorOnLatentsStats)
+       30    0.001    0.000    1.063    0.035 expectedLogLikelihood.py:99(computeSVPosteriorOnLatentsStats)
+       60    0.001    0.000    1.062    0.018 svEmbedding.py:23(computeSVPosteriorOnLatentsStats)
+    65263    1.000    0.000    1.000    0.000 {method 'squeeze' of 'torch._C._TensorBase' objects}
+    34790    0.909    0.000    0.994    0.000 module.py:587(__setattr__)
+     9575    0.104    0.000    0.991    0.000 expectedLogLikelihood.py:168(<listcomp>)
+    16286    0.726    0.000    0.726    0.000 {method 'mul' of 'torch._C._TensorBase' objects}
+   218830    0.304    0.000    0.720    0.000 {built-in method builtins.len}
+    35240    0.613    0.000    0.613    0.000 {method 'view' of 'torch._C._TensorBase' objects}
+     9575    0.158    0.000    0.583    0.000 __init__.py:20(_make_grads)
+    32028    0.574    0.000    0.574    0.000 {method 'view_as' of 'torch._C._TensorBase' objects}
+     9575    0.206    0.000    0.551    0.000 optimizer.py:159(zero_grad)
+     9070    0.551    0.000    0.551    0.000 {built-in method mul}
+     7598    0.316    0.000    0.491    0.000 tensor.py:364(__rdiv__)
+    22305    0.481    0.000    0.481    0.000 {method 'permute' of 'torch._C._TensorBase' objects}
+    17388    0.475    0.000    0.475    0.000 {built-in method eye}
+    19150    0.440    0.000    0.440    0.000 {built-in method t}
+    16486    0.422    0.000    0.422    0.000 {method 'abs' of 'torch._C._TensorBase' objects}
+    89510    0.364    0.000    0.416    0.000 tensor.py:408(__len__)
+     9575    0.377    0.000    0.377    0.000 {built-in method ones_like}
+    16396    0.374    0.000    0.374    0.000 {method 'max' of 'torch._C._TensorBase' objects}
+     2600    0.325    0.000    0.325    0.000 {built-in method builtins.print}
+    36408    0.267    0.000    0.267    0.000 {method 'zero_' of 'torch._C._TensorBase' objects}
+     9070    0.253    0.000    0.253    0.000 {method 'sub' of 'torch._C._TensorBase' objects}
+     9575    0.232    0.000    0.232    0.000 {built-in method reshape}
+     9160    0.217    0.000    0.217    0.000 {method 'neg' of 'torch._C._TensorBase' objects}
+     7598    0.175    0.000    0.175    0.000 {method 'reciprocal' of 'torch._C._TensorBase' objects}
+     9070    0.116    0.000    0.116    0.000 {method 'copy_' of 'torch._C._TensorBase' objects}
+    42023    0.083    0.000    0.083    0.000 {method 'numel' of 'torch._C._TensorBase' objects}
+    36408    0.079    0.000    0.079    0.000 {method 'detach_' of 'torch._C._TensorBase' objects}
+     2370    0.075    0.000    0.075    0.000 {method 'mul_' of 'torch._C._TensorBase' objects}
+        1    0.000    0.000    0.064    0.064 svLowerBound.py:36(setMeasurements)
+        1    0.000    0.000    0.064    0.064 expectedLogLikelihood.py:107(setMeasurements)
+        1    0.001    0.001    0.064    0.064 expectedLogLikelihood.py:115(__stackSpikeTimes)
+    48950    0.063    0.000    0.063    0.000 kernelMatricesStore.py:62(getKzzChol)
+    99145    0.063    0.000    0.063    0.000 svPosteriorOnIndPoints.py:22(getQMu)
+    89840    0.062    0.000    0.062    0.000 {built-in method builtins.isinstance}
+     5796    0.032    0.000    0.061    0.000 kernelMatricesStore.py:96(<listcomp>)
+    41515    0.061    0.000    0.061    0.000 kernelMatricesStore.py:59(getKzz)
+   120082    0.055    0.000    0.055    0.000 {method 'get' of 'dict' objects}
+     5796    0.027    0.000    0.053    0.000 kernelMatricesStore.py:97(<listcomp>)
+    90010    0.052    0.000    0.052    0.000 {method 'dim' of 'torch._C._TensorBase' objects}
+    26645    0.046    0.000    0.046    0.000 svPosteriorOnIndPoints.py:28(<listcomp>)
+     9744    0.043    0.000    0.043    0.000 tensor.py:427(<lambda>)
+    69968    0.041    0.000    0.041    0.000 {method 'append' of 'list' objects}
+     9605    0.032    0.000    0.032    0.000 svPosteriorOnLatents.py:159(<listcomp>)
+        5    0.007    0.001    0.029    0.006 expectedLogLikelihood.py:130(<listcomp>)
+     9575    0.027    0.000    0.027    0.000 svEmbedding.py:89(<listcomp>)
+        5    0.004    0.001    0.027    0.005 expectedLogLikelihood.py:125(<listcomp>)
+     1185    0.026    0.000    0.026    0.000 {method 'sqrt' of 'torch._C._TensorBase' objects}
+    19210    0.025    0.000    0.025    0.000 kernelMatricesStore.py:76(getKtt)
+    19210    0.024    0.000    0.024    0.000 kernelMatricesStore.py:73(getKtz)
+     1185    0.022    0.000    0.022    0.000 {method 'addcmul_' of 'torch._C._TensorBase' objects}
+     1185    0.022    0.000    0.022    0.000 {method 'addcdiv_' of 'torch._C._TensorBase' objects}
+     5796    0.020    0.000    0.020    0.000 kernelMatricesStore.py:84(<listcomp>)
+     9605    0.018    0.000    0.018    0.000 svPosteriorOnLatents.py:160(<listcomp>)
+     9575    0.015    0.000    0.015    0.000 svEmbedding.py:90(<listcomp>)
+     7574    0.014    0.000    0.015    0.000 lbfgs.py:242(_numel)
+     7167    0.014    0.000    0.014    0.000 {method 'pop' of 'list' objects}
+      120    0.004    0.000    0.014    0.000 optimizer.py:32(__init__)
+     5796    0.014    0.000    0.014    0.000 kernelMatricesStore.py:48(<listcomp>)
+       90    0.002    0.000    0.013    0.000 lbfgs.py:214(__init__)
+     5796    0.009    0.000    0.009    0.000 kernelMatricesStore.py:49(<listcomp>)
+     9575    0.009    0.000    0.009    0.000 {built-in method torch._C.is_grad_enabled}
+     3839    0.006    0.000    0.008    0.000 tensor.py:429(__hash__)
+     7216    0.008    0.000    0.008    0.000 {built-in method builtins.abs}
+      120    0.005    0.000    0.007    0.000 optimizer.py:176(add_param_group)
+       10    0.006    0.001    0.006    0.001 {built-in method tensor}
+       30    0.002    0.000    0.005    0.000 svLowerBound.py:45(getSVPosteriorOnIndPointsParams)
+       30    0.001    0.000    0.004    0.000 svLowerBound.py:54(getKernelsParams)
+     4708    0.004    0.000    0.004    0.000 {method 'setdefault' of 'dict' objects}
+       90    0.004    0.000    0.004    0.000 {built-in method builtins.min}
+       30    0.001    0.000    0.004    0.000 adam.py:30(__init__)
+      180    0.003    0.000    0.003    0.000 {built-in method zeros_like}
+       30    0.000    0.000    0.003    0.000 expectedLogLikelihood.py:55(getKernelsParams)
+      500    0.002    0.000    0.003    0.000 tensor.py:413(__iter__)
+       30    0.000    0.000    0.003    0.000 svEmbedding.py:52(getKernelsParams)
+       30    0.000    0.000    0.003    0.000 expectedLogLikelihood.py:46(getSVPosteriorOnIndPointsParams)
+       90    0.002    0.000    0.002    0.000 {method 'sum' of 'torch._C._TensorBase' objects}
+       30    0.000    0.000    0.002    0.000 svPosteriorOnLatents.py:43(getKernelsParams)
+       30    0.001    0.000    0.002    0.000 svLowerBound.py:51(getIndPointsLocs)
+     3839    0.002    0.000    0.002    0.000 {built-in method builtins.id}
+      120    0.002    0.000    0.002    0.000 {built-in method torch._C._log_api_usage_once}
+       30    0.000    0.000    0.002    0.000 svEmbedding.py:46(getSVPosteriorOnIndPointsParams)
+       30    0.001    0.000    0.002    0.000 kernelMatricesStore.py:34(getKernelsParams)
+       90    0.001    0.000    0.002    0.000 {built-in method _functools.reduce}
+       90    0.002    0.000    0.002    0.000 {method 'clone' of 'torch._C._TensorBase' objects}
+       30    0.000    0.000    0.002    0.000 svPosteriorOnLatents.py:40(getSVPosteriorOnIndPointsParams)
+       30    0.000    0.000    0.002    0.000 expectedLogLikelihood.py:52(getIndPointsLocs)
+       30    0.001    0.000    0.001    0.000 svLowerBound.py:48(getSVEmbeddingParams)
+     1185    0.001    0.000    0.001    0.000 {built-in method math.sqrt}
+       30    0.001    0.000    0.001    0.000 svPosteriorOnIndPoints.py:15(getParams)
+       30    0.000    0.000    0.001    0.000 svEmbedding.py:49(getIndPointsLocs)
+      420    0.001    0.000    0.001    0.000 lbfgs.py:244(<lambda>)
+       30    0.000    0.000    0.001    0.000 expectedLogLikelihood.py:49(getSVEmbeddingParams)
+      500    0.001    0.000    0.001    0.000 {built-in method torch._C._get_tracing_state}
+       30    0.000    0.000    0.000    0.000 svPosteriorOnLatents.py:46(getIndPointsLocs)
+      500    0.000    0.000    0.000    0.000 {method 'size' of 'torch._C._TensorBase' objects}
+       90    0.000    0.000    0.000    0.000 kernels.py:17(getParams)
+       33    0.000    0.000    0.000    0.000 {built-in method time.time}
+        1    0.000    0.000    0.000    0.000 svLowerBound.py:30(setInitialParams)
+        1    0.000    0.000    0.000    0.000 expectedLogLikelihood.py:144(setInitialParams)
+       30    0.000    0.000    0.000    0.000 svEmbedding.py:68(getParams)
+        2    0.000    0.000    0.000    0.000 svEmbedding.py:62(setInitialParams)
+      500    0.000    0.000    0.000    0.000 {built-in method builtins.iter}
+      120    0.000    0.000    0.000    0.000 {method 'isdisjoint' of 'set' objects}
+      120    0.000    0.000    0.000    0.000 {method 'items' of 'dict' objects}
+       30    0.000    0.000    0.000    0.000 svPosteriorOnIndPoints.py:17(<listcomp>)
+        1    0.000    0.000    0.000    0.000 svPosteriorOnLatents.py:130(setInitialParams)
+       90    0.000    0.000    0.000    0.000 {method 'extend' of 'list' objects}
+        2    0.000    0.000    0.000    0.000 svEmbedding.py:39(setTimes)
+        3    0.000    0.000    0.000    0.000 kernelMatricesStore.py:20(setInitialParams)
+       30    0.000    0.000    0.000    0.000 kernelMatricesStore.py:28(getIndPointsLocs)
+       30    0.000    0.000    0.000    0.000 svPosteriorOnIndPoints.py:18(<listcomp>)
+        2    0.000    0.000    0.000    0.000 svPosteriorOnLatents.py:33(setTimes)
+       30    0.000    0.000    0.000    0.000 svPosteriorOnIndPoints.py:19(<listcomp>)
+        2    0.000    0.000    0.000    0.000 kernelMatricesStore.py:70(setTimes)
+        1    0.000    0.000    0.000    0.000 svLowerBound.py:42(setQuadParams)
+        1    0.000    0.000    0.000    0.000 expectedLogLikelihood.py:149(setQuadParams)
+        1    0.000    0.000    0.000    0.000 svPosteriorOnIndPoints.py:10(setInitialParams)
+        9    0.000    0.000    0.000    0.000 kernels.py:20(setParams)
+        1    0.000    0.000    0.000    0.000 svPosteriorOnLatents.py:191(setInitialParams)
+        1    0.000    0.000    0.000    0.000 {method 'format' of 'str' objects}
+        1    0.000    0.000    0.000    0.000 svEmbedding.py:84(setNeuronForSpikeIndex)
+        1    0.000    0.000    0.000    0.000 expectedLogLikelihood.py:121(<listcomp>)
+        1    0.000    0.000    0.000    0.000 expectedLogLikelihood.py:122(<listcomp>)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+
+

@@ -14,7 +14,7 @@ import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 import plot.svGPFA.plotUtils
 
-def getLatentsSamples(meansFuncs, kernels, trialsTimes, latentsRegEpsilon, dtype):
+def getLatentsSamples(meansFuncs, kernels, trialsTimes, gpRegularization, dtype):
     nTrials = len(kernels)
     nLatents = len(kernels[0])
     latentsSamples = [[] for r in range(nTrials)]
@@ -25,7 +25,7 @@ def getLatentsSamples(meansFuncs, kernels, trialsTimes, latentsRegEpsilon, dtype
         for k in range(nLatents):
             print("Procesing latent {:d}".format(k))
             gp = stats.gaussianProcesses.eval.GaussianProcess(mean=meansFuncs[r][k], kernel=kernels[r][k])
-            latentsSamples[r][k,:] = gp.eval(t=trialsTimes[r], epsilon=latentsRegEpsilon)
+            latentsSamples[r][k,:] = gp.eval(t=trialsTimes[r], regularization=gpRegularization,)
     return latentsSamples
 
 def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
@@ -74,6 +74,7 @@ def main(argv):
     dtSimulate = float(simConfig["control_variables"]["dt"])
     latentsRegEpsilon = dtSimulate = float(simConfig["control_variables"]["latentsRegEpsilon"])
     dtLatentsFig = 1e-1
+    gpRegularization = 1e-3
 
     randomPrefixUsed = True
     while randomPrefixUsed:
@@ -97,7 +98,7 @@ def main(argv):
         latentsSamples = getLatentsSamples(meansFuncs=latentsMeansFuncs,
                                            kernels=kernels,
                                            trialsTimes=trialsTimes,
-                                           latentsRegEpsilon=latentsRegEpsilon,
+                                           gpRegularization=gpRegularization,
                                            dtype=C.dtype)
 
         simulator = simulations.svGPFA.simulations.GPFASimulator()
