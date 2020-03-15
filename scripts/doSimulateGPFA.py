@@ -72,7 +72,7 @@ def main(argv):
     trialsLengths = [int(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
     dtSimulate = float(simConfig["control_variables"]["dt"])
-    latentsRegEpsilon = dtSimulate = float(simConfig["control_variables"]["latentsRegEpsilon"])
+    latentsRegEpsilon = float(simConfig["control_variables"]["latentsRegEpsilon"])
     dtLatentsFig = 1e-1
     gpRegularization = 1e-3
 
