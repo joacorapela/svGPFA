@@ -1,9 +1,8 @@
 
 import pdb
 import torch
-import torch.nn as nn
 
-class SVLowerBound(nn.Module):
+class SVLowerBound:
 
     def __init__(self, eLL, klDiv):
         super(SVLowerBound, self).__init__()
@@ -25,7 +24,7 @@ class SVLowerBound(nn.Module):
         self._eLL.buildKernelsMatrices()
 
     def computeSVPosteriorOnLatentsStats(self):
-        self._eLL.computeSVPosteriorOnLatentsStats()
+        return self._eLL.computeSVPosteriorOnLatentsStats()
 
     def setInitialParams(self, initialParams):
         self._eLL.setInitialParams(initialParams=initialParams)
