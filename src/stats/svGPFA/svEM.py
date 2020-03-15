@@ -150,7 +150,7 @@ class SVEM:
                 converged = True
             if verbose and iterCount%nIterDisplay==0:
                 print(displayFmt%(iterCount, curEval))
-            lowerBoundHist.append(-curEval)
+            lowerBoundHist.append(-curEval.item())
             iterCount += 1
 
-        return {"lowerBound": -curEval, "lowerBoundHist": lowerBoundHist, "converged": converged}
+        return {"lowerBound": -curEval.item(), "lowerBoundHist": lowerBoundHist, "converged": converged}
