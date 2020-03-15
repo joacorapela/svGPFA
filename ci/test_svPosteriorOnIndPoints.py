@@ -15,8 +15,9 @@ def test_buildQSigma():
     q_sqrt = [torch.from_numpy(mat['q_sqrt'][(0,i)]).permute(2,0,1) for i in range(nLatents)]
     q_diag = [torch.from_numpy(mat['q_diag'][(0,i)]).permute(2,0,1) for i in range(nLatents)]
     q_sigma = [torch.from_numpy(mat['q_sigma'][(0,i)]).permute(2,0,1) for i in range(nLatents)]
+    qMu0 = [[] for i in range(nLatents)]
 
-    params0 = {"qMu0": None, "qSVec0": q_sqrt, "qSDiag0": q_diag}
+    params0 = {"qMu0": qMu0, "qSVec0": q_sqrt, "qSDiag0": q_diag}
     qU = SVPosteriorOnIndPoints()
     qU.setInitialParams(initialParams=params0)
     qSigma = qU.buildQSigma();
