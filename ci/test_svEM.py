@@ -174,7 +174,6 @@ def test_eStep_pointProcess():
 #     # pdb.set_trace()
 
 def test_mStepModelParams_pointProcess():
-    tol = 1e-4
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Mstep_Update_Iterative_PointProcess_svGPFA.mat")
 
@@ -256,11 +255,11 @@ def test_mStepModelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepModelParams(model=svlb, maxNIter=3000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
+    res = svEM._mStepModelParams(model=svlb, maxNIter=3000, tol=1e-6, lr=1e-1, verbose=True, nIterDisplay=1)
 
-    assert(abs(res["lowerBound"]-(-nLowerBound))<tol)
+    assert(res["lowerBound"]>-nLowerBound)
 
-    # pdb.set_trace()
+    pdb.set_trace()
 
 def test_mStepKernelParams_pointProcess():
     tol = 1e-5
