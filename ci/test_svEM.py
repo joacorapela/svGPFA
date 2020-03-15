@@ -578,15 +578,15 @@ def test_maximize_pointProcess():
     # pdb.set_trace()
 
 if __name__=='__main__':
-    # test_eStep_pointProcess() # passed
+    test_eStep_pointProcess() # passed
     # # test_eStep_poisson() # not tested
     test_mStepModelParams_pointProcess() # passed
-    # test_mStepKernelParams_pointProcess() # passed
-    # test_mStepIndPoints_pointProcess() # passed
+    test_mStepKernelParams_pointProcess() # passed
+    test_mStepIndPoints_pointProcess() # passed
 
-    # t0 = time.perf_counter()
-    # test_maximize_pointProcess() # passed
-    # elapsed = time.perf_counter()-t0
-    # print(elapsed)
+    t0 = time.perf_counter()
+    test_maximize_pointProcess() # passed
+    elapsed = time.perf_counter()-t0
+    print(elapsed)
 
     pdb.set_trace()
