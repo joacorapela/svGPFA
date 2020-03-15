@@ -2,10 +2,9 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
-import torch.nn as nn
 from .kernelMatricesStore import KernelMatricesStore
 
-class SVEmbedding(ABC, nn.Module):
+class SVEmbedding(ABC):
 
     def __init__(self, svPosteriorOnLatents):
         super(SVEmbedding, self).__init__()
@@ -61,8 +60,8 @@ class LinearSVEmbedding(SVEmbedding):
 
     def setInitialParams(self, initialParams):
         svEmbeddingInitialParams = initialParams["svEmbedding"]
-        self._C = nn.Parameter(svEmbeddingInitialParams["C0"])
-        self._d = nn.Parameter(svEmbeddingInitialParams["d0"])
+        self._C = svEmbeddingInitialParams["C0"]
+        self._d = svEmbeddingInitialParams["d0"]
         self._svPosteriorOnLatents.setInitialParams(initialParams=initialParams)
 
     def getParams(self):

@@ -1,9 +1,8 @@
 
 import pdb
 import torch
-import torch.nn as nn
 
-class KLDivergence(nn.Module):
+class KLDivergence:
 
     def __init__(self, indPointsLocsKMS, svPosteriorOnIndPoints):
         super(KLDivergence, self).__init__()

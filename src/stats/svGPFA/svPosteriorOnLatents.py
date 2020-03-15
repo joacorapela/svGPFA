@@ -2,10 +2,9 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
-import torch.nn as nn
 from .kernelMatricesStore import IndPointsLocsAndAllTimesKMS
 
-class SVPosteriorOnLatents(ABC, nn.Module):
+class SVPosteriorOnLatents(ABC):
 
     def __init__(self, svPosteriorOnIndPoints, indPointsLocsKMS,
                  indPointsLocsAndTimesKMS):

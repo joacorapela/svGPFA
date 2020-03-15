@@ -1,19 +1,18 @@
 
 import pdb
 import torch
-import torch.nn as nn
 from .utils import build3DdiagFromDiagVector
 
-class SVPosteriorOnIndPoints(nn.Module):
+class SVPosteriorOnIndPoints:
 
     def __init__(self):
         super(SVPosteriorOnIndPoints, self).__init__()
 
     def setInitialParams(self, initialParams):
         nLatents = len(initialParams["qMu0"])
-        self._qMu = nn.ParameterList([nn.Parameter(initialParams["qMu0"][k]) for k in range(nLatents)])
-        self._qSVec = nn.ParameterList([nn.Parameter(initialParams["qSVec0"][k]) for k in range(nLatents)])
-        self._qSDiag = nn.ParameterList([nn.Parameter(initialParams["qSDiag0"][k]) for k in range(nLatents)])
+        self._qMu = [initialParams["qMu0"][k] for k in range(nLatents)]
+        self._qSVec = [initialParams["qSVec0"][k] for k in range(nLatents)]
+        self._qSDiag = [initialParams["qSDiag0"][k] for k in range(nLatents)]
 
     def getParams(self):
         listOfTensors = []

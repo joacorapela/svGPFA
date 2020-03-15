@@ -1,11 +1,10 @@
 
 import pdb
 import torch
-import torch.nn as nn
 from abc import ABC, abstractmethod
 from .utils import chol3D
 
-class KernelMatricesStore(ABC, nn.Module):
+class KernelMatricesStore(ABC):
 
     def __init__(self):
         super(KernelMatricesStore, self).__init__()
@@ -15,7 +14,7 @@ class KernelMatricesStore(ABC, nn.Module):
         pass
 
     def setKernels(self, kernels):
-        self._kernels = nn.ModuleList(kernels)
+        self._kernels = kernels
 
     def setInitialParams(self, initialParams):
         self._Z = initialParams["inducingPointsLocs0"]
