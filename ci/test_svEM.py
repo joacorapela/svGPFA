@@ -48,7 +48,7 @@ def test_eStep_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
 
     linkFunction = torch.exp
 
@@ -197,7 +197,7 @@ def test_mStepModelParams_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
 
     linkFunction = torch.exp
 
@@ -286,7 +286,7 @@ def test_mStepKernelParams_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
 
     linkFunction = torch.exp
 
@@ -426,7 +426,7 @@ def test_mStepIndPoints_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
 
     linkFunction = torch.exp
 
@@ -514,7 +514,7 @@ def test_maximize_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
 
     linkFunction = torch.exp
 
@@ -579,15 +579,15 @@ def test_maximize_pointProcess():
     # pdb.set_trace()
 
 if __name__=='__main__':
-    test_eStep_pointProcess() # passed
-    # test_eStep_poisson() # not tested
+    # test_eStep_pointProcess() # passed
+    # # test_eStep_poisson() # not tested
     test_mStepModelParams_pointProcess() # passed
-    test_mStepKernelParams_pointProcess() # passed
-    test_mStepIndPoints_pointProcess() # passed
+    # test_mStepKernelParams_pointProcess() # passed
+    # test_mStepIndPoints_pointProcess() # passed
 
-    t0 = time.perf_counter()
-    test_maximize_pointProcess() # passed
-    elapsed = time.perf_counter()-t0
-    print(elapsed)
+    # t0 = time.perf_counter()
+    # test_maximize_pointProcess() # passed
+    # elapsed = time.perf_counter()-t0
+    # print(elapsed)
 
     pdb.set_trace()
