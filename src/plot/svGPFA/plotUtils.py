@@ -16,7 +16,7 @@ def getSimulatedSpikeTimesPlot(spikesTimes, figFilename, xlabel="Time (sec)", yl
     # nrow = math.floor(sqrtNTrials)
     # ncol = math.ceil(sqrtNTrials)
     # f, axs = plt.subplots(nrow, ncol, sharex=True, sharey=True)
-    f, axs = plt.subplots(nTrials, 1, sharex=True, sharey=True)
+    f, axs = plt.subplots(nTrials, 1, sharex=True, sharey=True, squeeze=False)
     for r in range(nTrials):
         # row = r//ncol
         # col = r%ncol
@@ -25,17 +25,18 @@ def getSimulatedSpikeTimesPlot(spikesTimes, figFilename, xlabel="Time (sec)", yl
         # axs[row, col].set_ylabel(ylabel)
         # axs[row, col].set_title(titlePattern.format(r))
         row = r
-        axs[row].eventplot(positions=spikesTimes[r])
-        axs[row].set_xlabel(xlabel)
-        axs[row].set_ylabel(ylabel)
-        axs[row].set_title(titlePattern.format(r))
+        col = 0
+        axs[row, col].eventplot(positions=spikesTimes[r])
+        axs[row, col].set_xlabel(xlabel)
+        axs[row, col].set_ylabel(ylabel)
+        axs[row, col].set_title(titlePattern.format(r))
     plt.savefig(figFilename)
     return f
 
 def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans, latentsSTDs, figFilename, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
     nTrials = len(latentsSamples)
     nLatents = latentsSamples[0].shape[0]
-    f, axs = plt.subplots(nTrials, nLatents, sharex=True, sharey=True)
+    f, axs = plt.subplots(nTrials, nLatents, sharex=True, sharey=True, squeeze=False)
     for r in range(nTrials):
         t = trialsTimes[r]
         for k in range(nLatents):
@@ -85,9 +86,9 @@ def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="I
 def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, trueLatentsMeans, trueLatentsSTDs, trialToPlot=0, figFilename=None):
     nLatents = muK.shape[2]
     timesToPlot = times
-    f, axes = plt.subplots(nLatents, 1, sharex=True)
+    f, axes = plt.subplots(nLatents, 1, sharex=True, squeeze=False)
     title = "Trial {:d}".format(trialToPlot)
-    axes[0].set_title(title)
+    axes[0,0].set_title(title)
     for k in range(nLatents):
         trueLatentsToPlot = trueLatents[trialToPlot][k].detach()
         trueMeanToPlot = trueLatentsMeans[trialToPlot][k].detach()
@@ -98,16 +99,16 @@ def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, tr
         if negativeMSE<positiveMSE:
             hatMeanToPlot = -hatMeanToPlot
         hatCIToPlot = 1.96*(varK[trialToPlot,:,k].sqrt()).detach()
-        axes[k].plot(timesToPlot, trueLatentsToPlot, label="true sampled", color="black")
-        axes[k].plot(timesToPlot, trueMeanToPlot, label="true mean", color="gray")
-        axes[k].fill_between(timesToPlot, trueMeanToPlot-trueCIToPlot, trueMeanToPlot+trueCIToPlot, color="lightgray")
-        axes[k].plot(timesToPlot, hatMeanToPlot, label="estimated", color="blue")
-        axes[k].fill_between(timesToPlot, hatMeanToPlot-hatCIToPlot, hatMeanToPlot+hatCIToPlot, color="lightblue")
+        axes[k,0].plot(timesToPlot, trueLatentsToPlot, label="true sampled", color="black")
+        axes[k,0].plot(timesToPlot, trueMeanToPlot, label="true mean", color="gray")
+        axes[k,0].fill_between(timesToPlot, trueMeanToPlot-trueCIToPlot, trueMeanToPlot+trueCIToPlot, color="lightgray")
+        axes[k,0].plot(timesToPlot, hatMeanToPlot, label="estimated", color="blue")
+        axes[k,0].fill_between(timesToPlot, hatMeanToPlot-hatCIToPlot, hatMeanToPlot+hatCIToPlot, color="lightblue")
         for i in range(indPointsLocs[k].shape[1]):
-            axes[k].axvline(x=indPointsLocs[k][trialToPlot,i, 0], color="red")
-        axes[k].set_ylabel("Latent %d"%(k))
-    axes[-1].set_xlabel("Sample")
-    axes[-1].legend()
+            axes[k,0].axvline(x=indPointsLocs[k][trialToPlot,i, 0], color="red")
+        axes[k,0].set_ylabel("Latent %d"%(k))
+    axes[-1,0].set_xlabel("Sample")
+    axes[-1,0].legend()
     plt.xlim(left=torch.min(timesToPlot)-1, right=torch.max(timesToPlot)+1)
     if figFilename is not None:
         plt.savefig(fname=figFilename)
