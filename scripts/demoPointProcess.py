@@ -153,7 +153,6 @@ def main(argv):
         "results/{:s}_estimation_metaData.ini".format(estimationPrefix)
     modelSaveFilename = \
         "results/{:s}_estimatedModel.pickle".format(estimationPrefix)
-    latentsFilename = "results/{:s}_latents.pickle".format(estimationPrefix)
     latentsFigFilename = "figures/{:s}_estimatedLatents.png".format(estimationPrefix)
     lowerBoundHistFigFilename = "figures/{:s}_lowerBoundHist.png".format(estimationPrefix)
 
@@ -165,15 +164,12 @@ def main(argv):
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
-    with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load( f)
 
     # plot lower bound history
     plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
 
     # predict latents at test times
     testMuK, testVarK = model.predictLatents(newTimes=testTimes)
-
-    plt.figure()
 
     # plot true and estimated latents
     indPointsLocs = model.getIndPointsLocs()
