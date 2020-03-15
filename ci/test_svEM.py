@@ -259,7 +259,7 @@ def test_mStepModelParams_pointProcess():
 
     assert(res["lowerBound"]>-nLowerBound)
 
-    pdb.set_trace()
+    # pdb.set_trace()
 
 def test_mStepKernelParams_pointProcess():
     tol = 1e-5
