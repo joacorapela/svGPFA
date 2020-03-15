@@ -17,7 +17,7 @@ def test_exponentialQuadraticKernel():
     leasK = torch.from_numpy(mat['G']).type(torch.DoubleTensor).permute(2,0,1)
     lengthScale = float(mat['lengthscale'][0,0])
     scale = 1.0
-    params = [lengthScale]
+    params = torch.tensor([lengthScale])
 
     kernel = ExponentialQuadraticKernel(scale=scale) 
     kernel.setParams(params=params)
@@ -37,7 +37,7 @@ def test_exponentialQuadraticKernelDiag():
     leasKDiag = torch.from_numpy(mat['Gdiag']).type(torch.DoubleTensor).permute(2,0,1)
     lengthScale = float(mat['lengthscale'][0,0])
     scale = float(mat['variance'][0,0])
-    params = [lengthScale]
+    params = torch.tensor([lengthScale])
 
     kernel = ExponentialQuadraticKernel(scale=scale)
     kernel.setParams(params=params)
@@ -58,7 +58,7 @@ def test_periodicKernel():
     lengthScale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
     scale = 1.0
-    params = [lengthScale, period]
+    params = torch.tensor([lengthScale, period])
 
     kernel = PeriodicKernel(scale=scale)
     kernel.setParams(params=params)
@@ -79,7 +79,7 @@ def test_periodicKernelDiag():
     lengthScale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
     scale = float(mat['variance'][0,0])
-    params = [lengthScale, period]
+    params = torch.tensor([lengthScale, period])
 
     kernel = PeriodicKernel(scale=scale)
     kernel.setParams(params=params)
