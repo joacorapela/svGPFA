@@ -18,8 +18,7 @@ import plot.svGPFA.plotUtils
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("deviceName", help="name of device (cpu or cuda)")
-    parser.add_argument("--profile", help="perform profiling",
-        action="store_true")
+    parser.add_argument("--profile", help="perform profiling", action="store_true")
     args = parser.parse_args()
     if args.profile:
         profile = True
@@ -61,7 +60,7 @@ def main(argv):
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
-    indPointsLocsKMSEpsilon = 1e-2
+    indPointsLocsKMSEpsilon = 1e-4
 
     # create kernels
     kernels = [[None] for k in range(nLatents)]
