@@ -11,20 +11,20 @@ class SVEM:
         defaultOptimParams = {"emMaxNIter":20,
                               "eStepMaxNIter":100,
                               "eStepTol":1e-3,
-                              "eStepLR":1,
-                              "eStepNIterDisplay":1,
+                              "eStepLR":1e-3,
+                              "eStepNIterDisplay":10,
                               "mStepModelParamsMaxNIter":100,
                               "mStepModelParamsTol":1e-3,
-                              "mStepModelParamsLR":1,
-                              "mStepModelParamsNIterDisplay":1,
+                              "mStepModelParamsLR":1e-3,
+                              "mStepModelParamsNIterDisplay":10,
                               "mStepKernelParamsMaxNIter":100,
                               "mStepKernelParamsTol":1e-3,
                               "mStepKernelParamsLR":1e-5,
-                              "mStepKernelParamsNIterDisplay":1,
+                              "mStepKernelParamsNIterDisplay":10,
                               "mStepIndPointsMaxNIter":100,
                               "mStepIndPointsTol":1e-3,
-                              "mStepIndPointsLR":1,
-                              "mStepIndPointsNIterDisplay":1,
+                              "mStepIndPointsLR":1-3,
+                              "mStepIndPointsNIterDisplay":10,
                               "verbose":True}
         optimParams = {**defaultOptimParams, **optimParams}
         model.setMeasurements(measurements=measurements)
@@ -133,9 +133,9 @@ class SVEM:
             def closure():
                 # details on this closure at http://sagecal.sourceforge.net/pytorch/index.html
                 nonlocal curEval
+
                 if torch.is_grad_enabled():
                     optimizer.zero_grad()
-                # pdb.set_trace()
                 curEval = -evalFunc()
                 if curEval.requires_grad:
                     curEval.backward(retain_graph=True)
@@ -145,7 +145,6 @@ class SVEM:
             prevEval = curEval
             optimizer.step(closure)
             # print("outside closure curEval={:f}".format(curEval))
-            # pdb.set_trace()
             if iterCount>1 and curEval<prevEval and prevEval-curEval<tol:
                 converged = True
             if verbose and iterCount%nIterDisplay==0:
