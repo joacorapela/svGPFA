@@ -494,6 +494,8 @@ def test_maximize_pointProcess():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
+    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
+    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
@@ -567,22 +569,64 @@ def test_maximize_pointProcess():
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-
-    lowerBoundHist = svEM.maximize(model=svlb, measurements=YNonStacked,
-                                   initialParams=initialParams,
-                                   quadParams=quadParams,
-                                   optimParams=optimParams)
+    optimParams = {"emMaxNIter":20, 
+                   #
+                   "eStepMaxNIter":100,
+                   "eStepTol":1e-3,
+                   "eStepLR":1e-3,
+                   "eStepNIterDisplay":10,
+                   #
+                   "mStepModelParamsMaxNIter":100,
+                   "mStepModelParamsTol":1e-3,
+                   "mStepModelParamsLR":1e-3,
+                   "mStepModelParamsNIterDisplay":10,
+                   #
+                   "mStepKernelParamsMaxNIter":100, 
+                   "mStepKernelParamsTol":1e-3,
+                   "mStepKernelParamsLR":1e-5,
+                   "mStepKernelParamsNIterDisplay":10,
+                   #
+                   "mStepIndPointsMaxNIter":100,
+                   "mStepIndPointsParamsTol":1e-3,
+                   "mStepIndPointsLR":1e-3, 
+                   "mStepIndPointsNIterDisplay":10}
+    '''
+    optimParams = {"emMaxNIter":30, 
+                   #
+                   "eStepMaxNIter":10,
+                   "eStepTol":1e-2,
+                   "eStepLR":1e-1,
+                   "eStepNIterDisplay":1,
+                   #
+                   "mStepModelParamsMaxNIter":10,
+                   "mStepModelParamsTol":1e-2,
+                   "mStepModelParamsLR":1e-1,
+                   "mStepModelParamsNIterDisplay":1,
+                   #
+                   "mStepKernelParamsMaxNIter":30, 
+                   "mStepKernelParamsTol":1e-2,
+                   "mStepKernelParamsLR":1e-4,
+                   "mStepKernelParamsNIterDisplay":1,
+                   #
+                   "mStepIndPointsMaxNIter":10,
+                   "mStepIndPointsParamsTol":1e-2,
+                   "mStepIndPointsLR":1e-4, 
+                   "mStepIndPointsNIterDisplay":1}
+    '''
+    lowerBoundHist, elapsedTimeHist = svEM.maximize(
+        model=svlb, measurements=YNonStacked,
+        initialParams=initialParams, quadParams=quadParams,
+        optimParams=optimParams)
     assert(lowerBoundHist[-1]>leasLowerBound)
 
     # pdb.set_trace()
 
 if __name__=='__main__':
-    test_eStep_pointProcess() # passed
+    # test_eStep_pointProcess() # passed
     # # test_eStep_poisson() # not tested
-    test_mStepModelParams_pointProcess() # passed
-    test_mStepKernelParams_pointProcess() # passed
-    test_mStepIndPoints_pointProcess() # passed
+    # test_mStepModelParams_pointProcess() # passed
+    # test_mStepKernelParams_pointProcess() # passed
+    # test_mStepIndPoints_pointProcess() # passed
 
     t0 = time.perf_counter()
     test_maximize_pointProcess() # passed
