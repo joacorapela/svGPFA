@@ -569,6 +569,7 @@ def test_maximize_pointProcess():
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
+    '''
     optimParams = {"emMaxNIter":20, 
                    #
                    "eStepMaxNIter":100,
@@ -593,26 +594,25 @@ def test_maximize_pointProcess():
     '''
     optimParams = {"emMaxNIter":30, 
                    #
-                   "eStepMaxNIter":10,
+                   "eStepMaxNIter":20,
                    "eStepTol":1e-2,
-                   "eStepLR":1e-1,
+                   "eStepLR":1e-2,
                    "eStepNIterDisplay":1,
                    #
-                   "mStepModelParamsMaxNIter":10,
+                   "mStepModelParamsMaxNIter":20,
                    "mStepModelParamsTol":1e-2,
-                   "mStepModelParamsLR":1e-1,
+                   "mStepModelParamsLR":1e-3,
                    "mStepModelParamsNIterDisplay":1,
                    #
-                   "mStepKernelParamsMaxNIter":30, 
+                   "mStepKernelParamsMaxNIter":50, 
                    "mStepKernelParamsTol":1e-2,
                    "mStepKernelParamsLR":1e-4,
                    "mStepKernelParamsNIterDisplay":1,
                    #
-                   "mStepIndPointsMaxNIter":10,
+                   "mStepIndPointsMaxNIter":80,
                    "mStepIndPointsParamsTol":1e-2,
-                   "mStepIndPointsLR":1e-4, 
+                   "mStepIndPointsLR":1e-3, 
                    "mStepIndPointsNIterDisplay":1}
-    '''
     lowerBoundHist, elapsedTimeHist = svEM.maximize(
         model=svlb, measurements=YNonStacked,
         initialParams=initialParams, quadParams=quadParams,
