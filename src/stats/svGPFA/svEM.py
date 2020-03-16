@@ -145,18 +145,16 @@ class SVEM:
                 if torch.is_grad_enabled():
                     optimizer.zero_grad()
                 curEval = -evalFunc()
-                if verbose and iterCount%nIterDisplay==0:
-                    print(displayFmt%(iterCount, curEval))
                 if curEval.requires_grad:
                     curEval.backward(retain_graph=True)
-                # print("inside closure curEval={:f}".format(curEval))
                 return curEval
 
             prevEval = curEval
+            if iterCount>1 and verbose and iterCount%nIterDisplay==0:
+                print(displayFmt%(iterCount, curEval))
             optimizer.step(closure)
             if updateModelFunc is not None:
                 updateModelFunc()
-            # print("outside closure curEval={:f}".format(curEval))
             if iterCount>1 and curEval<prevEval and prevEval-curEval<tol:
                 converged = True
             lowerBoundHist.append(-curEval.item())
