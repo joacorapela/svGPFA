@@ -3,9 +3,8 @@ import pdb
 from abc import ABC, abstractmethod
 import math
 import torch
-import torch.nn as nn
 
-class Kernel(ABC, nn.Module):
+class Kernel(ABC):
 
     def __init__(self):
         super(Kernel, self).__init__()
@@ -22,7 +21,7 @@ class Kernel(ABC, nn.Module):
         return self._params
 
     def setParams(self, params):
-        self._params = nn.Parameter(params)
+        self._params = params
 
 class ExponentialQuadraticKernel(Kernel):
 
@@ -44,7 +43,7 @@ class ExponentialQuadraticKernel(Kernel):
             self._lengthScaleFixed = False
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale, lengthScale = self._getAllParams(params=self._params)
+        scale, lengthScale = self._getAllParams()
 
         if X2 is None:
             X2 = X1
@@ -56,11 +55,11 @@ class ExponentialQuadraticKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale, lengthScale = self._getAllParams(params=self._params)
+        scale, lengthScale = self._getAllParams()
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
-    def _getAllParams(self, params):
+    def _getAllParams(self):
         if not self._scaleFixed and not self._lengthScaleFixed:
             scale = self._params[0]
             lengthScale = self._params[1]
@@ -100,7 +99,7 @@ class PeriodicKernel(Kernel):
             self._periodFixed = False
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale, lengthScale, period = self._getAllParams(params=self._params)
+        scale, lengthScale, period = self._getAllParams()
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -112,11 +111,11 @@ class PeriodicKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale, lengthScale, period = self._getAllParams(params=self._params)
+        scale, lengthScale, period = self._getAllParams()
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
-    def _getAllParams(self, params):
+    def _getAllParams(self):
         if not self._scaleFixed and not self._lengthScaleFixed and not self._periodFixed:
             scale = self._params[0]
             lengthScale = self._params[1]
