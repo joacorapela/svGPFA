@@ -1,6 +1,7 @@
 
 import pdb
 import math
+import pandas as pd
 import torch
 import stats.kernels
 
@@ -44,9 +45,10 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
     return meansFuncs
 
 def getLinearEmbeddingParams(nNeurons, nLatents, config):
-    C = torch.DoubleTensor([float(str) for str in config["embedding_params"]["C"][1:-1].split(",")])
-    C = torch.reshape(C, (nLatents, nNeurons)).transpose(0, 1)
-    d = torch.DoubleTensor([float(str) for str in config["embedding_params"]["d"][1:-1].split(",")])
-    d = torch.reshape(d, (nNeurons, 1))
+    df = pd.read_csv(config["embedding_params"]["C_filename"], header=None)
+    C = torch.from_numpy(df.values)
+    df = pd.read_csv(config["embedding_params"]["d_filename"], header=None)
+    d = torch.from_numpy(df.values)
+    # pdb.set_trace()
     return C, d
 
