@@ -12,21 +12,8 @@ sys.path.append("../src")
 import simulations.svGPFA.simulations
 import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
+from utils.svGPFA.miscUtils import getLatentsSamples, getTrialsTimes
 import plot.svGPFA.plotUtils
-
-def getLatentsSamples(meansFuncs, kernels, trialsTimes, gpRegularization, dtype):
-    nTrials = len(kernels)
-    nLatents = len(kernels[0])
-    latentsSamples = [[] for r in range(nTrials)]
-
-    for r in range(nTrials):
-        print("Procesing trial {:d}".format(r))
-        latentsSamples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
-        for k in range(nLatents):
-            print("Procesing latent {:d}".format(k))
-            gp = stats.gaussianProcesses.eval.GaussianProcess(mean=meansFuncs[r][k], kernel=kernels[r][k])
-            latentsSamples[r][k,:] = gp.eval(t=trialsTimes[r], regularization=gpRegularization,)
-    return latentsSamples
 
 def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
     nTrials = len(kernels)
@@ -50,13 +37,6 @@ def getLatentsTimes(trialsLengths, dt):
         latentsTimes[r] = torch.linspace(0, trialsLengths[r], round(trialsLengths[i]/dt))
     return latentsTimes
 
-def getTrialsTimes(trialsLengths, dt):
-    nTrials = len(trialsLengths)
-    trialsTimes = [[] for r in range(nTrials)]
-    for r in range(nTrials):
-        trialsTimes[r] = torch.linspace(0, trialsLengths[r], round(trialsLengths[r]/dt))
-    return trialsTimes
-
 def main(argv):
     if len(argv)!=2:
         print("Usage {:s} <simulation config number>".format(argv[0]))
@@ -69,7 +49,7 @@ def main(argv):
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["control_variables"]["nLatents"])
     nNeurons = int(simConfig["control_variables"]["nNeurons"])
-    trialsLengths = [int(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    trialsLengths = [float(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
     dtSimulate = float(simConfig["control_variables"]["dt"])
     latentsRegEpsilon = float(simConfig["control_variables"]["latentsRegEpsilon"])
