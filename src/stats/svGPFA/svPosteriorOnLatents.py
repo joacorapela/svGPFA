@@ -8,7 +8,6 @@ class SVPosteriorOnLatents(ABC):
 
     def __init__(self, svPosteriorOnIndPoints, indPointsLocsKMS,
                  indPointsLocsAndTimesKMS):
-        super(SVPosteriorOnLatents, self).__init__()
         self._svPosteriorOnIndPoints = svPosteriorOnIndPoints
         self._indPointsLocsKMS = indPointsLocsKMS
         self._indPointsLocsAndTimesKMS=indPointsLocsAndTimesKMS
