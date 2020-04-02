@@ -6,9 +6,6 @@ from .utils import chol3D
 
 class KernelMatricesStore(ABC):
 
-    def __init__(self):
-        super(KernelMatricesStore, self).__init__()
-
     @abstractmethod
     def buildKernelsMatrices(self):
         pass
@@ -39,7 +36,6 @@ class KernelMatricesStore(ABC):
 class IndPointsLocsKMS(KernelMatricesStore):
 
     def __init__(self, epsilon=1e-5):
-        super(IndPointsLocsKMS, self).__init__()
         self._epsilon = epsilon
 
     def buildKernelsMatrices(self):
