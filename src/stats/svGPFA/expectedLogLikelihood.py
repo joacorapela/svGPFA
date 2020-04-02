@@ -7,7 +7,6 @@ import torch
 class ExpectedLogLikelihood(ABC):
 
     def __init__(self, svEmbeddingAllTimes):
-        super(ExpectedLogLikelihood, self).__init__()
         self._svEmbeddingAllTimes = svEmbeddingAllTimes
 
     @abstractmethod
@@ -122,8 +121,7 @@ class PointProcessELL(ExpectedLogLikelihood):
         neuronForSpikeIndex = [[] for i in range(nTrials)]
         for trialIndex in range(nTrials):
             aList = [spikeTime for neuronIndex in range(len(spikeTimes[trialIndex])) for spikeTime in spikeTimes[trialIndex][neuronIndex]]
-            stackedSpikeTimes[trialIndex] = torch.tensor(
-                aList, device=device)
+            stackedSpikeTimes[trialIndex] = torch.tensor(aList, device=device)
             # stackedSpikeTimes[trialIndex] = torch.unsqueeze(
             #     stackedSpikeTimes[trialIndex], 1)
             aList = [neuronIndex for neuronIndex in range(len(spikeTimes[trialIndex])) for spikeTime in spikeTimes[trialIndex][neuronIndex]]
