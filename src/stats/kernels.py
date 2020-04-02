@@ -6,9 +6,6 @@ import torch
 
 class Kernel(ABC):
 
-    def __init__(self):
-        super(Kernel, self).__init__()
-
     @abstractmethod
     def buildKernelMatrix(self, X1, X2=None):
         pass
@@ -23,21 +20,21 @@ class Kernel(ABC):
     def setParams(self, params):
         self._params = params
 
+    @abstractmethod
+    def getNamedParams(self):
+        pass
+
 class ExponentialQuadraticKernel(Kernel):
 
     def __init__(self, scale=None, lengthScale=None, dtype=torch.double, device=torch.device("cpu")):
-        super(ExponentialQuadraticKernel, self).__init__()
-        # paramIsNone = torch.tensor([scale is None, lengthScale is None])
-        # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
-
         if scale is not None:
-            self._scale = scale
+            self._scale = torch.tensor(scale)
             self._scaleFixed = True
         else:
             self._scaleFixed = False
 
         if lengthScale is not None:
-            self._lengthScale = lengthScale
+            self._lengthScale = torch.tensor(lengthScale)
             self._lengthScaleFixed = True
         else:
             self._lengthScaleFixed = False
@@ -74,6 +71,11 @@ class ExponentialQuadraticKernel(Kernel):
 
         return scale, lengthScale
 
+    def getNamedParams(self):
+        scale, lengthScale = self._getAllParams()
+        answer = {"scale": scale, "lengthScale": lengthScale}
+        return answer
+
 class PeriodicKernel(Kernel):
     def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
         super(PeriodicKernel, self).__init__()
@@ -81,19 +83,19 @@ class PeriodicKernel(Kernel):
         # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
 
         if scale is not None:
-            self._scale = scale
+            self._scale = torch.tensor(scale)
             self._scaleFixed = True
         else:
             self._scaleFixed = False
 
         if lengthScale is not None:
-            self._lengthScale = lengthScale
+            self._lengthScale = torch.tensor(lengthScale)
             self._lengthScaleFixed = True
         else:
             self._lengthScaleFixed = False
 
         if period is not None:
-            self._period = period
+            self._period = torch.tensor(period)
             self._periodFixed = True
         else:
             self._periodFixed = False
@@ -148,6 +150,11 @@ class PeriodicKernel(Kernel):
             raise ValueError("Scale and lengthScale cannot be both fixed")
 
         return scale, lengthScale, period
+
+    def getNamedParams(self):
+        scale, lengthScale, period = self._getAllParams()
+        answer = {"scale": scale, "lengthScale": lengthScale, "period": period}
+        return answer
 
 '''
 class AddDiagKernel(Kernel):
