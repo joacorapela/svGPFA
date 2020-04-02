@@ -7,7 +7,6 @@ from .kernelMatricesStore import KernelMatricesStore
 class SVEmbedding(ABC):
 
     def __init__(self, svPosteriorOnLatents):
-        super(SVEmbedding, self).__init__()
         self._svPosteriorOnLatents = svPosteriorOnLatents
 
     def computeMeansAndVars(self, svPosteriorOnLatentsStats=None):
