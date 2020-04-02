@@ -54,22 +54,21 @@ def getKernelsParams0(kernels, noiseSTD):
         kernelsParams0[r] = [[] for r in range(nLatents)]
         for k in range(nLatents):
             trueParams = kernels[r][k].getParams()
-            kernelsParams0[r][k] = noiseSTD*torch.randn(len(trueParams))*trueParams
+            kernelsParams0[r][k] = noiseSTD*torch.randn(len(trueParams))+trueParams
     return kernelsParams0
 
 def main(argv):
-    if len(argv)!=4:
-        print("Usage {:s} <simulation number> <estimation number> <trial to plot>".format(argv[0]))
+    if len(argv)!=3:
+        print("Usage {:s} <simulation number> <estimation number>".format(argv[0]))
         return
 
     # load data and initial values
-    simResNumber = int(argv[1])
+    simNumber = int(argv[1])
     estNumber = int(argv[2])
-    trialToPlot = int(argv[3])
 
-    simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
-    simResConfig = configparser.ConfigParser()
-    simResConfig.read(simResConfigFilename)
+    simConfigFilename = "data/{:08d}_simulation_metaData.ini".format(simNumber)
+    simConfig = configparser.ConfigParser()
+    simConfig.read(simResConfigFilename)
     simConfigFilename = simResConfig["simulation_params"]["simConfigFilename"]
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
@@ -96,7 +95,7 @@ def main(argv):
     simConfig.read(simConfigFilename)
     nLatents = int(simConfig["control_variables"]["nLatents"])
     nNeurons = int(simConfig["control_variables"]["nNeurons"])
-    trialsLengths = [int(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    trialsLengths = [float(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
 
     C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
@@ -125,7 +124,33 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    # optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":20, 
+                   #
+                   "eStepMaxNIter":100, 
+                   "eStepTol":1e-3, 
+                   "eStepLR":1e-3, 
+                   "eStepLineSearchFn":"strong_wolfe", 
+                   "eStepNIterDisplay":1, 
+                   #
+                   "mStepModelParamsMaxNIter":100, 
+                   "mStepModelParamsTol":1e-3, 
+                   "mStepModelParamsLR":1e-3, 
+                   "mStepModelParamsLineSearchFn":"strong_wolfe", 
+                   "mStepModelParamsNIterDisplay":1, 
+                   #
+                   "mStepKernelParamsMaxNIter":10, 
+                   "mStepKernelParamsTol":1e-3, 
+                   "mStepKernelParamsLR":1e-3, 
+                   "mStepKernelParamsLineSearchFn":"strong_wolfe", 
+                   "mStepModelParamsNIterDisplay":1, 
+                   "mStepKernelParamsNIterDisplay":1, 
+                   #
+                   "mStepIndPointsMaxNIter":20, 
+                   "mStepIndPointsTol":1e-3, 
+                   "mStepIndPointsLR":1e-4, 
+                   "mStepIndPointsLineSearchFn":"strong_wolfe", 
+                   "mStepIndPointsNIterDisplay":1}
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
