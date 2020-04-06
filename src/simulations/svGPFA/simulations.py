@@ -34,15 +34,19 @@ class GPFASimulator:
         nNeurons = C.shape[0]
         nLatents = C.shape[1]
         nTrials = len(trialsTimes)
-        spikeTimes = [[] for n in range(nTrials)]
+        spikesTimes = [[] for n in range(nTrials)]
+        intensityValues = [[] for n in range(nTrials)]
         sampler = stats.pointProcess.sampler.Sampler()
         for r in range(nTrials):
             embeddings = torch.matmul(C, latentsSamples[r]) + d
             print("Processing trial {:d}".format(r))
-            spikeTimes[r] = [[] for r in range(nNeurons)]
+            spikesTimes[r] = [[] for r in range(nNeurons)]
+            intensityValues[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 print("Processing neuron {:d}".format(n))
-                spikeTimes[r][n] = torch.tensor(sampler.sampleInhomogeneousPP_timeRescaling(intensityTimes=trialsTimes[r], intensityValues=linkFunction(embeddings[n,:]), T=trialsTimes[r].max()), device=C.device)
+                intensityValues[r][n] = linkFunction(embeddings[n,:])
+                spikesTimes[r][n] = torch.tensor(sampler.sampleInhomogeneousPP_timeRescaling(intensityTimes=trialsTimes[r], intensityValues=intensityValues[r][n], T=trialsTimes[r].max()), device=C.device)
                 # pdb.set_trace()
-        return(spikeTimes)
+        answer = {"spikesTimes": spikesTimes, "intensityTimes": trialsTimes, "intensityValues": intensityValues}
+        return(answer)
 
