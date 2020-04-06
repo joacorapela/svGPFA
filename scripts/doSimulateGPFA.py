@@ -14,6 +14,7 @@ import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 from utils.svGPFA.miscUtils import getLatentsSamples, getTrialsTimes
 import plot.svGPFA.plotUtils
+from stats.pointProcess.tests import KSTestTimeRescalingUnbinned
 
 def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
     nTrials = len(kernels)
@@ -41,6 +42,8 @@ def main(argv):
     if len(argv)!=2:
         print("Usage {:s} <simulation config number>".format(argv[0]))
         return
+    trialKSTestTimeRescaling = 0
+    neuronKSTestTimeRescaling = 0
 
     # load data and initial values
     simConfigNumber = int(argv[1])
@@ -51,6 +54,7 @@ def main(argv):
     nNeurons = int(simConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
+    T = torch.tensor(trialsLengths).max()
     dtSimulate = float(simConfig["control_variables"]["dt"])
     latentsRegEpsilon = float(simConfig["control_variables"]["latentsRegEpsilon"])
     dtLatentsFig = 1e-1
@@ -66,8 +70,10 @@ def main(argv):
     simResFilename = "results/{:s}_simRes.pickle".format(randomPrefix)
     latentsFigFilename = \
         "figures/{:s}_simulation_latents.png".format(randomPrefix)
-    spikeTimesFigFilename = \
-        "figures/{:s}_simulation_spikeTimes.png".format(randomPrefix)
+    spikesTimesFigFilename = \
+        "figures/{:s}_simulation_spikesTimes.png".format(randomPrefix)
+    ksTestTimeRescalingFigFilename = \
+        "figures/{:s}_simulation_ksTestTimeRescaling.png".format(randomPrefix)
 
     with torch.no_grad():
         kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
@@ -82,7 +88,10 @@ def main(argv):
                                            dtype=C.dtype)
 
         simulator = simulations.svGPFA.simulations.GPFASimulator()
-        spikesTimes = simulator.simulate(trialsTimes=trialsTimes, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
+        res = simulator.simulate(trialsTimes=trialsTimes, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
+        spikesTimes = res["spikesTimes"]
+        intensityTimes = res["intensityTimes"]
+        intensityValues = res["intensityValues"]
         latentsMeans, latentsSTDs = getLatentsMeansAndSTDs(meansFuncs=latentsMeansFuncs, kernels=kernels, trialsTimes=trialsTimes)
 
     simRes = {"times": trialsTimes, "latents": latentsSamples,
@@ -100,10 +109,20 @@ def main(argv):
     # pLatents = ggplotly(pLatents)
     # pLatents.show()
 
-    pSpikes = plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot(spikesTimes=spikesTimes, figFilename=spikeTimesFigFilename)
+    pSpikes = plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot(spikesTimes=spikesTimes, figFilename=spikesTimesFigFilename)
     # pSpikes = ggplotly(pSpikes)
     # pSpikes.show()
 
+    spikesTimesKS = spikesTimes[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
+    cifKS = intensityValues[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
+    sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS,
+                                                     cif=cifKS, t0=0, tf=T,
+                                                     dt=dtSimulate)
+    title = "Trial {:d}, Neuron {:d}".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling)
+    plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs,
+                                                     uCDF=uCDF, cb=cb,
+                                                     figFilename=ksTestTimeRescalingFigFilename,
+                                                     title=title)
     plt.show()
 
     pdb.set_trace()
