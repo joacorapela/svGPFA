@@ -2,13 +2,11 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
-import torch.nn as nn
 from .kernelMatricesStore import KernelMatricesStore
 
-class SVEmbedding(ABC, nn.Module):
+class SVEmbedding(ABC):
 
     def __init__(self, svPosteriorOnLatents):
-        super(SVEmbedding, self).__init__()
         self._svPosteriorOnLatents = svPosteriorOnLatents
 
     def computeMeansAndVars(self, svPosteriorOnLatentsStats=None):
@@ -61,8 +59,8 @@ class LinearSVEmbedding(SVEmbedding):
 
     def setInitialParams(self, initialParams):
         svEmbeddingInitialParams = initialParams["svEmbedding"]
-        self._C = nn.Parameter(svEmbeddingInitialParams["C0"])
-        self._d = nn.Parameter(svEmbeddingInitialParams["d0"])
+        self._C = svEmbeddingInitialParams["C0"]
+        self._d = svEmbeddingInitialParams["d0"]
         self._svPosteriorOnLatents.setInitialParams(initialParams=initialParams)
 
     def getParams(self):
@@ -78,6 +76,11 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
     def predictLatents(self, newTimes):
         return self._svPosteriorOnLatents.predict(newTimes=newTimes)
+
+    def sample(self, times):
+        latentsSamples = self._svPosteriorOnLatents.sample(times=times)
+        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
+        return answer
 
 class LinearSVEmbeddingAssocTimes(LinearSVEmbedding):
 

@@ -3,10 +3,12 @@ import sys
 import os
 import time
 import pdb
+import random
 import argparse
 import cProfile, pstats
 from scipy.io import loadmat
 import pickle
+import configparser
 import torch
 import numpy as np
 sys.path.append("../src")
@@ -18,8 +20,7 @@ import plot.svGPFA.plotUtils
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("deviceName", help="name of device (cpu or cuda)")
-    parser.add_argument("--profile", help="perform profiling",
-        action="store_true")
+    parser.add_argument("--profile", help="perform profiling", action="store_true")
     args = parser.parse_args()
     if args.profile:
         profile = True
@@ -32,12 +33,23 @@ def main(argv):
     device = torch.device(deviceName)
     print("Using {:s}".format(deviceName))
 
-    tol = 1e-3
     ppSimulationFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessSimulation.mat")
     initDataFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessInitialConditions.mat")
-    lowerBoundHistFigFilename = "figures/leasLowerBoundHist_{:s}.png".format(deviceName)
-    modelSaveFilename = "results/estimationResLeasSimulation_{:s}.pickle".format(deviceName)
-    profilerFilenamePattern = "results/demoPointProcessLeasSimulation_{:d}Iter.pstats"
+
+    # save estimated values
+    estimationPrefixUsed = True
+    while estimationPrefixUsed:
+        estimationPrefix = "{:08d}".format(random.randint(0, 10**8))
+        estimMetaDataFilename = \
+            "results/{:s}_leasSimulation_estimation_metaData_{:s}.ini".format(estimationPrefix, deviceName)
+        if not os.path.exists(estimMetaDataFilename):
+           estimationPrefixUsed = False
+    modelSaveFilename = \
+        "results/{:s}_leasSimulation_estimatedModel_{:s}.pickle".format(estimationPrefix, deviceName)
+    profilerFilenamePattern = \
+        "results/{:s}_leaseSimulation_estimatedModel_{:s}.pstats".format(estimationPrefix, deviceName)
+    lowerBoundHistFigFilename = \
+        "figures/{:s}_leasSimulation_lowerBoundHist_{:s}.png".format(estimationPrefix, deviceName)
 
     mat = loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
@@ -61,7 +73,7 @@ def main(argv):
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
-    indPointsLocsKMSEpsilon = 1e-2
+    indPointsLocsKMSEpsilon = 1e-5
 
     # create kernels
     kernels = [[None] for k in range(nLatents)]
@@ -97,7 +109,36 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":5, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":200, 
+                   #
+                   "eStepMaxNIter":100, 
+                   "eStepTol":1e-3, 
+                   "eStepLR":1e-3, 
+                   "eStepLineSearchFn":"strong_wolfe", 
+                   "eStepNIterDisplay":1, 
+                   #
+                   "mStepModelParamsMaxNIter":100, 
+                   "mStepModelParamsTol":1e-3, 
+                   "mStepModelParamsLR":1e-3, 
+                   "mStepModelParamsLineSearchFn":"strong_wolfe", 
+                   "mStepModelParamsNIterDisplay":1, 
+                   #
+                   "mStepKernelParamsMaxNIter":10, 
+                   "mStepKernelParamsTol":1e-3, 
+                   "mStepKernelParamsLR":1e-3, 
+                   "mStepKernelParamsLineSearchFn":"strong_wolfe", 
+                   "mStepModelParamsNIterDisplay":1, 
+                   "mStepKernelParamsNIterDisplay":1, 
+                   #
+                   "mStepIndPointsMaxNIter":20, 
+                   "mStepIndPointsTol":1e-3, 
+                   "mStepIndPointsLR":1e-4, 
+                   "mStepIndPointsLineSearchFn":"strong_wolfe", 
+                   "mStepIndPointsNIterDisplay":1}
+    estimConfig = configparser.ConfigParser()
+    estimConfig["optim_params"] = optimParams
+    estimConfig["other"] = {"indPointsLocsKMSEpsilon": indPointsLocsKMSEpsilon}
+    with open(estimMetaDataFilename, "w") as f: estimConfig.write(f)
 
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
@@ -117,7 +158,7 @@ def main(argv):
     # pdb.set_trace()
     # ned debug code
 
-    model.to(device)
+    # model.to(device)
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()

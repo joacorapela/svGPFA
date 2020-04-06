@@ -13,8 +13,9 @@ import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
-from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 import myMath.utils
+from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
+from stats.pointProcess.tests import KSTestTimeRescalingUnbinned
 
 def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
     nTrials = len(trialsLengths)
@@ -54,58 +55,60 @@ def getKernelsParams0(kernels, noiseSTD):
         kernelsParams0[r] = [[] for r in range(nLatents)]
         for k in range(nLatents):
             trueParams = kernels[r][k].getParams()
-            kernelsParams0[r][k] = noiseSTD*torch.randn(len(trueParams))*trueParams
+            kernelsParams0[r][k] = noiseSTD*torch.randn(len(trueParams))+trueParams
     return kernelsParams0
 
 def main(argv):
     if len(argv)!=4:
-        print("Usage {:s} <simulation number> <estimation number> <trial to plot>".format(argv[0]))
+        print("Usage {:s} <simulation result number> <estimation init number> <trial to plot>".format(argv[0]))
         return
 
     # load data and initial values
     simResNumber = int(argv[1])
-    estNumber = int(argv[2])
+    estInitNumber = int(argv[2])
     trialToPlot = int(argv[3])
 
     simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simResConfig = configparser.ConfigParser()
     simResConfig.read(simResConfigFilename)
-    simConfigFilename = simResConfig["simulation_params"]["simConfigFilename"]
+    simInitConfigFilename = simResConfig["simulation_params"]["simInitConfigFilename"]
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
+
+    simInitConfig = configparser.ConfigParser()
+    simInitConfig.read(simInitConfigFilename)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
+    nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
+    trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    nTrials = len(trialsLengths)
+
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
-    spikeTimes = simRes["spikes"]
+    spikesTimes = simRes["spikes"]
     trueLatents = simRes["latents"]
     trueLatentsMeans = simRes["latentsMeans"]
     trueLatentsSTDs = simRes["latentsSTDs"]
+    timesTrueValues = torch.linspace(0, torch.max(torch.tensor(trialsLengths)), trueLatents[0].shape[1])
 
-    estConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estNumber)
-    estConfig = configparser.ConfigParser()
-    estConfig.read(estConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in estConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nTestPoints = int(estConfig["control_variables"]["nTestPoints"])
-    firstIndPoint = float(estConfig["control_variables"]["firstIndPoint"])
-    initCondEmbeddingSTD = float(estConfig["control_variables"]["initCondEmbeddingSTD"])
-    initCondIndPointsScale = float(estConfig["control_variables"]["initCondIndPointsScale"])
-    kernelsParams0NoiseSTD = float(estConfig["control_variables"]["kernelsParams0NoiseSTD"])
-    indPointsLocsKMSRegEpsilon = float(estConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
-    nQuad = int(estConfig["control_variables"]["nQuad"])
+    estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
+    estInitConfig = configparser.ConfigParser()
+    estInitConfig.read(estInitConfigFilename)
+    nIndPointsPerLatent = [int(str) for str in estInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
+    nTestPoints = int(estInitConfig["control_variables"]["nTestPoints"])
+    firstIndPoint = float(estInitConfig["control_variables"]["firstIndPoint"])
+    initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
+    initCondIndPointsScale = float(estInitConfig["control_variables"]["initCondIndPointsScale"])
+    kernelsParams0NoiseSTD = float(estInitConfig["control_variables"]["kernelsParams0NoiseSTD"])
+    indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
+    nQuad = int(estInitConfig["control_variables"]["nQuad"])
 
-    testTimes = torch.linspace(0, torch.max(torch.tensor(spikeTimes[0][0])), nTestPoints)
+    testTimes = torch.linspace(0, torch.max(torch.tensor(spikesTimes[0][0])), nTestPoints)
 
-    simConfig = configparser.ConfigParser()
-    simConfig.read(simConfigFilename)
-    nLatents = int(simConfig["control_variables"]["nLatents"])
-    nNeurons = int(simConfig["control_variables"]["nNeurons"])
-    trialsLengths = [int(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
-    nTrials = len(trialsLengths)
-
-    C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
+    C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simInitConfig)
     C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
     d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
 
     legQuadPoints, legQuadWeights = getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
-    kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
+    kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     kernelsParams0 = getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
     kernels = kernels[0] # the current code uses the same kernel for all trials
     kernelsParams0 = kernelsParams0[0] # the current code uses the same kernel for all trials
@@ -125,7 +128,33 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    # optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
+    optimParams = {"emMaxNIter":20,
+                   #
+                   "eStepMaxNIter":100,
+                   "eStepTol":1e-3,
+                   "eStepLR":1e-3,
+                   "eStepLineSearchFn":"strong_wolfe",
+                   "eStepNIterDisplay":1,
+                   #
+                   "mStepModelParamsMaxNIter":100,
+                   "mStepModelParamsTol":1e-3,
+                   "mStepModelParamsLR":1e-3,
+                   "mStepModelParamsLineSearchFn":"strong_wolfe",
+                   "mStepModelParamsNIterDisplay":1,
+                   #
+                   "mStepKernelParamsMaxNIter":10,
+                   "mStepKernelParamsTol":1e-3,
+                   "mStepKernelParamsLR":1e-3,
+                   "mStepKernelParamsLineSearchFn":"strong_wolfe",
+                   "mStepModelParamsNIterDisplay":1,
+                   "mStepKernelParamsNIterDisplay":1,
+                   #
+                   "mStepIndPointsMaxNIter":20,
+                   "mStepIndPointsTol":1e-3,
+                   "mStepIndPointsLR":1e-4,
+                   "mStepIndPointsLineSearchFn":"strong_wolfe",
+                   "mStepIndPointsNIterDisplay":1}
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
@@ -138,48 +167,55 @@ def main(argv):
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
     lowerBoundHist, elapsedTimeHist  = svEM.maximize(
-        model=model, measurements=spikeTimes, initialParams=initialParams,
+        model=model, measurements=spikesTimes, initialParams=initialParams,
         quadParams=quadParams, optimParams=optimParams)
 
     # save estimated values
-    estimationPrefixUsed = True
-    while estimationPrefixUsed:
-        estimationPrefix = "{:08d}".format(random.randint(0, 10**8))
-        metaDataFilename = \
-            "results/{:s}_estimation_metaData.csv".format(estimationPrefix)
+    estPrefixUsed = True
+    while estPrefixUsed:
+        estResNumber = random.randint(0, 10**8)
+        estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
         if not os.path.exists(metaDataFilename):
-           estimationPrefixUsed = False
-    estimMetaDataFilename = \
-        "results/{:s}_estimation_metaData.ini".format(estimationPrefix)
-    modelSaveFilename = \
-        "results/{:s}_estimatedModel.pickle".format(estimationPrefix)
-    latentsFilename = "results/{:s}_latents.pickle".format(estimationPrefix)
-    latentsFigFilename = "figures/{:s}_estimatedLatents.png".format(estimationPrefix)
-    lowerBoundHistFigFilename = "figures/{:s}_lowerBoundHist.png".format(estimationPrefix)
+           estPrefixUsed = False
+    modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
+    latentsFigFilename = "figures/{:08d}_estimatedLatents.png".format(estResNumber)
+    lowerBoundHistFigFilename = "figures/{:08d}_lowerBoundHist.png".format(estResNumber)
+    ksTestTimeRescalingFigFilename = "figures/{:08d}_ksTestTimeRescaling.png".format(estResNumber)
 
-    estimConfig = configparser.ConfigParser()
-    estimConfig["simulation_params"] = {"simResNumber": simResNumber}
-    estimConfig["optim_params"] = optimParams
-    estimConfig["estimation_params"] = {"estNumber": estNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
-    with open(estimMetaDataFilename, "w") as f: estimConfig.write(f)
+    estimResConfig = configparser.ConfigParser()
+    estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
+    estimResConfig["optim_params"] = optimParams
+    estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
+    with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
-    with open(latentsFilename, "rb") as f: trueLatentsSamples = pickle.load( f)
 
-    # plot lower bound history
-    plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
+    with torch.no_grad():
+        # plot lower bound history
+        plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
 
-    # predict latents at test times
-    testMuK, testVarK = model.predictLatents(newTimes=testTimes)
+        # predict latents at test times
+        testMuK, testVarK = model.predictLatents(newTimes=testTimes)
 
-    plt.figure()
+        # plot true and estimated latents
+        indPointsLocs = model.getIndPointsLocs()
+        plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(timesEstimatedValues=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, timesTrueValues=timesTrueValues, trueLatents=trueLatents, trueLatentsMeans=trueLatentsMeans, trueLatentsSTDs=trueLatentsSTDs, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
 
-    # plot true and estimated latents
-    indPointsLocs = model.getIndPointsLocs()
-    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatents, trueLatentsMeans=trueLatentsMeans, trueLatentsSTDs=trueLatentsSTDs, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
-
-    pdb.set_trace()
+        # KS test time rescaling
+        trialKSTestTimeRescaling = 0
+        neuronKSTestTimeRescaling = 0
+        dtCIF = 1e-3
+        T = torch.tensor(trialsLengths).max()
+        oneTrialCIFTimes = torch.arange(0, T, dtCIF)
+        cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
+        cifs = model.sampleCIFs(times=cifTimes)
+        spikesTimesKS = spikesTimes[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
+        cifKS = cifs[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
+        sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS, cif=cifKS, t0=0, tf=T, dt=dtCIF)
+        title = "Trial {:d}, Neuron {:d}".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling)
+        plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
+        pdb.set_trace()
 
 if __name__ == "__main__":
     main(sys.argv)

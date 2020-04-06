@@ -47,7 +47,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -134,7 +134,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = YNonStacked_tmp[r,0][n,0][:,0]
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 

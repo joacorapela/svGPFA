@@ -10,7 +10,6 @@ sys.path.append("../src")
 from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
 from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 
-'''
 def test_eval_IndPointsLocsKMS():
     tol = 1e-5
     tolKzzi = 6e-2
@@ -61,11 +60,12 @@ def test_eval_IndPointsLocsKMS():
         error = math.sqrt(((Kzz[k]-leasKzz[k])**2).flatten().mean())
         assert(error<tol)
 
+    '''
     Kzzi = indPointsLocsKMS.getKzzi()
     for k in range(len(Kzzi)):
         error = math.sqrt(((Kzzi[k]-leasKzzi[k])**2).flatten().mean())
         assert(error<tolKzzi)
-'''
+    '''
 
 def test_eval_IndPointsLocsAndAllTimesKMS():
     tol = 1e-5
@@ -183,6 +183,6 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
             assert(error<tol)
 
 if __name__=='__main__':
-    # test_eval_IndPointsLocsKMS()
+    test_eval_IndPointsLocsKMS()
     test_eval_IndPointsLocsAndAllTimesKMS()
     test_eval_IndPointsLocsAndAssocTimesKMS()

@@ -3,12 +3,8 @@ import pdb
 from abc import ABC, abstractmethod
 import math
 import torch
-import torch.nn as nn
 
-class Kernel(ABC, nn.Module):
-
-    def __init__(self):
-        super(Kernel, self).__init__()
+class Kernel(ABC):
 
     @abstractmethod
     def buildKernelMatrix(self, X1, X2=None):
@@ -22,29 +18,29 @@ class Kernel(ABC, nn.Module):
         return self._params
 
     def setParams(self, params):
-        self._params = nn.Parameter(params)
+        self._params = params
+
+    @abstractmethod
+    def getNamedParams(self):
+        pass
 
 class ExponentialQuadraticKernel(Kernel):
 
     def __init__(self, scale=None, lengthScale=None, dtype=torch.double, device=torch.device("cpu")):
-        super(ExponentialQuadraticKernel, self).__init__()
-        # paramIsNone = torch.tensor([scale is None, lengthScale is None])
-        # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
-
         if scale is not None:
-            self._scale = scale
+            self._scale = torch.tensor(scale)
             self._scaleFixed = True
         else:
             self._scaleFixed = False
 
         if lengthScale is not None:
-            self._lengthScale = lengthScale
+            self._lengthScale = torch.tensor(lengthScale)
             self._lengthScaleFixed = True
         else:
             self._lengthScaleFixed = False
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale, lengthScale = self._getAllParams(params=self._params)
+        scale, lengthScale = self._getAllParams()
 
         if X2 is None:
             X2 = X1
@@ -56,11 +52,11 @@ class ExponentialQuadraticKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale, lengthScale = self._getAllParams(params=self._params)
+        scale, lengthScale = self._getAllParams()
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
-    def _getAllParams(self, params):
+    def _getAllParams(self):
         if not self._scaleFixed and not self._lengthScaleFixed:
             scale = self._params[0]
             lengthScale = self._params[1]
@@ -75,6 +71,11 @@ class ExponentialQuadraticKernel(Kernel):
 
         return scale, lengthScale
 
+    def getNamedParams(self):
+        scale, lengthScale = self._getAllParams()
+        answer = {"scale": scale, "lengthScale": lengthScale}
+        return answer
+
 class PeriodicKernel(Kernel):
     def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
         super(PeriodicKernel, self).__init__()
@@ -82,25 +83,25 @@ class PeriodicKernel(Kernel):
         # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
 
         if scale is not None:
-            self._scale = scale
+            self._scale = torch.tensor(scale)
             self._scaleFixed = True
         else:
             self._scaleFixed = False
 
         if lengthScale is not None:
-            self._lengthScale = lengthScale
+            self._lengthScale = torch.tensor(lengthScale)
             self._lengthScaleFixed = True
         else:
             self._lengthScaleFixed = False
 
         if period is not None:
-            self._period = period
+            self._period = torch.tensor(period)
             self._periodFixed = True
         else:
             self._periodFixed = False
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale, lengthScale, period = self._getAllParams(params=self._params)
+        scale, lengthScale, period = self._getAllParams()
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -112,11 +113,11 @@ class PeriodicKernel(Kernel):
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale, lengthScale, period = self._getAllParams(params=self._params)
+        scale, lengthScale, period = self._getAllParams()
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
-    def _getAllParams(self, params):
+    def _getAllParams(self):
         if not self._scaleFixed and not self._lengthScaleFixed and not self._periodFixed:
             scale = self._params[0]
             lengthScale = self._params[1]
@@ -149,6 +150,11 @@ class PeriodicKernel(Kernel):
             raise ValueError("Scale and lengthScale cannot be both fixed")
 
         return scale, lengthScale, period
+
+    def getNamedParams(self):
+        scale, lengthScale, period = self._getAllParams()
+        answer = {"scale": scale, "lengthScale": lengthScale, "period": period}
+        return answer
 
 '''
 class AddDiagKernel(Kernel):

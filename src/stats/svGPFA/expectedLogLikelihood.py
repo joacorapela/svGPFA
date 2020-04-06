@@ -2,17 +2,19 @@
 import pdb
 from abc import ABC, abstractmethod
 import torch
-import torch.nn as nn
 # import warnings
 
-class ExpectedLogLikelihood(ABC, nn.Module):
+class ExpectedLogLikelihood(ABC):
 
     def __init__(self, svEmbeddingAllTimes):
-        super(ExpectedLogLikelihood, self).__init__()
         self._svEmbeddingAllTimes = svEmbeddingAllTimes
 
     @abstractmethod
     def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
+        pass
+
+    @abstractmethod
+    def sampleCIFs(self):
         pass
 
     @abstractmethod
@@ -90,7 +92,14 @@ class PointProcessELL(ExpectedLogLikelihood):
         aux1 = torch.matmul(aux0, eLinkValues)
         sELLTerm1 = torch.sum(aux1)
         sELLTerm2 = torch.sum(eLogLinkValues)
-        return -sELLTerm1+sELLTerm2
+        answer = -sELLTerm1+sELLTerm2
+        return answer
+
+    def sampleCIFs(self, times):
+        h = self._svEmbeddingAllTimes.sample(times=times)
+        nTrials = len(h)
+        answer = [self._linkFunction(h[r]) for r in range(nTrials)]
+        return answer
 
     def buildKernelsMatrices(self):
         self._svEmbeddingAllTimes.buildKernelsMatrices()
@@ -121,16 +130,13 @@ class PointProcessELL(ExpectedLogLikelihood):
         stackedSpikeTimes = [[] for i in range(nTrials)]
         neuronForSpikeIndex = [[] for i in range(nTrials)]
         for trialIndex in range(nTrials):
-            stackedSpikeTimes[trialIndex] = torch.tensor(
-                [spikeTime
-                 for neuronIndex in range(len(spikeTimes[trialIndex]))
-                 for spikeTime in spikeTimes[trialIndex][neuronIndex]],
-                 device=device)
+            aList = [spikeTime for neuronIndex in range(len(spikeTimes[trialIndex])) for spikeTime in spikeTimes[trialIndex][neuronIndex]]
+            stackedSpikeTimes[trialIndex] = torch.tensor(aList, device=device)
+            # stackedSpikeTimes[trialIndex] = torch.unsqueeze(
+            #     stackedSpikeTimes[trialIndex], 1)
+            aList = [neuronIndex for neuronIndex in range(len(spikeTimes[trialIndex])) for spikeTime in spikeTimes[trialIndex][neuronIndex]]
             neuronForSpikeIndex[trialIndex] = torch.tensor(
-                [neuronIndex
-                 for neuronIndex in range(len(spikeTimes[trialIndex]))
-                 for spikeTime in spikeTimes[trialIndex][neuronIndex]],
-                 device=device)
+                 aList, device=device)
         return stackedSpikeTimes, neuronForSpikeIndex
 
     def setIndPointsLocs(self, locs):
@@ -159,9 +165,14 @@ class PointProcessELL(ExpectedLogLikelihood):
         pass
 
 class PointProcessELLExpLink(PointProcessELL):
+    def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes):
+        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
+                         svEmbeddingAssocTimes=svEmbeddingAssocTimes)
+        self._linkFunction = torch.exp
+
     def _getELinkValues(self, eMean, eVar):
         # eLinkValues \in nTrials x nQuadLeg x nNeurons
-        eLinkValues = torch.exp(input=eMean+0.5*eVar)
+        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
@@ -254,9 +265,13 @@ class PoissonELL(ExpectedLogLikelihood):
 
 class PoissonELLExpLink(PoissonELL):
 
+    def __init__(self, svEmbeddingAllTime):
+        super().__init__(svEmbeddingAllTime=svEmbeddingAllTime)
+        self._linkFunction = torch.exp
+
     def _getELinkAndELogLinkValues(self, eMean, eVar):
         # intval \in nTrials x nQuadLeg x nNeurons
-        eLinkValues = torch.exp(input=eMean+0.5*eVar)
+        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
         eLogLink = eMean
         return eLink, eLogLink
 

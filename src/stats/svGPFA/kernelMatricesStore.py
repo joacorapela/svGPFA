@@ -1,21 +1,17 @@
 
 import pdb
 import torch
-import torch.nn as nn
 from abc import ABC, abstractmethod
 from .utils import chol3D
 
-class KernelMatricesStore(ABC, nn.Module):
-
-    def __init__(self):
-        super(KernelMatricesStore, self).__init__()
+class KernelMatricesStore(ABC):
 
     @abstractmethod
     def buildKernelsMatrices(self):
         pass
 
     def setKernels(self, kernels):
-        self._kernels = nn.ModuleList(kernels)
+        self._kernels = kernels
 
     def setInitialParams(self, initialParams):
         self._Z = initialParams["inducingPointsLocs0"]
@@ -40,7 +36,6 @@ class KernelMatricesStore(ABC, nn.Module):
 class IndPointsLocsKMS(KernelMatricesStore):
 
     def __init__(self, epsilon=1e-5):
-        super(IndPointsLocsKMS, self).__init__()
         self._epsilon = epsilon
 
     def buildKernelsMatrices(self):
@@ -76,17 +71,28 @@ class IndPointsLocsAndTimesKMS(KernelMatricesStore):
     def getKtt(self):
         return self._Ktt
 
+    def getKttDiag(self):
+        return self._KttDiag
+
 class IndPointsLocsAndAllTimesKMS(IndPointsLocsAndTimesKMS):
 
     def buildKernelsMatrices(self):
         # t \in nTrials x nQuad x 1
         nLatent = len(self._Z)
         self._Ktz = [[None] for k in range(nLatent)]
-        self._Ktt = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent,
-                                dtype=self._t.dtype, device=self._t.device)
+        self._KttDiag = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent,
+                                    dtype=self._t.dtype, device=self._t.device)
         for k in range(nLatent):
             self._Ktz[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._Z[k])
-            self._Ktt[:,:,k] = self._kernels[k].buildKernelMatrixDiag(X=self._t).squeeze()
+            self._KttDiag[:,:,k] = self._kernels[k].buildKernelMatrixDiag(X=self._t).squeeze()
+
+    def buildKttKernelsMatrices(self):
+        # t \in nTrials x nQuad x 1
+        nLatent = len(self._Z)
+        self._Ktt = [[None] for k in range(nLatent)]
+
+        for k in range(nLatent):
+            self._Ktt[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._t)
 
 class IndPointsLocsAndAssocTimesKMS(IndPointsLocsAndTimesKMS):
 
@@ -94,10 +100,10 @@ class IndPointsLocsAndAssocTimesKMS(IndPointsLocsAndTimesKMS):
         nLatent = len(self._Z)
         nTrial = self._Z[0].shape[0]
         self._Ktz = [[[None] for tr in range(nTrial)] for k in range(nLatent)]
-        self._Ktt = [[[None] for tr in  range(nTrial)] for k in range(nLatent)]
+        self._KttDiag = [[[None] for tr in  range(nTrial)] for k in range(nLatent)]
 
         for k in range(nLatent):
             for tr in range(nTrial):
                 self._Ktz[k][tr] = self._kernels[k].buildKernelMatrix(X1=self._t[tr], X2=self._Z[k][tr,:,:])
-                self._Ktt[k][tr] = self._kernels[k].buildKernelMatrixDiag(X=self._t[tr])
+                self._KttDiag[k][tr] = self._kernels[k].buildKernelMatrixDiag(X=self._t[tr])
 
