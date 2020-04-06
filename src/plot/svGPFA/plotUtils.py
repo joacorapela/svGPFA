@@ -10,6 +10,22 @@ from plotly.subplots import make_subplots
 import plotly.io as pio
 import plotly.offline
 
+def plotResKSTestTimeRescaling(sUTRISIs, uCDF, cb, figFilename,
+                               title="",
+                               dataColor="blue", cbColor="red",
+                               dataLinestyle="solid",
+                               cbLinestyle="dashed",
+                               ylabel="Empirical CDF",
+                               xlabel="Model CDF"):
+    plt.figure()
+    plt.plot(sUTRISIs, uCDF, color=dataColor, linestyle=dataLinestyle)
+    plt.plot([0, 1-cb], [cb, 1], color=cbColor, linestyle=cbLinestyle)
+    plt.plot([cb, 1], [0, 1-cb], color=cbColor, linestyle=cbLinestyle)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.savefig(figFilename)
+
 def getSimulatedSpikeTimesPlot(spikesTimes, figFilename, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
     nTrials = len(spikesTimes)
     sqrtNTrials = math.sqrt(nTrials)
@@ -83,9 +99,8 @@ def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="I
         plt.savefig(fname=figFilename)
     plt.show()
 
-def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, trueLatentsMeans, trueLatentsSTDs, trialToPlot=0, figFilename=None):
+def plotTrueAndEstimatedLatents(timesEstimatedValues, muK, varK, indPointsLocs, timesTrueValues, trueLatents, trueLatentsMeans, trueLatentsSTDs, trialToPlot=0, figFilename=None):
     nLatents = muK.shape[2]
-    timesToPlot = times
     f, axes = plt.subplots(nLatents, 1, sharex=True, squeeze=False)
     title = "Trial {:d}".format(trialToPlot)
     axes[0,0].set_title(title)
@@ -94,22 +109,24 @@ def plotTrueAndEstimatedLatents(times, muK, varK, indPointsLocs, trueLatents, tr
         trueMeanToPlot = trueLatentsMeans[trialToPlot][k].detach()
         trueCIToPlot = 1.96*(trueLatentsSTDs[trialToPlot][k]).detach()
         hatMeanToPlot = muK[trialToPlot,:,k].detach()
-        positiveMSE = torch.mean((trueMeanToPlot-hatMeanToPlot)**2).detach()
-        negativeMSE = torch.mean((trueMeanToPlot+hatMeanToPlot)**2).detach()
-        if negativeMSE<positiveMSE:
-            hatMeanToPlot = -hatMeanToPlot
+        # positiveMSE = torch.mean((trueMeanToPlot-hatMeanToPlot)**2).detach()
+        # negativeMSE = torch.mean((trueMeanToPlot+hatMeanToPlot)**2).detach()
+        # if negativeMSE<positiveMSE:
+        #     hatMeanToPlot = -hatMeanToPlot
         hatCIToPlot = 1.96*(varK[trialToPlot,:,k].sqrt()).detach()
-        axes[k,0].plot(timesToPlot, trueLatentsToPlot, label="true sampled", color="black")
-        axes[k,0].plot(timesToPlot, trueMeanToPlot, label="true mean", color="gray")
-        axes[k,0].fill_between(timesToPlot, trueMeanToPlot-trueCIToPlot, trueMeanToPlot+trueCIToPlot, color="lightgray")
-        axes[k,0].plot(timesToPlot, hatMeanToPlot, label="estimated", color="blue")
-        axes[k,0].fill_between(timesToPlot, hatMeanToPlot-hatCIToPlot, hatMeanToPlot+hatCIToPlot, color="lightblue")
+        axes[k,0].plot(timesTrueValues, trueLatentsToPlot, label="true sampled", color="black")
+        axes[k,0].plot(timesTrueValues, trueMeanToPlot, label="true mean", color="gray")
+        axes[k,0].fill_between(timesTrueValues, trueMeanToPlot-trueCIToPlot, trueMeanToPlot+trueCIToPlot, color="lightgray")
+        axes[k,0].plot(timesEstimatedValues, hatMeanToPlot, label="estimated", color="blue")
+        axes[k,0].fill_between(timesEstimatedValues, hatMeanToPlot-hatCIToPlot, hatMeanToPlot+hatCIToPlot, color="lightblue")
         for i in range(indPointsLocs[k].shape[1]):
             axes[k,0].axvline(x=indPointsLocs[k][trialToPlot,i, 0], color="red")
         axes[k,0].set_ylabel("Latent %d"%(k))
-    axes[-1,0].set_xlabel("Sample")
+    axes[-1,0].set_xlabel("Time (sec)")
     axes[-1,0].legend()
-    plt.xlim(left=torch.min(timesToPlot)-1, right=torch.max(timesToPlot)+1)
+    allIndPointsLocs = torch.cat([indPointsLocs[k][trialToPlot,:,0] for k in range(len(indPointsLocs))])
+    # allTimes = torch.cat((timesTrueValues, timesEstimatedValues, allIndPointsLocs))
+    # plt.xlim(left=torch.min(allTimes), right=torch.max(allTimes))
     if figFilename is not None:
         plt.savefig(fname=figFilename)
     plt.show()
