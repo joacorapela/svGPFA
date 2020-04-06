@@ -2,11 +2,12 @@
 import pdb
 import math
 import random
+import pandas as pd
 import torch
 
 # function [xks,rst,rstsort,cb,n] = KS_test_time_rescaling(Y,pk)
 def timeRescaling(Y, pk, eps=1e-10):
-    pk = torch.max(pk, torch.tensor([eps]))
+    pk = torch.max(pk, torch.tensor([eps], dtype=torch.double))
     qk = -torch.log(1-pk)
     # make the rescaled times
     n = int(torch.sum(Y).item())
@@ -46,3 +47,13 @@ def KSTestTimeRescaling(Y, pk, eps=1e-10):
     uCDF = (k-0.5)/n                            # uniform cummulative distribution function
     cb = 1.36/math.sqrt(n)                      # 95% confidence bounds for large sample sizes (see Brown et al., 2001)
     return sUTRISIs, uCDF, cb
+
+def KSTestTimeRescalingUnbinned(spikesTimes, cif, t0, tf, dt, eps=1e-10):
+        pk = cif*dt
+        bins = torch.arange(t0-dt/2, tf+dt/2, dt)
+        # start binning spikes using pandas
+        cutRes, _ = pd.cut(spikesTimes, bins=bins, retbins=True)
+        Y = torch.from_numpy(cutRes.value_counts().values)
+        # end binning spikes using pandas
+        sUTRISIs, uCDF, cb = KSTestTimeRescaling(Y=Y, pk=pk, eps=eps)
+        return sUTRISIs, uCDF, cb 
