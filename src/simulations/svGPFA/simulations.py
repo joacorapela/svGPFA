@@ -1,7 +1,7 @@
 
 import pdb
 import torch
-import stats.sampler
+import stats.pointProcess.sampler
 
 class GPFASimulator:
 
