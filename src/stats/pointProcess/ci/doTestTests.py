@@ -34,9 +34,8 @@ def test_timeRescaling():
     # spikes = torch.tensor(sampler.sampleInhomogeneousPP_thinning(intensityTimes=t, intensityValues=cifValues, T=tf)["inhomogeneous"])
     bins = np.arange(t0-dt/2, tf+dt/2, dt)
     # start binning spikes using pandas
-    cutRes, bins = pd.cut(spikes, bins=bins, retbins=True)
+    cutRes, _ = pd.cut(spikes, bins=bins, retbins=True)
     Y = torch.from_numpy(cutRes.value_counts().values)
-    midpoints = [(a + b) /2 for a,b in zip(bins[:-1], bins[1:])]
     # end binning spikes using pandas
     pk = cifValues*dt
     sUTRISIs, uCDF, cb = KSTestTimeRescaling(Y=Y, pk=pk) # rescaledISIs~exp(\lambda=1.0)
