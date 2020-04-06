@@ -14,6 +14,10 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
+    def sampleCIFs(self):
+        pass
+
+    @abstractmethod
     def buildKernelsMatrices(self):
         pass
 
@@ -91,6 +95,12 @@ class PointProcessELL(ExpectedLogLikelihood):
         answer = -sELLTerm1+sELLTerm2
         return answer
 
+    def sampleCIFs(self, times):
+        h = self._svEmbeddingAllTimes.sample(times=times)
+        nTrials = len(h)
+        answer = [self._linkFunction(h[r]) for r in range(nTrials)]
+        return answer
+
     def buildKernelsMatrices(self):
         self._svEmbeddingAllTimes.buildKernelsMatrices()
         self._svEmbeddingAssocTimes.buildKernelsMatrices()
@@ -155,9 +165,14 @@ class PointProcessELL(ExpectedLogLikelihood):
         pass
 
 class PointProcessELLExpLink(PointProcessELL):
+    def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes):
+        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
+                         svEmbeddingAssocTimes=svEmbeddingAssocTimes)
+        self._linkFunction = torch.exp
+
     def _getELinkValues(self, eMean, eVar):
         # eLinkValues \in nTrials x nQuadLeg x nNeurons
-        eLinkValues = torch.exp(input=eMean+0.5*eVar)
+        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
@@ -250,9 +265,13 @@ class PoissonELL(ExpectedLogLikelihood):
 
 class PoissonELLExpLink(PoissonELL):
 
+    def __init__(self, svEmbeddingAllTime):
+        super().__init__(svEmbeddingAllTime=svEmbeddingAllTime)
+        self._linkFunction = torch.exp
+
     def _getELinkAndELogLinkValues(self, eMean, eVar):
         # intval \in nTrials x nQuadLeg x nNeurons
-        eLinkValues = torch.exp(input=eMean+0.5*eVar)
+        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
         eLogLink = eMean
         return eLink, eLogLink
 
