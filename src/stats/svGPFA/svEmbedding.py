@@ -77,6 +77,11 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
     def predictLatents(self, newTimes):
         return self._svPosteriorOnLatents.predict(newTimes=newTimes)
 
+    def sample(self, times):
+        latentsSamples = self._svPosteriorOnLatents.sample(times=times)
+        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
+        return answer
+
 class LinearSVEmbeddingAssocTimes(LinearSVEmbedding):
 
     def setNeuronForSpikeIndex(self, neuronForSpikeIndex):
