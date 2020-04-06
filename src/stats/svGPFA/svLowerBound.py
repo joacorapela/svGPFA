@@ -15,6 +15,10 @@ class SVLowerBound:
         theEval = eLLEval-klDivEval
         return theEval
 
+    def sampleCIFs(self, times):
+        answer = self._eLL.sampleCIFs(times=times)
+        return answer
+
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
         answer = self._eLL.evalSumAcrossTrialsAndNeurons(
             svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
