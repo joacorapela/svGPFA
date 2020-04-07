@@ -22,7 +22,7 @@ def test_eval_IndPointsLocsKMS():
     leasKzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     leasKzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     leasKtz = [torch.from_numpy(mat['Ktz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    leasKtt = torch.from_numpy(mat['Ktt']).type(torch.DoubleTensor).permute(2, 0, 1)
+    leasKttDiag = torch.from_numpy(mat['Ktt']).type(torch.DoubleTensor).permute(2, 0, 1)
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
@@ -45,7 +45,7 @@ def test_eval_IndPointsLocsKMS():
     mat = loadmat(dataFilename)
     Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
-    leasKtt_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
+    leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
@@ -80,7 +80,7 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     leasKzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     leasKzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     leasKtz = [torch.from_numpy(mat['Ktz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    leasKtt = torch.from_numpy(mat['Ktt']).type(torch.DoubleTensor).permute(2, 0, 1)
+    leasKttDiag = torch.from_numpy(mat['Ktt']).type(torch.DoubleTensor).permute(2, 0, 1)
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
@@ -89,8 +89,8 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
             kernels[k] = PeriodicKernel(scale=1.0)
-            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
-                                              float(hprs[k,0][1])], 
+            kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
+                                              float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = ExponentialQuadraticKernel(scale=1.0)
@@ -103,7 +103,7 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     mat = loadmat(dataFilename)
     Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
-    leasKtt_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
+    leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
@@ -119,8 +119,8 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
         error = math.sqrt(((Ktz_allTimes[k]-leasKtz[k])**2).flatten().mean())
         assert(error<tol)
 
-    Ktt_allTimes = indPointsLocsAndAllTimesKMS.getKtt()
-    error = math.sqrt(((Ktt_allTimes-leasKtt)**2).flatten().mean())
+    KttDiag_allTimes = indPointsLocsAndAllTimesKMS.getKttDiag()
+    error = math.sqrt(((KttDiag_allTimes-leasKttDiag)**2).flatten().mean())
     assert(error<tol)
 
 def test_eval_IndPointsLocsAndAssocTimesKMS():
@@ -136,7 +136,7 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
     leasKzz = [torch.from_numpy(mat['Kzz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     leasKzzi = [torch.from_numpy(mat['Kzzi'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     leasKtz = [torch.from_numpy(mat['Ktz'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    leasKtt = torch.from_numpy(mat['Ktt']).type(torch.DoubleTensor).permute(2, 0, 1)
+    leasKttDiag = torch.from_numpy(mat['Ktt']).type(torch.DoubleTensor).permute(2, 0, 1)
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
@@ -159,7 +159,7 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
     mat = loadmat(dataFilename)
     Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
-    leasKtt_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
+    leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
@@ -176,10 +176,10 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
             error = math.sqrt(((Ktz_associatedTimes[k][tr]-leasKtz_spikes[k][tr])**2).flatten().mean())
         assert(error<tol)
 
-    Ktt_associatedTimes = indPointsLocsAndAssocTimesKMS.getKtt()
+    KttDiag_associatedTimes = indPointsLocsAndAssocTimesKMS.getKttDiag()
     for k in range(nLatents):
         for tr in range(nTrials):
-            error = math.sqrt(((Ktt_associatedTimes[k][tr]-leasKtt_spikes[k][tr])**2).flatten().mean())
+            error = math.sqrt(((KttDiag_associatedTimes[k][tr]-leasKttDiag_spikes[k][tr])**2).flatten().mean())
             assert(error<tol)
 
 if __name__=='__main__':
