@@ -9,26 +9,31 @@ class SVEM:
     # @clock
     def maximize(self, model, measurements, initialParams, quadParams, optimParams):
         defaultOptimParams = {"emMaxNIter":20,
+                              #
                               "eStepMaxNIter":100,
                               "eStepTol":1e-3,
                               "eStepLR":1e-0,
                               "eStepLineSearchFn":"strong_wolfe", 
                               "eStepNIterDisplay":1,
+                              #
                               "mStepModelParamsMaxNIter":100,
                               "mStepModelParamsTol":1e-3,
                               "mStepModelParamsLR":1e-0,
-                              "mStepModelParamsLineSearchFn":"strong_wolfe", 
+                              "mStepModelParamsLineSearchFn":"strong_wolfe",
                               "mStepModelParamsNIterDisplay":1,
+                              #
                               "mStepKernelParamsMaxNIter":100,
                               "mStepKernelParamsTol":1e-3,
                               "mStepKernelParamsLR":1e-3,
-                              "mStepKernelParamsLineSearchFn":"strong_wolfe", 
+                              "mStepKernelParamsLineSearchFn":"strong_wolfe",
                               "mStepKernelParamsNIterDisplay":1,
+                              #
                               "mStepIndPointsMaxNIter":100,
                               "mStepIndPointsTol":1e-3,
                               "mStepIndPointsLR":1e-0,
-                              "mStepIndPointsLineSearchFn":"strong_wolfe", 
+                              "mStepIndPointsLineSearchFn":"strong_wolfe",
                               "mStepIndPointsNIterDisplay":1,
+                              #
                               "verbose":True}
         optimParams = {**defaultOptimParams, **optimParams}
         model.setMeasurements(measurements=measurements)
