@@ -103,6 +103,8 @@ def main(argv):
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
 
+    optimParams = estInitConfig["optim_params"]
+
     testTimes = torch.linspace(0, torch.max(torch.tensor(spikesTimes[0][0])), nTestPoints)
 
     C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simInitConfig)
@@ -130,34 +132,6 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
-    # optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
-    optimParams = {"emMaxNIter":40,
-                   #
-                   "eStepMaxNIter":100,
-                   "eStepTol":1e-3,
-                   "eStepLR":1e-3,
-                   "eStepLineSearchFn":"strong_wolfe",
-                   "eStepNIterDisplay":1,
-                   #
-                   "mStepModelParamsMaxNIter":100,
-                   "mStepModelParamsTol":1e-3,
-                   "mStepModelParamsLR":1e-3,
-                   "mStepModelParamsLineSearchFn":"strong_wolfe",
-                   "mStepModelParamsNIterDisplay":1,
-                   #
-                   "mStepKernelParamsMaxNIter":10,
-                   "mStepKernelParamsTol":1e-3,
-                   "mStepKernelParamsLR":1e-3,
-                   "mStepKernelParamsLineSearchFn":"strong_wolfe",
-                   "mStepModelParamsNIterDisplay":1,
-                   "mStepKernelParamsNIterDisplay":1,
-                   #
-                   "mStepIndPointsMaxNIter":20,
-                   "mStepIndPointsTol":1e-3,
-                   "mStepIndPointsLR":1e-4,
-                   "mStepIndPointsLineSearchFn":"strong_wolfe",
-                   "mStepIndPointsNIterDisplay":1}
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
