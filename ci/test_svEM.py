@@ -493,7 +493,6 @@ def test_mStepIndPoints_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    pdb.set_trace()
     res = svEM._mStepIndPoints(model=svlb, maxNIter=10, tol=1e-3, lr=1e-3,
                                lineSearchFn="strong_wolfe", verbose=True,
                                nIterDisplay=1)
