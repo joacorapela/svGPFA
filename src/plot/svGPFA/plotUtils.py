@@ -14,11 +14,12 @@ def plotResKSTestTimeRescaling(sUTRISIs, uCDF, cb, figFilename,
                                title="",
                                dataColor="blue", cbColor="red",
                                dataLinestyle="solid",
+                               dataMarker="*",
                                cbLinestyle="dashed",
                                ylabel="Empirical CDF",
                                xlabel="Model CDF"):
     plt.figure()
-    plt.plot(sUTRISIs, uCDF, color=dataColor, linestyle=dataLinestyle)
+    plt.plot(sUTRISIs, uCDF, color=dataColor, linestyle=dataLinestyle, marker=dataMarker)
     plt.plot([0, 1-cb], [cb, 1], color=cbColor, linestyle=cbLinestyle)
     plt.plot([cb, 1], [0, 1-cb], color=cbColor, linestyle=cbLinestyle)
     plt.xlabel(xlabel)
@@ -52,7 +53,7 @@ def getSimulatedSpikeTimesPlot(spikesTimes, figFilename, xlabel="Time (sec)", yl
 def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans, latentsSTDs, figFilename, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
     nTrials = len(latentsSamples)
     nLatents = latentsSamples[0].shape[0]
-    f, axs = plt.subplots(nTrials, nLatents, sharex=True, sharey=True, squeeze=False)
+    f, axs = plt.subplots(nTrials, nLatents, sharex=False, sharey=False, squeeze=False)
     for r in range(nTrials):
         t = trialsTimes[r]
         for k in range(nLatents):
