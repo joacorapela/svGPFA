@@ -9,14 +9,18 @@ import plot.svGPFA.plotUtils
 from stats.pointProcess.tests import KSTestTimeRescalingUnbinned
 
 def main(argv):
-    if len(argv)!=2:
-        print("Usage {:s} <estimation result number>".format(argv[0]))
+    if len(argv)!=4:
+        print("Usage {:s} <estimation result number> <trial to plot> <neuron to plot>".format(argv[0]))
         return
 
-    # load data and initial values
     estResNumber = int(argv[1])
-    ksTestTimeRescalingFigFilename = "figures/{:08d}_ksTestTimeRescaling.png".format(estResNumber)
+    trialToPlot = int(argv[2])
+    neuronToPlot = int(argv[3])
+    dtCIF = 1e-3
 
+    ksTestTimeRescalingFigFilename = "figures/{:08d}_ksTestTimeRescaling_trial{:03d}_neuron_{:04d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+
+    # load data and initial values
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     with open(modelSaveFilename, "rb") as f: savedResults = pickle.load(f)
     model = savedResults["model"]
@@ -43,18 +47,20 @@ def main(argv):
     spikesTimes = simRes["spikes"]
 
     # KS test time rescaling
-    trialKSTestTimeRescaling = 0
-    neuronKSTestTimeRescaling = 0
-    dtCIF = 1e-3
     T = torch.tensor(trialsLengths).max()
     oneTrialCIFTimes = torch.arange(0, T, dtCIF)
     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
     with torch.no_grad():
         cifs = model.sampleCIFs(times=cifTimes)
-    spikesTimesKS = spikesTimes[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
-    cifKS = cifs[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
+    spikesTimesKS = spikesTimes[trialToPlot][neuronToPlot]
+    ### begin debug ###
+    # print("*** Warning debug code on ***")
+    # import random
+    # spikesTimesKS = [random.uniform(0, 1) for i in range(len(spikesTimesKS))]
+    ### end debug ###
+    cifKS = cifs[trialToPlot][neuronToPlot]
     sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS, cif=cifKS, t0=0, tf=T, dt=dtCIF)
-    title = "Trial {:d}, Neuron {:d}".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling)
+    title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
     plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
     pdb.set_trace()
 
