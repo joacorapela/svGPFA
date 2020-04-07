@@ -56,7 +56,6 @@ def main(argv):
     nTrials = len(trialsLengths)
     T = torch.tensor(trialsLengths).max()
     dtSimulate = float(simConfig["control_variables"]["dt"])
-    latentsRegEpsilon = float(simConfig["control_variables"]["latentsRegEpsilon"])
     dtLatentsFig = 1e-1
     gpRegularization = 1e-3
 
@@ -100,7 +99,7 @@ def main(argv):
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
 
     simResConfig = configparser.ConfigParser()
-    simResConfig["simulation_params"] = {"simConfigFilename": simConfigFilename}
+    simResConfig["simulation_params"] = {"simInitConfigFilename": simConfigFilename}
     simResConfig["simulation_results"] = {"simResFilename": simResFilename}
     with open(metaDataFilename, "w") as f:
         simResConfig.write(f)
