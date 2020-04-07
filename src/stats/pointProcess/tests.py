@@ -7,6 +7,10 @@ import torch
 
 # function [xks,rst,rstsort,cb,n] = KS_test_time_rescaling(Y,pk)
 def timeRescaling(Y, pk, eps=1e-10):
+    indicesMoreThanOneSpikes = Y>1
+    if len(indicesMoreThanOneSpikes)>0:
+        warnings.warn("Found more than one spike in {:d} bins".format(len(indicesMoreThanOneSpikes)))
+        Y[indicesMoreThanOneSpikes] = 1.0
     pk = torch.max(pk, torch.tensor([eps], dtype=torch.double))
     qk = -torch.log(1-pk)
     # make the rescaled times
