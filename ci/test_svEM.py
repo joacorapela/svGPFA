@@ -48,7 +48,7 @@ def test_eStep_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -77,8 +77,9 @@ def test_eStep_pointProcess():
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
+    indPointsLocsKMSEpsilon = 1e-5
     qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
@@ -114,7 +115,8 @@ def test_eStep_pointProcess():
     svlb.buildKernelsMatrices()
 
     res = svEM._eStep(model=svlb, maxNIter=1500, tol=1e-3, lr=1e-3,
-                      verbose=True, nIterDisplay=100)
+                      lineSearchFn="strong_wolfe", verbose=True,
+                      nIterDisplay=1)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
 
@@ -196,7 +198,7 @@ def test_mStepModelParams_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -217,8 +219,9 @@ def test_mStepModelParams_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
+    indPointsLocsKMSEpsilon = 1e-5
     qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
@@ -255,7 +258,9 @@ def test_mStepModelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepModelParams(model=svlb, maxNIter=3000, tol=1e-6, lr=1e-1, verbose=True, nIterDisplay=1)
+    res = svEM._mStepModelParams(model=svlb, maxNIter=3000, tol=1e-6, lr=1e-1,
+                                 lineSearchFn="strong_wolfe", verbose=True,
+                                 nIterDisplay=1)
 
     assert(res["lowerBound"]>-nLowerBound)
 
@@ -285,7 +290,7 @@ def test_mStepKernelParams_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -306,8 +311,9 @@ def test_mStepKernelParams_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
+    indPointsLocsKMSEpsilon = 1e-2
     qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
@@ -344,7 +350,9 @@ def test_mStepKernelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepKernelParams(model=svlb, maxNIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+    res = svEM._mStepKernelParams(model=svlb, maxNIter=50, tol=1e-3, lr=1e-3,
+                                  lineSearchFn="strong_wolfe", verbose=True,
+                                  nIterDisplay=1)
 
     assert(res["lowerBound"]>(-nLowerBound))
 
@@ -425,7 +433,7 @@ def test_mStepIndPoints_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -446,8 +454,9 @@ def test_mStepIndPoints_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
+    indPointsLocsKMSEpsilon = 1e-5
     qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
@@ -484,7 +493,10 @@ def test_mStepIndPoints_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.buildKernelsMatrices()
 
-    res = svEM._mStepIndPoints(model=svlb, maxNIter=100, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+    pdb.set_trace()
+    res = svEM._mStepIndPoints(model=svlb, maxNIter=10, tol=1e-3, lr=1e-3,
+                               lineSearchFn="strong_wolfe", verbose=True,
+                               nIterDisplay=1)
 
     assert(res["lowerBound"]>(-nLowerBound))
 
@@ -515,7 +527,7 @@ def test_maximize_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)                                     
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -537,8 +549,9 @@ def test_maximize_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
+    indPointsLocsKMSEpsilon = 1e-2
     qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = SVPosteriorOnLatentsAllTimes(
@@ -592,7 +605,7 @@ def test_maximize_pointProcess():
                    "mStepIndPointsLR":1e-3, 
                    "mStepIndPointsNIterDisplay":10}
     '''
-    optimParams = {"emMaxNIter":30, 
+    optimParams = {"emMaxNIter":3,
                    #
                    "eStepMaxNIter":20,
                    "eStepTol":1e-2,
@@ -604,14 +617,14 @@ def test_maximize_pointProcess():
                    "mStepModelParamsLR":1e-3,
                    "mStepModelParamsNIterDisplay":1,
                    #
-                   "mStepKernelParamsMaxNIter":50, 
+                   "mStepKernelParamsMaxNIter":20,
                    "mStepKernelParamsTol":1e-2,
                    "mStepKernelParamsLR":1e-4,
                    "mStepKernelParamsNIterDisplay":1,
                    #
-                   "mStepIndPointsMaxNIter":80,
+                   "mStepIndPointsMaxNIter":20,
                    "mStepIndPointsParamsTol":1e-2,
-                   "mStepIndPointsLR":1e-3, 
+                   "mStepIndPointsLR":1e-3,
                    "mStepIndPointsNIterDisplay":1}
     lowerBoundHist, elapsedTimeHist = svEM.maximize(
         model=svlb, measurements=YNonStacked,
@@ -622,11 +635,11 @@ def test_maximize_pointProcess():
     # pdb.set_trace()
 
 if __name__=='__main__':
-    # test_eStep_pointProcess() # passed
-    # # test_eStep_poisson() # not tested
-    # test_mStepModelParams_pointProcess() # passed
-    # test_mStepKernelParams_pointProcess() # passed
-    # test_mStepIndPoints_pointProcess() # passed
+    test_eStep_pointProcess() # passed
+    # test_eStep_poisson() # not tested
+    test_mStepModelParams_pointProcess() # passed
+    test_mStepKernelParams_pointProcess() # passed
+    test_mStepIndPoints_pointProcess() # passed
 
     t0 = time.perf_counter()
     test_maximize_pointProcess() # passed
