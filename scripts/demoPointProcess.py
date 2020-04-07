@@ -59,14 +59,17 @@ def getKernelsParams0(kernels, noiseSTD):
     return kernelsParams0
 
 def main(argv):
-    if len(argv)!=4:
-        print("Usage {:s} <simulation result number> <estimation init number> <trial to plot>".format(argv[0]))
+    if len(argv)!=3:
+        print("Usage {:s} <simulation result number> <estimation init number>".format(argv[0]))
         return
 
     # load data and initial values
     simResNumber = int(argv[1])
     estInitNumber = int(argv[2])
-    trialToPlot = int(argv[3])
+    trialToPlot = 0
+    trialKSTestTRtoPlot = 0
+    neuronKSTestTRtoPlot = 0
+    dtCIF = 1e-3
 
     simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simResConfig = configparser.ConfigParser()
@@ -129,7 +132,7 @@ def main(argv):
                   "legQuadWeights": legQuadWeights}
     # optimParams = {"emMaxNIter":20, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":100, "mStepKernelParamsLR":1e-5, "mStepIndPointsMaxNIter":100}
     # optimParams = {"emMaxNIter":10, "eStepMaxNIter":100, "mStepModelParamsMaxNIter":100, "mStepKernelParamsMaxNIter":20, "mStepIndPointsMaxNIter":10, "mStepIndPointsLR": 1e-2}
-    optimParams = {"emMaxNIter":20,
+    optimParams = {"emMaxNIter":40,
                    #
                    "eStepMaxNIter":100,
                    "eStepTol":1e-3,
@@ -175,12 +178,12 @@ def main(argv):
     while estPrefixUsed:
         estResNumber = random.randint(0, 10**8)
         estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
-        if not os.path.exists(metaDataFilename):
+        if not os.path.exists(estimResMetaDataFilename):
            estPrefixUsed = False
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     latentsFigFilename = "figures/{:08d}_estimatedLatents.png".format(estResNumber)
     lowerBoundHistFigFilename = "figures/{:08d}_lowerBoundHist.png".format(estResNumber)
-    ksTestTimeRescalingFigFilename = "figures/{:08d}_ksTestTimeRescaling.png".format(estResNumber)
+    ksTestTimeRescalingFigFilename = "figures/{:08d}_ksTestTimeRescaling_trial{:03d}_neuron_{:04d}.png".format(estResNumber, trialKSTestTRtoPlot, neuronKSTestTRtoPlot)
 
     estimResConfig = configparser.ConfigParser()
     estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
@@ -191,31 +194,28 @@ def main(argv):
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
+    # plot lower bound history
+    plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
+
+    # predict latents at test times
+    testMuK, testVarK = model.predictLatents(newTimes=testTimes)
+
+    # plot true and estimated latents
+    indPointsLocs = model.getIndPointsLocs()
+    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(timesEstimatedValues=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, timesTrueValues=timesTrueValues, trueLatents=trueLatents, trueLatentsMeans=trueLatentsMeans, trueLatentsSTDs=trueLatentsSTDs, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
+
+    # KS test time rescaling
+    T = torch.tensor(trialsLengths).max()
+    oneTrialCIFTimes = torch.arange(0, T, dtCIF)
+    cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
     with torch.no_grad():
-        # plot lower bound history
-        plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, figFilename=lowerBoundHistFigFilename)
-
-        # predict latents at test times
-        testMuK, testVarK = model.predictLatents(newTimes=testTimes)
-
-        # plot true and estimated latents
-        indPointsLocs = model.getIndPointsLocs()
-        plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(timesEstimatedValues=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, timesTrueValues=timesTrueValues, trueLatents=trueLatents, trueLatentsMeans=trueLatentsMeans, trueLatentsSTDs=trueLatentsSTDs, trialToPlot=trialToPlot, figFilename=latentsFigFilename)
-
-        # KS test time rescaling
-        trialKSTestTimeRescaling = 0
-        neuronKSTestTimeRescaling = 0
-        dtCIF = 1e-3
-        T = torch.tensor(trialsLengths).max()
-        oneTrialCIFTimes = torch.arange(0, T, dtCIF)
-        cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
         cifs = model.sampleCIFs(times=cifTimes)
-        spikesTimesKS = spikesTimes[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
-        cifKS = cifs[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
-        sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS, cif=cifKS, t0=0, tf=T, dt=dtCIF)
-        title = "Trial {:d}, Neuron {:d}".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling)
-        plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
-        pdb.set_trace()
+    spikesTimesKS = spikesTimes[trialKSTestTRtoPlot][neuronKSTestTRtoPlot]
+    cifKS = cifs[trialKSTestTRtoPlot][neuronKSTestTRtoPlot]
+    sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS, cif=cifKS, t0=0, tf=T, dt=dtCIF)
+    title = "Trial {:d}, Neuron {:d}".format(trialKSTestTRtoPlot, neuronKSTestTRtoPlot)
+    plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
+    pdb.set_trace()
 
 if __name__ == "__main__":
     main(sys.argv)
