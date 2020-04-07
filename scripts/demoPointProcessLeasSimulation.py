@@ -73,7 +73,7 @@ def main(argv):
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
-    indPointsLocsKMSEpsilon = 1e-5
+    indPointsLocsKMSEpsilon = 1e-2
 
     # create kernels
     kernels = [[None] for k in range(nLatents)]
