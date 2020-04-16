@@ -14,15 +14,20 @@ from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinear
 from utils.svGPFA.miscUtils import getLatentsMeanFuncsSamples, getTrialsTimes
 
 def plotTrueAndEstimatedEmbeddingParams(trueC, trueD, estimatedC, estimatedD,
-                                        linestyleTrue="-",
-                                        linestyleEstimated=":",
+                                        linestyleTrue="solid",
+                                        linestyleEstimated="dashed",
+                                        marker="*",
                                         xlabel="Neuron Index",
                                         ylabel="Coefficient Value"):
-    for i in range(trueC.shape[1]):
-        plt.plot(trueC[:,i], label="true C[{:d}]".format(i), linestyle=linestyleTrue)
-        plt.plot(estimatedC[:,i], label="est. C[{:d}]".format(i), linestyle=linestyleEstimated)
-    plt.plot(trueD, label="true d")
-    plt.plot(estimatedD, label="est. d")
+    plt.figure()
+    for i in range(estimatedC.shape[1]):
+        plt.plot(trueC[:,i], label="true C[{:d}]".format(i),
+                 linestyle=linestyleTrue, marker=marker)
+        plt.plot(estimatedC[:,i], label="est. C[{:d}]".format(i),
+                 linestyle=linestyleEstimated, marker=marker)
+    plt.plot(trueD, label="true d", linestyle=linestyleTrue, marker=marker)
+    plt.plot(estimatedD, label="est. d", linestyle=linestyleEstimated,
+             marker=marker)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.legend()
@@ -48,8 +53,9 @@ def plotTrueAndEstimatedLatentsMeans(trueLatentsMeans, estimatedLatentsMeans,
     # trueLatentsMeans[r] \in nLatents x nInd[k]
     # qMu[k] \in nTrials x nInd[k] x 1
     nTrials = len(trueLatentsMeans)
-    nLatents = trueLatentsMeans[0].shape[0]
-    fig, axs = plt.subplots(nTrials, nLatents)
+    nLatents = estimatedLatentsMeans.shape[2]
+    plt.figure()
+    fig, axs = plt.subplots(nTrials, nLatents, squeeze=False)
     for r in range(nTrials):
         times = trialsTimes[r]
         for k in range(nLatents):
@@ -83,7 +89,7 @@ def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
                                                 trueParams,
                                                 estimatedParams,
                                                 trueLegend = "True",
-                                                estimatedLegend = "True",
+                                                estimatedLegend = "Estimated",
                                                 yLabel="Parameter Value",
                                                 useLegend=False):
         x = np.arange(len(labels))  # the label locations
@@ -98,19 +104,20 @@ def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
         if useLegend:
             ax.legend()
 
-    fig, axs = plt.subplots(len(trueKernels), 1)
-    for k in range(len(trueKernels)):
+    plt.figure()
+    fig, axs = plt.subplots(len(estimatedKernelsParams), 1, squeeze=False)
+    for k in range(len(estimatedKernelsParams)):
         namedParams = trueKernels[k].getNamedParams()
         labels = namedParams.keys()
         trueParams = [z.item() for z in list(namedParams.values())]
         estimatedParams = estimatedKernelsParams[k].tolist()
         # we are fixing scale to 1.0. This is not great :(
-        estimatedParams = [1.0] + estimatedParams
+        # estimatedParams = [1.0] + estimatedParams
         if k==0:
             useLegend = True
         else:
             useLegend = False
-        plotOneSetTrueAndEstimatedKernelsParams(ax=axs[k], labels=labels,
+        plotOneSetTrueAndEstimatedKernelsParams(ax=axs[k,0], labels=labels,
                                                 trueParams=trueParams,
                                                 estimatedParams=
                                                  estimatedParams,
@@ -123,31 +130,31 @@ def main(argv):
 
     estNumber = int(argv[1])
     gpRegularization = 1e-3
-    estMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estNumber)
+    estResConfigFilename = "results/{:08d}_estimation_metaData.ini".format(estNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estNumber)
-    kernelsParamsFigFilename = "figures/true{:08d}AndEstimated{:08d}KernelsParams.png"
-    latentsMeansFigFilename = "figures/true{:08d}AndEstimated{:08d}LatentsMeans.png"
-    embeddingParamsFigFilename = "figures/true{:08d}AndEstimated{:08d}EmbeddingParams.png"
+    kernelsParamsFigFilename = "figures/{:08d}_trueAndEstimatedKernelsParams.png".format(estNumber)
+    latentsMeansFigFilename = "figures/{:08d}_trueAndEstimatedLatentsMeans.png".format(estNumber)
+    embeddingParamsFigFilename = "figures/{:08d}_trueAndEstimatedEmbeddingParams.png".format(estNumber)
 
-    estMetaDataConfig = configparser.ConfigParser()
-    estMetaDataConfig.read(estMetaDataFilename)
-    simResNumber = int(estMetaDataConfig["simulation_params"]["simResNumber"])
-    simMetaDataFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
-    simMetaDataConfig = configparser.ConfigParser()
-    simMetaDataConfig.read(simMetaDataFilename)
-    simConfigFilename = simMetaDataConfig["simulation_params"]["simConfigFilename"]
-    simConfig = configparser.ConfigParser()
-    simConfig.read(simConfigFilename)
-    nLatents = int(simConfig["control_variables"]["nLatents"])
-    nNeurons = int(simConfig["control_variables"]["nNeurons"])
-    trialsLengths = [float(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    estResConfig = configparser.ConfigParser()
+    estResConfig.read(estResConfigFilename)
+    simResNumber = int(estResConfig["simulation_params"]["simResNumber"])
+    simResFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
+    simResConfig = configparser.ConfigParser()
+    simResConfig.read(simResFilename)
+    simInitConfigFilename = simResConfig["simulation_params"]["simInitConfigFilename"]
+    simInitConfig = configparser.ConfigParser()
+    simInitConfig.read(simInitConfigFilename)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
+    nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
+    trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
-    dtSimulate = float(simConfig["control_variables"]["dt"])
+    dtSimulate = float(simInitConfig["control_variables"]["dt"])
 
-    kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)[0]
+    kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)[0]
     # latentsMeansFuncs[r][k] \in lambda(t)
-    tLatentsMeansFuncs = getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simConfig)
-    trueC, trueD = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
+    tLatentsMeansFuncs = getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+    trueC, trueD = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simInitConfig)
     trialsTimes = getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
 
     # latentsMeansSamples[r][k,t]
@@ -162,18 +169,19 @@ def main(argv):
     with torch.no_grad():
         latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
         estimatedC, estimatedD = model.getSVEmbeddingParams()
-        # plotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
-        # plt.savefig(kernelsParamsFigFilename)
 
-        # qMu[r] \in nTrials x nInd[k] x 1
-        # plotTrueAndEstimatedLatentsMeans(trueLatentsMeans=tLatentsMeans, estimatedLatentsMeans=latentsMeans, trialsTimes=trialsTimes)
-        # plt.savefig(latentsMeansFigFilename)
+    plotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
+    plt.savefig(kernelsParamsFigFilename)
 
-        plotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
-        # f = plt.gcf()
-        # plotly_fig = tls.mpl_to_plotly(f)
-        # plotly.offline.plot(plotly_fig, filename="/tmp/tmp.html")
-        # plt.savefig(embeddingParamsFigFilename)
+    # qMu[r] \in nTrials x nInd[k] x 1
+    plotTrueAndEstimatedLatentsMeans(trueLatentsMeans=tLatentsMeans, estimatedLatentsMeans=latentsMeans, trialsTimes=trialsTimes)
+    plt.savefig(latentsMeansFigFilename)
+
+    plotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
+    plt.savefig(embeddingParamsFigFilename)
+    # f = plt.gcf()
+    # plotly_fig = tls.mpl_to_plotly(f)
+    # plotly.offline.plot(plotly_fig, filename="/tmp/tmp.html")
 
     pdb.set_trace()
 
