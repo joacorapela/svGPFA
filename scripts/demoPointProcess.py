@@ -15,7 +15,7 @@ import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
 import myMath.utils
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
-from stats.pointProcess.tests import KSTestTimeRescalingUnbinned
+from stats.pointProcess.tests import KSTestTimeRescalingNumericalCorrection
 
 def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
     nTrials = len(trialsLengths)
@@ -59,17 +59,25 @@ def getKernelsParams0(kernels, noiseSTD):
     return kernelsParams0
 
 def main(argv):
-    if len(argv)!=3:
-        print("Usage {:s} <simulation result number> <estimation init number>".format(argv[0]))
+    nLatents = None
+    if len(argv)==3:
+        simResNumber = int(argv[1])
+        estInitNumber = int(argv[2])
+    elif len(argv)==4:
+        simResNumber = int(argv[1])
+        estInitNumber = int(argv[2])
+        nLatents = int(argv[3])
+    else:
+        print("Usage {:s} <simulation result number> <estimation init number> or ".format(argv[0]))
+        print("Usage {:s} <simulation result number> <estimation init number> <nunmber of latents>".format(argv[0]))
         return
 
     # load data and initial values
-    simResNumber = int(argv[1])
-    estInitNumber = int(argv[2])
     trialToPlot = 0
-    trialKSTestTRtoPlot = 0
-    neuronKSTestTRtoPlot = 0
+    trialToPlot = 0
+    neuronToPlot = 0
     dtCIF = 1e-3
+    gamma = 10
 
     simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simResConfig = configparser.ConfigParser()
@@ -79,22 +87,28 @@ def main(argv):
 
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
-    nLatents = int(simInitConfig["control_variables"]["nLatents"])
+    if nLatents is None:
+        nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    dtSimulate = float(simInitConfig["control_variables"]["dt"])
     nTrials = len(trialsLengths)
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
     trueLatents = simRes["latents"]
+    simCIFsValues = simRes["cifValues"]
+    trueLatents = [trueLatents[r][:nLatents,:] for r in range(nTrials)]
     trueLatentsMeans = simRes["latentsMeans"]
     trueLatentsSTDs = simRes["latentsSTDs"]
+    trueLatentsSTDs = [trueLatentsSTDs[r][:nLatents,:] for r in range(nTrials)]
     timesTrueValues = torch.linspace(0, torch.max(torch.tensor(trialsLengths)), trueLatents[0].shape[1])
 
     estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
     nIndPointsPerLatent = [int(str) for str in estInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
+    nIndPointsPerLatent = nIndPointsPerLatent[:nLatents]
     nTestPoints = int(estInitConfig["control_variables"]["nTestPoints"])
     firstIndPoint = float(estInitConfig["control_variables"]["firstIndPoint"])
     initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
@@ -103,12 +117,45 @@ def main(argv):
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
 
-    optimParams = estInitConfig["optim_params"]
+    optimParamsConfig = estInitConfig._sections["optim_params"]
+    optimParams = {}
+    optimParams["emMaxNIter"] = int(optimParamsConfig["emMaxNIter".lower()])
+    #
+    optimParams["eStepEstimate"] = optimParamsConfig["eStepEstimate".lower()]=="True"
+    optimParams["eStepMaxNIter"] = int(optimParamsConfig["eStepMaxNIter".lower()])
+    optimParams["eStepTol"] = float(optimParamsConfig["eStepTol".lower()])
+    optimParams["eStepLR"] = float(optimParamsConfig["eStepLR".lower()])
+    optimParams["eStepLineSearchFn"] = optimParamsConfig["eStepLineSearchFn".lower()]
+    optimParams["eStepNIterDisplay"] = int(optimParamsConfig["eStepNIterDisplay".lower()])
+    #
+    optimParams["mStepModelParamsEstimate"] = optimParamsConfig["mStepModelParamsEstimate".lower()]=="True"
+    optimParams["mStepModelParamsMaxNIter"] = int(optimParamsConfig["mStepModelParamsMaxNIter".lower()])
+    optimParams["mStepModelParamsTol"] = float(optimParamsConfig["mStepModelParamsTol".lower()])
+    optimParams["mStepModelParamsLR"] = float(optimParamsConfig["mStepModelParamsLR".lower()])
+    optimParams["mStepModelParamsLineSearchFn"] = optimParamsConfig["mStepModelParamsLineSearchFn".lower()]
+    optimParams["mStepModelParamsNIterDisplay"] = int(optimParamsConfig["mStepModelParamsNIterDisplay".lower()])
+    #
+    optimParams["mStepKernelParamsEstimate"] = optimParamsConfig["mStepKernelParamsEstimate".lower()]=="True"
+    optimParams["mStepKernelParamsMaxNIter"] = int(optimParamsConfig["mStepKernelParamsMaxNIter".lower()])
+    optimParams["mStepKernelParamsTol"] = float(optimParamsConfig["mStepKernelParamsTol".lower()])
+    optimParams["mStepKernelParamsLR"] = float(optimParamsConfig["mStepKernelParamsLR".lower()])
+    optimParams["mStepKernelParamsLineSearchFn"] = optimParamsConfig["mStepKernelParamsLineSearchFn".lower()]
+    optimParams["mStepKernelParamsNIterDisplay"] = int(optimParamsConfig["mStepKernelParamsNIterDisplay".lower()])
+    #
+    optimParams["mStepIndPointsEstimate"] = optimParamsConfig["mStepIndPointsEstimate".lower()]="True"
+    optimParams["mStepIndPointsMaxNIter"] = int(optimParamsConfig["mStepIndPointsMaxNIter".lower()])
+    optimParams["mStepIndPointsTol"] = float(optimParamsConfig["mStepIndPointsTol".lower()])
+    optimParams["mStepIndPointsLR"] = float(optimParamsConfig["mStepIndPointsLR".lower()])
+    optimParams["mStepIndPointsLineSearchFn"] = optimParamsConfig["mStepIndPointsLineSearchFn".lower()]
+    optimParams["mStepIndPointsNIterDisplay"] = int(optimParamsConfig["mStepIndPointsNIterDisplay".lower()])
+    #
+    optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     testTimes = torch.linspace(0, torch.max(torch.tensor(spikesTimes[0][0])), nTestPoints)
 
     C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simInitConfig)
     C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
+    C0 = C0[:,:nLatents]
     d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
 
     legQuadPoints, legQuadWeights = getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
@@ -157,7 +204,17 @@ def main(argv):
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     latentsFigFilename = "figures/{:08d}_estimatedLatents.png".format(estResNumber)
     lowerBoundHistFigFilename = "figures/{:08d}_lowerBoundHist.png".format(estResNumber)
-    ksTestTimeRescalingFigFilename = "figures/{:08d}_ksTestTimeRescaling_trial{:03d}_neuron_{:04d}.png".format(estResNumber, trialKSTestTRtoPlot, neuronKSTestTRtoPlot)
+    ksTestTimeRescalingNumericalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_numericalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+    trueAndEstimatedCIFsFigFilename = "figures/{:08d}_trueAndEstimatedCIFs_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+    rocFigFilename = "figures/{:08d}_rocAnalysis_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+    kernelsParamsFigFilename = "figures/{:08d}_trueAndEstimatedKernelsParams.png".format(estNumber)
+    latentsMeansFigFilename = "figures/{:08d}_trueAndEstimatedLatentsMeans.png".format(estNumber)
+    embeddingParamsFigFilename = "figures/{:08d}_trueAndEstimatedEmbeddingParams.png".format(estNumber)
+    ksTestTimeRescalingAnalyticalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+    timeRescalingDiffCDFsFigFilename = "figures/{:08d}_timeRescalingDiffCDFs_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+    timeRescaling1LagScatterPlotFigFilename = "figures/{:08d}_timeRescaling1LagScatterPlot_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+    timeRescalingACFFigFilename = "figures/{:08d}_timeRescalingACF_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
+
 
     estimResConfig = configparser.ConfigParser()
     estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
@@ -183,12 +240,64 @@ def main(argv):
     oneTrialCIFTimes = torch.arange(0, T, dtCIF)
     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
     with torch.no_grad():
-        cifs = model.sampleCIFs(times=cifTimes)
-    spikesTimesKS = spikesTimes[trialKSTestTRtoPlot][neuronKSTestTRtoPlot]
-    cifKS = cifs[trialKSTestTRtoPlot][neuronKSTestTRtoPlot]
-    sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS, cif=cifKS, t0=0, tf=T, dt=dtCIF)
-    title = "Trial {:d}, Neuron {:d}".format(trialKSTestTRtoPlot, neuronKSTestTRtoPlot)
-    plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
+        cifValues = model.computeMeanCIFs(times=cifTimes)
+    spikesTimesKS = spikesTimes[trialToPlot][neuronToPlot]
+    cifTimesKS = cifTimes[trialToPlot,:,0]
+    cifValuesKS = cifValues[trialToPlot][neuronToPlot]
+
+    title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
+
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=cifTimesKS, cifValues=cifValuesKS, gamma=gamma)
+    plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingNumericalCorrectionFigFilename, title=title)
+
+    plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0], simCIFValues=simCIFsValues[trialToPlot][neuronToPlot], estCIFValues=cifsValuesKS, figFilename=trueAndEstimatedCIFsFigFilename, title=title)
+
+    pk = cifValuesKS*dtCIF
+    bins = pd.interval_range(start=0, end=T, periods=len(pk))
+    # start binning spikes using pandas
+    cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
+    Y = torch.from_numpy(cutRes.value_counts().values)
+
+    fpr, tpr, thresholds = metrics.roc_curve(Y, pk, pos_label=1)
+    roc_auc = metrics.auc(fpr, tpr)
+    plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title, figFilename=rocFigFilename)
+
+    # plot model params
+    tLatentsMeansFuncs = getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+    trueC, trueD = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simInitConfig)
+    trialsTimes = getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
+
+    # latentsMeansSamples[r][k,t]
+    tLatentsMeans = getLatentsMeanFuncsSamples(latentsMeansFuncs=
+                                                tLatentsMeansFuncs,
+                                               trialsTimes=trialsTimes,
+                                               dtype=trueC.dtype)
+
+    kernelsParams = model.getKernelsParams()
+    with torch.no_grad():
+        latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
+        estimatedC, estimatedD = model.getSVEmbeddingParams()
+    plotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
+    plt.savefig(kernelsParamsFigFilename)
+
+    plotTrueAndEstimatedLatentsMeans(trueLatentsMeans=tLatentsMeans, estimatedLatentsMeans=latentsMeans, trialsTimes=trialsTimes)
+    plt.savefig(latentsMeansFigFilename)
+
+    plotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
+    plt.savefig(embeddingParamsFigFilename)
+
+    #KS Test analytical correction
+    t0 = math.floor(cifTimesKS.min())
+    tf = math.ceil(cifTimesKS.max())
+    dt = (cifTimesKS[1]-cifTimesKS[0]).item()
+    utSRISIs, uCDF, cb, utRISIs = KSTestTimeRescalingAnalyticalCorrectionUnbinned(spikesTimes=spikesTimesKS, cifValues=cifValuesKS, t0=t0, tf=tf, dt=dt)
+    sUTRISIs, _ = torch.sort(utSRISIs)
+    plot.svGPFA.plotUtils.plotResKSTestTimeRescalingAnalyticalCorrection(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, title=title, figFilename=ksTestTimeRescalingAnalyticalCorrectionFigFilename)
+    plot.svGPFA.plotUtils.plotDifferenceCDFs(sUTRISIs=sUTRISIs, uCDF=uCDF, cb=cb, figFilename=timeRescalingDiffCDFsFigFilename),
+    plot.svGPFA.plotUtils.plotScatter1Lag(x=utRISIs, title=title, figFilename=timeRescaling1LagScatterPlotFigFilename),
+    acfRes, confint = statsmodels.tsa.stattools.acf(x=utRISIs, unbiased=True, alpha=0.05)
+    plot.svGPFA.plotUtils.plotACF(acf=acfRes, Fs=1/dt, confint=confint, title=title, figFilename=timeRescalingACFFigFilename),
+
     pdb.set_trace()
 
 if __name__ == "__main__":
