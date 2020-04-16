@@ -8,13 +8,14 @@ import plotly
 import matplotlib.pyplot as plt
 import pickle
 import configparser
+import pandas as pd
 sys.path.append("../src")
 import simulations.svGPFA.simulations
 import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 from utils.svGPFA.miscUtils import getLatentsSamples, getTrialsTimes
 import plot.svGPFA.plotUtils
-from stats.pointProcess.tests import KSTestTimeRescalingUnbinned
+from stats.pointProcess.tests import KSTestTimeRescalingNumericalCorrection
 
 def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
     nTrials = len(kernels)
@@ -44,6 +45,10 @@ def main(argv):
         return
     trialKSTestTimeRescaling = 0
     neuronKSTestTimeRescaling = 0
+    trialCIFToPlot = 0
+    neuronCIFToPlot = 0
+    dtCIF = 1e-3
+    gamma = 10
 
     # load data and initial values
     simConfigNumber = int(argv[1])
@@ -61,18 +66,21 @@ def main(argv):
 
     randomPrefixUsed = True
     while randomPrefixUsed:
-        randomPrefix = "{:08d}".format(random.randint(0, 10**8))
+        simNumber = random.randint(0, 10**8)
         metaDataFilename = \
-            "results/{:s}_simulation_metaData.ini".format(randomPrefix)
+            "results/{:08d}_simulation_metaData.ini".format(simNumber)
         if not os.path.exists(metaDataFilename):
            randomPrefixUsed = False
-    simResFilename = "results/{:s}_simRes.pickle".format(randomPrefix)
+    simResFilename = "results/{:08d}_simRes.pickle".format(simNumber)
     latentsFigFilename = \
-        "figures/{:s}_simulation_latents.png".format(randomPrefix)
+        "figures/{:08d}_simulation_latents.png".format(simNumber)
+    cifFigFilename = \
+        "figures/{:08d}_simulation_cif_trial{:03d}_neuron{:03d}.png".format(simNumber, trialCIFToPlot, neuronCIFToPlot)
     spikesTimesFigFilename = \
-        "figures/{:s}_simulation_spikesTimes.png".format(randomPrefix)
+        "figures/{:08d}_simulation_spikesTimes.png".format(simNumber)
     ksTestTimeRescalingFigFilename = \
-        "figures/{:s}_simulation_ksTestTimeRescaling.png".format(randomPrefix)
+        "figures/{:08d}_simulation_ksTestTimeRescaling.png".format(simNumber)
+    rocFigFilename = "figures/{:08d}_simulation_rocAnalisis_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToAnalyze, neuronToAnalyze)
 
     with torch.no_grad():
         kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
@@ -89,12 +97,16 @@ def main(argv):
         simulator = simulations.svGPFA.simulations.GPFASimulator()
         res = simulator.simulate(trialsTimes=trialsTimes, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
         spikesTimes = res["spikesTimes"]
-        intensityTimes = res["intensityTimes"]
-        intensityValues = res["intensityValues"]
+        cifTimes = res["cifTimes"]
+        cifValues = res["cifValues"]
         latentsMeans, latentsSTDs = getLatentsMeansAndSTDs(meansFuncs=latentsMeansFuncs, kernels=kernels, trialsTimes=trialsTimes)
 
-    simRes = {"times": trialsTimes, "latents": latentsSamples,
-              "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs,
+    simRes = {"times": trialsTimes, 
+              "latents": latentsSamples,
+              "latentsMeans": latentsMeans, 
+              "latentsSTDs": latentsSTDs,
+              "cifTimes": cifTimes, 
+              "cifValues": cifValues,
               "spikes": spikesTimes}
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
 
@@ -108,20 +120,35 @@ def main(argv):
     # pLatents = ggplotly(pLatents)
     # pLatents.show()
 
+    timesCIFToPlot = cifTimes[trialCIFToPlot]
+    valuesCIFToPlot = cifValues[trialCIFToPlot][neuronCIFToPlot]
+    title = "Trial {:d}, Neuron {:d}".format(trialCIFToPlot, neuronCIFToPlot)
+    plot.svGPFA.plotUtils.plotCIF(times=timesCIFToPlot, values=valuesCIFToPlot, title=title, figFilename=cifFigFilename)
+
     pSpikes = plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot(spikesTimes=spikesTimes, figFilename=spikesTimesFigFilename)
     # pSpikes = ggplotly(pSpikes)
     # pSpikes.show()
 
+    T = torch.tensor(trialsLengths).max()
+    oneTrialCIFTimes = torch.arange(0, T, dtCIF)
+    cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
+    cifTimesKS = cifTimes[trialKSTestTimeRescaling,:,0]
+    cifValuesKS = cifValues[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
     spikesTimesKS = spikesTimes[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
-    cifKS = intensityValues[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
-    sUTRISIs, uCDF, cb = KSTestTimeRescalingUnbinned(spikesTimes=spikesTimesKS,
-                                                     cif=cifKS, t0=0, tf=T,
-                                                     dt=dtSimulate)
-    title = "Trial {:d}, Neuron {:d}".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling)
-    plot.svGPFA.plotUtils.plotResKSTestTimeRescaling(sUTRISIs=sUTRISIs,
-                                                     uCDF=uCDF, cb=cb,
-                                                     figFilename=ksTestTimeRescalingFigFilename,
-                                                     title=title)
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=cifTimesKS, cifValues=cifValuesKS, gamma=gamma)
+    title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling, len(spikesTimesKS))
+    plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
+
+    pk = cifValuesKS*dtCIF
+    bins = pd.interval_range(start=0, end=T, periods=len(pk))
+    # start binning spikes using pandas
+    cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
+    Y = torch.from_numpy(cutRes.value_counts().values)
+
+    fpr, tpr, thresholds = metrics.roc_curve(Y, pk, pos_label=1)
+    roc_auc = metrics.auc(fpr, tpr)
+    plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, figFilename=rocFigFilename)
+
     plt.show()
 
     pdb.set_trace()
