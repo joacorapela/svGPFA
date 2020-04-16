@@ -18,7 +18,8 @@ def main(argv):
     marker = 'x'
     mSimFilename = "../../matlabCode/scripts/results/pointProcessSimulation.mat"
     mModelSaveFilename = "../../matlabCode/scripts/results/pointProcessEstimationRes.mat"
-    pModelSaveFilename = "results/estimationResLeasSimulation.pickle"
+    # pModelSaveFilename = "results/estimationResLeasSimulation.pickle"
+    pModelSaveFilename = "results/37816127_leasSimulation_estimatedModel_cpu.pickle"
     staticFigFilenamePattern = "figures/truePythonMatlabLatentsPointProcess_trial{:d}.png"
     dynamicFigFilenamePattern = "figures/truePythonMatlabLatentsPointProcess_trial{:d}.html"
 
