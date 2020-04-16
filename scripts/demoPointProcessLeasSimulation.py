@@ -109,20 +109,23 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":200, 
+    optimParams = {"emMaxNIter":0, 
                    #
+                   "eStepEstimate":True, 
                    "eStepMaxNIter":100, 
                    "eStepTol":1e-3, 
                    "eStepLR":1e-3, 
                    "eStepLineSearchFn":"strong_wolfe", 
                    "eStepNIterDisplay":1, 
                    #
+                   "mStepModelParamsEstimate":True, 
                    "mStepModelParamsMaxNIter":100, 
                    "mStepModelParamsTol":1e-3, 
                    "mStepModelParamsLR":1e-3, 
                    "mStepModelParamsLineSearchFn":"strong_wolfe", 
                    "mStepModelParamsNIterDisplay":1, 
                    #
+                   "mStepKernelParamsEstimate":True, 
                    "mStepKernelParamsMaxNIter":10, 
                    "mStepKernelParamsTol":1e-3, 
                    "mStepKernelParamsLR":1e-3, 
@@ -130,11 +133,15 @@ def main(argv):
                    "mStepModelParamsNIterDisplay":1, 
                    "mStepKernelParamsNIterDisplay":1, 
                    #
+                   "mStepIndPointsEstimate":True, 
                    "mStepIndPointsMaxNIter":20, 
                    "mStepIndPointsTol":1e-3, 
                    "mStepIndPointsLR":1e-4, 
                    "mStepIndPointsLineSearchFn":"strong_wolfe", 
-                   "mStepIndPointsNIterDisplay":1}
+                   "mStepIndPointsNIterDisplay":1,
+                   #
+                   "verbose":True
+                  }
     estimConfig = configparser.ConfigParser()
     estimConfig["optim_params"] = optimParams
     estimConfig["other"] = {"indPointsLocsKMSEpsilon": indPointsLocsKMSEpsilon}
