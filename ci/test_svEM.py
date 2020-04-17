@@ -606,39 +606,49 @@ def test_maximize_pointProcess():
     '''
     optimParams = {"emMaxNIter":3,
                    #
+                   "eStepEstimate": True,
                    "eStepMaxNIter":20,
                    "eStepTol":1e-2,
                    "eStepLR":1e-2,
+                   "eStepLineSearchFn": "strong_wolfe",
                    "eStepNIterDisplay":1,
                    #
+                   "mStepModelParamsEstimate": True,
                    "mStepModelParamsMaxNIter":20,
                    "mStepModelParamsTol":1e-2,
                    "mStepModelParamsLR":1e-3,
+                   "mStepModelParamsLineSearchFn": "strong_wolfe",
                    "mStepModelParamsNIterDisplay":1,
                    #
+                   "mStepKernelParamsEstimate": True,
                    "mStepKernelParamsMaxNIter":20,
                    "mStepKernelParamsTol":1e-2,
                    "mStepKernelParamsLR":1e-4,
+                   "mStepKernelParamsLineSearchFn": "strong_wolfe",
                    "mStepKernelParamsNIterDisplay":1,
                    #
+                   "mStepIndPointsEstimate": True,
                    "mStepIndPointsMaxNIter":20,
                    "mStepIndPointsParamsTol":1e-2,
                    "mStepIndPointsLR":1e-3,
-                   "mStepIndPointsNIterDisplay":1}
+                   "mStepIndPointsLineSearchFn": "strong_wolfe",
+                   "mStepIndPointsNIterDisplay":1,
+                   #
+                   "verbose": True}
     lowerBoundHist, elapsedTimeHist = svEM.maximize(
         model=svlb, measurements=YNonStacked,
         initialParams=initialParams, quadParams=quadParams,
-        optimParams=optimParams)
+        optimParams=optimParams, plotLatentsEstimates=False)
     assert(lowerBoundHist[-1]>leasLowerBound)
 
     # pdb.set_trace()
 
 if __name__=='__main__':
-    test_eStep_pointProcess() # passed
-    # test_eStep_poisson() # not tested
-    test_mStepModelParams_pointProcess() # passed
-    test_mStepKernelParams_pointProcess() # passed
-    test_mStepIndPoints_pointProcess() # passed
+    # test_eStep_pointProcess() # passed
+    # # test_eStep_poisson() # not tested
+    # test_mStepModelParams_pointProcess() # passed
+    # test_mStepKernelParams_pointProcess() # passed
+    # test_mStepIndPoints_pointProcess() # passed
 
     t0 = time.perf_counter()
     test_maximize_pointProcess() # passed
