@@ -13,7 +13,7 @@ class SVEmbedding(ABC):
         if svPosteriorOnLatentsStats is None:
             svPosteriorOnLatentsStats = \
                 self._svPosteriorOnLatents.computeMeansAndVars()
-        means, vars = self._getMeansAndVarsGivenSVPosteriorOnLatentsStats(
+        means, vars = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(
             means=svPosteriorOnLatentsStats[0],
             vars=svPosteriorOnLatentsStats[1])
         return means, vars
@@ -51,8 +51,7 @@ class SVEmbedding(ABC):
         return self._svPosteriorOnLatents.getKernelsParams()
 
     @abstractmethod
-    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means,
-                                                        vars):
+    def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
         pass
 
 class LinearSVEmbedding(SVEmbedding):
@@ -68,8 +67,7 @@ class LinearSVEmbedding(SVEmbedding):
 
 class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
-    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means,
-                                                        vars):
+    def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
         qHMu = torch.matmul(means, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
         qHVar = torch.matmul(vars, (torch.t(self._C))**2)
         return qHMu, qHVar
@@ -82,12 +80,17 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
         answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
         return answer
 
+    def computeMeans(self, times):
+        qKMu = self._svPosteriorOnLatents.computeMeans(times=times)
+        qHMu = torch.matmul(qKMu, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
+        return qHMu
+
 class LinearSVEmbeddingAssocTimes(LinearSVEmbedding):
 
     def setNeuronForSpikeIndex(self, neuronForSpikeIndex):
         self._neuronForSpikeIndex = neuronForSpikeIndex
 
-    def _getMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
+    def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
         nTrials = len(self._neuronForSpikeIndex)
         qHMu = [[None] for tr in range(nTrials)]
         qHVar = [[None] for tr in range(nTrials)]
