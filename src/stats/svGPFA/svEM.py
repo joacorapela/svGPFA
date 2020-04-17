@@ -3,39 +3,13 @@ import pdb
 import torch
 import time
 # from .utils import clock
+import matplotlib.pyplot as plt
+import plot.svGPFA.plotUtils
 
 class SVEM:
 
     # @clock
-    def maximize(self, model, measurements, initialParams, quadParams, optimParams):
-        defaultOptimParams = {"emMaxNIter":20,
-                              #
-                              "eStepMaxNIter":100,
-                              "eStepTol":1e-3,
-                              "eStepLR":1e-0,
-                              "eStepLineSearchFn":"strong_wolfe", 
-                              "eStepNIterDisplay":1,
-                              #
-                              "mStepModelParamsMaxNIter":100,
-                              "mStepModelParamsTol":1e-3,
-                              "mStepModelParamsLR":1e-0,
-                              "mStepModelParamsLineSearchFn":"strong_wolfe",
-                              "mStepModelParamsNIterDisplay":1,
-                              #
-                              "mStepKernelParamsMaxNIter":100,
-                              "mStepKernelParamsTol":1e-3,
-                              "mStepKernelParamsLR":1e-3,
-                              "mStepKernelParamsLineSearchFn":"strong_wolfe",
-                              "mStepKernelParamsNIterDisplay":1,
-                              #
-                              "mStepIndPointsMaxNIter":100,
-                              "mStepIndPointsTol":1e-3,
-                              "mStepIndPointsLR":1e-0,
-                              "mStepIndPointsLineSearchFn":"strong_wolfe",
-                              "mStepIndPointsNIterDisplay":1,
-                              #
-                              "verbose":True}
-        optimParams = {**defaultOptimParams, **optimParams}
+    def maximize(self, model, measurements, initialParams, quadParams, optimParams, plotLatentEstimates=True, latentFigFilenamePattern="/tmp/latentsIter{:03d}.png"):
         model.setMeasurements(measurements=measurements)
         model.setInitialParams(initialParams=initialParams)
         model.setQuadParams(quadParams=quadParams)
@@ -45,53 +19,74 @@ class SVEM:
         lowerBoundHist = []
         elapsedTimeHist = []
         startTime = time.time()
+        plotTimes = quadParams["legQuadPoints"][0,:,0]
+
+        fig = plt.figure()
+        plt.plot(plotTimes, plotTimes)
+        plt.ion()
+        plt.show()
+        lowerBound = -float("inf")
         while iter<optimParams["emMaxNIter"]:
-            print("Iteration %02d, E-Step start"%(iter))
-            maxRes = self._eStep(
-                model=model,
-                maxNIter=optimParams["eStepMaxNIter"],
-                tol=optimParams["eStepTol"],
-                lr=optimParams["eStepLR"],
-                lineSearchFn=optimParams["eStepLineSearchFn"],
-                verbose=optimParams["verbose"],
-                nIterDisplay=optimParams["eStepNIterDisplay"])
-            print("Iteration %02d, E-Step end: %f"%(iter, -maxRes['lowerBound']))
-            print("Iteration %02d, M-Step Model Params start"%(iter))
-            # pdb.set_trace()
-            maxRes = self._mStepModelParams(
-                model=model,
-                maxNIter=optimParams["mStepModelParamsMaxNIter"],
-                tol=optimParams["mStepModelParamsTol"],
-                lr=optimParams["mStepModelParamsLR"],
-                lineSearchFn=optimParams["mStepModelParamsLineSearchFn"],
-                verbose=optimParams["verbose"],
-                nIterDisplay=optimParams["mStepModelParamsNIterDisplay"])
-            print("Iteration %02d, M-Step Model Params end: %f"%
+            with torch.no_grad():
+                if iter>0:
+                    lowerBound = maxRes["lowerBound"]
+                muK, varK = model.predictLatents(newTimes=plotTimes)
+                title = "{:d}/{:d}, {:f}".format(iter, optimParams["emMaxNIter"]-1, -lowerBound)
+                plot.svGPFA.plotUtils.plotEstimatedLatents(fig=fig, times=plotTimes, muK=muK, varK=varK, indPointsLocs=model.getIndPointsLocs(), title=title, figFilename=latentFigFilenamePattern.format(iter))
+                plt.draw()
+                # plt.pause(0.05)
+                plt.pause(1.00)
+                # pdb.set_trace()
+            if optimParams["eStepEstimate"]:
+                print("Iteration %02d, E-Step start"%(iter))
+                maxRes = self._eStep(
+                    model=model,
+                    maxNIter=optimParams["eStepMaxNIter"],
+                    tol=optimParams["eStepTol"],
+                    lr=optimParams["eStepLR"],
+                    lineSearchFn=optimParams["eStepLineSearchFn"],
+                    verbose=optimParams["verbose"],
+                    nIterDisplay=optimParams["eStepNIterDisplay"])
+                print("Iteration %02d, E-Step end: %f"%(iter, -maxRes['lowerBound']))
+            if optimParams["mStepModelParamsEstimate"]:
+                print("Iteration %02d, M-Step Model Params start"%(iter))
+                # pdb.set_trace()
+                maxRes = self._mStepModelParams(
+                    model=model,
+                    maxNIter=optimParams["mStepModelParamsMaxNIter"],
+                    tol=optimParams["mStepModelParamsTol"],
+                    lr=optimParams["mStepModelParamsLR"],
+                    lineSearchFn=optimParams["mStepModelParamsLineSearchFn"],
+                    verbose=optimParams["verbose"],
+                    nIterDisplay=optimParams["mStepModelParamsNIterDisplay"])
+                print("Iteration %02d, M-Step Model Params end: %f"%
+                      (iter, -maxRes['lowerBound']))
+            if optimParams["mStepKernelParamsEstimate"]:
+                print("Iteration %02d, M-Step Kernel Params start"%(iter))
+                # pdb.set_trace()
+                maxRes = self._mStepKernelParams(
+                    model=model,
+                    maxNIter=optimParams["mStepKernelParamsMaxNIter"],
+                    tol=optimParams["mStepKernelParamsTol"],
+                    lr=optimParams["mStepKernelParamsLR"],
+                    lineSearchFn=optimParams["mStepKernelParamsLineSearchFn"],
+                    verbose=optimParams["verbose"],
+                    nIterDisplay=optimParams["mStepKernelParamsNIterDisplay"])
+                print("Iteration %02d, M-Step Kernel Params end: %f"%
                     (iter, -maxRes['lowerBound']))
-            print("Iteration %02d, M-Step Kernel Params start"%(iter))
-            # pdb.set_trace()
-            maxRes = self._mStepKernelParams(
-                model=model,
-                maxNIter=optimParams["mStepKernelParamsMaxNIter"],
-                tol=optimParams["mStepKernelParamsTol"],
-                lr=optimParams["mStepKernelParamsLR"],
-                lineSearchFn=optimParams["mStepKernelParamsLineSearchFn"],
-                verbose=optimParams["verbose"],
-                nIterDisplay=optimParams["mStepKernelParamsNIterDisplay"])
-            print("Iteration %02d, M-Step Kernel Params end: %f"%
-                    (iter, -maxRes['lowerBound']))
-            print("Iteration %02d, M-Step Ind Points start"%(iter))
-            # pdb.set_trace()
-            maxRes = self._mStepIndPoints(
-                model=model,
-                maxNIter=optimParams["mStepIndPointsMaxNIter"],
-                tol=optimParams["mStepIndPointsTol"],
-                lr=optimParams["mStepIndPointsLR"],
-                lineSearchFn=optimParams["mStepIndPointsLineSearchFn"],
-                verbose=optimParams["verbose"],
-                nIterDisplay=optimParams["mStepIndPointsNIterDisplay"])
-            print("Iteration %02d, M-Step Ind Points end: %f"%
-                    (iter, -maxRes['lowerBound']))
+            if optimParams["mStepIndPointsEstimate"]:
+                print("Iteration %02d, M-Step Ind Points start"%(iter))
+                # pdb.set_trace()
+                maxRes = self._mStepIndPoints(
+                    model=model,
+                    maxNIter=optimParams["mStepIndPointsMaxNIter"],
+                    tol=optimParams["mStepIndPointsTol"],
+                    lr=optimParams["mStepIndPointsLR"],
+                    lineSearchFn=optimParams["mStepIndPointsLineSearchFn"],
+                    verbose=optimParams["verbose"],
+                    nIterDisplay=optimParams["mStepIndPointsNIterDisplay"])
+                print("Iteration %02d, M-Step Ind Points end: %f"%
+                      (iter, -maxRes['lowerBound']))
             elapsedTimeHist.append(time.time()-startTime)
             iter += 1
             lowerBoundHist.append(maxRes['lowerBound'])
