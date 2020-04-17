@@ -629,7 +629,7 @@ def test_maximize_pointProcess():
                    #
                    "mStepIndPointsEstimate": True,
                    "mStepIndPointsMaxNIter":20,
-                   "mStepIndPointsParamsTol":1e-2,
+                   "mStepIndPointsTol":1e-2,
                    "mStepIndPointsLR":1e-3,
                    "mStepIndPointsLineSearchFn": "strong_wolfe",
                    "mStepIndPointsNIterDisplay":1,
