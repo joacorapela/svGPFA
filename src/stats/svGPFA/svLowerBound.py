@@ -19,6 +19,10 @@ class SVLowerBound:
         answer = self._eLL.sampleCIFs(times=times)
         return answer
 
+    def computeMeanCIFs(self, times):
+        answer = self._eLL.computeMeanCIFs(times=times)
+        return answer
+
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
         answer = self._eLL.evalSumAcrossTrialsAndNeurons(
             svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
