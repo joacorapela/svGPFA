@@ -25,7 +25,7 @@ class GPFASimulator:
         :param: d: constant in mapping latent to neural activity
         :type: d: numpy array :math:`\in R^N`
 
-        :params: linkFunction: function mapping embedding values to point-process intensity values.
+        :params: linkFunction: function mapping embedding values to point-process cif values.
         :type: linkFunction: function
 
         :return: list where list[n][r] contains the of spike times for neuron n in trial r
@@ -35,18 +35,18 @@ class GPFASimulator:
         nLatents = C.shape[1]
         nTrials = len(trialsTimes)
         spikesTimes = [[] for n in range(nTrials)]
-        intensityValues = [[] for n in range(nTrials)]
+        cifValues = [[] for n in range(nTrials)]
         sampler = stats.pointProcess.sampler.Sampler()
         for r in range(nTrials):
             embeddings = torch.matmul(C, latentsSamples[r]) + d
             print("Processing trial {:d}".format(r))
             spikesTimes[r] = [[] for r in range(nNeurons)]
-            intensityValues[r] = [[] for r in range(nNeurons)]
+            cifValues[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 print("Processing neuron {:d}".format(n))
-                intensityValues[r][n] = linkFunction(embeddings[n,:])
-                spikesTimes[r][n] = torch.tensor(sampler.sampleInhomogeneousPP_timeRescaling(intensityTimes=trialsTimes[r], intensityValues=intensityValues[r][n], T=trialsTimes[r].max()), device=C.device)
+                cifValues[r][n] = linkFunction(embeddings[n,:])
+                spikesTimes[r][n] = torch.tensor(sampler.sampleInhomogeneousPP_timeRescaling(cifTimes=trialsTimes[r], cifValues=cifValues[r][n], T=trialsTimes[r].max()), device=C.device)
                 # pdb.set_trace()
-        answer = {"spikesTimes": spikesTimes, "intensityTimes": trialsTimes, "intensityValues": intensityValues}
+        answer = {"spikesTimes": spikesTimes, "cifTimes": trialsTimes, "cifValues": cifValues}
         return(answer)
 
