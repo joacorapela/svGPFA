@@ -9,7 +9,7 @@ import plot.svGPFA.plotUtils
 class SVEM:
 
     # @clock
-    def maximize(self, model, measurements, initialParams, quadParams, optimParams, plotLatentEstimates=True, latentFigFilenamePattern="/tmp/latentsIter{:03d}.png"):
+    def maximize(self, model, measurements, initialParams, quadParams, optimParams, plotLatentsEstimates=True, latentFigFilenamePattern="/tmp/latentsIter{:03d}.png"):
         model.setMeasurements(measurements=measurements)
         model.setInitialParams(initialParams=initialParams)
         model.setQuadParams(quadParams=quadParams)
@@ -21,22 +21,24 @@ class SVEM:
         startTime = time.time()
         plotTimes = quadParams["legQuadPoints"][0,:,0]
 
-        fig = plt.figure()
-        plt.plot(plotTimes, plotTimes)
-        plt.ion()
-        plt.show()
-        lowerBound = -float("inf")
+        if plotLatentsEstimates:
+            fig = plt.figure()
+            plt.plot(plotTimes, plotTimes)
+            plt.ion()
+            plt.show()
+            lowerBound = -float("inf")
         while iter<optimParams["emMaxNIter"]:
-            with torch.no_grad():
-                if iter>0:
-                    lowerBound = maxRes["lowerBound"]
-                muK, varK = model.predictLatents(newTimes=plotTimes)
-                title = "{:d}/{:d}, {:f}".format(iter, optimParams["emMaxNIter"]-1, -lowerBound)
-                plot.svGPFA.plotUtils.plotEstimatedLatents(fig=fig, times=plotTimes, muK=muK, varK=varK, indPointsLocs=model.getIndPointsLocs(), title=title, figFilename=latentFigFilenamePattern.format(iter))
-                plt.draw()
-                # plt.pause(0.05)
-                plt.pause(1.00)
-                # pdb.set_trace()
+            if plotLatentsEstimates:
+                with torch.no_grad():
+                    if iter>0:
+                        lowerBound = maxRes["lowerBound"]
+                    muK, varK = model.predictLatents(newTimes=plotTimes)
+                    title = "{:d}/{:d}, {:f}".format(iter, optimParams["emMaxNIter"]-1, -lowerBound)
+                    plot.svGPFA.plotUtils.plotEstimatedLatents(fig=fig, times=plotTimes, muK=muK, varK=varK, indPointsLocs=model.getIndPointsLocs(), title=title, figFilename=latentFigFilenamePattern.format(iter))
+                    plt.draw()
+                    # plt.pause(0.05)
+                    plt.pause(1.00)
+                    # pdb.set_trace()
             if optimParams["eStepEstimate"]:
                 print("Iteration %02d, E-Step start"%(iter))
                 maxRes = self._eStep(
