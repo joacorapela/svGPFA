@@ -7,7 +7,7 @@ import pickle
 import configparser
 import pandas as pd
 import statsmodels.tsa.stattools
-from sklearn import metrics
+import sklearn.metrics
 sys.path.append(os.path.expanduser("../src"))
 import plot.svGPFA.plotUtils
 
@@ -64,8 +64,8 @@ def main(argv):
     cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
     Y = torch.from_numpy(cutRes.value_counts().values)
 
-    fpr, tpr, thresholds = metrics.roc_curve(Y, pk, pos_label=1)
-    roc_auc = metrics.auc(fpr, tpr)
+    fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
     title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToAnalyze, neuronToAnalyze, len(spikesTimesKS))
     plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title, figFilename=rocFigFilename)
 
