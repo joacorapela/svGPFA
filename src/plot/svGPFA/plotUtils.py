@@ -4,20 +4,125 @@ import math
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-import chart_studio.plotly as py
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
-import plotly.io as pio
-import plotly.offline
 
-def plotResROCAnalysis(fpr, tpr, auc, figFilename, title="",
+def plotTrueAndEstimatedEmbeddingParams(trueC, trueD, estimatedC, estimatedD,
+                                        linestyleTrue="solid",
+                                        linestyleEstimated="dashed",
+                                        marker="*",
+                                        xlabel="Neuron Index",
+                                        ylabel="Coefficient Value"):
+    # plt.figure()
+    for i in range(estimatedC.shape[1]):
+        plt.plot(trueC[:,i], label="true C[{:d}]".format(i),
+                 linestyle=linestyleTrue, marker=marker)
+        plt.plot(estimatedC[:,i], label="est. C[{:d}]".format(i),
+                 linestyle=linestyleEstimated, marker=marker)
+    plt.plot(trueD, label="true d", linestyle=linestyleTrue, marker=marker)
+    plt.plot(estimatedD, label="est. d", linestyle=linestyleEstimated,
+             marker=marker)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.legend()
+
+def plotTrueAndEstimatedLatentsMeans(trueLatentsMeans, estimatedLatentsMeans,
+                                     trialsTimes,
+                                     labelTrue="True",
+                                     labelEstimated="Estimated",
+                                     xlabel="Time (sec)",
+                                     ylabel="Latent Value"):
+    def plotOneSetTrueAndEstimatedLatentsMeans(ax, trueLatentMean,
+                                               estimatedLatentMean,
+                                               times,
+                                               labelTrue, labelEstimated,
+                                               xlabel, ylabel, useLegend):
+            ax.plot(times, trueLatentMean, label=labelTrue)
+            ax.plot(times, estimatedLatentMean, label=labelEstimated)
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+            if useLegend:
+                ax.legend()
+
+    # trueLatentsMeans[r] \in nLatents x nInd[k]
+    # qMu[k] \in nTrials x nInd[k] x 1
+    nTrials = len(trueLatentsMeans)
+    nLatents = estimatedLatentsMeans.shape[2]
+    # plt.figure()
+    fig, axs = plt.subplots(nTrials, nLatents, squeeze=False)
+    for r in range(nTrials):
+        times = trialsTimes[r]
+        for k in range(nLatents):
+            trueLatentMean = trueLatentsMeans[r][k,:]
+            estimatedLatentMean = estimatedLatentsMeans[r,:,k]
+            if r==0 and k==nLatents-1:
+                useLegend = True
+            else:
+                useLegend = False
+            if r==nTrials//2 and k==0:
+                ylabelToPlot = ylabel
+            else:
+                ylabelToPlot = None
+            if r==nTrials-1 and k==nLatents//2:
+                xlabelToPlot = xlabel
+            else:
+                xlabelToPlot = None
+            plotOneSetTrueAndEstimatedLatentsMeans(ax=axs[r,k],
+                                                   trueLatentMean=trueLatentMean,
+                                                   estimatedLatentMean=estimatedLatentMean,
+                                                   times=times,
+                                                   labelTrue=labelTrue,
+                                                   labelEstimated=
+                                                    labelEstimated,
+                                                   xlabel=xlabelToPlot,
+                                                   ylabel=ylabelToPlot,
+                                                   useLegend=useLegend)
+
+def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
+    def plotOneSetTrueAndEstimatedKernelsParams(ax, labels,
+                                                trueParams,
+                                                estimatedParams,
+                                                trueLegend = "True",
+                                                estimatedLegend = "Estimated",
+                                                yLabel="Parameter Value",
+                                                useLegend=False):
+        x = np.arange(len(labels))  # the label locations
+        width = 0.35  # the width of the bars
+
+        rects1 = ax.bar(x - width/2, trueParams, width, label=trueLegend)
+        rects2 = ax.bar(x + width/2, estimatedParams, width, label=estimatedLegend)
+
+        ax.set_ylabel(yLabel)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
+        if useLegend:
+            ax.legend()
+
+    # plt.figure()
+    fig, axs = plt.subplots(len(estimatedKernelsParams), 1, squeeze=False)
+    for k in range(len(estimatedKernelsParams)):
+        namedParams = trueKernels[k].getNamedParams()
+        labels = namedParams.keys()
+        trueParams = [z.item() for z in list(namedParams.values())]
+        estimatedParams = estimatedKernelsParams[k].tolist()
+        # we are fixing scale to 1.0. This is not great :(
+        # estimatedParams = [1.0] + estimatedParams
+        if k==0:
+            useLegend = True
+        else:
+            useLegend = False
+        plotOneSetTrueAndEstimatedKernelsParams(ax=axs[k,0], labels=labels,
+                                                trueParams=trueParams,
+                                                estimatedParams=
+                                                 estimatedParams,
+                                                useLegend=useLegend)
+
+def plotResROCAnalysis(fpr, tpr, auc, figFilename=None, title="",
                        colorROC="red", colorRef="black",
                        linestyleROC="-", linestyleRef="--",
                        labelPattern="ROC curve (area={:0.2f})",
                        xlabel="False Positive Rate",
                        ylabel="True Positive Rate",
                        legendLoc="lower right"):
-    plt.figure()
+    # plt.figure()
     plt.plot(fpr, tpr, color=colorROC, linestyle=linestyleROC, label=labelPattern.format(auc))
     plt.plot([0, 1], [0, 1], color=colorRef, linestyle=linestyleRef)
     plt.xlim([0.0, 1.0])
@@ -26,15 +131,16 @@ def plotResROCAnalysis(fpr, tpr, auc, figFilename, title="",
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend(loc=legendLoc)
-    plt.savefig(fname=figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
     plt.show()
 
-def plotACF(acf, confint, Fs, figFilename, title="", xlabel="Lag (sec)", ylabel="ACF", colorACF="black", colorConfint="red", colorRef="gray", linestyleACF="-", linestyleConfint=":", linestyleRef=":"):
+def plotACF(acf, confint, Fs, figFilename=None, title="", xlabel="Lag (sec)", ylabel="ACF", colorACF="black", colorConfint="red", colorRef="gray", linestyleACF="-", linestyleConfint=":", linestyleRef=":"):
     acf[0] = None
     confint[0,:] = None
 
     time = np.arange(len(acf))/Fs
-    plt.figure()
+    # plt.figure()
     plt.plot(time, acf, color=colorACF, linestyle=linestyleACF)
     plt.plot(time, confint[:,0], color=colorConfint, linestyle=linestyleConfint)
     plt.plot(time, confint[:,1], color=colorConfint, linestyle=linestyleConfint)
@@ -42,74 +148,80 @@ def plotACF(acf, confint, Fs, figFilename, title="", xlabel="Lag (sec)", ylabel=
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.savefig(fname=figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
-def plotScatter1Lag(x, figFilename, title="", xlabel="x[t-1]", ylabel="x[t]"):
-    plt.figure()
+def plotScatter1Lag(x, figFilename=None, title="", xlabel="x[t-1]", ylabel="x[t]"):
+    # plt.figure()
     plt.scatter(x[:-1], x[1:])
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.savefig(fname=figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def plotSimulatedAndEstimatedCIFs(times, simCIFValues, estCIFValues,
-                                  figFilename,
+                                  figFilename=None,
                                   title="",
                                   labelSimulated="True",
                                   labelEstimated="Estimated",
                                   xlabel="Time (sec)",
                                   ylabel="Conditional Intensity Function"):
-    plt.figure()
+    # plt.figure()
     plt.plot(times, simCIFValues, label=labelSimulated)
     plt.plot(times, estCIFValues, label=labelEstimated)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.legend()
     plt.title(title)
-    plt.savefig(fname=figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
-def plotCIF(times, values, figFilename, title="", xlabel="Time (sec)",
+def plotCIF(times, values, figFilename=None, title="", xlabel="Time (sec)",
             ylabel="Conditional Intensity Function"):
-    plt.figure()
+    # plt.figure()
     plt.plot(times, values)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.savefig(fname=figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def plotResKSTestTimeRescalingAnalyticalCorrection(
-    sUTRISIs, uCDF, cb, figFilename,
+    sUTRISIs, uCDF, cb, figFilename=None,
     title="", dataColor="blue", cbColor="red", dataLinestyle="solid",
     dataMarker="*", cbLinestyle="dashed",
     ylabel="Empirical CDF", xlabel="Model CDF"):
 
-    plt.figure()
+    # plt.figure()
     plt.plot(sUTRISIs, uCDF, color=dataColor, linestyle=dataLinestyle, marker=dataMarker)
     plt.plot([0, 1-cb], [cb, 1], color=cbColor, linestyle=cbLinestyle)
     plt.plot([cb, 1], [0, 1-cb], color=cbColor, linestyle=cbLinestyle)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.savefig(figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def plotDifferenceCDFs(
-    sUTRISIs, uCDF, cb, figFilename,
+    sUTRISIs, uCDF, cb, figFilename=None,
     title="", dataColor="blue", cbColor="red", dataLinestyle="solid",
     dataMarker="*", cbLinestyle="dashed",
     ylabel="Difference", xlabel="CDF"):
 
-    plt.figure()
+    # plt.figure()
     plt.plot(uCDF, sUTRISIs-uCDF, color=dataColor, linestyle=dataLinestyle, marker=dataMarker)
     plt.plot([0, 1], [cb, cb], color=cbColor, linestyle=cbLinestyle)
     plt.plot([0, 1], [-cb, -cb], color=cbColor, linestyle=cbLinestyle)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    plt.savefig(figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def plotResKSTestTimeRescalingNumericalCorrection(
     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy,
-    cb, figFilename, title="",
+    cb, figFilename=None, title="",
     dataColor="blue", cbColor="red", refColor="black",
     estECDFcolor="magenta", simECDFcolor="cyan",
     estECDFmarker="+", simECDFmarker="*",
@@ -120,7 +232,7 @@ def plotResKSTestTimeRescalingNumericalCorrection(
     diffLabel="Difference", estECDFlabel="Estimated",
     simECDFlabel="True" ):
 
-    plt.figure()
+    # plt.figure()
     plt.plot(diffECDFsX, diffECDFsY, color=dataColor, marker=dataMarker, linestyle=dataLinestyle, label=diffLabel)
     plt.scatter(estECDFx, estECDFy, color=estECDFcolor, marker=estECDFmarker, label=estECDFlabel)
     plt.scatter(simECDFx, simECDFy, color=simECDFcolor, marker=simECDFmarker, label=simECDFlabel)
@@ -131,15 +243,16 @@ def plotResKSTestTimeRescalingNumericalCorrection(
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend()
-    plt.savefig(figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
-def getSimulatedSpikeTimesPlot(spikesTimes, figFilename, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
+def getSimulatedSpikeTimesPlot(spikesTimes, figFilename=None, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
     nTrials = len(spikesTimes)
     sqrtNTrials = math.sqrt(nTrials)
     # nrow = math.floor(sqrtNTrials)
     # ncol = math.ceil(sqrtNTrials)
     # f, axs = plt.subplots(nrow, ncol, sharex=True, sharey=True)
-    plt.figure()
+    # plt.figure()
     f, axs = plt.subplots(nTrials, 1, sharex=True, sharey=True, squeeze=False)
     for r in range(nTrials):
         # row = r//ncol
@@ -154,13 +267,15 @@ def getSimulatedSpikeTimesPlot(spikesTimes, figFilename, xlabel="Time (sec)", yl
         axs[row, col].set_xlabel(xlabel)
         axs[row, col].set_ylabel(ylabel)
         axs[row, col].set_title(titlePattern.format(r))
-    plt.savefig(figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
     return f
 
-def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans, latentsSTDs, figFilename, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
+def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans,
+                            latentsSTDs, figFilename=None, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
     nTrials = len(latentsSamples)
     nLatents = latentsSamples[0].shape[0]
-    plt.figure()
+    # plt.figure()
     f, axs = plt.subplots(nTrials, nLatents, sharex=False, sharey=False, squeeze=False)
     for r in range(nTrials):
         t = trialsTimes[r]
@@ -173,7 +288,8 @@ def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans, latentsST
             axs[r,k].set_xlabel(xlabel)
             axs[r,k].set_ylabel(ylabel)
             axs[r,k].set_title("r={}, k={}".format(r, k))
-    plt.savefig(figFilename)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
     return f
 
 def plotEstimatedLatents(fig, times, muK, varK, indPointsLocs, title="", figFilename=None):
@@ -211,7 +327,7 @@ def plotEstimatedLatents(fig, times, muK, varK, indPointsLocs, title="", figFile
         plt.savefig(fname=figFilename)
 
 def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="Iteration Number", xlabelElapsedTime="Elapsed Time (sec)", ylabel="Lower Bound", marker="x", linestyle="-", figFilename=None):
-    plt.figure()
+    # plt.figure()
     if elapsedTimeHist is None:
         plt.plot(lowerBoundHist, marker=marker, linestyle=linestyle)
         plt.xlabel(xlabelIterNumber)
@@ -225,7 +341,7 @@ def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="I
 
 def plotTrueAndEstimatedLatents(timesEstimatedValues, muK, varK, indPointsLocs, timesTrueValues, trueLatents, trueLatentsMeans, trueLatentsSTDs, trialToPlot=0, figFilename=None):
     nLatents = muK.shape[2]
-    plt.figure()
+    # plt.figure()
     f, axes = plt.subplots(nLatents, 1, sharex=True, squeeze=False)
     title = "Trial {:d}".format(trialToPlot)
     axes[0,0].set_title(title)
@@ -260,9 +376,11 @@ def plotTruePythonAndMatlabLatents(tTimes, tLatents,
                                    pTimes, pMuK, pVarK,
                                    mTimes, mMuK, mVarK,
                                    trialToPlot=0, figFilenamePattern=None):
-    figFilename = figFilenamePattern.format(trialToPlot)
+    figFilename = None
+    if figFilenamePattern is not None:
+        figFilename = figFilenamePattern.format(trialToPlot)
     nLatents = mMuK.shape[2]
-    plt.figure()
+    # plt.figure()
     f, axes = plt.subplots(nLatents, 1, sharex=True)
     title = "Trial {:d}".format(trialToPlot)
     axes[0].set_title(title)
@@ -295,116 +413,4 @@ def plotTruePythonAndMatlabLatents(tTimes, tLatents,
     if figFilename is not None:
         plt.savefig(fname=figFilename)
     plt.show()
-
-def plotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
-                                         pTimes, pMuK, pVarK,
-                                         mTimes, mMuK, mVarK,
-                                         trialToPlot=0,
-                                         staticFigFilenamePattern=None,
-                                         dynamicFigFilenamePattern=None,
-                                         xlabel="Time (sec)",
-                                         ylabelPattern="Latent {:d}"):
-    pio.renderers.default = "browser"
-    staticFigFilename = staticFigFilenamePattern.format(trialToPlot)
-    dynamicFigFilename = dynamicFigFilenamePattern.format(trialToPlot)
-    nLatents = mMuK.shape[2]
-    fig = make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
-    # titles = ["Trial {:d}".format(trialToPlot)] + ["" for i in range(nLatents)]
-    title = "Trial {:d}".format(trialToPlot)
-    for k in range(nLatents):
-        trueToPlot = tLatents[trialToPlot,:,k]
-
-        pMeanToPlot = pMuK[trialToPlot,:,k]
-        positiveMSE = torch.mean((trueToPlot-pMeanToPlot)**2)
-        negativeMSE = torch.mean((trueToPlot+pMeanToPlot)**2)
-        if negativeMSE<positiveMSE:
-            pMeanToPlot = -pMeanToPlot
-        pCIToPlot = 1.96*(pVarK[trialToPlot,:,k].sqrt())
-
-        mMeanToPlot = mMuK[trialToPlot,:,k]
-        positiveMSE = torch.mean((trueToPlot-mMeanToPlot)**2)
-        negativeMSE = torch.mean((trueToPlot+mMeanToPlot)**2)
-        if negativeMSE<positiveMSE:
-            mMeanToPlot = -mMeanToPlot
-        mCIToPlot = 1.96*(mVarK[trialToPlot,:,k].sqrt())
-
-        tLatentToPlot = tLatents[trialToPlot,:,k]
-
-        x1 = pTimes
-        x1_rev = x1.flip(dims=[0])
-        y1 = pMeanToPlot
-        y1_upper = y1 + pCIToPlot
-        y1_lower = y1 - pCIToPlot
-        # y1_lower = y1_lower[::-1] # negative stride not supported in pytorch
-        y1_lower = y1_lower.flip(dims=[0])
-
-        x2 = mTimes
-        x2_rev = x2.flip(dims=[0])
-        y2 = mMeanToPlot
-        y2_upper = y2 + mCIToPlot
-        y2_lower = y2 - mCIToPlot
-        # y2_lower = y2_lower[::-1] # negative stride not supported in pytorch
-        y2_lower = y2_lower.flip(dims=[0])
-
-        x3 = tTimes
-        y3 = tLatentToPlot
-
-        trace1 = go.Scatter(
-            x=np.concatenate((x1, x1_rev)),
-            y=np.concatenate((y1_upper, y1_lower)),
-            fill='tozerox',
-            fillcolor='rgba(255,0,0,0.2)',
-            line=dict(color='rgba(255,255,255,0)'),
-            showlegend=False,
-            name='Python',
-        )
-        trace2 = go.Scatter(
-            x=np.concatenate((x2, x2_rev)),
-            y=np.concatenate((y2_upper, y2_lower)),
-            fill='tozerox',
-            fillcolor='rgba(0,0,255,0.2)',
-            line=dict(color='rgba(255,255,255,0)'),
-            name='Matlab',
-            showlegend=False,
-        )
-        trace3 = go.Scatter(
-            x=x1,
-            y=y1,
-            # line=dict(color='rgb(0,100,80)'),
-            line=dict(color='red'),
-            mode='lines',
-            name='Python',
-            showlegend=(k==0),
-        )
-        trace4 = go.Scatter(
-            x=x2,
-            y=y2,
-            # line=dict(color='rgb(0,176,246)'),
-            line=dict(color='blue'),
-            mode='lines',
-            name='Matlab',
-            showlegend=(k==0),
-        )
-        trace5 = go.Scatter(
-            x=x3,
-            y=y3,
-            line=dict(color='black'),
-            mode='lines',
-            name='True',
-            showlegend=(k==0),
-        )
-        fig.add_trace(trace1, row=k+1, col=1)
-        fig.add_trace(trace2, row=k+1, col=1)
-        fig.add_trace(trace3, row=k+1, col=1)
-        fig.add_trace(trace4, row=k+1, col=1)
-        fig.add_trace(trace5, row=k+1, col=1)
-        fig.update_yaxes(title_text=ylabelPattern.format(k+1), row=k+1, col=1)
-        # pdb.set_trace()
-
-    fig.update_layout(title_text=title)
-    fig.update_xaxes(title_text=xlabel, row=3, col=1)
-    fig.write_image(staticFigFilename)
-    plotly.offline.plot(fig, filename=dynamicFigFilename)
-    # fig.show()
-    # pdb.set_trace()
 
