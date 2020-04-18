@@ -44,10 +44,10 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
             meansFuncs[r][k] = meanFunc
     return meansFuncs
 
-def getLinearEmbeddingParams(nNeurons, nLatents, config):
-    df = pd.read_csv(config["embedding_params"]["C_filename"], header=None)
+def getLinearEmbeddingParams(nNeurons, nLatents, CFilename, dFilename):
+    df = pd.read_csv(CFilename, header=None)
     C = torch.from_numpy(df.values)
-    df = pd.read_csv(config["embedding_params"]["d_filename"], header=None)
+    df = pd.read_csv(dFilename, header=None)
     d = torch.from_numpy(df.values)
     # pdb.set_trace()
     return C, d
