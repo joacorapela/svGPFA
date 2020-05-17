@@ -1,21 +1,21 @@
-stats.gaussianProcesses package
+stats.pointProcess package
 ===============================
 
 Submodules
 ----------
 
-stats.gaussianProcesses.eval module
+stats.pointProcess.sampler module
 -----------------------------------
 
-.. automodule:: stats.gaussianProcesses.eval
+.. automodule:: stats.pointProcess.sampler
    :members:
    :undoc-members:
    :show-inheritance:
 
-stats.gaussianProcesses.learn module
+stats.pointProcess.tests module
 ------------------------------------
 
-.. automodule:: stats.gaussianProcesses.learn
+.. automodule:: stats.pointProcess.tests
    :members:
    :undoc-members:
    :show-inheritance:
@@ -24,7 +24,7 @@ stats.gaussianProcesses.learn module
 Module contents
 ---------------
 
-.. automodule:: stats.gaussianProcesses
+.. automodule:: stats.pointProcess
    :members:
    :undoc-members:
    :show-inheritance:

@@ -159,9 +159,8 @@
 <span></span>
 <span class="kn">import</span> <span class="nn">pdb</span>
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 
-<div class="viewcode-block" id="SVLowerBound"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound">[docs]</a><span class="k">class</span> <span class="nc">SVLowerBound</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="SVLowerBound"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound">[docs]</a><span class="k">class</span> <span class="nc">SVLowerBound</span><span class="p">:</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eLL</span><span class="p">,</span> <span class="n">klDiv</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SVLowerBound</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -174,6 +173,14 @@
         <span class="n">theEval</span> <span class="o">=</span> <span class="n">eLLEval</span><span class="o">-</span><span class="n">klDivEval</span>
         <span class="k">return</span> <span class="n">theEval</span></div>
 
+<div class="viewcode-block" id="SVLowerBound.sampleCIFs"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.sampleCIFs">[docs]</a>    <span class="k">def</span> <span class="nf">sampleCIFs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">sampleCIFs</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+<div class="viewcode-block" id="SVLowerBound.computeMeanCIFs"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.computeMeanCIFs">[docs]</a>    <span class="k">def</span> <span class="nf">computeMeanCIFs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">):</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">computeMeanCIFs</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">times</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span></div>
+
 <div class="viewcode-block" id="SVLowerBound.evalELLSumAcrossTrialsAndNeurons"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.evalELLSumAcrossTrialsAndNeurons">[docs]</a>    <span class="k">def</span> <span class="nf">evalELLSumAcrossTrialsAndNeurons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">svPosteriorOnLatentsStats</span><span class="p">):</span>
         <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">evalSumAcrossTrialsAndNeurons</span><span class="p">(</span>
             <span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStats</span><span class="p">)</span>
@@ -183,7 +190,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SVLowerBound.computeSVPosteriorOnLatentsStats"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.computeSVPosteriorOnLatentsStats">[docs]</a>    <span class="k">def</span> <span class="nf">computeSVPosteriorOnLatentsStats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">computeSVPosteriorOnLatentsStats</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">computeSVPosteriorOnLatentsStats</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SVLowerBound.setInitialParams"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.setInitialParams">[docs]</a>    <span class="k">def</span> <span class="nf">setInitialParams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initialParams</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eLL</span><span class="o">.</span><span class="n">setInitialParams</span><span class="p">(</span><span class="n">initialParams</span><span class="o">=</span><span class="n">initialParams</span><span class="p">)</span></div>

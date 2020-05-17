@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="stats.svGPFA package" href="stats.svGPFA.html" />
+    <link rel="next" title="stats.pointProcess package" href="stats.pointProcess.html" />
     <link rel="prev" title="stats package" href="stats.html" /> 
 </head>
 
@@ -99,17 +99,16 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">stats.gaussianProcesses package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.gaussianProcesses.eval">stats.gaussianProcesses.eval module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-stats.gaussianProcesses.kernels">stats.gaussianProcesses.kernels module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.gaussianProcesses.learn">stats.gaussianProcesses.learn module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.gaussianProcesses">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="stats.pointProcess.html">stats.pointProcess package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="stats.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats.kernels">stats.kernels module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats.sampler">stats.sampler module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats">Module contents</a></li>
 </ul>
 </li>
@@ -192,7 +191,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="stats.gaussianProcesses.eval.GaussianProcess.eval">
-<code class="sig-name descname">eval</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">epsilon=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/gaussianProcesses/eval.html#GaussianProcess.eval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.eval.GaussianProcess.eval" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">eval</code><span class="sig-paren">(</span><em class="sig-param">t</em>, <em class="sig-param">regularization=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/gaussianProcesses/eval.html#GaussianProcess.eval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.eval.GaussianProcess.eval" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -205,37 +204,6 @@
 <code class="sig-name descname">std</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/gaussianProcesses/eval.html#GaussianProcess.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.eval.GaussianProcess.std" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-</div>
-<div class="section" id="module-stats.gaussianProcesses.kernels">
-<span id="stats-gaussianprocesses-kernels-module"></span><h2>stats.gaussianProcesses.kernels module<a class="headerlink" href="#module-stats.gaussianProcesses.kernels" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="stats.gaussianProcesses.kernels.Kernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.gaussianProcesses.kernels.</code><code class="sig-name descname">Kernel</code><a class="reference internal" href="_modules/stats/gaussianProcesses/kernels.html#Kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="stats.gaussianProcesses.kernels.Kernel.buildKSample">
-<code class="sig-name descname">buildKSample</code><span class="sig-paren">(</span><em class="sig-param">x1</em>, <em class="sig-param">x2</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/gaussianProcesses/kernels.html#Kernel.buildKSample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.kernels.Kernel.buildKSample" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.gaussianProcesses.kernels.Kernel.buildKSampleGrad">
-<code class="sig-name descname">buildKSampleGrad</code><span class="sig-paren">(</span><em class="sig-param">x1</em>, <em class="sig-param">x2</em>, <em class="sig-param">params</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/gaussianProcesses/kernels.html#Kernel.buildKSampleGrad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.kernels.Kernel.buildKSampleGrad" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="stats.gaussianProcesses.kernels.PeriodicRandomFunctionKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.gaussianProcesses.kernels.</code><code class="sig-name descname">PeriodicRandomFunctionKernel</code><a class="reference internal" href="_modules/stats/gaussianProcesses/kernels.html#PeriodicRandomFunctionKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.kernels.PeriodicRandomFunctionKernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats.gaussianProcesses.kernels.Kernel" title="stats.gaussianProcesses.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.gaussianProcesses.kernels.Kernel</span></code></a></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="stats.gaussianProcesses.kernels.SquaredExponentialKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.gaussianProcesses.kernels.</code><code class="sig-name descname">SquaredExponentialKernel</code><a class="reference internal" href="_modules/stats/gaussianProcesses/kernels.html#SquaredExponentialKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.gaussianProcesses.kernels.SquaredExponentialKernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats.gaussianProcesses.kernels.Kernel" title="stats.gaussianProcesses.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.gaussianProcesses.kernels.Kernel</span></code></a></p>
 </dd></dl>
 
 </div>
@@ -281,7 +249,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="stats.svGPFA.html" class="btn btn-neutral float-right" title="stats.svGPFA package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="stats.pointProcess.html" class="btn btn-neutral float-right" title="stats.pointProcess package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="stats.html" class="btn btn-neutral float-left" title="stats package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
