@@ -2,7 +2,7 @@
 
 Tested with [Python 3](https://www.python.org/downloads/release/python-352/) and [Pytorch 1.3.0](https://pytorch.org/).
 
-* A Colab notebook can be found [here](https://colab.research.google.com/drive/1DxsaoZxpfdETHNs8b-KQIqQEAA_Qx0CB) and a Jupyter notebookd [here](ipynb/demoPointProcess.ipynb)
+* A Colab notebook can be found [here](https://colab.research.google.com/drive/1DxsaoZxpfdETHNs8b-KQIqQEAA_Qx0CB) and a Jupyter notebook [here](ipynb/demoPointProcess.ipynb)
 * Documentation can be found [here](https://svgpfa.readthedocs.io/)
 * A script running svGPFA on simulated data can be found at [scripts/demoPointProcess.py](scripts/demoPointProcess.py).
 * The source code can be found under [src](src).
