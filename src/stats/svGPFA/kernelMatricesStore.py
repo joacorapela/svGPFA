@@ -35,7 +35,7 @@ class KernelMatricesStore(ABC):
 
 class IndPointsLocsKMS(KernelMatricesStore):
 
-    def __init__(self, epsilon=1e-5):
+    def setEpsilon(self, epsilon):
         self._epsilon = epsilon
 
     def buildKernelsMatrices(self):
