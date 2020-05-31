@@ -13,6 +13,9 @@ from .svLowerBound import SVLowerBound
 PointProcess = 0
 #:
 Poisson = 1
+#:
+Gaussian = 2
+
 
 #:
 LinearEmbedding = 100
@@ -20,18 +23,18 @@ LinearEmbedding = 100
 #:
 ExponentialLink = 1000
 #:
-OtherLink = 1001
+NonExponentialLink = 1001
 
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModel(conditionalDist, linkFunction, embeddingType, kernels, indPointsLocsKMSEpsilon=1e-3):
+    def buildModel(conditionalDist, linkFunction, embeddingType, kernels):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
                 if linkFunction==ExponentialLink:
                     qU = SVPosteriorOnIndPoints()
-                    indPointsLocsKMS = IndPointsLocsKMS(epsilon=indPointsLocsKMSEpsilon)
+                    indPointsLocsKMS = IndPointsLocsKMS()
                     indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
                     indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
                     qKAllTimes = SVPosteriorOnLatentsAllTimes(
