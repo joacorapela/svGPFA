@@ -5,6 +5,7 @@ import random
 import torch
 import pickle
 import configparser
+import stats.svGPFA.svGPFAModelFactory
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.tsa.stattools
@@ -149,14 +150,14 @@ def main(argv):
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels,
-        indPointsLocsKMSEpsilon=indPointsLocsKMSRegEpsilon)
+        kernels=kernels)
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
     lowerBoundHist, elapsedTimeHist  = svEM.maximize(
         model=model, measurements=spikesTimes, initialParams=initialParams,
-        quadParams=quadParams, optimParams=optimParams)
+        quadParams=quadParams, optimParams=optimParams,
+        indPointsLocsKMSEpsilon=indPointsLocsKMSRegEpsilon)
 
     # save estimated values
     estPrefixUsed = True
