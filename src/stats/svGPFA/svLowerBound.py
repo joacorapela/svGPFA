@@ -46,6 +46,9 @@ class SVLowerBound:
     def setIndPointsLocs(self, locs):
         self._eLL.setIndPointsLocs(locs=locs)
 
+    def setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon):
+        self._eLL.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+
     def setQuadParams(self, quadParams):
         self._eLL.setQuadParams(quadParams=quadParams)
 
