@@ -45,6 +45,9 @@ class SVPosteriorOnLatents(ABC):
     def getIndPointsLocs(self):
         return self._indPointsLocsKMS.getIndPointsLocs()
 
+    def setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon):
+        self._indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSEpsilon)
+
 class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
     def predict(self, newTimes):
