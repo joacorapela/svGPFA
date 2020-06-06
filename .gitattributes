@@ -1,2 +1,2 @@
-ipynb/* ipynb linguist-documentation
-docs/* linguist-documentation
+* linguist-vendored
+*.py linguist-vendored=false
