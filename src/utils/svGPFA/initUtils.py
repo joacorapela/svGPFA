@@ -2,16 +2,7 @@
 import sys
 import os
 import torch
-sys.path.append(os.path.expanduser("../src"))
 import myMath.utils
-
-def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
-    nTrials = len(trialsLengths)
-    legQuadPoints = torch.empty((nTrials, nQuad, 1), dtype=dtype)
-    legQuadWeights = torch.empty((nTrials, nQuad, 1), dtype=dtype)
-    for r in range(nTrials):
-        legQuadPoints[r,:,0], legQuadWeights[r,:,0] = myMath.utils.leggaussVarLimits(n=nQuad, a=0, b=trialsLengths[r])
-    return legQuadPoints, legQuadWeights
 
 def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPoint):
     nLatents = len(nIndPointsPerLatent)
