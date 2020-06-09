@@ -5,7 +5,6 @@ import configparser
 import importlib
 import numpy as np
 from numpy import array
-import torch
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -13,7 +12,7 @@ from dash.dependencies import Input, Output, State, ALL, MATCH
 from dash.exceptions import PreventUpdate
 sys.path.append("../src")
 import stats.svGPFA.svGPFAModelFactory
-from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram
+from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram, getKernels
 
 def main(argv):
     if(len(argv)!=2):
@@ -22,9 +21,11 @@ def main(argv):
     guiFilename = argv[1]
     guiConfig = configparser.ConfigParser()
     guiConfig.read(guiFilename)
+    defaultNLatents = int(guiConfig["latents"]["nLatents"])
     minNLatents = int(guiConfig["latents"]["minNLatents"])
     maxNLatents = int(guiConfig["latents"]["maxNLatents"])
     firstIndPoint = float(guiConfig["indPoints"]["firstIndPoint"])
+    defaultKernels = getKernels(nLatents=defaultNLatents, config=guiConfig)
 
     external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
@@ -78,6 +79,7 @@ def main(argv):
                     min=0,
                     max=10,
                     marks={i: str(i) for i in range(minNLatents, maxNLatents)},
+                    value=defaultNLatents,
                 )],
                 style={"width": "25%"}
             ),
@@ -322,9 +324,10 @@ def main(argv):
                                 "latent": k
                             },
                             options=[
-                                {"label": "Exponential Quadratic", "value": "ExponentialQuadraticKernel"},
-                                {"label": "Periodic", "value": "PeriodicKernel"},
+                                {"label": "ExponentialQuadraticKernel", "value": "ExponentialQuadraticKernel"},
+                                {"label": "PeriodicKernel", "value": "PeriodicKernel"},
                             ],
+                            value=type(defaultKernels[k]).__name__,
                             style={"width": "45%"}
                         ),
                     ]),
@@ -345,8 +348,8 @@ def main(argv):
                                 "latent": k
                             },
                             options=[
-                                {"label": "Exponential Quadratic", "value": "ExponentialQuadraticKernel"},
-                                {"label": "Periodic", "value": "PeriodicKernel"},
+                                {"label": "ExponentialQuadraticKernel", "value": "ExponentialQuadraticKernel"},
+                                {"label": "PeriodicKernel", "value": "PeriodicKernel"},
                             ],
                             style={"width": "45%"}
                         ),
@@ -355,37 +358,6 @@ def main(argv):
                 newChildren.append(aDiv)
             answer = kernelsTypesContainerChildren + newChildren
             return answer
-
-    @app.callback([Output({"type": "kernelTypeOfParam0", "latent": MATCH}, "children"),
-                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "value"),
-                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "hidden"),
-                   Output({"type": "periodParam0", "latent": MATCH}, "value"),
-                   Output({"type": "periodParam0", "latent": MATCH}, "hidden"),
-                   Output({"type": "periodParam0Label", "latent": MATCH}, "children")],
-                  [Input({"type": "kernelTypeComponent", "latent": MATCH}, "value")],
-                  [State({"type": "kernelTypeOfParam0", "latent": MATCH}, "value")],
-                 )
-    def updateKernelsParams0(kernelTypeComponentValue, kernelTypeOfParam0Value):
-        # pdb.set_trace()
-        if kernelTypeComponentValue is None or kernelTypeComponentValue==kernelTypeOfParam0Value:
-            raise PreventUpdate
-        if kernelTypeComponentValue=="PeriodicKernel":
-            kernelType = "Periodic"
-            lengthScaleValue = None
-            lengthScaleHidden = False
-            periodValue = None
-            periodValueHidden = False
-            periodLabel = "Period"
-        elif kernelTypeComponentValue=="ExponentialQuadraticKernel":
-            kernelType = "Exponential Quadratic"
-            lengthScaleValue = None
-            lengthScaleHidden = False
-            periodValue = None
-            periodValueHidden = True
-            periodLabel = ""
-        else:
-            raise RuntimeError("Invalid kernel type: {:s}".format(kernelTypeComponentValue))
-        return [kernelType, lengthScaleValue, lengthScaleHidden, periodValue, periodValueHidden, periodLabel]
 
     @app.callback(
         [Output("kernelParams0ParentContainer", "hidden"),
@@ -401,11 +373,137 @@ def main(argv):
         if nLatents==0:
             # non-relevant event
             raise PreventUpdate
-        if nLatents<len(kernelParams0ContainerChildren):
+        if len(kernelParams0ContainerChildren)==0:
+            # initialize kernels params with those from defaultKernels
+            newChildren = []
+            for k in range(nLatents):
+                namedKernelsParams = defaultKernels[k].getNamedParams()
+                # pdb.set_trace()
+                if type(defaultKernels[k]).__name__=="PeriodicKernel":
+                    aDiv = html.Div(
+                        children=[
+                            html.Div(
+                                children=[
+                                    html.Label(
+                                        id={
+                                            "type": "kernelsTypeParam0Label",
+                                            "latent": k
+                                        },
+                                        children="Kernel {:d} Type".format(k+1),
+                                    ),
+                                    html.Label(
+                                        id={
+                                            "type": "kernelTypeOfParam0",
+                                            "latent": k
+                                        },
+                                        children="PeriodicKernel",
+                                    ),
+                                ], style={"display": "inline-block", "width": "30%"},
+                            ),
+                            html.Div(
+                                children=[
+                                    html.Label(
+                                        id={
+                                            "type": "lengthScaleParam0Label",
+                                            "latent": k
+                                        },
+                                        children="Length Scale",
+                                    ),
+                                    dcc.Input(
+                                        id={
+                                            "type": "lengthScaleParam0",
+                                            "latent": k
+                                        },
+                                        type="number",
+                                        min=0,
+                                        value=namedKernelsParams["lengthScale"].item(),
+                                    ),
+                                ], style={"display": "inline-block", "width": "30%"}),
+                                html.Div(
+                                    children=[
+                                        html.Label(
+                                            id={
+                                                "type": "periodParam0Label",
+                                                "latent": k
+                                            },
+                                            children="Period",
+                                        ),
+                                        dcc.Input(
+                                            id={
+                                                "type": "periodParam0",
+                                                "latent": k
+                                            },
+                                            type="number",
+                                            min=0,
+                                            value=namedKernelsParams["period"].item(),
+                                        ),
+                                    ], style={"display": "inline-block", "width": "30%"}),
+                    ])
+                elif type(defaultKernels[k]).__name__=="ExponentialQuadraticKernel":
+                    aDiv = html.Div(
+                        children=[
+                            html.Div(
+                                children=[
+                                    html.Label(
+                                        id={
+                                            "type": "kernelTypeParam0Label",
+                                            "latent": k
+                                        },
+                                        children="Kernel {:d} Type".format(k+1),
+                                    ),
+                                    html.Label(
+                                        id={
+                                            "type": "kernelTypeOfParam0",
+                                            "latent": k
+                                        },
+                                        children="ExponentialQuadraticKernel",
+                                    )
+                            ], style={"display": "inline-block", "width": "30%"}),
+                            html.Div(
+                                children=[
+                                    html.Label(
+                                        id={
+                                            "type": "lengthScaleParam0Label",
+                                            "latent": k
+                                        },
+                                        children="Length Scale",
+                                    ),
+                                    dcc.Input(
+                                        id={
+                                            "type": "lengthScaleParam0",
+                                            "latent": k
+                                        },
+                                        type="number",
+                                        min=0,
+                                        value=namedKernelsParams["lengthScale"].item(),
+                                    ),
+                                ], style={"display": "inline-block", "width": "30%"}),
+                            html.Div(
+                                children=[
+                                    html.Label(
+                                        id={
+                                            "type": "periodParam0Label",
+                                            "latent": k
+                                        },
+                                        children="Period"),
+                                    dcc.Input(
+                                        id={
+                                            "type": "periodParam0",
+                                            "latent": k
+                                        },
+                                        type="number",
+                                        min=0,
+                                    ),
+                                ],
+                                hidden=True,
+                                # style={"display": "inline-block", "width": "30%"}
+                                ),
+                        ])
+                newChildren.append(aDiv)
+        elif nLatents<len(kernelParams0ContainerChildren):
             # remove kernel params from the end
             # pdb.set_trace()
             newChildren = kernelParams0ContainerChildren[:nLatents]
-            return newChildren
         elif nLatents>len(kernelParams0ContainerChildren):
             # pdb.set_trace()
             nKernelsParams0ToAdd = nLatents-len(kernelParams0ContainerChildren)
@@ -428,7 +526,7 @@ def main(argv):
                                             "type": "kernelTypeOfParam0",
                                             "latent": k
                                         },
-                                        children="Periodic Kernel"
+                                        children="PeriodicKernel"
                                     ),
                                 ], style={"display": "inline-block", "width": "30%"}
                             ),
@@ -483,7 +581,7 @@ def main(argv):
                                             "type": "kernelTypeOfParam0",
                                             "latent": k
                                         },
-                                        children="Exponential Quadratic"
+                                        children="ExponentialQuadraticKernel"
                                     ),
                                 ], style={"display": "inline-block", "width": "30%"}),
                             html.Div(
@@ -579,15 +677,45 @@ def main(argv):
                                         value=None,
                                     ),
                                 ],
-                                hidden=True,
                                 style={"display": "inline-block", "width": "30%"}
                             ),
                         ])
                 else:
                     raise RuntimeError("Invalid Kernel type {:s}".format(kTypeToAdd))
                 newChildren.append(aDiv)
-            kernelParams0ParentContainerHidden = False
-            return kernelParams0ParentContainerHidden, newChildren
+        kernelParams0ParentContainerHidden = False
+        return kernelParams0ParentContainerHidden, newChildren
+
+    @app.callback([Output({"type": "kernelTypeOfParam0", "latent": MATCH}, "children"),
+                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "value"),
+                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "type"),
+                   Output({"type": "periodParam0", "latent": MATCH}, "value"),
+                   Output({"type": "periodParam0", "latent": MATCH}, "type"),
+                   Output({"type": "periodParam0Label", "latent": MATCH}, "children")],
+                  [Input({"type": "kernelTypeComponent", "latent": MATCH}, "value")],
+                  [State({"type": "kernelTypeOfParam0", "latent": MATCH}, "children")],
+                 )
+    def updateKernelsParams0(kernelTypeComponentValue, kernelTypeOfParam0Children):
+        pdb.set_trace()
+        if kernelTypeComponentValue is None or kernelTypeOfParam0Children is None or kernelTypeComponentValue==kernelTypeOfParam0Children:
+            raise PreventUpdate
+        if kernelTypeComponentValue=="PeriodicKernel":
+            kernelType = "PeriodicKernel"
+            lengthScaleValue = None
+            lengthScaleType = "number"
+            periodValue = None
+            periodValueType = "number"
+            periodLabel = "Period"
+        elif kernelTypeComponentValue=="ExponentialQuadraticKernel":
+            kernelType = "ExponentialQuadraticKernel"
+            lengthScaleValue = None
+            lengthScaleType = "number"
+            periodValue = None
+            periodValueType = "hidden"
+            periodLabel = ""
+        else:
+            raise RuntimeError("Invalid kernel type: {:s}".format(kernelTypeComponentValue))
+        return [kernelType, lengthScaleValue, lengthScaleType, periodValue, periodValueType, periodLabel]
 
     @app.callback(
         Output("kernelParams0BufferContainer", "children"),
