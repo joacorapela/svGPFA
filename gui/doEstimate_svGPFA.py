@@ -3,6 +3,7 @@ import sys
 import datetime
 import configparser
 import importlib
+import math
 import numpy as np
 from numpy import array
 import torch
@@ -13,7 +14,7 @@ from dash.dependencies import Input, Output, State, ALL, MATCH
 from dash.exceptions import PreventUpdate
 sys.path.append("../src")
 import stats.svGPFA.svGPFAModelFactory
-from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram
+from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram, getKernels, getKernelParams0Div, guessTrialsLengths
 
 def main(argv):
     if(len(argv)!=2):
@@ -22,14 +23,42 @@ def main(argv):
     guiFilename = argv[1]
     guiConfig = configparser.ConfigParser()
     guiConfig.read(guiFilename)
+
+    condDistString = guiConfig["modelSpecs"]["condDist"]
+    if condDistString=="PointProcess":
+        condDist0 = stats.svGPFA.svGPFAModelFactory.PointProcess
+    elif condDistString=="Poisson":
+        condDist0 = stats.svGPFA.svGPFAModelFactory.Poisson
+    elif condDistString=="Gaussian":
+        condDist0 = stats.svGPFA.svGPFAModelFactory.Gaussian
+    else:
+        raise RuntimeError("Invalid conditional distribution: {:s}".format(condDistString))
+
+    linkFuncString = guiConfig["modelSpecs"]["linkFunc"]
+    if linkFuncString=="ExponentialLink":
+        linkFunc0 = stats.svGPFA.svGPFAModelFactory.ExponentialLink
+    elif linkFuncString=="NonExponential":
+        linkFunc0 = stats.svGPFA.svGPFAModelFactory.NonExponential
+    else:
+        raise RuntimeError("Invalid link function: {:s}".format(linkFunctionString))
+
+    embeddingString = guiConfig["modelSpecs"]["embedding"]
+    if embeddingString=="LinearEmbedding":
+        embedding0 = stats.svGPFA.svGPFAModelFactory.LinearEmbedding
+    else:
+        raise RuntimeError("Invalid embedding: {:s}".format(embeddingString))
+
+    nLatents0 = int(guiConfig["latents"]["nLatents"])
     minNLatents = int(guiConfig["latents"]["minNLatents"])
     maxNLatents = int(guiConfig["latents"]["maxNLatents"])
     firstIndPoint = float(guiConfig["indPoints"]["firstIndPoint"])
+    nIndPoints0 = [int(guiConfig["indPoints"]["numberOfIndPointsLatent{:d}".format(k+1)]) for k in range(nLatents0)]
+    defaultNIndPoints = int(guiConfig["indPoints"]["defaultNIndPoints"])
+    kernels0 = getKernels(nLatents=nLatents0, config=guiConfig)
 
     external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
     app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
-    app.config['suppress_callback_exceptions'] = True
     app.layout = html.Div(children=[
         html.H1(children="Sparse Variational Gaussian Process Factor Analysis"),
 
@@ -46,6 +75,7 @@ def main(argv):
                         {"label": "Poisson", "value": stats.svGPFA.svGPFAModelFactory.Poisson},
                         {"label": "Gaussian", "value": stats.svGPFA.svGPFAModelFactory.Gaussian},
                     ],
+                    value=condDist0,
                 ),
             ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
             html.Div(
@@ -57,6 +87,7 @@ def main(argv):
                             {"label": "Exponential", "value": stats.svGPFA.svGPFAModelFactory.ExponentialLink},
                             {"label": "Other", "value": stats.svGPFA.svGPFAModelFactory.NonExponentialLink},
                         ],
+                        value=linkFunc0,
                     ),
                 ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
             html.Div(
@@ -67,6 +98,7 @@ def main(argv):
                         options=[
                             {"label": "Linear", "value": stats.svGPFA.svGPFAModelFactory.LinearEmbedding},
                         ],
+                        value=embedding0,
                     ),
                 ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
         ], style={"display": "flex", "flex-wrap": "wrap", "width": 800, "padding-bottom": "20px", "background-color": "white"}),
@@ -77,6 +109,7 @@ def main(argv):
                     id="nLatentsComponent",
                     min=0,
                     max=10,
+                    value=nLatents0,
                     marks={i: str(i) for i in range(minNLatents, maxNLatents)},
                 )],
                 style={"width": "25%"}
@@ -101,8 +134,8 @@ def main(argv):
                 html.Label("Spikes Variable Name"),
                 html.Div(children=[
                     dcc.Dropdown(
-                        id="spikesTimesVar", 
-                        # disabled=True, 
+                        id="spikesTimesVar",
+                        # disabled=True,
                         # # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
                         # style={"display": "inline-block", "width": "200px", "padding-right": "20px"}
                         # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
@@ -143,14 +176,35 @@ def main(argv):
                 ),
             ], hidden=True, style={"width": "20%", "columnCount": 1}),
         html.Div(
-            id="kernelParams0ParentContainer", 
+            id="kernelParams0ParentContainer",
             children=[
                 html.H4("Initial Kernels Parameters"),
                 html.Div(id="kernelParams0Container", children=[]),
                 html.Div(id="kernelParams0BufferContainer", children=[], hidden=False),
                 html.Hr(),
             ],
-            hidden=True),
+            hidden=True,
+        ),
+        html.Div(
+            id="embeddingParams0",
+            children=[
+            html.H4("Initial Conditions for Linear Embedding"),
+            html.Div(children=[
+                    html.Label("Mixing Matrix"),
+                    dcc.Textarea(
+                        id="C0string",
+                        required=True,
+                    ),
+                ]),
+                html.Div(children=[
+                    html.Label("Offset Vector"),
+                    dcc.Textarea(
+                        id="d0string",
+                        required=True,
+                    ),
+                ]),
+                html.Hr(),
+            ], hidden=True),
         html.Div(
             id="trialsLengthsParentContainer",
             children=[
@@ -177,109 +231,165 @@ def main(argv):
             ],
             hidden=True),
         html.Div(
-            id="embeddingParams0",
-            children=[
-            html.H4("Initial Conditions for Linear Embedding"),
-            html.Div(children=[
-                    html.Label("Mixing Matrix"),
-                    dcc.Textarea(
-                        id="C0string",
-                    ),
-                ]),
-                html.Div(children=[
-                    html.Label("Offset Vector"),
-                    dcc.Textarea(
-                        id="d0string",
-                    ),
-                ]),
-                html.Hr(),
-            ], hidden=True),
-        html.Div(
             id="optimParams",
             children=[
                 html.H4("EM Parameters"),
                 html.Div(children=[
                     html.Label("Maximum EM iterations"),
-                    dcc.Input(id="maxIter", type="number"),
+                    dcc.Input(
+                        id="maxIter",
+                        type="number",
+                        required=True,
+                        value=int(guiConfig["emParams"]["emMaxNIter"]),
+                    ),
                 ], style={"padding-bottom": "20px"}),
                 html.Div(children=[
                     html.H6("Expectation Step"),
-                    dcc.Checklist(id="eStepEstimate",
-                                  options=[{"label": "estimate",
-                                            "value": "eStepEstimate"}],
-                                 ),
+                    dcc.Checklist(
+                        id="eStepEstimate",
+                        options=[{"label": "estimate",
+                                  "value": "eStepEstimate"}],
+                        value=[guiConfig["emParams"]["eStepEstimate"]],
+                    ),
                     html.Label("Maximum iterations"),
-                    dcc.Input(id="eStepMaxIter", type="number"),
+                    dcc.Input(
+                        id="eStepMaxNIter",
+                        type="number",
+                        required=True,
+                        value=int(guiConfig["emParams"]["eStepMaxNIter"]),
+                    ),
                     html.Label("Learning rate"),
-                    dcc.Input(id="eStepLR", type="number"),
+                    dcc.Input(
+                        id="eStepLR",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["eStepLR"]),
+                    ),
                     html.Label("Tolerance"),
-                    dcc.Input(id="eStepTol", type="number", required=True),
+                    dcc.Input(
+                        id="eStepTol",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["eStepTol"]),
+                    ),
                     html.Label("Line search"),
                     dcc.RadioItems(
                         options=[
                             {"label": "strong wolfe", "value": "eStepLineSearchStrong_wolfe"},
                             {"label": "none", "value": "eStepLineSearchNone"},
                         ],
+                        value=guiConfig["emParams"]["eStepLineSearchFn"],
                     ),
                 ], style={"padding-bottom": "20px"}),
                 html.Div(children=[
                     html.H6("Maximization Step on Embedding Parameters"),
-                    dcc.Checklist(id="mStepEmbedding",
-                                  options=[{"label": "estimate",
-                                            "value": "mStepEmbeddingEstimate"}],
-                                 ),
+                    dcc.Checklist(
+                        id="mStepEmbedding",
+                        options=[{"label": "estimate", "value": "mStepEmbeddingEstimate"}],
+                        value=[guiConfig["emParams"]["mStepEmbeddingEstimate"]],
+                    ),
                     html.Label("Maximum iterations"),
-                    dcc.Input(id="mStepEmbeddingMaxIter", type="number"),
+                    dcc.Input(
+                        id="mStepEmbeddingMaxNIter",
+                        type="number",
+                        required=True,
+                        value=int(guiConfig["emParams"]["mStepEmbeddingMaxNIter"]),
+                    ),
                     html.Label("Learning rate"),
-                    dcc.Input(id="mStepEmbeddingLR", type="number"),
+                    dcc.Input(
+                        id="mStepEmbeddingLR",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["mStepEmbeddingLR"]),
+                    ),
                     html.Label("Tolerance"),
-                    dcc.Input(id="mStepEmbeddingTol", type="number"),
+                    dcc.Input(
+                        id="mStepEmbeddingTol",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["mStepEmbeddingTol"]),
+                    ),
                     html.Label("Line search"),
                     dcc.RadioItems(
                         options=[
                             {"label": "strong wolfe", "value": "mStepEmbeddingLineSearchStrong_wolfe"},
                             {"label": "none", "value": "mStepEmbeddingLineSearchNone"},
                         ],
+                        value=guiConfig["emParams"]["mStepEmbeddingLineSearchFn"],
                     ),
                 ], style={"padding-bottom": "20px"}),
                 html.Div(children=[
                     html.H6("Maximization Step on Kernels Parameters"),
-                    dcc.Checklist(id="mStepKernelsParams",
-                                  options=[{"label": "estimate",
-                                            "value": "mStepKernelsParamsEstimate"}],
-                                 ),
+                    dcc.Checklist(
+                        id="mStepKernels",
+                        options=[{"label": "estimate", "value": "mStepKernelsEstimate"}],
+                        value=[guiConfig["emParams"]["mStepKernelsEstimate"]],
+                    ),
                     html.Label("Maximum iterations"),
-                    dcc.Input(id="mStepKernelsParamsMaxIter", type="number"),
+                    dcc.Input(
+                        id="mStepKernelsMaxNIter",
+                        type="number",
+                        required=True,
+                        value=int(guiConfig["emParams"]["mStepKernelsMaxNIter"]),
+                    ),
                     html.Label("Learning rate"),
-                    dcc.Input(id="mStepKernelsParamsLR", type="number"),
+                    dcc.Input(
+                        id="mStepKernelsLR",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["mStepKernelsLR"]),
+                    ),
                     html.Label("Tolerance"),
-                    dcc.Input(id="mStepKernelsParamsTol", type="number"),
+                    dcc.Input(
+                        id="mStepKernelsTol",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["mStepKernelsTol"]),
+                    ),
                     html.Label("Line search"),
                     dcc.RadioItems(
                         options=[
-                            {"label": "strong wolfe", "value": "mStepKernelsParamsLineSearchStrong_wolfe"},
-                            {"label": "none", "value": "mStepKernelsParamsLineSearchNone"},
+                            {"label": "strong wolfe", "value": "mStepKernelsLineSearchStrong_wolfe"},
+                            {"label": "none", "value": "mStepKernelsLineSearchNone"},
                         ],
+                        value=guiConfig["emParams"]["mStepKernelsLineSearchFn"],
                     ),
                 ], style={"padding-bottom": "20px"}),
                 html.Div(children=[
                     html.H6("Maximization Step on Inducing Points Parameters"),
-                    dcc.Checklist(id="mStepIndPointsParams",
-                                  options=[{"label": "estimate",
-                                            "value": "mStepIndPointsParamsEstimate"}],
-                                 ),
+                    dcc.Checklist(
+                        id="mStepIndPoints",
+                        options=[{"label": "estimate", "value": "mStepIndPointsEstimate"}],
+                        value=[guiConfig["emParams"]["mStepIndPointsEstimate"]],
+                    ),
                     html.Label("Maximum iterations"),
-                    dcc.Input(id="mStepIndPointsParamsMaxIter", type="number"),
+                    dcc.Input(
+                        id="mStepIndPointsMaxNIter",
+                        type="number",
+                        required=True,
+                        value=int(guiConfig["emParams"]["mStepIndPointsMaxNIter"]),
+                    ),
                     html.Label("Learning rate"),
-                    dcc.Input(id="mStepIndPointsParamsLR", type="number"),
+                    dcc.Input(
+                        id="mStepIndPointsLR",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["mStepIndPointsLR"]),
+                    ),
                     html.Label("Tolerance"),
-                    dcc.Input(id="mStepIndPointsParamsTol", type="number"),
+                    dcc.Input(
+                        id="mStepIndPointsTol",
+                        type="number",
+                        required=True,
+                        value=float(guiConfig["emParams"]["mStepIndPointsTol"]),
+                    ),
                     html.Label("Line search"),
                     dcc.RadioItems(
                         options=[
-                            {"label": "strong wolfe", "value": "mStepIndPointsParamsLineSearchStrong_wolfe"},
-                            {"label": "none", "value": "mStepIndPointsParamsLineSearchNone"},
+                            {"label": "strong wolfe", "value": "mStepIndPointsLineSearchStrong_wolfe"},
+                            {"label": "none", "value": "mStepIndPointsLineSearchNone"},
                         ],
+                        value=guiConfig["emParams"]["mStepIndPointsLineSearchFn"],
                     ),
                 ], style={"padding-bottom": "20px"}),
             ]
@@ -288,11 +398,21 @@ def main(argv):
         html.H4("Miscellaneous Parameters"),
         html.Div(children=[
             html.Label("Number of quadrature points"),
-            dcc.Input(id="nQuad", type="number"),
+            dcc.Input(
+                id="nQuad",
+                type="number",
+                required=True,
+                value=int(guiConfig["miscParams"]["nQuad"]),
+            ),
         ], style={"padding-bottom": "20px"}),
         html.Div(children=[
             html.Label("Variance added to kernel covariance matrix for inducing points"),
-            dcc.Input(id="indPointsLocsKMSRegEpsilon", type="number"),
+            dcc.Input(
+                id="indPointsLocsKMSRegEpsilon",
+                type="number",
+                required=True,
+                value=float(guiConfig["miscParams"]["indPointsLocsKMSRegEpsilon"]),
+            ),
         ], style={"padding-bottom": "20px"}),
         html.Hr(),
         html.Button("Estimate", id="doEstimate", n_clicks=0),
@@ -325,6 +445,7 @@ def main(argv):
                                 {"label": "Exponential Quadratic", "value": "ExponentialQuadraticKernel"},
                                 {"label": "Periodic", "value": "PeriodicKernel"},
                             ],
+                            value=type(kernels0[k]).__name__,
                             style={"width": "45%"}
                         ),
                     ]),
@@ -356,37 +477,6 @@ def main(argv):
             answer = kernelsTypesContainerChildren + newChildren
             return answer
 
-    @app.callback([Output({"type": "kernelTypeOfParam0", "latent": MATCH}, "children"),
-                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "value"),
-                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "hidden"),
-                   Output({"type": "periodParam0", "latent": MATCH}, "value"),
-                   Output({"type": "periodParam0", "latent": MATCH}, "hidden"),
-                   Output({"type": "periodParam0Label", "latent": MATCH}, "children")],
-                  [Input({"type": "kernelTypeComponent", "latent": MATCH}, "value")],
-                  [State({"type": "kernelTypeOfParam0", "latent": MATCH}, "value")],
-                 )
-    def updateKernelsParams0(kernelTypeComponentValue, kernelTypeOfParam0Value):
-        # pdb.set_trace()
-        if kernelTypeComponentValue is None or kernelTypeComponentValue==kernelTypeOfParam0Value:
-            raise PreventUpdate
-        if kernelTypeComponentValue=="PeriodicKernel":
-            kernelType = "Periodic"
-            lengthScaleValue = None
-            lengthScaleHidden = False
-            periodValue = None
-            periodValueHidden = False
-            periodLabel = "Period"
-        elif kernelTypeComponentValue=="ExponentialQuadraticKernel":
-            kernelType = "Exponential Quadratic"
-            lengthScaleValue = None
-            lengthScaleHidden = False
-            periodValue = None
-            periodValueHidden = True
-            periodLabel = ""
-        else:
-            raise RuntimeError("Invalid kernel type: {:s}".format(kernelTypeComponentValue))
-        return [kernelType, lengthScaleValue, lengthScaleHidden, periodValue, periodValueHidden, periodLabel]
-
     @app.callback(
         [Output("kernelParams0ParentContainer", "hidden"),
          Output("kernelParams0Container", "children")],
@@ -401,204 +491,73 @@ def main(argv):
         if nLatents==0:
             # non-relevant event
             raise PreventUpdate
-        if nLatents<len(kernelParams0ContainerChildren):
+        if len(kernelParams0ContainerChildren)==0:
+            # initialize kernels params with those from kernels0
+            newChildren = []
+            for k in range(nLatents):
+                kernelType = type(kernels0[k]).__name__
+                ### being convert the values in kernels0[k].getNamedParams() from tensor to number
+                namedKernelParamsTmp = kernels0[k].getNamedParams()
+                values = [value.item() for value in namedKernelParamsTmp.values()]
+                keys = list(namedKernelParamsTmp.keys())
+                namedKernelParams = dict(zip(keys, values))
+                ### end convert the values in kernels0[k].getNamedParams() from tensor to number
+                aDiv = getKernelParams0Div(kernelType=kernelType, namedKernelParams=namedKernelParams, latentID=k)
+                newChildren.append(aDiv)
+        elif nLatents<len(kernelParams0ContainerChildren):
             # remove kernel params from the end
-            # pdb.set_trace()
             newChildren = kernelParams0ContainerChildren[:nLatents]
-            return newChildren
         elif nLatents>len(kernelParams0ContainerChildren):
             # pdb.set_trace()
+            newChildren = []
             nKernelsParams0ToAdd = nLatents-len(kernelParams0ContainerChildren)
             newChildren = kernelParams0ContainerChildren
+            namedKernelParams = {"LengthScale": None, "Period": None}
             for k in range(len(kernelParams0ContainerChildren), nLatents):
-                kTypeToAdd = kernelTypeComponentValues[k]
-                if kTypeToAdd=="PeriodicKernel":
-                    aDiv = html.Div(
-                        children=[
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "kernelTypeParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Kernel {:d} Type".format(k+1)),
-                                    html.Label(
-                                        id={
-                                            "type": "kernelTypeOfParam0",
-                                            "latent": k
-                                        },
-                                        children="Periodic Kernel"
-                                    ),
-                                ], style={"display": "inline-block", "width": "30%"}
-                            ),
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "lengthScaleParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Length Scale"),
-                                    dcc.Input(
-                                        id={
-                                            "type": "lengthScaleParam0",
-                                            "latent": k
-                                        },
-                                        type="number",
-                                        min=0,
-                                    ),
-                                ], style={"display": "inline-block", "width": "30%"}),
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "periodParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Period"),
-                                    dcc.Input(
-                                        id={
-                                            "type": "periodParam0",
-                                            "latent": k
-                                        },
-                                        type="number",
-                                        min=0,
-                                    ),
-                                ], style={"display": "inline-block", "width": "30%"}),
-                            ])
-                elif kTypeToAdd=="ExponentialQuadraticKernel":
-                    aDiv = html.Div(
-                        children=[
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "kernelTypeParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Kernel {:d} Type".format(k+1)),
-                                    html.Label(
-                                        id={
-                                            "type": "kernelTypeOfParam0",
-                                            "latent": k
-                                        },
-                                        children="Exponential Quadratic"
-                                    ),
-                                ], style={"display": "inline-block", "width": "30%"}),
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "lengthScaleParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Length Scale"),
-                                    dcc.Input(
-                                        id={
-                                            "type": "lengthScaleParam0",
-                                            "latent": k
-                                        },
-                                        type="number",
-                                        min=0,
-                                    ),
-                                ],
-                                style={"display": "inline-block", "width": "30%"}),
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "periodParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Period"),
-                                        dcc.Input(
-                                            id={
-                                                "type": "periodParam0",
-                                                "latent": k
-                                            },
-                                            type="number",
-                                            min=0,
-                                            value=None,
-                                        ),
-                                    ],
-                                hidden=True,
-                                style={"display": "inline-block", "width": "30%"}
-                                ),
-                        ])
-                elif kTypeToAdd is None:
-                    aDiv = html.Div(
-                        children=[
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "kernelTypeParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Kernel {:d} Type".format(k+1)),
-                                    html.Label(
-                                        id={
-                                            "type": "kernelTypeOfParam0",
-                                            "latent": k
-                                        },
-                                    ),
-                                ], style={"display": "inline-block", "width": "30%"}),
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "lengthScaleParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Length Scale"),
-                                    dcc.Input(
-                                        id={
-                                            "type": "lengthScaleParam0",
-                                            "latent": k
-                                        },
-                                        type="number",
-                                        min=0,
-                                    ),
-                                ], style={"display": "inline-block", "width": "30%"}),
-                            html.Div(
-                                children=[
-                                    html.Label(
-                                        id={
-                                            "type": "periodParam0Label",
-                                            "latent": k
-                                        },
-                                        children="Period"),
-                                    dcc.Input(
-                                        id={
-                                            "type": "periodParam0",
-                                            "latent": k
-                                        },
-                                        type="number",
-                                        min=0,
-                                        value=None,
-                                    ),
-                                ],
-                                hidden=True,
-                                style={"display": "inline-block", "width": "30%"}
-                            ),
-                        ])
-                else:
-                    raise RuntimeError("Invalid Kernel type {:s}".format(kTypeToAdd))
+                kernelType = kernelTypeComponentValues[k]
+                aDiv = getKernelParams0Div(kernelType=kernelType, namedKernelParams=namedKernelParams, latentID=k)
                 newChildren.append(aDiv)
-            kernelParams0ParentContainerHidden = False
-            return kernelParams0ParentContainerHidden, newChildren
+                # pdb.set_trace()
+        kernelParams0ParentContainerHidden = False
+        # pdb.set_trace()
+        return kernelParams0ParentContainerHidden, newChildren
+
+    @app.callback([Output({"type": "kernelTypeOfParam0", "latent": MATCH}, "children"),
+                   Output({"type": "lengthScaleParam0", "latent": MATCH}, "value"),
+                   Output({"type": "periodParam0", "latent": MATCH}, "value"),
+                   Output({"type": "periodParam0Container", "latent": MATCH}, "style")],
+                  [Input({"type": "kernelTypeComponent", "latent": MATCH}, "value")],
+                  [State({"type": "kernelTypeOfParam0", "latent": MATCH}, "children"),
+                   State({"type": "kernelTypeOfParam0", "latent": MATCH}, "hidden"),],
+                 )
+    def updateKernelsParams0(kernelTypeComponentValue, kernelTypeOfParam0Children, kernelTypeOfParam0Style):
+        if kernelTypeComponentValue is None or kernelTypeComponentValue==kernelTypeOfParam0Children:
+            raise PreventUpdate
+        if kernelTypeComponentValue=="PeriodicKernel":
+            kernelType = "Periodic"
+            lengthScaleValue = None
+            periodValue = None
+            periodContainerStyle = {"display": "inline-block", "width": "30%"}
+        elif kernelTypeComponentValue=="ExponentialQuadraticKernel":
+            kernelType = "Exponential Quadratic"
+            lengthScaleValue = None
+            periodValue = None
+            periodContainerStyle = {"display": "none"}
+        else:
+            raise RuntimeError("Invalid kernel type: {:s}".format(kernelTypeComponentValue))
+        return kernelType, lengthScaleValue, periodValue, periodContainerStyle
 
     @app.callback(
         Output("kernelParams0BufferContainer", "children"),
-        [Input("nLatentsComponent", "value")])
-    def createKernelsParams0Buffer(nLatentsComponentValue):
+        [Input("kernelParams0Container", "children")])
+    def createKernelsParams0Buffer(kernelParams0ContainerChildren):
         # pdb.set_trace()
-        if nLatentsComponentValue is None:
+        nLatents = len(kernelParams0ContainerChildren)
+        if nLatents is None:
             raise PreventUpdate
 
         children = []
-        for k in range(nLatentsComponentValue):
+        for k in range(nLatents):
             aDiv = html.Div(
                 id={
                     "type": "kernelParams0Buffer",
@@ -610,26 +569,28 @@ def main(argv):
 
     @app.callback(
         Output({"type": "kernelParams0Buffer", "latent": MATCH}, "children"),
-        [Input({"type": "kernelTypeComponent", "latent": MATCH}, "value"),
+        [Input("kernelParams0BufferContainer", "children"),
+         Input({"type": "kernelTypeComponent", "latent": MATCH}, "value"),
          Input({"type": "lengthScaleParam0", "latent": MATCH}, "value"),
          Input({"type": "periodParam0", "latent": MATCH}, "value"),
         ])
-    def populateKernelParams0Buffer(kernelTypeComponent, lengthScaleParam0, periodParam0):
+    def populateKernelParams0Buffer(kernelParams0ContainerChildren, kernelTypeComponentValue, lengthScaleParam0Value, periodParam0Value):
         # pdb.set_trace()
-        if lengthScaleParam0 is None:
-            lengthScaleParam0 = -1.0
-        if periodParam0 is None:
-            periodParam0 = -1.0
-        if kernelTypeComponent=="PeriodicKernel":
-            stringRep = "{:f},{:f}".format(lengthScaleParam0, periodParam0)
+        if lengthScaleParam0Value is None:
+            lengthScaleParam0Value = -1.0
+        if periodParam0Value is None:
+            periodParam0Value = -1.0
+        if kernelTypeComponentValue=="PeriodicKernel":
+            stringRep = "{:f},{:f}".format(lengthScaleParam0Value, periodParam0Value)
             params0 = np.fromstring(stringRep, sep=",")
-        elif kernelTypeComponent=="ExponentialQuadraticKernel":
-            stringRep = "{:f}".format(lengthScaleParam0)
+        elif kernelTypeComponentValue=="ExponentialQuadraticKernel":
+            stringRep = "{:f}".format(lengthScaleParam0Value)
             params0 = np.fromstring(stringRep, sep=",")
-        elif kernelTypeComponent is None:
-            params0 = ""
+        elif kernelTypeComponentValue is None:
+            stringRep = "{:f}".format(-1.0)
+            params0 = np.fromstring(stringRep, sep=",")
         else:
-            raise RuntimeError("Invalid kernelTypeComponent={:s}".format(kernelTypeComponent))
+            raise RuntimeError("Invalid kernelTypeComponent={:s}".format(kernelTypeComponentValue))
         answer = [np.array_repr(params0)]
         return answer
 
@@ -666,6 +627,7 @@ def main(argv):
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
             nTrials = spikesTimes.shape[0]
             nNeurons = spikesTimes.shape[1]
+            trialsLengthsGuesses = guessTrialsLengths(spikesTimes=spikesTimes)
             nTrialsAndNNeuronsInfo = "trials: {:d}, neurons: {:d}".format(nTrials, nNeurons)
             trialToPlotOptions = [{"label": str(r+1), "value": r} for r in range(nTrials)]
             trialToPlotValue = 0
@@ -676,9 +638,11 @@ def main(argv):
                 aDiv = html.Div(children=[
                     html.Label("Trial {:d}".format(r+1)),
                     dcc.Input(
-                        type="number", 
+                        type="number",
                         placeholder="trial length",
                         min=0,
+                        required=True,
+                        value = trialsLengthsGuesses[r],
                     ),
                 ])
                 trialsLengthsChildren.append(aDiv)
@@ -702,53 +666,56 @@ def main(argv):
             return rastergram
         raise PreventUpdate
 
-#     @app.callback(Output("trialsLengths", "children"),
-#                   [Input("spikesInfo", "children")])
-#     def showTrialLengths(spikesInfoChildren):
-#         # pdb.set_trace()
-#         if spikesInfoChildren is not None:
-#             nTrials = runner.getSpikesTimes().shape[0]
-#             someChildren = [html.H4("Trials lengths")]
-#             for r in range(nTrials):
-#                 aDiv = html.Div(children=[
-#                     html.Label("Trial {:d}".format(r+1)),
-#                     dcc.Input(
-#                         type="number", placeholder="trial length",
-#                         min=0,
-#                     ),
-#                 ])
-#                 someChildren.append(aDiv)
-#             someChildren.append(html.Hr())
-#             return someChildren
-#         # return [None]
-#         raise PreventUpdate
-
     @app.callback([Output("nIndPointsPerLatentContainer", "children"),
                    Output("nIndPointsPerLatentParentContainer", "hidden") ],
-                  [Input("nLatentsComponent", "value")])
-    def showNIndPointsPerLatent(nLatentsComponentValue):
+                  [Input("nLatentsComponent", "value")],
+                  [State("nIndPointsPerLatentContainer", "children")])
+    def showNIndPointsPerLatent(nLatents, nIndPointsPerLatentContainerChildren):
         # pdb.set_trace()
-        if nLatentsComponentValue is None:
+        if nLatents is None:
             raise PreventUpdate
-        someChildren = []
-        for k in range(nLatentsComponentValue):
-            aChildren = html.Div(children=[
-                html.Label("Latent {:d}".format(k+1)),
-                html.Div(
-                    children=[
-                    dcc.Slider(
-                        id={
-                            "type": "nIndPoints",
-                            "latent": k
-                        },
-                        min=5,
-                        max=50,
-                        marks={i: str(i) for i in range(5, 51, 5)},
-                        value=20,
-                    )
-                ], style={"width": "25%", "height": "50px"}),
-            ])
-            someChildren.append(aChildren)
+        if len(nIndPointsPerLatentContainerChildren)==0:
+            someChildren = []
+            for k in range(nLatents):
+                aChildren = html.Div(children=[
+                    html.Label("Latent {:d}".format(k+1)),
+                    html.Div(
+                        children=[
+                        dcc.Slider(
+                            id={
+                                "type": "nIndPoints",
+                                "latent": k
+                            },
+                            min=5,
+                            max=50,
+                            marks={i: str(i) for i in range(5, 51, 5)},
+                            value=nIndPoints0[k],
+                        )
+                    ], style={"width": "25%", "height": "50px"}),
+                ])
+                someChildren.append(aChildren)
+        elif len(nIndPointsPerLatentContainerChildren)<nLatents:
+            someChildren = nIndPointsPerLatentContainerChildren
+            for k in range(len(nIndPointsPerLatentContainerChildren), nLatents):
+                aChildren = html.Div(children=[
+                    html.Label("Latent {:d}".format(k+1)),
+                    html.Div(
+                        children=[
+                        dcc.Slider(
+                            id={
+                                "type": "nIndPoints",
+                                "latent": k
+                            },
+                            min=5,
+                            max=50,
+                            marks={i: str(i) for i in range(5, 51, 5)},
+                            value=defaultNIndPoints,
+                        )
+                    ], style={"width": "25%", "height": "50px"}),
+                ])
+                someChildren.append(aChildren)
+        elif len(nIndPointsPerLatentContainerChildren)>nLatents:
+            someChildren = nIndPointsPerLatentContainerChildren[:nLatents]
         nIndPointsPerLatentParentContaineHidden = False
         return someChildren, nIndPointsPerLatentParentContaineHidden
 
@@ -774,9 +741,10 @@ def main(argv):
                         "latent": k
                     },
                     type="text",
-                    value=np.array_repr(qMu0.squeeze()),
                     size="{:d}".format(5*nIndPoints),
-                    required=True),
+                    required=True,
+                    value=np.array_repr(qMu0.squeeze()),
+                ),
                 html.Label("Spanning Vector of Covariance"),
                 dcc.Input(
                     id={
@@ -784,9 +752,10 @@ def main(argv):
                         "latent": k
                     },
                     type="text",
-                    value=np.array_repr(qVec0.squeeze()),
                     size="{:d}".format(5*nIndPoints),
-                    required=True),
+                    required=True,
+                    value=np.array_repr(qVec0.squeeze()),
+                ),
                 html.Label("Diagonal Vector of Covariance"),
                 dcc.Input(
                     id={
@@ -794,33 +763,37 @@ def main(argv):
                         "latent": k
                     },
                     type="text",
-                    value=np.array_repr(qDiag0.squeeze()),
                     size="{:d}".format(5*nIndPoints),
-                    required=True),
+                    required=True,
+                    value=np.array_repr(qDiag0.squeeze()),
+                ),
             ], style={"padding-bottom": "30px"})
             someChildren.append(aChildren)
         svPosteriorOnIndPointsParams0ParentContainerHidden = False
         return someChildren, svPosteriorOnIndPointsParams0ParentContainerHidden
 
-#     @app.callback([Output("embeddingParams0", "hidden"),
-#                    Output("C0string", "value"),
-#                    Output("C0string", "style"),
-#                    Output("d0string", "value"),
-#                    Output("d0string", "style")],
-#                   [Input("nLatentsComponent", "value"),
-#                    Input("spikesInfo", "children")])
-#     def populateEmbeddingInitialConditions(nLatentsComponentValue, spikesInfoChildren):
-#         # pdb.set_trace()
-#         if spikesInfoChildren is not None:
-#             nNeurons = runner.getSpikesTimes().shape[1]
-#             C0 = np.random.uniform(size=(nNeurons, nLatentsComponentValue))
-#             d0 = np.random.uniform(size=(nNeurons, 1))
-#             C0style = {"width": nLatentsComponentValue*175, "height": 300}
-#             d0style={"width": 200, "height": 300}
-#             # answer = [False, np.array2string(C0), C0style, np.array2string(d0), d0style]
-#             answer = [False, np.array_repr(C0), C0style, np.array_repr(d0), d0style]
-#             return answer
-#         raise PreventUpdate
+    @app.callback([Output("embeddingParams0", "hidden"),
+                   Output("C0string", "value"),
+                   Output("C0string", "style"),
+                   Output("d0string", "value"),
+                   Output("d0string", "style")],
+                  [Input("spikesTimesVar", "value"),
+                   Input("nLatentsComponent", "value")],
+                  [State("uploadSpikes", "contents"),
+                   State("uploadSpikes", "filename")])
+    def populateEmbeddingInitialConditions(spikesTimesVar, nLatentsComponentValue, contents, filename):
+        # pdb.set_trace()
+        if spikesTimesVar is not None:
+            spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
+            nNeurons = spikesTimes.shape[1]
+            C0 = np.random.uniform(size=(nNeurons, nLatentsComponentValue))
+            d0 = np.random.uniform(size=(nNeurons, 1))
+            C0style = {"width": nLatentsComponentValue*175, "height": 300}
+            d0style={"width": 200, "height": 300}
+            # answer = [False, np.array2string(C0), C0style, np.array2string(d0), d0style]
+            answer = [False, np.array_repr(C0), C0style, np.array_repr(d0), d0style]
+            return answer
+        raise PreventUpdate
 
     @app.callback(
         Output("estimationRes", "children"),
