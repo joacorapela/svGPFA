@@ -2,10 +2,8 @@ import pdb
 import sys
 import datetime
 import configparser
-import importlib
 import math
 import numpy as np
-from numpy import array
 import torch
 import dash
 import dash_core_components as dcc
@@ -14,7 +12,7 @@ from dash.dependencies import Input, Output, State, ALL, MATCH
 from dash.exceptions import PreventUpdate
 sys.path.append("../src")
 import stats.svGPFA.svGPFAModelFactory
-from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram, getKernels, getKernelParams0Div, guessTrialsLengths
+from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram, getKernels, getKernelParams0Div, guessTrialsLengths, svGPFA_runner
 
 def main(argv):
     if(len(argv)!=2):
@@ -135,7 +133,7 @@ def main(argv):
                 html.Div(children=[
                     dcc.Dropdown(
                         id="spikesTimesVar",
-                        # disabled=True,
+                        disabled=True,
                         # # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
                         # style={"display": "inline-block", "width": "200px", "padding-right": "20px"}
                         # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
@@ -208,7 +206,7 @@ def main(argv):
         html.Div(
             id="trialsLengthsParentContainer",
             children=[
-                html.H4("Trials lengths"),
+                html.H4("Trials Lengths"),
                 html.Div(id="trialsLengthsContainer", children=[]),
                 html.Hr(),
             ],
@@ -237,10 +235,10 @@ def main(argv):
                 html.Div(children=[
                     html.Label("Maximum EM iterations"),
                     dcc.Input(
-                        id="maxIter",
+                        id="emMaxIter",
                         type="number",
                         required=True,
-                        value=int(guiConfig["emParams"]["emMaxNIter"]),
+                        value=int(guiConfig["emParams"]["emMaxIter"]),
                     ),
                 ], style={"padding-bottom": "20px"}),
                 html.Div(children=[
@@ -248,15 +246,15 @@ def main(argv):
                     dcc.Checklist(
                         id="eStepEstimate",
                         options=[{"label": "estimate",
-                                  "value": "eStepEstimate"}],
+                                  "value": "True"}],
                         value=[guiConfig["emParams"]["eStepEstimate"]],
                     ),
                     html.Label("Maximum iterations"),
                     dcc.Input(
-                        id="eStepMaxNIter",
+                        id="eStepMaxIter",
                         type="number",
                         required=True,
-                        value=int(guiConfig["emParams"]["eStepMaxNIter"]),
+                        value=int(guiConfig["emParams"]["eStepMaxIter"]),
                     ),
                     html.Label("Learning rate"),
                     dcc.Input(
@@ -274,9 +272,9 @@ def main(argv):
                     ),
                     html.Label("Line search"),
                     dcc.RadioItems(
+                        id="eStepLineSearchFn",
                         options=[
                             {"label": "strong wolfe", "value": "eStepLineSearchStrong_wolfe"},
-                            {"label": "none", "value": "eStepLineSearchNone"},
                         ],
                         value=guiConfig["emParams"]["eStepLineSearchFn"],
                     ),
@@ -284,16 +282,16 @@ def main(argv):
                 html.Div(children=[
                     html.H6("Maximization Step on Embedding Parameters"),
                     dcc.Checklist(
-                        id="mStepEmbedding",
-                        options=[{"label": "estimate", "value": "mStepEmbeddingEstimate"}],
+                        id="mStepEmbeddingEstimate",
+                        options=[{"label": "estimate", "value": "True"}],
                         value=[guiConfig["emParams"]["mStepEmbeddingEstimate"]],
                     ),
                     html.Label("Maximum iterations"),
                     dcc.Input(
-                        id="mStepEmbeddingMaxNIter",
+                        id="mStepEmbeddingMaxIter",
                         type="number",
                         required=True,
-                        value=int(guiConfig["emParams"]["mStepEmbeddingMaxNIter"]),
+                        value=int(guiConfig["emParams"]["mStepEmbeddingMaxIter"]),
                     ),
                     html.Label("Learning rate"),
                     dcc.Input(
@@ -311,9 +309,9 @@ def main(argv):
                     ),
                     html.Label("Line search"),
                     dcc.RadioItems(
+                        id="mStepEmbeddingLineSearchFn",
                         options=[
                             {"label": "strong wolfe", "value": "mStepEmbeddingLineSearchStrong_wolfe"},
-                            {"label": "none", "value": "mStepEmbeddingLineSearchNone"},
                         ],
                         value=guiConfig["emParams"]["mStepEmbeddingLineSearchFn"],
                     ),
@@ -321,16 +319,16 @@ def main(argv):
                 html.Div(children=[
                     html.H6("Maximization Step on Kernels Parameters"),
                     dcc.Checklist(
-                        id="mStepKernels",
+                        id="mStepKernelsEstimate",
                         options=[{"label": "estimate", "value": "mStepKernelsEstimate"}],
                         value=[guiConfig["emParams"]["mStepKernelsEstimate"]],
                     ),
                     html.Label("Maximum iterations"),
                     dcc.Input(
-                        id="mStepKernelsMaxNIter",
+                        id="mStepKernelsMaxIter",
                         type="number",
                         required=True,
-                        value=int(guiConfig["emParams"]["mStepKernelsMaxNIter"]),
+                        value=int(guiConfig["emParams"]["mStepKernelsMaxIter"]),
                     ),
                     html.Label("Learning rate"),
                     dcc.Input(
@@ -348,9 +346,9 @@ def main(argv):
                     ),
                     html.Label("Line search"),
                     dcc.RadioItems(
+                        id="mStepKernelsLineSearchFn",
                         options=[
                             {"label": "strong wolfe", "value": "mStepKernelsLineSearchStrong_wolfe"},
-                            {"label": "none", "value": "mStepKernelsLineSearchNone"},
                         ],
                         value=guiConfig["emParams"]["mStepKernelsLineSearchFn"],
                     ),
@@ -358,16 +356,16 @@ def main(argv):
                 html.Div(children=[
                     html.H6("Maximization Step on Inducing Points Parameters"),
                     dcc.Checklist(
-                        id="mStepIndPoints",
+                        id="mStepIndPointsEstimate",
                         options=[{"label": "estimate", "value": "mStepIndPointsEstimate"}],
                         value=[guiConfig["emParams"]["mStepIndPointsEstimate"]],
                     ),
                     html.Label("Maximum iterations"),
                     dcc.Input(
-                        id="mStepIndPointsMaxNIter",
+                        id="mStepIndPointsMaxIter",
                         type="number",
                         required=True,
-                        value=int(guiConfig["emParams"]["mStepIndPointsMaxNIter"]),
+                        value=int(guiConfig["emParams"]["mStepIndPointsMaxIter"]),
                     ),
                     html.Label("Learning rate"),
                     dcc.Input(
@@ -385,9 +383,9 @@ def main(argv):
                     ),
                     html.Label("Line search"),
                     dcc.RadioItems(
+                        id="mStepIndPointsLineSearchFn",
                         options=[
                             {"label": "strong wolfe", "value": "mStepIndPointsLineSearchStrong_wolfe"},
-                            {"label": "none", "value": "mStepIndPointsLineSearchNone"},
                         ],
                         value=guiConfig["emParams"]["mStepIndPointsLineSearchFn"],
                     ),
@@ -638,6 +636,10 @@ def main(argv):
                 aDiv = html.Div(children=[
                     html.Label("Trial {:d}".format(r+1)),
                     dcc.Input(
+                        id={
+                            "type": "trialsLengths",
+                            "latent": r,
+                        },
                         type="number",
                         placeholder="trial length",
                         min=0,
@@ -798,55 +800,154 @@ def main(argv):
     @app.callback(
         Output("estimationRes", "children"),
         [Input("doEstimate", "n_clicks")],
-        [State("conditionalDist", "value"),
+        [State("spikesTimesVar", "value"),
+         State("uploadSpikes", "contents"),
+         State("uploadSpikes", "filename"),
+         State("conditionalDist", "value"),
          State("linkFunction", "value"),
          State("embeddingType", "value"),
          State("nLatentsComponent", "value"),
          State("C0string", "value"),
          State("d0string", "value"),
          State({"type": "kernelTypeComponent",  "latent": ALL}, "value"),
-         State({"type": "kernelParams0Components",  "latent": ALL}, "children"),
+         State({"type": "kernelParams0Buffer", "latent": ALL}, "children"),
          State({"type": "nIndPoints",  "latent": ALL}, "value"),
-         State({"type": "trialsLenghts",  "latent": ALL}, "value"),
+         State({"type": "trialsLengths",  "latent": ALL}, "value"),
          State({"type": "svPosterioOnIndPointsMu0",  "latent": ALL}, "value"),
          State({"type": "svPosterioOnIndPointsVec0",  "latent": ALL}, "value"),
          State({"type": "svPosterioOnIndPointsDiag0",  "latent": ALL}, "value"),
+         #
+         State("emMaxIter", "value"),
+         #
+         State("eStepEstimate", "value"),
+         State("eStepMaxIter", "value"),
+         State("eStepLR", "value"),
+         State("eStepTol", "value"),
+         State("eStepLineSearchFn", "value"),
+         #
+         State("mStepEmbeddingEstimate", "value"),
+         State("mStepEmbeddingMaxIter", "value"),
+         State("mStepEmbeddingLR", "value"),
+         State("mStepEmbeddingTol", "value"),
+         State("mStepEmbeddingLineSearchFn", "value"),
+         #
+         State("mStepKernelsEstimate", "value"),
+         State("mStepKernelsMaxIter", "value"),
+         State("mStepKernelsLR", "value"),
+         State("mStepKernelsTol", "value"),
+         State("mStepKernelsLineSearchFn", "value"),
+         #
+         State("mStepIndPointsEstimate", "value"),
+         State("mStepIndPointsMaxIter", "value"),
+         State("mStepIndPointsLR", "value"),
+         State("mStepIndPointsTol", "value"),
+         State("mStepIndPointsLineSearchFn", "value"),
+         #
          State("nQuad", "value"),
          State("indPointsLocsKMSRegEpsilon", "value"),
         ])
     def estimateSVGPFA(doEstimateNClicks,
+                       spikesTimesVar,
+                       contents,
+                       filename,
                        conditionalDist,
                        linkFunction,
                        embeddingType,
                        nLatentsComponentValue,
                        C0string,
                        d0string,
-                       kernelTypeComponent,
-                       kernelParams0Components,
+                       kernelTypeComponentValues,
+                       kernelParams0Children,
                        nIndPoints,
                        trialsLengths,
                        svPosterioOnIndPointsMu0,
                        svPosterioOnIndPointsVec0,
                        svPosterioOnIndPointsDiag0,
+                       #
+                       emMaxIter,
+                       #
+                       eStepEstimate,
+                       eStepMaxIter,
+                       eStepLR,
+                       eStepTol,
+                       eStepLineSearchFn,
+                       #
+                       mStepEmbeddingEstimate,
+                       mStepEmbeddingMaxIter,
+                       mStepEmbeddingLR,
+                       mStepEmbeddingTol,
+                       mStepEmbeddingLineSearchFn,
+                       #
+                       mStepKernelsEstimate,
+                       mStepKernelsMaxIter,
+                       mStepKernelsLR,
+                       mStepKernelsTol,
+                       mStepKernelsLineSearchFn,
+                       #
+                       mStepIndPointsEstimate,
+                       mStepIndPointsMaxIter,
+                       mStepIndPointsLR,
+                       mStepIndPointsTol,
+                       mStepIndPointsLineSearchFn,
+                       #
                        nQuad,
                        indPointsLocsKMSRegEpsilon,
                       ):
         # pdb.set_trace()
         if doEstimateNClicks>0:
+            optimParams = {}
+            optimParams["emMaxIter"] = emMaxIter
+            #
+            optimParams["eStepEstimate"] = eStepEstimate
+            optimParams["eStepMaxIter"] = eStepMaxIter
+            optimParams["eStepLR"] = eStepLR
+            optimParams["eStepTol"] = eStepTol
+            optimParams["eStepLineSearchFn"] = eStepLineSearchFn
+            optimParams["eStepNIterDisplay"] = 1
+            #
+            optimParams["mStepEmbeddingEstimate"] = mStepEmbeddingEstimate
+            optimParams["mStepEmbeddingMaxIter"] = mStepEmbeddingMaxIter
+            optimParams["mStepEmbeddingLR"] = mStepEmbeddingLR
+            optimParams["mStepEmbeddingTol"] = mStepEmbeddingTol
+            optimParams["mStepEmbeddingLineSearchFn"] = mStepEmbeddingLineSearchFn
+            optimParams["mStepEmbeddingNIterDisplay"] = 1
+            #
+            optimParams["mStepKernelsEstimate"] = mStepKernelsEstimate
+            optimParams["mStepKernelsMaxIter"] = mStepKernelsMaxIter
+            optimParams["mStepKernelsLR"] = mStepKernelsLR
+            optimParams["mStepKernelsTol"] = mStepKernelsTol
+            optimParams["mStepKernelsLineSearchFn"] = mStepKernelsLineSearchFn
+            optimParams["mStepKernelsNIterDisplay"] = 1
+            #
+            optimParams["mStepIndPointsEstimate"] = mStepIndPointsEstimate
+            optimParams["mStepIndPointsMaxIter"] = mStepIndPointsMaxIter
+            optimParams["mStepIndPointsLR"] = mStepIndPointsLR
+            optimParams["mStepIndPointsTol"] = mStepIndPointsTol
+            optimParams["mStepIndPointsLineSearchFn"] = mStepIndPointsLineSearchFn
+            optimParams["mStepIndPointsNIterDisplay"] = 1
+            #
+            optimParams["verbose"] = True
+
+            nTrials = len(trialsLengths)
+            spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
+            runner = svGPFA_runner(firstIndPoint=firstIndPoint)
+            runner.setSpikesTimes(spikesTimes=spikesTimes)
             runner.setConditionalDist(conditionalDist=conditionalDist)
             runner.setLinkFunction(linkFunction=linkFunction)
             runner.setEmbeddingType(embeddingType=embeddingType)
-            runner.setKernels(kernelTypeComponents=kernelTypeComponents)
-            runner.setKernelsParams0(kernelParams0Components=kernelParams0Components)
+            runner.setKernels(kernelTypeComponentValues=kernelTypeComponentValues)
+            runner.setKernelsParams0(kernelParams0Children=kernelParams0Children)
             runner.setNIndPointsPerLatent(nIndPointsPerLatent=nIndPoints)
             runner.setEmbeddingParams0(nLatents=nLatentsComponentValue, C0string=C0string, d0string=d0string),
             runner.setTrialsLengths(trialsLengths=trialsLengths)
-            runner.setSVPosteriorOnIndPointsParams0(
-                qMu0Strings=svPosterioOnIndPointsMu0,
-                qSVec0Strings=svPosterioOnIndPointsVec0,
-                qSDiag0Strings=svPosterioOnIndPointsDiag0)
+            runner.setSVPosteriorOnIndPointsParams0(qMu0Strings=svPosterioOnIndPointsMu0, qSVec0Strings=svPosterioOnIndPointsVec0, qSDiag0Strings=svPosterioOnIndPointsDiag0, nTrials=nTrials)
             runner.setNQuad(nQuad=nQuad)
             runner.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+            runner.setOptimParams(optimParams=optimParams)
+
+            runner.run()
+
+            pdb.set_trace()
 
             return ["Successful estimation!!!"]
 
