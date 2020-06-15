@@ -5,12 +5,10 @@ import random
 import torch
 import pickle
 import configparser
-import stats.svGPFA.svGPFAModelFactory
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.tsa.stattools
-sys.path.append(os.path.expanduser("../src"))
-import demoUtils
+sys.path.append("../src")
 import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
@@ -19,6 +17,7 @@ import myMath.utils
 import utils.svGPFA.configUtils
 import stats.pointProcess.tests
 import utils.svGPFA.miscUtils
+import utils.svGPFA.initUtils
 
 def main(argv):
     nLatents = None
@@ -115,24 +114,23 @@ def main(argv):
 
     testTimes = torch.linspace(0, torch.max(torch.tensor(spikesTimes[0][0])), nTestPoints)
 
-
-    CFilename = config["embedding_params"]["C_filename"],
-    dFilename = config["embedding_params"]["d_filename"],
+    CFilename = simInitConfig["embedding_params"]["C_filename"]
+    dFilename = simInitConfig["embedding_params"]["d_filename"]
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=CFilename, dFilename=dFilename)
     C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
     C0 = C0[:,:nLatents]
     d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
 
-    legQuadPoints, legQuadWeights = demoUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
+    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
-    kernelsParams0 = demoUtils.getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
+    kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
     kernels = kernels[0] # the current code uses the same kernels for all trials
     kernelsParams0 = kernelsParams0[0] # the current code uses the same kernels for all trials
 
-    qMu0, qSVec0, qSDiag0 = demoUtils.getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
+    qMu0, qSVec0, qSDiag0 = utils.svGPFA.initUtils.getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
 
-    Z0 = demoUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent,
+    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent,
                           trialsLengths=trialsLengths, firstIndPoint=firstIndPoint)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
