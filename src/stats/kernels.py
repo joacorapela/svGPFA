@@ -26,7 +26,7 @@ class Kernel(ABC):
 
 class ExponentialQuadraticKernel(Kernel):
 
-    def __init__(self, scale=None, lengthScale=None, dtype=torch.double, device=torch.device("cpu")):
+    def __init__(self, scale=1.0, lengthScale=None, dtype=torch.double, device=torch.device("cpu")):
         if scale is not None:
             self._scale = torch.tensor(scale)
             self._scaleFixed = True
@@ -77,7 +77,7 @@ class ExponentialQuadraticKernel(Kernel):
         return answer
 
 class PeriodicKernel(Kernel):
-    def __init__(self, scale=None, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
+    def __init__(self, scale=1.0, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
         super(PeriodicKernel, self).__init__()
         # paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])
         # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
