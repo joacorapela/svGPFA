@@ -13,8 +13,8 @@ class SVEM:
         model.setMeasurements(measurements=measurements)
         model.setInitialParams(initialParams=initialParams)
         model.setQuadParams(quadParams=quadParams)
-        model.buildKernelsMatrices()
         model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+        model.buildKernelsMatrices()
 
         iter = 0
         lowerBoundHist = []
@@ -28,13 +28,13 @@ class SVEM:
             plt.ion()
             plt.show()
             lowerBound = -float("inf")
-        while iter<optimParams["emMaxNIter"]:
+        while iter<optimParams["emMaxIter"]:
             if plotLatentsEstimates:
                 with torch.no_grad():
                     if iter>0:
                         lowerBound = maxRes["lowerBound"]
                     muK, varK = model.predictLatents(newTimes=plotTimes)
-                    title = "{:d}/{:d}, {:f}".format(iter, optimParams["emMaxNIter"]-1, -lowerBound)
+                    title = "{:d}/{:d}, {:f}".format(iter, optimParams["emMaxIter"]-1, -lowerBound)
                     plot.svGPFA.plotUtils.plotEstimatedLatents(fig=fig, times=plotTimes, muK=muK, varK=varK, indPointsLocs=model.getIndPointsLocs(), title=title, figFilename=latentFigFilenamePattern.format(iter))
                     plt.draw()
                     # plt.pause(0.05)
@@ -44,37 +44,37 @@ class SVEM:
                 print("Iteration %02d, E-Step start"%(iter))
                 maxRes = self._eStep(
                     model=model,
-                    maxNIter=optimParams["eStepMaxNIter"],
+                    maxIter=optimParams["eStepMaxIter"],
                     tol=optimParams["eStepTol"],
                     lr=optimParams["eStepLR"],
                     lineSearchFn=optimParams["eStepLineSearchFn"],
                     verbose=optimParams["verbose"],
                     nIterDisplay=optimParams["eStepNIterDisplay"])
                 print("Iteration %02d, E-Step end: %f"%(iter, -maxRes['lowerBound']))
-            if optimParams["mStepModelParamsEstimate"]:
+            if optimParams["mStepEmbeddingEstimate"]:
                 print("Iteration %02d, M-Step Model Params start"%(iter))
                 # pdb.set_trace()
-                maxRes = self._mStepModelParams(
+                maxRes = self._mStepEmbedding(
                     model=model,
-                    maxNIter=optimParams["mStepModelParamsMaxNIter"],
-                    tol=optimParams["mStepModelParamsTol"],
-                    lr=optimParams["mStepModelParamsLR"],
-                    lineSearchFn=optimParams["mStepModelParamsLineSearchFn"],
+                    maxIter=optimParams["mStepEmbeddingMaxIter"],
+                    tol=optimParams["mStepEmbeddingTol"],
+                    lr=optimParams["mStepEmbeddingLR"],
+                    lineSearchFn=optimParams["mStepEmbeddingLineSearchFn"],
                     verbose=optimParams["verbose"],
-                    nIterDisplay=optimParams["mStepModelParamsNIterDisplay"])
+                    nIterDisplay=optimParams["mStepEmbeddingNIterDisplay"])
                 print("Iteration %02d, M-Step Model Params end: %f"%
                       (iter, -maxRes['lowerBound']))
-            if optimParams["mStepKernelParamsEstimate"]:
+            if optimParams["mStepKernelsEstimate"]:
                 print("Iteration %02d, M-Step Kernel Params start"%(iter))
                 # pdb.set_trace()
-                maxRes = self._mStepKernelParams(
+                maxRes = self._mStepKernels(
                     model=model,
-                    maxNIter=optimParams["mStepKernelParamsMaxNIter"],
-                    tol=optimParams["mStepKernelParamsTol"],
-                    lr=optimParams["mStepKernelParamsLR"],
-                    lineSearchFn=optimParams["mStepKernelParamsLineSearchFn"],
+                    maxIter=optimParams["mStepKernelsMaxIter"],
+                    tol=optimParams["mStepKernelsTol"],
+                    lr=optimParams["mStepKernelsLR"],
+                    lineSearchFn=optimParams["mStepKernelsLineSearchFn"],
                     verbose=optimParams["verbose"],
-                    nIterDisplay=optimParams["mStepKernelParamsNIterDisplay"])
+                    nIterDisplay=optimParams["mStepKernelsNIterDisplay"])
                 print("Iteration %02d, M-Step Kernel Params end: %f"%
                     (iter, -maxRes['lowerBound']))
             if optimParams["mStepIndPointsEstimate"]:
@@ -82,7 +82,7 @@ class SVEM:
                 # pdb.set_trace()
                 maxRes = self._mStepIndPoints(
                     model=model,
-                    maxNIter=optimParams["mStepIndPointsMaxNIter"],
+                    maxIter=optimParams["mStepIndPointsMaxIter"],
                     tol=optimParams["mStepIndPointsTol"],
                     lr=optimParams["mStepIndPointsLR"],
                     lineSearchFn=optimParams["mStepIndPointsLineSearchFn"],
@@ -96,15 +96,15 @@ class SVEM:
             # pdb.set_trace()
         return lowerBoundHist, elapsedTimeHist
 
-    def _eStep(self, model, maxNIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
+    def _eStep(self, model, maxIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
         x = model.getSVPosteriorOnIndPointsParams()
         evalFunc = model.eval
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
         # optimizer = torch.optim.Adam(x, lr=lr)
-        answer= self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay)
+        answer= self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxIter=maxIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay)
         return answer
 
-    def _mStepModelParams(self, model, maxNIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
+    def _mStepEmbedding(self, model, maxIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
         x = model.getSVEmbeddingParams()
         svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
         evalFunc = lambda: \
@@ -114,10 +114,10 @@ class SVEM:
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
         # pdb.set_trace()
         # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxIter=maxIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
         return answer
 
-    def _mStepKernelParams(self, model, maxNIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
+    def _mStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
         x = model.getKernelsParams()
         def evalFunc():
             model.buildKernelsMatrices()
@@ -125,10 +125,10 @@ class SVEM:
             return answer
         # optimizer = torch.optim.Adam(x, lr=lr)
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxIter=maxIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay)
         return answer
 
-    def _mStepIndPoints(self, model, maxNIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
+    def _mStepIndPoints(self, model, maxIter, tol, lr, lineSearchFn, verbose, nIterDisplay):
         x = model.getIndPointsLocs()
         def evalFunc():
             model.buildKernelsMatrices()
@@ -136,23 +136,23 @@ class SVEM:
             return answer
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
         # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer, maxIter=maxIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay)
         return answer
 
-    def _setupAndMaximizeStep(self, x, evalFunc, optimizer, maxNIter, tol, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f"):
+    def _setupAndMaximizeStep(self, x, evalFunc, optimizer, maxIter, tol, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f"):
         for i in range(len(x)):
             x[i].requires_grad = True
-        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer, maxNIter=maxNIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
+        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer, maxIter=maxIter, tol=tol, verbose=verbose, nIterDisplay=nIterDisplay, displayFmt=displayFmt)
         for i in range(len(x)):
             x[i].requires_grad = False
         return maxRes
 
-    def _maximizeStep(self, evalFunc, optimizer, maxNIter, tol, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f"):
+    def _maximizeStep(self, evalFunc, optimizer, maxIter, tol, verbose, nIterDisplay, displayFmt="Step: %d, negative lower bound: %f"):
         iterCount = 0
         lowerBoundHist = []
         curEval = torch.tensor([float("inf")])
         converged = False
-        while not converged and iterCount<maxNIter:
+        while not converged and iterCount<maxIter:
             def closure():
                 # details on this closure at http://sagecal.sourceforge.net/pytorch/index.html
                 nonlocal curEval
