@@ -1,8 +1,12 @@
 import pdb
 import sys
+import os
+import uuid
 import datetime
 import configparser
 import math
+import multiprocessing as mp
+import signal
 import numpy as np
 import torch
 import dash
@@ -10,9 +14,11 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State, ALL, MATCH
 from dash.exceptions import PreventUpdate
+from plotly.colors import DEFAULT_PLOTLY_COLORS
 sys.path.append("../src")
 import stats.svGPFA.svGPFAModelFactory
 from guiUtils import getContentsVarsNames, getSpikesTimes, getRastergram, getKernels, getKernelParams0Div, guessTrialsLengths, svGPFA_runner
+import utils.networking.multiprocessingUtils
 
 def main(argv):
     if(len(argv)!=2):
@@ -21,6 +27,8 @@ def main(argv):
     guiFilename = argv[1]
     guiConfig = configparser.ConfigParser()
     guiConfig.read(guiFilename)
+
+    dtLatentsTimes = 0.1
 
     condDistString = guiConfig["modelSpecs"]["condDist"]
     if condDistString=="PointProcess":
@@ -56,378 +64,593 @@ def main(argv):
 
     external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
-    app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
-    app.layout = html.Div(children=[
-        html.H1(children="Sparse Variational Gaussian Process Factor Analysis"),
-
-        html.Hr(),
-
-        html.H4(children="Model Specification"),
-        html.Div(children=[
+    def serve_layout():
+        session_id = str(uuid.uuid4())
+        aDiv = html.Div(children=[
+            html.H1(children="Sparse Variational Gaussian Process Factor Analysis"),
+            html.Hr(),
+            html.H4(children="Model Specification"),
             html.Div(children=[
-                html.Label("Conditional Distribution"),
-                dcc.RadioItems(
-                    id="conditionalDist",
-                    options=[
-                        {"label": "Point Process", "value": stats.svGPFA.svGPFAModelFactory.PointProcess},
-                        {"label": "Poisson", "value": stats.svGPFA.svGPFAModelFactory.Poisson},
-                        {"label": "Gaussian", "value": stats.svGPFA.svGPFAModelFactory.Gaussian},
-                    ],
-                    value=condDist0,
-                ),
-            ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
-            html.Div(
-                children=[
-                    html.Label("Link Function"),
-                    dcc.RadioItems(
-                        id="linkFunction",
-                        options=[
-                            {"label": "Exponential", "value": stats.svGPFA.svGPFAModelFactory.ExponentialLink},
-                            {"label": "Other", "value": stats.svGPFA.svGPFAModelFactory.NonExponentialLink},
-                        ],
-                        value=linkFunc0,
-                    ),
-                ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
-            html.Div(
-                children=[
-                    html.Label("Embedding Type"),
-                    dcc.RadioItems(
-                        id="embeddingType",
-                        options=[
-                            {"label": "Linear", "value": stats.svGPFA.svGPFAModelFactory.LinearEmbedding},
-                        ],
-                        value=embedding0,
-                    ),
-                ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
-        ], style={"display": "flex", "flex-wrap": "wrap", "width": 800, "padding-bottom": "20px", "background-color": "white"}),
-        html.Div(children=[
-            html.Label("Number of Latents"),
-            html.Div(children=[
-                dcc.Slider(
-                    id="nLatentsComponent",
-                    min=0,
-                    max=10,
-                    value=nLatents0,
-                    marks={i: str(i) for i in range(minNLatents, maxNLatents)},
-                )],
-                style={"width": "25%"}
-            ),
-        ], style={"padding-bottom": "20px"}),
-        html.Div(id="kernelsTypesContainer", children=[]),
-        html.Hr(),
-        html.H4(children="Data"),
-        html.Div(children=[
-            html.Div(children=[
-                dcc.Upload(
-                    id="uploadSpikes",
-                    children=html.Button("Upload Spikes"),
-                    style={"display": "inline-block", "width": "30%", "padding-right": "20px"},
-                ),
-                html.Div(
-                    id="spikesInfo",
-                    style={"display": "inline-block", "width": "30%"},
-                ),
-            ], style={"display": "flex", "flex-wrap": "wrap", "width": 1500, "padding-bottom": "20px", "background-color": "white"}),
-            html.Div(children=[
-                html.Label("Spikes Variable Name"),
                 html.Div(children=[
-                    dcc.Dropdown(
-                        id="spikesTimesVar",
-                        disabled=True,
-                        # # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
-                        # style={"display": "inline-block", "width": "200px", "padding-right": "20px"}
-                        # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
-                        style={"width": "165px", "padding-right": "20px"}
+                    html.Label("Conditional Distribution"),
+                    dcc.RadioItems(
+                        id="conditionalDist",
+                        options=[
+                            {"label": "Point Process", "value": stats.svGPFA.svGPFAModelFactory.PointProcess},
+                            {"label": "Poisson", "value": stats.svGPFA.svGPFAModelFactory.Poisson},
+                            {"label": "Gaussian", "value": stats.svGPFA.svGPFAModelFactory.Gaussian},
+                        ],
+                        value=condDist0,
+                    ),
+                ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
+                html.Div(
+                    children=[
+                        html.Label("Link Function"),
+                        dcc.RadioItems(
+                            id="linkFunction",
+                            options=[
+                                {"label": "Exponential", "value": stats.svGPFA.svGPFAModelFactory.ExponentialLink},
+                                {"label": "Other", "value": stats.svGPFA.svGPFAModelFactory.NonExponentialLink},
+                            ],
+                            value=linkFunc0,
+                        ),
+                    ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
+                html.Div(
+                    children=[
+                        html.Label("Embedding Type"),
+                        dcc.RadioItems(
+                            id="embeddingType",
+                            options=[
+                                {"label": "Linear", "value": stats.svGPFA.svGPFAModelFactory.LinearEmbedding},
+                            ],
+                            value=embedding0,
+                        ),
+                    ], style={"display": "inline-block", "background-color": "white", "padding-right": "30px"}),
+            ], style={"display": "flex", "flex-wrap": "wrap", "width": 800, "padding-bottom": "20px", "background-color": "white"}),
+            html.Div(children=[
+                html.Label("Number of Latents"),
+                html.Div(children=[
+                    dcc.Slider(
+                        id="nLatentsComponent",
+                        min=0,
+                        max=10,
+                        value=nLatents0,
+                        marks={i: str(i) for i in range(minNLatents, maxNLatents)},
+                    )],
+                    style={"width": "25%"}
+                ),
+            ], style={"padding-bottom": "20px"}),
+            html.Div(id="kernelsTypesContainer", children=[]),
+            html.Hr(),
+            html.H4(children="Data"),
+            html.Div(children=[
+                html.Div(children=[
+                    dcc.Upload(
+                        id="uploadSpikes",
+                        children=html.Button("Upload Spikes"),
+                        style={"display": "inline-block", "width": "30%", "padding-right": "20px"},
                     ),
                     html.Div(
-                        id="nTrialsAndNNeuronsInfoComponent",
-                        # style={"display": "inline-block", "width": "30%"},
-                        style={"display": "inline-block"},
+                        id="spikesInfo",
+                        style={"display": "inline-block", "width": "30%"},
                     ),
-                ], style={"display": "flex", "flex-wrap": "wrap", "width": 800, "padding-bottom": "20px", "background-color": "white"}),
-            ], style={"width": "200px"}),
-        ], style={"width": 800, "background-color": "white"}),
-        html.Div(
-            id="nTrialsComponent",
-            # style={'display': 'none'},
-        ),
-        html.Div(
-            id="nNeuronsComponent",
-            # style={'display': 'none'},
-        ),
-        html.Hr(),
-        html.Div(
-            id="trialToPlotParentContainer",
-            children=[
-                html.Label("Trial to Plot"),
-                dcc.Dropdown(
-                    id="trialToPlotComponent",
-                    options=[
-                        {"label": "dummy option", "value": -1},
-                    ],
-                    value=-1,
-                    style={"width": "80%"}
-                ),
-                dcc.Graph(
-                    id="trialRastergram",
-                    figure={}
-                ),
-            ], hidden=True, style={"width": "20%", "columnCount": 1}),
-        html.Div(
-            id="kernelParams0ParentContainer",
-            children=[
-                html.H4("Initial Kernels Parameters"),
-                html.Div(id="kernelParams0Container", children=[]),
-                html.Div(id="kernelParams0BufferContainer", children=[], hidden=False),
-                html.Hr(),
-            ],
-            hidden=True,
-        ),
-        html.Div(
-            id="embeddingParams0",
-            children=[
-            html.H4("Initial Conditions for Linear Embedding"),
+                ], style={"display": "flex", "flex-wrap": "wrap", "width": 1500, "padding-bottom": "20px", "background-color": "white"}),
+                html.Div(children=[
+                    html.Label("Spikes Variable Name"),
+                    html.Div(children=[
+                        dcc.Dropdown(
+                            id="spikesTimesVar",
+                            disabled=True,
+                            # # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
+                            # style={"display": "inline-block", "width": "200px", "padding-right": "20px"}
+                            # style={"display": "inline-block", "width": "30%", "padding-right": "20px"}
+                            style={"width": "165px", "padding-right": "20px"}
+                        ),
+                        html.Div(
+                            id="nTrialsAndNNeuronsInfoComponent",
+                            # style={"display": "inline-block", "width": "30%"},
+                            style={"display": "inline-block"},
+                        ),
+                    ], style={"display": "flex", "flex-wrap": "wrap", "width": 800, "padding-bottom": "20px", "background-color": "white"}),
+                ], style={"width": "200px"}),
+            ], style={"width": 800, "background-color": "white"}),
+            html.Div(
+                id="nTrialsComponent",
+                # style={'display': 'none'},
+            ),
+            html.Div(
+                id="nNeuronsComponent",
+                # style={'display': 'none'},
+            ),
+            html.Hr(),
+            html.Div(
+                id="trialToPlotRasterParentContainer",
+                children=[
+                    html.Label("Trial to Plot"),
+                    dcc.Dropdown(
+                        id="trialToPlotRasterComponent",
+                        options=[
+                            {"label": "dummy option", "value": -1},
+                        ],
+                        value=-1,
+                        style={"width": "80%"}
+                    ),
+                    dcc.Graph(
+                        id="trialRastergram",
+                        figure={}
+                    ),
+                ], hidden=True, style={"width": "20%", "columnCount": 1}),
+            html.Div(
+                id="kernelParams0ParentContainer",
+                children=[
+                    html.H4("Initial Kernels Parameters"),
+                    html.Div(id="kernelParams0Container", children=[]),
+                    html.Div(id="kernelParams0BufferContainer", children=[], hidden=False),
+                    html.Hr(),
+                ],
+                hidden=True,
+            ),
+            html.Div(
+                id="embeddingParams0",
+                children=[
+                html.H4("Initial Conditions for Linear Embedding"),
+                html.Div(children=[
+                        html.Label("Mixing Matrix"),
+                        dcc.Textarea(
+                            id="C0string",
+                            required=True,
+                            spellCheck=False,
+                        ),
+                    ]),
+                    html.Div(children=[
+                        html.Label("Offset Vector"),
+                        dcc.Textarea(
+                            id="d0string",
+                            required=True,
+                            spellCheck=False,
+                        ),
+                    ]),
+                    html.Hr(),
+                ], hidden=True),
+            html.Div(
+                id="trialsLengthsParentContainer",
+                children=[
+                    html.H4("Trials Durations (sec)"),
+                    html.Div(id="trialsLengthsContainer", children=[]),
+                    html.Hr(),
+                ],
+                hidden=True,
+            ),
+            html.Div(
+                id="nIndPointsPerLatentParentContainer",
+                children=[
+                    html.H4("Number of Inducing Points"),
+                    html.Div(id="nIndPointsPerLatentContainer", children=[]),
+                    html.Hr(),
+                ],
+                hidden=True),
+            html.Div(
+                id="svPosteriorOnIndPointsParams0ParentContainer",
+                children=[
+                    html.H4("Initial Conditions for Variational Posterior on Inducing Points"),
+                    html.Div(id="svPosteriorOnIndPointsParams0Container"),
+                    html.Hr(),
+                ],
+                hidden=True),
+            html.Div(
+                id="optimParams",
+                children=[
+                    html.H4("EM Parameters"),
+                    html.Div(children=[
+                        html.Label("Maximum EM iterations"),
+                        dcc.Input(
+                            id="emMaxIter",
+                            type="number",
+                            required=True,
+                            value=int(guiConfig["emParams"]["emMaxIter"]),
+                        ),
+                    ], style={"padding-bottom": "20px"}),
+                    html.Div(children=[
+                        html.H6("Expectation Step"),
+                        dcc.Checklist(
+                            id="eStepEstimate",
+                            options=[{"label": "estimate",
+                                      "value": "True"}],
+                            value=[guiConfig["emParams"]["eStepEstimate"]],
+                        ),
+                        html.Label("Maximum iterations"),
+                        dcc.Input(
+                            id="eStepMaxIter",
+                            type="number",
+                            required=True,
+                            value=int(guiConfig["emParams"]["eStepMaxIter"]),
+                        ),
+                        html.Label("Learning rate"),
+                        dcc.Input(
+                            id="eStepLR",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["eStepLR"]),
+                        ),
+                        html.Label("Tolerance"),
+                        dcc.Input(
+                            id="eStepTol",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["eStepTol"]),
+                        ),
+                        html.Label("Line search"),
+                        dcc.RadioItems(
+                            id="eStepLineSearchFn",
+                            options=[
+                                {"label": "strong wolfe", "value": "strong_wolfe"},
+                                {"label": "none", "value": "noLineSearch"},
+                            ],
+                            value=guiConfig["emParams"]["eStepLineSearchFn"],
+                        ),
+                    ], style={"padding-bottom": "20px"}),
+                    html.Div(children=[
+                        html.H6("Maximization Step on Embedding Parameters"),
+                        dcc.Checklist(
+                            id="mStepEmbeddingEstimate",
+                            options=[{"label": "estimate", "value": "True"}],
+                            value=[guiConfig["emParams"]["mStepEmbeddingEstimate"]],
+                        ),
+                        html.Label("Maximum iterations"),
+                        dcc.Input(
+                            id="mStepEmbeddingMaxIter",
+                            type="number",
+                            required=True,
+                            value=int(guiConfig["emParams"]["mStepEmbeddingMaxIter"]),
+                        ),
+                        html.Label("Learning rate"),
+                        dcc.Input(
+                            id="mStepEmbeddingLR",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["mStepEmbeddingLR"]),
+                        ),
+                        html.Label("Tolerance"),
+                        dcc.Input(
+                            id="mStepEmbeddingTol",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["mStepEmbeddingTol"]),
+                        ),
+                        html.Label("Line search"),
+                        dcc.RadioItems(
+                            id="mStepEmbeddingLineSearchFn",
+                            options=[
+                                {"label": "strong wolfe", "value": "strong_wolfe"},
+                                {"label": "none", "value": "noLineSearch"},
+                            ],
+                            value=guiConfig["emParams"]["mStepEmbeddingLineSearchFn"],
+                        ),
+                    ], style={"padding-bottom": "20px"}),
+                    html.Div(children=[
+                        html.H6("Maximization Step on Kernels Parameters"),
+                        dcc.Checklist(
+                            id="mStepKernelsEstimate",
+                            options=[{"label": "estimate", "value": "mStepKernelsEstimate"}],
+                            value=[guiConfig["emParams"]["mStepKernelsEstimate"]],
+                        ),
+                        html.Label("Maximum iterations"),
+                        dcc.Input(
+                            id="mStepKernelsMaxIter",
+                            type="number",
+                            required=True,
+                            value=int(guiConfig["emParams"]["mStepKernelsMaxIter"]),
+                        ),
+                        html.Label("Learning rate"),
+                        dcc.Input(
+                            id="mStepKernelsLR",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["mStepKernelsLR"]),
+                        ),
+                        html.Label("Tolerance"),
+                        dcc.Input(
+                            id="mStepKernelsTol",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["mStepKernelsTol"]),
+                        ),
+                        html.Label("Line search"),
+                        dcc.RadioItems(
+                            id="mStepKernelsLineSearchFn",
+                            options=[
+                                {"label": "strong wolfe", "value": "strong_wolfe"},
+                                {"label": "none", "value": "noLineSearch"},
+                            ],
+                            value=guiConfig["emParams"]["mStepKernelsLineSearchFn"],
+                        ),
+                    ], style={"padding-bottom": "20px"}),
+                    html.Div(children=[
+                        html.H6("Maximization Step on Inducing Points Parameters"),
+                        dcc.Checklist(
+                            id="mStepIndPointsEstimate",
+                            options=[{"label": "estimate", "value": "mStepIndPointsEstimate"}],
+                            value=[guiConfig["emParams"]["mStepIndPointsEstimate"]],
+                        ),
+                        html.Label("Maximum iterations"),
+                        dcc.Input(
+                            id="mStepIndPointsMaxIter",
+                            type="number",
+                            required=True,
+                            value=int(guiConfig["emParams"]["mStepIndPointsMaxIter"]),
+                        ),
+                        html.Label("Learning rate"),
+                        dcc.Input(
+                            id="mStepIndPointsLR",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["mStepIndPointsLR"]),
+                        ),
+                        html.Label("Tolerance"),
+                        dcc.Input(
+                            id="mStepIndPointsTol",
+                            type="number",
+                            required=True,
+                            value=float(guiConfig["emParams"]["mStepIndPointsTol"]),
+                        ),
+                        html.Label("Line search"),
+                        dcc.RadioItems(
+                            id="mStepIndPointsLineSearchFn",
+                            options=[
+                                {"label": "strong wolfe", "value": "strong_wolfe"},
+                                {"label": "none", "value": "noLineSearch"},
+                            ],
+                            value=guiConfig["emParams"]["mStepIndPointsLineSearchFn"],
+                        ),
+                    ], style={"padding-bottom": "20px"}),
+                ]
+            ),
+            html.Hr(),
+            html.H4("Miscellaneous Parameters"),
             html.Div(children=[
-                    html.Label("Mixing Matrix"),
-                    dcc.Textarea(
-                        id="C0string",
-                        required=True,
-                    ),
-                ]),
-                html.Div(children=[
-                    html.Label("Offset Vector"),
-                    dcc.Textarea(
-                        id="d0string",
-                        required=True,
-                    ),
-                ]),
-                html.Hr(),
-            ], hidden=True),
-        html.Div(
-            id="trialsLengthsParentContainer",
-            children=[
-                html.H4("Trials Lengths"),
-                html.Div(id="trialsLengthsContainer", children=[]),
-                html.Hr(),
-            ],
-            hidden=True,
-        ),
-        html.Div(
-            id="nIndPointsPerLatentParentContainer",
-            children=[
-                html.H4("Number of Inducing Points"),
-                html.Div(id="nIndPointsPerLatentContainer", children=[]),
-                html.Hr(),
-            ],
-            hidden=True),
-        html.Div(
-            id="svPosteriorOnIndPointsParams0ParentContainer",
-            children=[
-                html.H4("Initial Conditions for Variational Posterior on Inducing Points"),
-                html.Div(id="svPosteriorOnIndPointsParams0Container"),
-                html.Hr(),
-            ],
-            hidden=True),
-        html.Div(
-            id="optimParams",
-            children=[
-                html.H4("EM Parameters"),
-                html.Div(children=[
-                    html.Label("Maximum EM iterations"),
-                    dcc.Input(
-                        id="emMaxIter",
-                        type="number",
-                        required=True,
-                        value=int(guiConfig["emParams"]["emMaxIter"]),
-                    ),
-                ], style={"padding-bottom": "20px"}),
-                html.Div(children=[
-                    html.H6("Expectation Step"),
-                    dcc.Checklist(
-                        id="eStepEstimate",
-                        options=[{"label": "estimate",
-                                  "value": "True"}],
-                        value=[guiConfig["emParams"]["eStepEstimate"]],
-                    ),
-                    html.Label("Maximum iterations"),
-                    dcc.Input(
-                        id="eStepMaxIter",
-                        type="number",
-                        required=True,
-                        value=int(guiConfig["emParams"]["eStepMaxIter"]),
-                    ),
-                    html.Label("Learning rate"),
-                    dcc.Input(
-                        id="eStepLR",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["eStepLR"]),
-                    ),
-                    html.Label("Tolerance"),
-                    dcc.Input(
-                        id="eStepTol",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["eStepTol"]),
-                    ),
-                    html.Label("Line search"),
-                    dcc.RadioItems(
-                        id="eStepLineSearchFn",
-                        options=[
-                            {"label": "strong wolfe", "value": "eStepLineSearchStrong_wolfe"},
-                        ],
-                        value=guiConfig["emParams"]["eStepLineSearchFn"],
-                    ),
-                ], style={"padding-bottom": "20px"}),
-                html.Div(children=[
-                    html.H6("Maximization Step on Embedding Parameters"),
-                    dcc.Checklist(
-                        id="mStepEmbeddingEstimate",
-                        options=[{"label": "estimate", "value": "True"}],
-                        value=[guiConfig["emParams"]["mStepEmbeddingEstimate"]],
-                    ),
-                    html.Label("Maximum iterations"),
-                    dcc.Input(
-                        id="mStepEmbeddingMaxIter",
-                        type="number",
-                        required=True,
-                        value=int(guiConfig["emParams"]["mStepEmbeddingMaxIter"]),
-                    ),
-                    html.Label("Learning rate"),
-                    dcc.Input(
-                        id="mStepEmbeddingLR",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["mStepEmbeddingLR"]),
-                    ),
-                    html.Label("Tolerance"),
-                    dcc.Input(
-                        id="mStepEmbeddingTol",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["mStepEmbeddingTol"]),
-                    ),
-                    html.Label("Line search"),
-                    dcc.RadioItems(
-                        id="mStepEmbeddingLineSearchFn",
-                        options=[
-                            {"label": "strong wolfe", "value": "mStepEmbeddingLineSearchStrong_wolfe"},
-                        ],
-                        value=guiConfig["emParams"]["mStepEmbeddingLineSearchFn"],
-                    ),
-                ], style={"padding-bottom": "20px"}),
-                html.Div(children=[
-                    html.H6("Maximization Step on Kernels Parameters"),
-                    dcc.Checklist(
-                        id="mStepKernelsEstimate",
-                        options=[{"label": "estimate", "value": "mStepKernelsEstimate"}],
-                        value=[guiConfig["emParams"]["mStepKernelsEstimate"]],
-                    ),
-                    html.Label("Maximum iterations"),
-                    dcc.Input(
-                        id="mStepKernelsMaxIter",
-                        type="number",
-                        required=True,
-                        value=int(guiConfig["emParams"]["mStepKernelsMaxIter"]),
-                    ),
-                    html.Label("Learning rate"),
-                    dcc.Input(
-                        id="mStepKernelsLR",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["mStepKernelsLR"]),
-                    ),
-                    html.Label("Tolerance"),
-                    dcc.Input(
-                        id="mStepKernelsTol",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["mStepKernelsTol"]),
-                    ),
-                    html.Label("Line search"),
-                    dcc.RadioItems(
-                        id="mStepKernelsLineSearchFn",
-                        options=[
-                            {"label": "strong wolfe", "value": "mStepKernelsLineSearchStrong_wolfe"},
-                        ],
-                        value=guiConfig["emParams"]["mStepKernelsLineSearchFn"],
-                    ),
-                ], style={"padding-bottom": "20px"}),
-                html.Div(children=[
-                    html.H6("Maximization Step on Inducing Points Parameters"),
-                    dcc.Checklist(
-                        id="mStepIndPointsEstimate",
-                        options=[{"label": "estimate", "value": "mStepIndPointsEstimate"}],
-                        value=[guiConfig["emParams"]["mStepIndPointsEstimate"]],
-                    ),
-                    html.Label("Maximum iterations"),
-                    dcc.Input(
-                        id="mStepIndPointsMaxIter",
-                        type="number",
-                        required=True,
-                        value=int(guiConfig["emParams"]["mStepIndPointsMaxIter"]),
-                    ),
-                    html.Label("Learning rate"),
-                    dcc.Input(
-                        id="mStepIndPointsLR",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["mStepIndPointsLR"]),
-                    ),
-                    html.Label("Tolerance"),
-                    dcc.Input(
-                        id="mStepIndPointsTol",
-                        type="number",
-                        required=True,
-                        value=float(guiConfig["emParams"]["mStepIndPointsTol"]),
-                    ),
-                    html.Label("Line search"),
-                    dcc.RadioItems(
-                        id="mStepIndPointsLineSearchFn",
-                        options=[
-                            {"label": "strong wolfe", "value": "mStepIndPointsLineSearchStrong_wolfe"},
-                        ],
-                        value=guiConfig["emParams"]["mStepIndPointsLineSearchFn"],
-                    ),
-                ], style={"padding-bottom": "20px"}),
-            ]
-        ),
-        html.Hr(),
-        html.H4("Miscellaneous Parameters"),
-        html.Div(children=[
-            html.Label("Number of quadrature points"),
-            dcc.Input(
-                id="nQuad",
-                type="number",
-                required=True,
-                value=int(guiConfig["miscParams"]["nQuad"]),
+                html.Label("Number of quadrature points"),
+                dcc.Input(
+                    id="nQuad",
+                    type="number",
+                    required=True,
+                    value=int(guiConfig["miscParams"]["nQuad"]),
+                ),
+            ], style={"padding-bottom": "20px"}),
+            html.Div(children=[
+                html.Label("Variance added to kernel covariance matrix for inducing points"),
+                dcc.Input(
+                    id="indPointsLocsKMSRegEpsilon",
+                    type="number",
+                    required=True,
+                    value=float(guiConfig["miscParams"]["indPointsLocsKMSRegEpsilon"]),
+                ),
+            ], style={"padding-bottom": "20px"}),
+            html.Hr(),
+            html.Button("Estimate", id="doEstimate", n_clicks=0),
+            html.Button("Cancel Estimation", id="cancelEstimation", n_clicks=0),
+            html.Div(id="cancelEstimationDummyDiv", hidden=True),
+            html.Div(id='sessionID', children=[session_id]),
+            html.Div(id='pid'),
+            html.Div(id='estimationStatus', children=["Not started"]),
+            dcc.Interval(
+                id='logIntervalComponent',
+                interval=1*1000, # in milliseconds
+                n_intervals=0,
+                disabled=True,
             ),
-        ], style={"padding-bottom": "20px"}),
-        html.Div(children=[
-            html.Label("Variance added to kernel covariance matrix for inducing points"),
-            dcc.Input(
-                id="indPointsLocsKMSRegEpsilon",
-                type="number",
-                required=True,
-                value=float(guiConfig["miscParams"]["indPointsLocsKMSRegEpsilon"]),
+            dcc.Interval(
+                id='estimationProgressGraphsIntervalComponent',
+                interval=1*2000, # in milliseconds
+                n_intervals=0,
+                disabled=True,
             ),
-        ], style={"padding-bottom": "20px"}),
-        html.Hr(),
-        html.Button("Estimate", id="doEstimate", n_clicks=0),
-        html.Div(id="estimationRes"),
-    ])
+            html.Div(id="estimationRes"),
+            dcc.Textarea(
+                id='logTextarea',
+                value='',
+                style={"display": "none", 'width': '60%', 'height': 300},
+                spellCheck=False,
+            ),
+            html.Div(
+                id="estimationProgressGraphsContainer",
+                children=[
+                    dcc.Graph(id="lowerBoundGraph"),
+                    html.Label("Trial to Plot"),
+                    dcc.Dropdown(
+                        id="trialToPlotLatentsComponent",
+                        options=[
+                            {"label": "", "value": -1},
+                        ],
+                        value=-1,
+                        style={"width": "30%"}
+                    ),
+                    html.Label("Latent to Plot"),
+                    dcc.Dropdown(
+                        id="latentToPlotComponent",
+                        options=[
+                            {"label": "dummy option", "value": -1},
+                        ],
+                        value=-1,
+                        style={"width": "30%"}
+                    ),
+                    dcc.Input(
+                        id="sampleRateForPlotting",
+                        type="number",
+                        required=True,
+                        value=10,
+                        style={"display": "none"}
+                    ),
+                    dcc.Graph(id="latentsGraph"),
+                ],
+                style={"display": "block"},
+            ),
+        ])
+        return aDiv
+
+    app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+    app.layout = serve_layout
+
+    @app.callback([Output('lowerBoundGraph', 'figure'),
+                   Output('estimationStatus', 'children')],
+                  [Input('estimationProgressGraphsIntervalComponent', 'n_intervals')],
+                  [State('emMaxIter', 'value'),
+                   State('sessionID', 'children'),
+                   State('pid', 'children'),
+                   State('lowerBoundGraph', 'figure'),
+                  ])
+    def update_lowerBoundGraph_live(estimationProgressGraphsIntervalComponent_n_intervals, emMaxIterValue, sessionIDChildren, pidChildren, lowerBoundGraphFigure):
+        if estimationProgressGraphsIntervalComponent_n_intervals==0:
+            raise PreventUpdate
+
+        lowerBoundLockFN = "/tmp/lockLowerBound{:s}.lock".format(sessionIDChildren[0])
+        lowerBoundStreamFN = "/tmp/bufferLowerBound{:s}.npy".format(sessionIDChildren[0])
+
+        if os.path.exists(lowerBoundStreamFN):
+            lowerBoundLock = utils.networking.multiprocessingUtils.FileLock(filename=lowerBoundLockFN)
+            if not lowerBoundLock.is_locked():
+                lowerBoundLock.lock()
+                with open(lowerBoundStreamFN, 'rb') as f:
+                    lowerBoundArray = np.load(f)
+                lowerBoundLock.unlock()
+                lowerBoundGraphFigure = dict({
+                    "data": [{
+                        "type": "scatter", "mode": "lines+markers",
+                        "x": np.arange(len(lowerBoundArray)),
+                        "y": lowerBoundArray,
+                    }],
+                    "layout": {
+                        "xaxis": {"title": "Iteration", "range": [-1, emMaxIterValue+1]},
+                        # "yaxis": {"title": "Log Likelihood", "range": [minLowerBound, maxLowerBound]},
+                        "yaxis": {"title": "Log Likelihood"},
+                        "height": 450, # px
+                    }
+                })
+                if (len(lowerBoundArray)-1)<emMaxIterValue:
+                    estimationStatusChildren = "In progress (pid={:s}) ...".format(pidChildren)
+                else:
+                    estimationStatusChildren = "Done"
+
+            answer = (lowerBoundGraphFigure, estimationStatusChildren)
+            return answer
+        raise PreventUpdate
+
+    @app.callback(Output('latentsGraph', 'figure'),
+                  [Input('estimationProgressGraphsIntervalComponent', 'n_intervals')],
+                  [State('sessionID', 'children'),
+                   State('trialToPlotLatentsComponent', 'value'),
+                   State('latentToPlotComponent', 'value'),
+                   State('sampleRateForPlotting', 'value'),
+                   State({"type": "trialsLengths",  "latent": ALL}, "value"),
+                   State('latentsGraph', 'figure'),
+                  ])
+    def update_latentsGraph_live(estimationProgressGraphsIntervalComponent_n_intervals, sessionIDChildren, trialToPlotLatentComponentValue, latentToPlotValue, sampleRateForPlottingValue, trialsLengths, latentsGraphFigure):
+        if estimationProgressGraphsIntervalComponent_n_intervals==0:
+            raise PreventUpdate
+
+        latentsLockFN = "/tmp/lockLatents{:s}.lock".format(sessionIDChildren[0])
+        latentsStreamFN = "/tmp/bufferLatents{:s}.npz".format(sessionIDChildren[0])
+
+        if os.path.exists(latentsStreamFN):
+            latentsLock = utils.networking.multiprocessingUtils.FileLock(filename=latentsLockFN)
+            if not latentsLock.is_locked():
+                latentsLock.lock()
+                with open(latentsStreamFN, 'rb') as f:
+                    loadRes = np.load(f)
+                    iteration = loadRes["iteration"]
+                    times = loadRes["times"]
+                    muK = loadRes["muK"]
+                    varK = loadRes["varK"]
+                latentsLock.unlock()
+                latentsGraphFigure = dict({
+                    "data": [],
+                    "layout": {
+                        "title": "Iteration {:d}, Trial {:d}, Latent {:d}".format(iteration, trialToPlotLatentComponentValue+1, latentToPlotValue+1),
+                        "xaxis": {"title": "Time (sec)"},
+                        "yaxis": {"title": "Latent"},
+                        "height": 450, # px
+                    }
+                })
+                times = np.arange(0, trialsLengths[trialToPlotLatentComponentValue-1],
+                                  1.0/sampleRateForPlottingValue)
+                times_rev = times[::-1]
+                cTimes = np.concatenate((times,times_rev))
+                meanToPlot = muK[trialToPlotLatentComponentValue-1,:,latentToPlotValue-1]
+                varToPlot = varK[trialToPlotLatentComponentValue-1,:,latentToPlotValue-1]
+                upperBound = meanToPlot+1.96*np.sqrt(varToPlot)
+                lowerBound = meanToPlot-1.96*np.sqrt(varToPlot)
+                lowerBound_rev = lowerBound[::-1]
+                cBounds = np.concatenate((upperBound, lowerBound_rev))
+                transparentFillcolor = DEFAULT_PLOTLY_COLORS[0].replace("rgb", "rgba").replace(")", ", 0.2)")
+                lineColor = DEFAULT_PLOTLY_COLORS[0]
+                latentsGraphFigure["data"].append(
+                    {
+                        "type": "scatter",
+                        "x": cTimes,
+                        "y": cBounds,
+                        "fill": "tozerox",
+                        "fillcolor": transparentFillcolor,
+                        "line":dict(color='rgba(255,255,255,0)'),
+                        "showlegend": False,
+                    },
+                )
+                latentsGraphFigure["data"].append(
+                    {
+                        "type": "scatter",
+                        "x": times,
+                        "y": meanToPlot,
+                        "line": {"color": lineColor},
+                        "mode": "lines",
+                        "showlegend": False,
+                    },
+                )
+            return latentsGraphFigure
+        raise PreventUpdate
+
+    @app.callback(Output('logTextarea', 'value'),
+                  [Input('logIntervalComponent', 'n_intervals')],
+                  [State('logTextarea', 'value'),
+                   State('sessionID', 'children'),
+                  ])
+    # def update_graph_live(intervalComponentn_intervals, nIterValue, sessionIDChildren, lowerBoundGraphFigure, latentsGraphFigure):
+    def update_log_live(logIntervalComponent_n_intervals, logTextareaValue, sessionIDChildren):
+        if logIntervalComponent_n_intervals==0:
+            raise PreventUpdate
+
+        logLockFN = "/tmp/lockLog{:s}.lock".format(sessionIDChildren[0])
+        logStreamFN = "/tmp/bufferLog{:s}.log".format(sessionIDChildren[0])
+
+        logLock = utils.networking.multiprocessingUtils.FileLock(filename=logLockFN)
+        if os.path.exists(logStreamFN):
+
+            if not logLock.is_locked():
+                logLock.lock()
+                with open(logStreamFN, 'r') as f:
+                    newLogLines = f.readlines()
+                # os.remove(logStreamFN)
+                logLock.unlock()
+                logTextareaValue = ""
+                for logLine in newLogLines:
+                    logTextareaValue = logTextareaValue + logLine
+
+            return logTextareaValue
+        raise PreventUpdate
 
     @app.callback(
-        Output("kernelsTypesContainer", "children"),
+        [Output("kernelsTypesContainer", "children"),
+         Output("latentToPlotComponent", "options"),
+         Output("latentToPlotComponent", "value"),
+        ],
         [Input("nLatentsComponent", "value")],
         [State("kernelsTypesContainer", "children")])
     def populateKernelsTypes(nLatentsComponentValue, kernelsTypesContainerChildren):
         if nLatentsComponentValue is None:
             raise PreventUpdate
+        latentToPlotComponentOptions = [{"label": str(r+1), "value": r} for r in range(nLatentsComponentValue)]
+        latentToPlotComponentValue = 0
         if nLatentsComponentValue==len(kernelsTypesContainerChildren):
             raise PreventUpdate
         elif nLatentsComponentValue<len(kernelsTypesContainerChildren):
-            return kernelsTypesContainerChildren[:nLatentsComponentValue]
+            kernelsTypesContainerChildren = kernelsTypesContainerChildren[:nLatentsComponentValue]
         elif len(kernelsTypesContainerChildren)==0:
             newChildren = []
             for k in range(nLatentsComponentValue):
@@ -449,8 +672,7 @@ def main(argv):
                     ]),
                 ], style={"columnCount": 1})
                 newChildren.append(aDiv)
-            answer = kernelsTypesContainerChildren + newChildren
-            return answer
+            kernelsTypesContainerChildren = kernelsTypesContainerChildren + newChildren
         elif nLatentsComponentValue>len(kernelsTypesContainerChildren):
             newChildren = []
             for k in range(len(kernelsTypesContainerChildren),
@@ -472,8 +694,8 @@ def main(argv):
                     ]),
                 ], style={"columnCount": 1})
                 newChildren.append(aDiv)
-            answer = kernelsTypesContainerChildren + newChildren
-            return answer
+            kernelsTypesContainerChildren = kernelsTypesContainerChildren + newChildren
+        return kernelsTypesContainerChildren, latentToPlotComponentOptions, latentToPlotComponentValue
 
     @app.callback(
         [Output("kernelParams0ParentContainer", "hidden"),
@@ -611,9 +833,11 @@ def main(argv):
     @app.callback([Output("nTrialsComponent", "children"),
                    Output("nNeuronsComponent", "children"),
                    Output("nTrialsAndNNeuronsInfoComponent", "children"),
-                   Output("trialToPlotComponent", "options"),
-                   Output("trialToPlotComponent", "value"),
-                   Output("trialToPlotParentContainer", "hidden"),
+                   Output("trialToPlotRasterComponent", "options"),
+                   Output("trialToPlotRasterComponent", "value"),
+                   Output("trialToPlotRasterParentContainer", "hidden"),
+                   Output("trialToPlotLatentsComponent", "options"),
+                   Output("trialToPlotLatentsComponent", "value"),
                    Output("trialsLengthsContainer", "children"),
                    Output("trialsLengthsParentContainer", "hidden")],
                   [Input("spikesTimesVar", "value")],
@@ -627,9 +851,11 @@ def main(argv):
             nNeurons = spikesTimes.shape[1]
             trialsLengthsGuesses = guessTrialsLengths(spikesTimes=spikesTimes)
             nTrialsAndNNeuronsInfo = "trials: {:d}, neurons: {:d}".format(nTrials, nNeurons)
-            trialToPlotOptions = [{"label": str(r+1), "value": r} for r in range(nTrials)]
-            trialToPlotValue = 0
-            trialToPlotDivHidden = False
+            trialToPlotRasterOptions = [{"label": str(r+1), "value": r} for r in range(nTrials)]
+            trialToPlotRasterValue = 0
+            trialToPlotRasterParentDivHidden = False
+            trialToPlotLatentsOptions = [{"label": str(r+1), "value": r} for r in range(nTrials)]
+            trialToPlotLatentsValue = 0
             #
             trialsLengthsChildren = []
             for r in range(nTrials):
@@ -650,20 +876,20 @@ def main(argv):
                 trialsLengthsChildren.append(aDiv)
             #
             trialsLengthsParentContainerHidden = False
-            return nTrials, nNeurons, nTrialsAndNNeuronsInfo, trialToPlotOptions, trialToPlotValue, trialToPlotDivHidden, trialsLengthsChildren, trialsLengthsParentContainerHidden
+            return nTrials, nNeurons, nTrialsAndNNeuronsInfo, trialToPlotRasterOptions, trialToPlotRasterValue, trialToPlotRasterParentDivHidden, trialToPlotLatentsOptions, trialToPlotLatentsValue, trialsLengthsChildren, trialsLengthsParentContainerHidden
         raise PreventUpdate
 
     @app.callback(Output("trialRastergram", "figure"),
-                  [Input("trialToPlotComponent", "value")],
+                  [Input("trialToPlotRasterComponent", "value")],
                   [State("spikesTimesVar", "value"),
                    State("uploadSpikes", "contents"),
                    State("uploadSpikes", "filename")])
-    def updateRastergram(trialToPlot, spikesTimesVar, contents, filename):
+    def updateRastergram(trialToPlotRaster, spikesTimesVar, contents, filename):
         # pdb.set_trace()
-        if trialToPlot>=0 and spikesTimesVar is not None:
+        if trialToPlotRaster>=0 and spikesTimesVar is not None:
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
-            trialSpikesTimes = spikesTimes[trialToPlot,:]
-            title="Trial {:d}".format(trialToPlot+1)
+            trialSpikesTimes = spikesTimes[trialToPlotRaster,:]
+            title="Trial {:d}".format(trialToPlotRaster+1)
             rastergram = getRastergram(trialSpikesTimes=trialSpikesTimes, title=title)
             return rastergram
         raise PreventUpdate
@@ -798,9 +1024,15 @@ def main(argv):
         raise PreventUpdate
 
     @app.callback(
-        Output("estimationRes", "children"),
+        [Output("pid", "children"),
+         Output("estimationProgressGraphsContainer", "style"),
+         Output('logTextarea', 'style'),
+         Output('logIntervalComponent', 'disabled'),
+         Output('estimationProgressGraphsIntervalComponent', 'disabled'),
+        ],
         [Input("doEstimate", "n_clicks")],
-        [State("spikesTimesVar", "value"),
+        [State("sessionID", "children"),
+         State("spikesTimesVar", "value"),
          State("uploadSpikes", "contents"),
          State("uploadSpikes", "filename"),
          State("conditionalDist", "value"),
@@ -845,8 +1077,11 @@ def main(argv):
          #
          State("nQuad", "value"),
          State("indPointsLocsKMSRegEpsilon", "value"),
+         State('logTextarea', 'style'),
+         State('estimationProgressGraphsContainer', 'style'),
         ])
     def estimateSVGPFA(doEstimateNClicks,
+                       sessionIDChildren,
                        spikesTimesVar,
                        contents,
                        filename,
@@ -892,8 +1127,10 @@ def main(argv):
                        #
                        nQuad,
                        indPointsLocsKMSRegEpsilon,
+                       #
+                       logTextareaStyle,
+                       estimationProgressGraphsContainerStyle,
                       ):
-        # pdb.set_trace()
         if doEstimateNClicks>0:
             optimParams = {}
             optimParams["emMaxIter"] = emMaxIter
@@ -928,6 +1165,10 @@ def main(argv):
             #
             optimParams["verbose"] = True
 
+
+            logTextareaStyle["display"] = "block"
+            estimationProgressGraphsContainerStyle["display"] = "block"
+
             nTrials = len(trialsLengths)
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
             runner = svGPFA_runner(firstIndPoint=firstIndPoint)
@@ -945,11 +1186,45 @@ def main(argv):
             runner.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
             runner.setOptimParams(optimParams=optimParams)
 
-            runner.run()
+            logLockFN = "/tmp/lockLog{:s}.lock".format(sessionIDChildren[0])
+            logStreamFN = "/tmp/bufferLog{:s}.log".format(sessionIDChildren[0])
+            logLock = utils.networking.multiprocessingUtils.FileLock(filename=logLockFN)
+            lowerBoundLockFN = "/tmp/lockLowerBound{:s}.lock".format(sessionIDChildren[0])
+            lowerBoundStreamFN = "/tmp/bufferLowerBound{:s}.npy".format(sessionIDChildren[0])
+            lowerBoundLock = utils.networking.multiprocessingUtils.FileLock(filename=lowerBoundLockFN)
+            latentsLockFN = "/tmp/lockLatents{:s}.lock".format(sessionIDChildren[0])
+            latentsTimes = torch.arange(0, np.max(trialsLengths), dtLatentsTimes)
+            latentsLock = utils.networking.multiprocessingUtils.FileLock(filename=latentsLockFN)
+            latentsStreamFN = "/tmp/bufferLatents{:s}.npz".format(sessionIDChildren[0])
 
-            pdb.set_trace()
+            keywords = {"logLock": logLock, 
+                        "logStreamFN": logStreamFN,
+                        "lowerBoundLock": lowerBoundLock, 
+                        "lowerBoundStreamFN": lowerBoundStreamFN, 
+                        "latentsTimes": latentsTimes,
+                        "latentsLock": latentsLock,
+                        "latentsStreamFN": latentsStreamFN,
+                       }
+            p = mp.Process(target=runner.run, kwargs=keywords)
+            # runner.run()
+            p.start()
+            estimationProgressGraphsContainerStyle = {"display": "block"}
+            logIntervalComponentDisabled = False
+            estimationProgressGraphsIntervalComponentDisabled = False
+            pidChildren = "{:d}".format(p.pid)
+            return pidChildren, estimationProgressGraphsContainerStyle, logTextareaStyle, logIntervalComponentDisabled, estimationProgressGraphsIntervalComponentDisabled
+        raise PreventUpdate
 
-            return ["Successful estimation!!!"]
+    @app.callback(
+        Output("cancelEstimationDummyDiv", "children"),
+        [Input("cancelEstimation", "n_clicks")],
+        [State("pid", "children")],
+    )
+    def cancelEstimation(cancelEstimation_n_clicks, pidChildren):
+        if cancelEstimation_n_clicks>0:
+            pid = int(pidChildren)
+            os.kill(pid, signal.SIGKILL)
+        raise PreventUpdate
 
     app.run_server(debug=True)
 
