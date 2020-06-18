@@ -25,7 +25,6 @@ def getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent, nLatents, nTrials, sca
         qMu0[i] = torch.zeros(nTrials, nIndPointsPerLatent[i], 1, dtype=torch.double)
         qSVec0[i] = scale*torch.eye(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
         qSDiag0[i] = scale*torch.ones(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
-    pdb.set_trace()
     return qMu0, qSVec0, qSDiag0
 
 def getKernelsParams0(kernels, noiseSTD):
