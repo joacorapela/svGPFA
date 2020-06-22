@@ -2,6 +2,14 @@
 import torch
 import stats.gaussianProcesses.eval
 
+def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
+    nTrials = len(trialsLengths)
+    legQuadPoints = torch.empty((nTrials, nQuad, 1), dtype=dtype)
+    legQuadWeights = torch.empty((nTrials, nQuad, 1), dtype=dtype)
+    for r in range(nTrials):
+        legQuadPoints[r,:,0], legQuadWeights[r,:,0] = myMath.utils.leggaussVarLimits(n=nQuad, a=0, b=trialsLengths[r])
+    return legQuadPoints, legQuadWeights
+
 def getTrialsTimes(trialsLengths, dt):
     nTrials = len(trialsLengths)
     trialsTimes = [[] for r in range(nTrials)]
