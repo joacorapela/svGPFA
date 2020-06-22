@@ -78,7 +78,7 @@ class ExponentialQuadraticKernel(Kernel):
 
 class PeriodicKernel(Kernel):
     def __init__(self, scale=1.0, lengthScale=None, period=None, dtype=torch.double, device=torch.device("cpu")):
-        super(PeriodicKernel, self).__init__()
+        # super(PeriodicKernel, self).__init__()
         # paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])
         # self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))
 
@@ -122,30 +122,30 @@ class PeriodicKernel(Kernel):
             scale = self._params[0]
             lengthScale = self._params[1]
             period = self._params[2]
-        elif self._scaleFixed and not self._lengthScaleFixed and not self._periodFixed:
-            scale = self._scale
-            lengthScale = self._params[0]
-            period = self._params[1]
+        elif not self._scaleFixed and not self._lengthScaleFixed and self._periodFixed:
+            scale = self._params[0]
+            lengthScale = self._params[1]
+            period = self._period
         elif not self._scaleFixed and self._lengthScaleFixed and not self._periodFixed:
             scale = self._params[0]
             lengthScale = self._lengthScale
             period = self._params[1]
-        elif self._scaleFixed and self._lengthScaleFixed and not self._periodFixed:
+        elif not self._scaleFixed and self._lengthScaleFixed and self._periodFixed:
             scale = self._params[0]
-            lengthScale = self._params[1]
+            lengthScale = self._lengthScale
+            period = self._period
+        elif self._scaleFixed and not self._lengthScaleFixed and not self._periodFixed:
+            scale = self._scale
+            lengthScale = self._params[0]
+            period = self._params[1]
+        elif self._scaleFixed and not self._lengthScaleFixed and self._periodFixed:
+            scale = self._scale
+            lengthScale = self._params[0]
             period = self._period
         elif self._scaleFixed and self._lengthScaleFixed and not self._periodFixed:
             scale = self._scale
             lengthScale = self._lengthScale
             period = self._params[0]
-        elif self._scaleFixed and not self._lengthScaleFixed and self._periodFixed:
-            scale = self._scale
-            lengthScale = self._params[0]
-            period = self.period
-        elif not self._scaleFixed and self._lengthScaleFixed and self._periodFixed:
-            scale = self._params[0]
-            lengthScale = self._lengthScale
-            period = self._period
         else:
             raise ValueError("Scale and lengthScale cannot be both fixed")
 
