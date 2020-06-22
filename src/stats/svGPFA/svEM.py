@@ -56,13 +56,12 @@ class SVEM:
                 message = "Iteration %02d, E-Step start\n"%(iter+1)
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
                 # begin debug
                 # with torch.no_grad():
                 #     logLike = model.eval()
@@ -89,13 +88,12 @@ class SVEM:
                 message = "Iteration %02d, E-Step end: %f\n"%(iter+1, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
             # begin debug
             # pdb.set_trace()
             # end debug
@@ -103,13 +101,12 @@ class SVEM:
                 message = "Iteration %02d, M-Step Model Params start\n"%(iter+1)
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
                 # pdb.set_trace()
                 if optimParams["eStepLineSearchFn"]=="None":
                     lineSearchFn = None
@@ -131,13 +128,12 @@ class SVEM:
                 message = "Iteration %02d, M-Step Model Params end: %f\n"%(iter+1, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
             # begin debug
             # pdb.set_trace()
             # end debug
@@ -145,13 +141,12 @@ class SVEM:
                 message = "Iteration %02d, M-Step Kernel Params start\n"%(iter+1)
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
                 # pdb.set_trace()
                 if optimParams["eStepLineSearchFn"]=="None":
                     lineSearchFn = None
@@ -173,13 +168,12 @@ class SVEM:
                 message = "Iteration %02d, M-Step Kernel Params end: %f\n"%(iter+1, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
             # begin debug
             # pdb.set_trace()
             # end debug
@@ -187,13 +181,12 @@ class SVEM:
                 message = "Iteration %02d, M-Step Ind Points start\n"%(iter+1)
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
                 # pdb.set_trace()
                 if optimParams["eStepLineSearchFn"]=="None":
                     lineSearchFn = None
@@ -215,13 +208,12 @@ class SVEM:
                 message = "Iteration %02d, M-Step Ind Points end: %f\n"%(iter+1, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
+                )
             # begin debug
             # pdb.set_trace()
             # end debug
@@ -377,20 +369,12 @@ class SVEM:
             message = displayFmt%(iterCount, curEval)
             if verbose and iterCount%nIterDisplay==0:
                 out.write(message)
-                if self._writeToLockedLog(
+                self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN
-                ):
-                    logStream = io.StringIO()
-#             if verbose and iterCount%nIterDisplay==0:
-#                 self._writeToLockedLog(
-#                     message=displayFmt%(iterCount, curEval),
-#                     logLock=logLock,
-#                     logStream=logStream,
-#                     logStreamFN=logStreamFN
-#                 )
+                )
             lowerBoundHist.append(-curEval.item())
             iterCount += 1
 
@@ -403,5 +387,5 @@ class SVEM:
             with open(logStreamFN, 'a') as f:
                 f.write(logStream.getvalue())
             logLock.unlock()
-            return True
-        return False
+            logStream.truncate(0)
+            logStream.seek(0)
