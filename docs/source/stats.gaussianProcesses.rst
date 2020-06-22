@@ -12,14 +12,6 @@ stats.gaussianProcesses.eval module
    :undoc-members:
    :show-inheritance:
 
-stats.gaussianProcesses.kernels module
---------------------------------------
-
-.. automodule:: stats.gaussianProcesses.kernels
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 stats.gaussianProcesses.learn module
 ------------------------------------
 

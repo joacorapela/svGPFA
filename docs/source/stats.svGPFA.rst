@@ -28,14 +28,6 @@ stats.svGPFA.klDivergence module
    :undoc-members:
    :show-inheritance:
 
-stats.svGPFA.simulations module
--------------------------------
-
-.. automodule:: stats.svGPFA.simulations
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 stats.svGPFA.svEM module
 ------------------------
 
