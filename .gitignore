@@ -27,4 +27,4 @@ ipynb/results
 # scripts/figures/*
 # scripts/results/*
 src/stats/gaussianProcesses/kernels.py
-*/old/*
+old/
