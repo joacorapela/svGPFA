@@ -97,12 +97,12 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">stats package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="stats.gaussianProcesses.html">stats.gaussianProcesses package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="stats.pointProcess.html">stats.pointProcess package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stats.kernels">stats.kernels module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-stats.sampler">stats.sampler module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-stats">Module contents</a></li>
 </ul>
 </li>
@@ -179,9 +179,15 @@
 <li class="toctree-l1"><a class="reference internal" href="stats.gaussianProcesses.html">stats.gaussianProcesses package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.eval">stats.gaussianProcesses.eval module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.kernels">stats.gaussianProcesses.kernels module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.learn">stats.gaussianProcesses.learn module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="stats.pointProcess.html">stats.pointProcess package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="stats.pointProcess.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.pointProcess.html#module-stats.pointProcess.sampler">stats.pointProcess.sampler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.pointProcess.html#module-stats.pointProcess.tests">stats.pointProcess.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.pointProcess.html#module-stats.pointProcess">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a><ul>
@@ -189,7 +195,6 @@
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.expectedLogLikelihood">stats.svGPFA.expectedLogLikelihood module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.kernelMatricesStore">stats.svGPFA.kernelMatricesStore module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.klDivergence">stats.svGPFA.klDivergence module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.simulations">stats.svGPFA.simulations module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEM">stats.svGPFA.svEM module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEmbedding">stats.svGPFA.svEmbedding module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svGPFAModelFactory">stats.svGPFA.svGPFAModelFactory module</a></li>
@@ -222,12 +227,17 @@
 <code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="stats.kernels.ExponentialQuadraticKernel.getNamedParams">
+<code class="sig-name descname">getNamedParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.getNamedParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="stats.kernels.Kernel">
 <em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">Kernel</code><a class="reference internal" href="_modules/stats/kernels.html#Kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.Module</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
 <dl class="method">
 <dt id="stats.kernels.Kernel.buildKernelMatrix">
 <em class="property">abstract </em><code class="sig-name descname">buildKernelMatrix</code><span class="sig-paren">(</span><em class="sig-param">X1</em>, <em class="sig-param">X2=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.buildKernelMatrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
@@ -236,6 +246,11 @@
 <dl class="method">
 <dt id="stats.kernels.Kernel.buildKernelMatrixDiag">
 <em class="property">abstract </em><code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.Kernel.getNamedParams">
+<em class="property">abstract </em><code class="sig-name descname">getNamedParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#Kernel.getNamedParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.Kernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -264,79 +279,10 @@
 <code class="sig-name descname">buildKernelMatrixDiag</code><span class="sig-paren">(</span><em class="sig-param">X</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.buildKernelMatrixDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-</div>
-<div class="section" id="module-stats.sampler">
-<span id="stats-sampler-module"></span><h2>stats.sampler module<a class="headerlink" href="#module-stats.sampler" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="stats.sampler.Sampler">
-<em class="property">class </em><code class="sig-prename descclassname">stats.sampler.</code><code class="sig-name descname">Sampler</code><a class="reference internal" href="_modules/stats/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
-<dt id="stats.sampler.Sampler.sampleInhomogeneousPP_thinning">
-<code class="sig-name descname">sampleInhomogeneousPP_thinning</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_thinning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_thinning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Thining algorithm to sample from an inhomogeneous point process. Algorithm 2 from Yuanda Chen (2016). Thinning algorithms for simulating Point Prcesses.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>intensityFun: Intensity function of the point process.</p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>intensityFun: function</p>
-</dd>
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>T: the returned samples of the point process <span class="math notranslate nohighlight">\(\in [0, T]\)</span></p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>T: double</p>
-</dd>
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>nGrid: number of points in the grid used to search for the maximum of intensityFun.</p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>nGrid: integer</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>(inhomogeneous, homogeneous): samples of the inhomogeneous and homogenous point process with intensity function intensityFun.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>tuple containing two lists</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">
-<code class="sig-name descname">sampleInhomogeneousPP_timeRescaling</code><span class="sig-paren">(</span><em class="sig-param">intensityFun</em>, <em class="sig-param">T</em>, <em class="sig-param">dt=0.03</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/sampler.html#Sampler.sampleInhomogeneousPP_timeRescaling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling" title="Permalink to this definition">¶</a></dt>
-<dd><p>Time rescaling algorithm to sample from an inhomogeneous point
-process. Chapter 2 from Uri Eden’s Point Process Notes.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>intensityFun: intensity function of the point process.</p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>intensityFun: function</p>
-</dd>
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>T: the returned samples of the point process <span class="math notranslate nohighlight">\(\in [0, T]\)</span></p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>T: double</p>
-</dd>
-<dt class="field-odd">Param</dt>
-<dd class="field-odd"><p>dt: spike-time resolution.</p>
-</dd>
-<dt class="field-even">Type</dt>
-<dd class="field-even"><p>dt: float</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>samples of the inhomogeneous point process with intensity function intensityFun.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
-</dd></dl>
+<dt id="stats.kernels.PeriodicKernel.getNamedParams">
+<code class="sig-name descname">getNamedParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.getNamedParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
    stats.gaussianProcesses
+   stats.pointProcess
    stats.svGPFA
 
 Submodules
@@ -16,14 +17,6 @@ stats.kernels module
 --------------------
 
 .. automodule:: stats.kernels
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-stats.sampler module
---------------------
-
-.. automodule:: stats.sampler
    :members:
    :undoc-members:
    :show-inheritance:

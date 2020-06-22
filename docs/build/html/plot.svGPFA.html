@@ -181,8 +181,33 @@
 <div class="section" id="module-plot.svGPFA.plotUtils">
 <span id="plot-svgpfa-plotutils-module"></span><h2>plot.svGPFA.plotUtils module<a class="headerlink" href="#module-plot.svGPFA.plotUtils" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="plot.svGPFA.plotUtils.getSimulatedLatentsPlot">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">getSimulatedLatentsPlot</code><span class="sig-paren">(</span><em class="sig-param">trialsTimes</em>, <em class="sig-param">latentsSamples</em>, <em class="sig-param">latentsMeans</em>, <em class="sig-param">latentsSTDs</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">alpha=0.5</em>, <em class="sig-param">marker='x'</em>, <em class="sig-param">xlabel='Time (sec)'</em>, <em class="sig-param">ylabel='Amplitude'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#getSimulatedLatentsPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.getSimulatedLatentsPlot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">getSimulatedSpikeTimesPlot</code><span class="sig-paren">(</span><em class="sig-param">spikesTimes</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">xlabel='Time (sec)'</em>, <em class="sig-param">ylabel='Neuron'</em>, <em class="sig-param">titlePattern='Trial {:d}'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#getSimulatedSpikeTimesPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotACF">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotACF</code><span class="sig-paren">(</span><em class="sig-param">acf</em>, <em class="sig-param">confint</em>, <em class="sig-param">Fs</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">xlabel='Lag (sec)'</em>, <em class="sig-param">ylabel='ACF'</em>, <em class="sig-param">colorACF='black'</em>, <em class="sig-param">colorConfint='red'</em>, <em class="sig-param">colorRef='gray'</em>, <em class="sig-param">linestyleACF='-'</em>, <em class="sig-param">linestyleConfint=':'</em>, <em class="sig-param">linestyleRef=':'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotACF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotACF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotCIF">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotCIF</code><span class="sig-paren">(</span><em class="sig-param">times</em>, <em class="sig-param">values</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">xlabel='Time (sec)'</em>, <em class="sig-param">ylabel='Conditional Intensity Function'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotCIF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotCIF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotDifferenceCDFs">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotDifferenceCDFs</code><span class="sig-paren">(</span><em class="sig-param">sUTRISIs</em>, <em class="sig-param">uCDF</em>, <em class="sig-param">cb</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">dataColor='blue'</em>, <em class="sig-param">cbColor='red'</em>, <em class="sig-param">dataLinestyle='solid'</em>, <em class="sig-param">dataMarker='*'</em>, <em class="sig-param">cbLinestyle='dashed'</em>, <em class="sig-param">ylabel='Difference'</em>, <em class="sig-param">xlabel='CDF'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotDifferenceCDFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotDifferenceCDFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="plot.svGPFA.plotUtils.plotEstimatedLatents">
-<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotEstimatedLatents</code><span class="sig-paren">(</span><em class="sig-param">times</em>, <em class="sig-param">muK</em>, <em class="sig-param">varK</em>, <em class="sig-param">indPointsLocs</em>, <em class="sig-param">trialToPlot=0</em>, <em class="sig-param">figFilename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotEstimatedLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotEstimatedLatents" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotEstimatedLatents</code><span class="sig-paren">(</span><em class="sig-param">fig</em>, <em class="sig-param">times</em>, <em class="sig-param">muK</em>, <em class="sig-param">varK</em>, <em class="sig-param">indPointsLocs</em>, <em class="sig-param">title=''</em>, <em class="sig-param">figFilename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotEstimatedLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotEstimatedLatents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
@@ -191,18 +216,53 @@
 <dd></dd></dl>
 
 <dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotResKSTestTimeRescalingAnalyticalCorrection">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotResKSTestTimeRescalingAnalyticalCorrection</code><span class="sig-paren">(</span><em class="sig-param">sUTRISIs</em>, <em class="sig-param">uCDF</em>, <em class="sig-param">cb</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">dataColor='blue'</em>, <em class="sig-param">cbColor='red'</em>, <em class="sig-param">dataLinestyle='solid'</em>, <em class="sig-param">dataMarker='*'</em>, <em class="sig-param">cbLinestyle='dashed'</em>, <em class="sig-param">ylabel='Empirical CDF'</em>, <em class="sig-param">xlabel='Model CDF'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotResKSTestTimeRescalingAnalyticalCorrection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotResKSTestTimeRescalingAnalyticalCorrection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotResKSTestTimeRescalingNumericalCorrection</code><span class="sig-paren">(</span><em class="sig-param">diffECDFsX</em>, <em class="sig-param">diffECDFsY</em>, <em class="sig-param">estECDFx</em>, <em class="sig-param">estECDFy</em>, <em class="sig-param">simECDFx</em>, <em class="sig-param">simECDFy</em>, <em class="sig-param">cb</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">dataColor='blue'</em>, <em class="sig-param">cbColor='red'</em>, <em class="sig-param">refColor='black'</em>, <em class="sig-param">estECDFcolor='magenta'</em>, <em class="sig-param">simECDFcolor='cyan'</em>, <em class="sig-param">estECDFmarker='+'</em>, <em class="sig-param">simECDFmarker='*'</em>, <em class="sig-param">dataLinestyle='solid'</em>, <em class="sig-param">cbLinestyle='dashed'</em>, <em class="sig-param">refLinestyle='solid'</em>, <em class="sig-param">dataMarker='o'</em>, <em class="sig-param">ylabel='Empirical Cumulative Distribution Function'</em>, <em class="sig-param">xlabel='Rescaled Time'</em>, <em class="sig-param">diffLabel='Difference'</em>, <em class="sig-param">estECDFlabel='Estimated'</em>, <em class="sig-param">simECDFlabel='True'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotResKSTestTimeRescalingNumericalCorrection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotResROCAnalysis">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotResROCAnalysis</code><span class="sig-paren">(</span><em class="sig-param">fpr</em>, <em class="sig-param">tpr</em>, <em class="sig-param">auc</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">colorROC='red'</em>, <em class="sig-param">colorRef='black'</em>, <em class="sig-param">linestyleROC='-'</em>, <em class="sig-param">linestyleRef='--'</em>, <em class="sig-param">labelPattern='ROC curve (area={:0.2f})'</em>, <em class="sig-param">xlabel='False Positive Rate'</em>, <em class="sig-param">ylabel='True Positive Rate'</em>, <em class="sig-param">legendLoc='lower right'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotResROCAnalysis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotResROCAnalysis" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotScatter1Lag">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotScatter1Lag</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">xlabel='x[t-1]'</em>, <em class="sig-param">ylabel='x[t]'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotScatter1Lag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotScatter1Lag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotSimulatedAndEstimatedCIFs</code><span class="sig-paren">(</span><em class="sig-param">times</em>, <em class="sig-param">simCIFValues</em>, <em class="sig-param">estCIFValues</em>, <em class="sig-param">figFilename=None</em>, <em class="sig-param">title=''</em>, <em class="sig-param">labelSimulated='True'</em>, <em class="sig-param">labelEstimated='Estimated'</em>, <em class="sig-param">xlabel='Time (sec)'</em>, <em class="sig-param">ylabel='Conditional Intensity Function'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotSimulatedAndEstimatedCIFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotTrueAndEstimatedEmbeddingParams">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTrueAndEstimatedEmbeddingParams</code><span class="sig-paren">(</span><em class="sig-param">trueC</em>, <em class="sig-param">trueD</em>, <em class="sig-param">estimatedC</em>, <em class="sig-param">estimatedD</em>, <em class="sig-param">linestyleTrue='solid'</em>, <em class="sig-param">linestyleEstimated='dashed'</em>, <em class="sig-param">marker='*'</em>, <em class="sig-param">xlabel='Neuron Index'</em>, <em class="sig-param">ylabel='Coefficient Value'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTrueAndEstimatedEmbeddingParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTrueAndEstimatedEmbeddingParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotTrueAndEstimatedKernelsParams">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTrueAndEstimatedKernelsParams</code><span class="sig-paren">(</span><em class="sig-param">trueKernels</em>, <em class="sig-param">estimatedKernelsParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTrueAndEstimatedKernelsParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTrueAndEstimatedKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents">
-<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTrueAndEstimatedLatents</code><span class="sig-paren">(</span><em class="sig-param">times</em>, <em class="sig-param">muK</em>, <em class="sig-param">varK</em>, <em class="sig-param">indPointsLocs</em>, <em class="sig-param">trueLatents</em>, <em class="sig-param">trialToPlot=0</em>, <em class="sig-param">figFilename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTrueAndEstimatedLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTrueAndEstimatedLatents</code><span class="sig-paren">(</span><em class="sig-param">timesEstimatedValues</em>, <em class="sig-param">muK</em>, <em class="sig-param">varK</em>, <em class="sig-param">indPointsLocs</em>, <em class="sig-param">timesTrueValues</em>, <em class="sig-param">trueLatents</em>, <em class="sig-param">trueLatentsMeans</em>, <em class="sig-param">trueLatentsSTDs</em>, <em class="sig-param">trialToPlot=0</em>, <em class="sig-param">figFilename=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTrueAndEstimatedLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="plot.svGPFA.plotUtils.plotTrueAndEstimatedLatentsMeans">
+<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTrueAndEstimatedLatentsMeans</code><span class="sig-paren">(</span><em class="sig-param">trueLatentsMeans</em>, <em class="sig-param">estimatedLatentsMeans</em>, <em class="sig-param">trialsTimes</em>, <em class="sig-param">labelTrue='True'</em>, <em class="sig-param">labelEstimated='Estimated'</em>, <em class="sig-param">xlabel='Time (sec)'</em>, <em class="sig-param">ylabel='Latent Value'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTrueAndEstimatedLatentsMeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTrueAndEstimatedLatentsMeans" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatents">
 <code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTruePythonAndMatlabLatents</code><span class="sig-paren">(</span><em class="sig-param">tTimes</em>, <em class="sig-param">tLatents</em>, <em class="sig-param">pTimes</em>, <em class="sig-param">pMuK</em>, <em class="sig-param">pVarK</em>, <em class="sig-param">mTimes</em>, <em class="sig-param">mMuK</em>, <em class="sig-param">mVarK</em>, <em class="sig-param">trialToPlot=0</em>, <em class="sig-param">figFilenamePattern=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTruePythonAndMatlabLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatents" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatentsPlotly">
-<code class="sig-prename descclassname">plot.svGPFA.plotUtils.</code><code class="sig-name descname">plotTruePythonAndMatlabLatentsPlotly</code><span class="sig-paren">(</span><em class="sig-param">tTimes</em>, <em class="sig-param">tLatents</em>, <em class="sig-param">pTimes</em>, <em class="sig-param">pMuK</em>, <em class="sig-param">pVarK</em>, <em class="sig-param">mTimes</em>, <em class="sig-param">mMuK</em>, <em class="sig-param">mVarK</em>, <em class="sig-param">trialToPlot=0</em>, <em class="sig-param">staticFigFilenamePattern=None</em>, <em class="sig-param">dynamicFigFilenamePattern=None</em>, <em class="sig-param">xlabel='Time (sec)'</em>, <em class="sig-param">ylabelPattern='Latent {:d}'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/plot/svGPFA/plotUtils.html#plotTruePythonAndMatlabLatentsPlotly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatentsPlotly" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>

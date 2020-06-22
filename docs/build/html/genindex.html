@@ -172,6 +172,7 @@
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  
 </div>
 <h2 id="B">B</h2>
@@ -223,9 +224,7 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.kernels.Kernel.buildKSample">buildKSample() (stats.gaussianProcesses.kernels.Kernel method)</a>
-</li>
-      <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.kernels.Kernel.buildKSampleGrad">buildKSampleGrad() (stats.gaussianProcesses.kernels.Kernel method)</a>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices">buildKttKernelsMatrices() (stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS method)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel">buildModel() (stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory static method)</a>
 </li>
@@ -241,6 +240,18 @@
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.utils.clock">clock() (in module stats.svGPFA.utils)</a>
 </li>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeMeanCIFs">computeMeanCIFs() (stats.svGPFA.expectedLogLikelihood.PointProcessELL method)</a>
+
+      <ul>
+        <li><a href="stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.computeMeanCIFs">(stats.svGPFA.svLowerBound.SVLowerBound method)</a>
+</li>
+      </ul></li>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.computeMeans">computeMeans() (stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes method)</a>
+
+      <ul>
+        <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeans">(stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes method)</a>
+</li>
+      </ul></li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.svEmbedding.SVEmbedding.computeMeansAndVars">computeMeansAndVars() (stats.svGPFA.svEmbedding.SVEmbedding method)</a>
 
       <ul>
@@ -271,8 +282,6 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="stats.svGPFA.html#stats.svGPFA.simulations.EmbeddingSimulator">EmbeddingSimulator (class in stats.svGPFA.simulations)</a>
-</li>
       <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.eval.GaussianProcess.eval">eval() (stats.gaussianProcesses.eval.GaussianProcess method)</a>
 
       <ul>
@@ -287,8 +296,6 @@
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials">evalSumAcrossLatentsAndTrials() (stats.svGPFA.klDivergence.KLDivergence method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons">evalSumAcrossTrialsAndNeurons() (stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood method)</a>
 
       <ul>
@@ -297,6 +304,8 @@
         <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons">(stats.svGPFA.expectedLogLikelihood.PoissonELL method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.learn.GPMarginalLogLikelihood.evalWithGradient">evalWithGradient() (stats.gaussianProcesses.learn.GPMarginalLogLikelihood method)</a>
 </li>
       <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.learn.GPMarginalLogLikelihood.evalWithoutInverse">evalWithoutInverse() (stats.gaussianProcesses.learn.GPMarginalLogLikelihood method)</a>
@@ -324,8 +333,6 @@
       <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.eval.GaussianProcess">GaussianProcess (class in stats.gaussianProcesses.eval)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.utils.getDiagIndicesIn3DArray">getDiagIndicesIn3DArray() (in module stats.svGPFA.utils)</a>
-</li>
-      <li><a href="stats.svGPFA.html#stats.svGPFA.simulations.EmbeddingSimulator.getEmbeddingFunctionForNeuronAndTrial">getEmbeddingFunctionForNeuronAndTrial() (stats.svGPFA.simulations.EmbeddingSimulator method)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getEpsilon">getEpsilon() (stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS method)</a>
 </li>
@@ -357,14 +364,24 @@
       </ul></li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKtt">getKtt() (stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKttDiag">getKttDiag() (stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS method)</a>
+</li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKtz">getKtz() (stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS method)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getKzz">getKzz() (stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getKzzChol">getKzzChol() (stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS method)</a>
 </li>
+      <li><a href="stats.html#stats.kernels.ExponentialQuadraticKernel.getNamedParams">getNamedParams() (stats.kernels.ExponentialQuadraticKernel method)</a>
+
+      <ul>
+        <li><a href="stats.html#stats.kernels.Kernel.getNamedParams">(stats.kernels.Kernel method)</a>
+</li>
+        <li><a href="stats.html#stats.kernels.PeriodicKernel.getNamedParams">(stats.kernels.PeriodicKernel method)</a>
+</li>
+      </ul></li>
       <li><a href="stats.html#stats.kernels.Kernel.getParams">getParams() (stats.kernels.Kernel method)</a>
 
       <ul>
@@ -376,6 +393,10 @@
 </li>
       </ul></li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getQMu">getQMu() (stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints method)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.getSimulatedLatentsPlot">getSimulatedLatentsPlot() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot">getSimulatedSpikeTimesPlot() (in module plot.svGPFA.plotUtils)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams">getSVEmbeddingParams() (stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood method)</a>
 
@@ -393,8 +414,6 @@
         <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.getSVPosteriorOnIndPointsParams">(stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents method)</a>
 </li>
       </ul></li>
-      <li><a href="stats.svGPFA.html#stats.svGPFA.simulations.GPFASimulator">GPFASimulator (class in stats.svGPFA.simulations)</a>
-</li>
       <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.learn.GPMarginalLogLikelihood">GPMarginalLogLikelihood (class in stats.gaussianProcesses.learn)</a>
 </li>
   </ul></td>
@@ -419,17 +438,19 @@
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.kernels.Kernel">Kernel (class in stats.gaussianProcesses.kernels)</a>
-
-      <ul>
-        <li><a href="stats.html#stats.kernels.Kernel">(class in stats.kernels)</a>
+      <li><a href="stats.html#stats.kernels.Kernel">Kernel (class in stats.kernels)</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.svGPFA.html#stats.svGPFA.kernelMatricesStore.KernelMatricesStore">KernelMatricesStore (class in stats.svGPFA.kernelMatricesStore)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.klDivergence.KLDivergence">KLDivergence (class in stats.svGPFA.klDivergence)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.tests.KSTestTimeRescalingAnalyticalCorrection">KSTestTimeRescalingAnalyticalCorrection() (in module stats.pointProcess.tests)</a>
+</li>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.tests.KSTestTimeRescalingAnalyticalCorrectionUnbinned">KSTestTimeRescalingAnalyticalCorrectionUnbinned() (in module stats.pointProcess.tests)</a>
+</li>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.tests.KSTestTimeRescalingNumericalCorrection">KSTestTimeRescalingNumericalCorrection() (in module stats.pointProcess.tests)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -475,28 +496,46 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.html#stats.kernels.PeriodicKernel">PeriodicKernel (class in stats.kernels)</a>
 </li>
-      <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.kernels.PeriodicRandomFunctionKernel">PeriodicRandomFunctionKernel (class in stats.gaussianProcesses.kernels)</a>
-</li>
       <li><a href="plot.html#module-plot">plot (module)</a>
 </li>
       <li><a href="plot.svGPFA.html#module-plot.svGPFA">plot.svGPFA (module)</a>
 </li>
       <li><a href="plot.svGPFA.html#module-plot.svGPFA.plotUtils">plot.svGPFA.plotUtils (module)</a>
 </li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotACF">plotACF() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotCIF">plotCIF() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotDifferenceCDFs">plotDifferenceCDFs() (in module plot.svGPFA.plotUtils)</a>
+</li>
       <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotEstimatedLatents">plotEstimatedLatents() (in module plot.svGPFA.plotUtils)</a>
 </li>
       <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotLowerBoundHist">plotLowerBoundHist() (in module plot.svGPFA.plotUtils)</a>
 </li>
-      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents">plotTrueAndEstimatedLatents() (in module plot.svGPFA.plotUtils)</a>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotResKSTestTimeRescalingAnalyticalCorrection">plotResKSTestTimeRescalingAnalyticalCorrection() (in module plot.svGPFA.plotUtils)</a>
 </li>
-      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatents">plotTruePythonAndMatlabLatents() (in module plot.svGPFA.plotUtils)</a>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection">plotResKSTestTimeRescalingNumericalCorrection() (in module plot.svGPFA.plotUtils)</a>
 </li>
-      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatentsPlotly">plotTruePythonAndMatlabLatentsPlotly() (in module plot.svGPFA.plotUtils)</a>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotResROCAnalysis">plotResROCAnalysis() (in module plot.svGPFA.plotUtils)</a>
 </li>
-      <li><a href="stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.PointProcess">PointProcess (in module stats.svGPFA.svGPFAModelFactory)</a>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotScatter1Lag">plotScatter1Lag() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs">plotSimulatedAndEstimatedCIFs() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTrueAndEstimatedEmbeddingParams">plotTrueAndEstimatedEmbeddingParams() (in module plot.svGPFA.plotUtils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTrueAndEstimatedKernelsParams">plotTrueAndEstimatedKernelsParams() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents">plotTrueAndEstimatedLatents() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTrueAndEstimatedLatentsMeans">plotTrueAndEstimatedLatentsMeans() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="plot.svGPFA.html#plot.svGPFA.plotUtils.plotTruePythonAndMatlabLatents">plotTruePythonAndMatlabLatents() (in module plot.svGPFA.plotUtils)</a>
+</li>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.PointProcess">PointProcess (in module stats.svGPFA.svGPFAModelFactory)</a>
+</li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL">PointProcessELL (class in stats.svGPFA.expectedLogLikelihood)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink">PointProcessELLExpLink (class in stats.svGPFA.expectedLogLikelihood)</a>
@@ -527,11 +566,25 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="stats.html#stats.sampler.Sampler.sampleInhomogeneousPP_thinning">sampleInhomogeneousPP_thinning() (stats.sampler.Sampler method)</a>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.sample">sample() (stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes method)</a>
+
+      <ul>
+        <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample">(stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes method)</a>
 </li>
-      <li><a href="stats.html#stats.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">sampleInhomogeneousPP_timeRescaling() (stats.sampler.Sampler method)</a>
+      </ul></li>
+      <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.sampleCIFs">sampleCIFs() (stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood method)</a>
+
+      <ul>
+        <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PointProcessELL.sampleCIFs">(stats.svGPFA.expectedLogLikelihood.PointProcessELL method)</a>
 </li>
-      <li><a href="stats.html#stats.sampler.Sampler">Sampler (class in stats.sampler)</a>
+        <li><a href="stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.sampleCIFs">(stats.svGPFA.svLowerBound.SVLowerBound method)</a>
+</li>
+      </ul></li>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.sampler.Sampler.sampleInhomogeneousPP_thinning">sampleInhomogeneousPP_thinning() (stats.pointProcess.sampler.Sampler method)</a>
+</li>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.sampler.Sampler.sampleInhomogeneousPP_timeRescaling">sampleInhomogeneousPP_timeRescaling() (stats.pointProcess.sampler.Sampler method)</a>
+</li>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.sampler.Sampler">Sampler (class in stats.pointProcess.sampler)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs">setIndPointsLocs() (stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood method)</a>
 
@@ -607,12 +660,12 @@
         <li><a href="stats.svGPFA.html#stats.svGPFA.svLowerBound.SVLowerBound.setMeasurements">(stats.svGPFA.svLowerBound.SVLowerBound method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.PoissonELL.setMiscParams">setMiscParams() (stats.svGPFA.expectedLogLikelihood.PoissonELL method)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes.setNeuronForSpikeIndex">setNeuronForSpikeIndex() (stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="stats.html#stats.kernels.Kernel.setParams">setParams() (stats.kernels.Kernel method)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setQuadParams">setQuadParams() (stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood method)</a>
@@ -633,23 +686,21 @@
         <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.setTimes">(stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents method)</a>
 </li>
       </ul></li>
-      <li><a href="stats.svGPFA.html#stats.svGPFA.simulations.GPFASimulator.simulate">simulate() (stats.svGPFA.simulations.GPFASimulator method)</a>
-</li>
-      <li><a href="stats.gaussianProcesses.html#stats.gaussianProcesses.kernels.SquaredExponentialKernel">SquaredExponentialKernel (class in stats.gaussianProcesses.kernels)</a>
-</li>
       <li><a href="stats.html#module-stats">stats (module)</a>
 </li>
       <li><a href="stats.gaussianProcesses.html#module-stats.gaussianProcesses">stats.gaussianProcesses (module)</a>
 </li>
       <li><a href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.eval">stats.gaussianProcesses.eval (module)</a>
 </li>
-      <li><a href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.kernels">stats.gaussianProcesses.kernels (module)</a>
-</li>
       <li><a href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.learn">stats.gaussianProcesses.learn (module)</a>
 </li>
       <li><a href="stats.html#module-stats.kernels">stats.kernels (module)</a>
 </li>
-      <li><a href="stats.html#module-stats.sampler">stats.sampler (module)</a>
+      <li><a href="stats.pointProcess.html#module-stats.pointProcess">stats.pointProcess (module)</a>
+</li>
+      <li><a href="stats.pointProcess.html#module-stats.pointProcess.sampler">stats.pointProcess.sampler (module)</a>
+</li>
+      <li><a href="stats.pointProcess.html#module-stats.pointProcess.tests">stats.pointProcess.tests (module)</a>
 </li>
       <li><a href="stats.svGPFA.html#module-stats.svGPFA">stats.svGPFA (module)</a>
 </li>
@@ -658,8 +709,6 @@
       <li><a href="stats.svGPFA.html#module-stats.svGPFA.kernelMatricesStore">stats.svGPFA.kernelMatricesStore (module)</a>
 </li>
       <li><a href="stats.svGPFA.html#module-stats.svGPFA.klDivergence">stats.svGPFA.klDivergence (module)</a>
-</li>
-      <li><a href="stats.svGPFA.html#module-stats.svGPFA.simulations">stats.svGPFA.simulations (module)</a>
 </li>
       <li><a href="stats.svGPFA.html#module-stats.svGPFA.svEM">stats.svGPFA.svEM (module)</a>
 </li>
@@ -692,6 +741,20 @@
       <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes">SVPosteriorOnLatentsAllTimes (class in stats.svGPFA.svPosteriorOnLatents)</a>
 </li>
       <li><a href="stats.svGPFA.html#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes">SVPosteriorOnLatentsAssocTimes (class in stats.svGPFA.svPosteriorOnLatents)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.tests.timeRescaling">timeRescaling() (in module stats.pointProcess.tests)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.tests.timeRescalingAnalyticalCorrection">timeRescalingAnalyticalCorrection() (in module stats.pointProcess.tests)</a>
+</li>
+      <li><a href="stats.pointProcess.html#stats.pointProcess.tests.timeRescalingForUnbinnedSpikes">timeRescalingForUnbinnedSpikes() (in module stats.pointProcess.tests)</a>
 </li>
   </ul></td>
 </tr></table>
