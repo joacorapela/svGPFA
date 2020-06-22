@@ -5,6 +5,7 @@ import random
 import torch
 import pickle
 import configparser
+import stats.svGPFA.svGPFAModelFactory
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.tsa.stattools

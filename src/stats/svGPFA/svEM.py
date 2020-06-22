@@ -28,6 +28,7 @@ class SVEM:
         model.setQuadParams(quadParams=quadParams)
         model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
         model.buildKernelsMatrices()
+        model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
 
         iter = 0
         lowerBound0 = model.eval()
