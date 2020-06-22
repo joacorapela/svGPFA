@@ -377,8 +377,6 @@ class SVEM:
             message = displayFmt%(iterCount, curEval)
             if verbose and iterCount%nIterDisplay==0:
                 out.write(message)
-                if verbose:
-                    out.write(message)
                 if self._writeToLockedLog(
                     message=message,
                     logLock=logLock,
