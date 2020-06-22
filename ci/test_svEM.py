@@ -1,5 +1,6 @@
 
 import sys
+import io
 import os
 import pdb
 import math
@@ -114,11 +115,12 @@ def test_eStep_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
     svlb.buildKernelsMatrices()
+    logStream = io.StringIO()
 
     res = svEM._eStep(model=svlb, maxIter=1500, tol=1e-3, lr=1e-3,
                       lineSearchFn="strong_wolfe", verbose=True,
                       out=sys.stdout, nIterDisplay=1, logLock=None,
-                      logStream=None, logStreamFN=None)
+                      logStream=logStream, logStreamFN=None)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
 
@@ -260,11 +262,12 @@ def test_mStepModelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
+    logStream = io.StringIO()
 
     res = svEM._mStepEmbedding(model=svlb, maxIter=3000, tol=1e-6, lr=1e-1,
                                lineSearchFn="strong_wolfe", verbose=True,
                                out=sys.stdout, nIterDisplay=1, logLock=None,
-                               logStream=None, logStreamFN=None)
+                               logStream=logStream, logStreamFN=None)
     assert(res["lowerBound"]>-nLowerBound)
 
     # pdb.set_trace()
@@ -353,11 +356,12 @@ def test_mStepKernelParams_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
+    logStream = io.StringIO()
 
     res = svEM._mStepKernels(model=svlb, maxIter=50, tol=1e-3, lr=1e-3,
                              lineSearchFn="strong_wolfe", verbose=True,
                              out=sys.stdout, nIterDisplay=1, logLock=None,
-                             logStream=None, logStreamFN=None)
+                             logStream=logStream, logStreamFN=None)
 
     assert(res["lowerBound"]>(-nLowerBound))
 
@@ -498,11 +502,12 @@ def test_mStepIndPoints_pointProcess():
     svlb.setQuadParams(quadParams=quadParams)
     svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
+    logStream = io.StringIO()
 
     res = svEM._mStepIndPoints(model=svlb, maxIter=10, tol=1e-3, lr=1e-3,
                                lineSearchFn="strong_wolfe", verbose=True,
                                out=sys.stdout, nIterDisplay=1, logLock=None,
-                               logStream=None, logStreamFN=None)
+                               logStream=logStream, logStreamFN=None)
 
     assert(res["lowerBound"]>(-nLowerBound))
 
@@ -647,15 +652,16 @@ def test_maximize_pointProcess():
     lowerBoundHist, elapsedTimeHist = svEM.maximize(
         model=svlb, measurements=YNonStacked,
         initialParams=initialParams, quadParams=quadParams,
-        optimParams=optimParams, indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+        optimParams=optimParams,
+        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon, out=sys.stdout)
     assert(lowerBoundHist[-1]>leasLowerBound)
 
 if __name__=='__main__':
     # test_eStep_pointProcess() # passed
     # # test_eStep_poisson() # not tested
-    # test_mStepModelParams_pointProcess() # passed
-    # test_mStepKernelParams_pointProcess() # passed
-    # test_mStepIndPoints_pointProcess() # passed
+    test_mStepModelParams_pointProcess() # passed
+    test_mStepKernelParams_pointProcess() # passed
+    test_mStepIndPoints_pointProcess() # passed
 
     t0 = time.perf_counter()
     test_maximize_pointProcess() # passed
