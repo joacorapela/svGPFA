@@ -174,7 +174,6 @@ def main(argv):
     if profile:
         pr = cProfile.Profile()
         pr.enable()
-    pdb.set_trace()
     tStart = time.time()
     lowerBoundHist, elapsedTimeHist = \
         svEM.maximize(model=model,
