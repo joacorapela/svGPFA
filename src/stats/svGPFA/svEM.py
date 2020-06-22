@@ -46,7 +46,7 @@ class SVEM:
             muK, varK = model.predictLatents(newTimes=latentsTimes)
 
             with open(latentsStreamFN, 'wb') as f:
-                np.savez(f, iteration=iter+1, times=latentsTimes.numpy(), muK=muK.numpy(), varK=varK.numpy())
+                np.savez(f, iteration=iter+1, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
             lowerBoundLock.unlock()
 
         logStream = io.StringIO()
@@ -68,12 +68,16 @@ class SVEM:
                 # print(logLike)
                 # pdb.set_trace()
                 # end debug
+                if optimParams["eStepLineSearchFn"]=="None":
+                    lineSearchFn = None
+                else:
+                    lineSearchFn = optimParams["eStepLineSearchFn"]
                 maxRes = self._eStep(
                     model=model,
                     maxIter=optimParams["eStepMaxIter"],
                     tol=optimParams["eStepTol"],
                     lr=optimParams["eStepLR"],
-                    lineSearchFn=optimParams["eStepLineSearchFn"],
+                    lineSearchFn=lineSearchFn,
                     verbose=optimParams["verbose"],
                     out=out,
                     nIterDisplay=optimParams["eStepNIterDisplay"],
@@ -106,12 +110,16 @@ class SVEM:
                 ):
                     logStream = io.StringIO()
                 # pdb.set_trace()
+                if optimParams["eStepLineSearchFn"]=="None":
+                    lineSearchFn = None
+                else:
+                    lineSearchFn = optimParams["eStepLineSearchFn"]
                 maxRes = self._mStepEmbedding(
                     model=model,
                     maxIter=optimParams["mStepEmbeddingMaxIter"],
                     tol=optimParams["mStepEmbeddingTol"],
                     lr=optimParams["mStepEmbeddingLR"],
-                    lineSearchFn=optimParams["mStepEmbeddingLineSearchFn"],
+                    lineSearchFn=lineSearchFn,
                     verbose=optimParams["verbose"],
                     out=out,
                     nIterDisplay=optimParams["mStepEmbeddingNIterDisplay"],
@@ -144,12 +152,16 @@ class SVEM:
                 ):
                     logStream = io.StringIO()
                 # pdb.set_trace()
+                if optimParams["eStepLineSearchFn"]=="None":
+                    lineSearchFn = None
+                else:
+                    lineSearchFn = optimParams["eStepLineSearchFn"]
                 maxRes = self._mStepKernels(
                     model=model,
                     maxIter=optimParams["mStepKernelsMaxIter"],
                     tol=optimParams["mStepKernelsTol"],
                     lr=optimParams["mStepKernelsLR"],
-                    lineSearchFn=optimParams["mStepKernelsLineSearchFn"],
+                    lineSearchFn=lineSearchFn,
                     verbose=optimParams["verbose"],
                     out=out,
                     nIterDisplay=optimParams["mStepKernelsNIterDisplay"],
@@ -182,12 +194,16 @@ class SVEM:
                 ):
                     logStream = io.StringIO()
                 # pdb.set_trace()
+                if optimParams["eStepLineSearchFn"]=="None":
+                    lineSearchFn = None
+                else:
+                    lineSearchFn = optimParams["eStepLineSearchFn"]
                 maxRes = self._mStepIndPoints(
                     model=model,
                     maxIter=optimParams["mStepIndPointsMaxIter"],
                     tol=optimParams["mStepIndPointsTol"],
                     lr=optimParams["mStepIndPointsLR"],
-                    lineSearchFn=optimParams["mStepIndPointsLineSearchFn"],
+                    lineSearchFn=lineSearchFn,
                     verbose=optimParams["verbose"],
                     out=out,
                     nIterDisplay=optimParams["mStepIndPointsNIterDisplay"],
@@ -222,7 +238,7 @@ class SVEM:
                 muK, varK = model.predictLatents(newTimes=latentsTimes)
 
                 with open(latentsStreamFN, 'wb') as f:
-                    np.savez(f, iteration=iter+1, times=latentsTimes.numpy(), muK=muK.numpy(), varK=varK.numpy())
+                    np.savez(f, iteration=iter+1, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
                 lowerBoundLock.unlock()
 
             iter += 1
@@ -358,8 +374,17 @@ class SVEM:
             if curEval<prevEval and prevEval-curEval<tol:
                 converged = True
             message = displayFmt%(iterCount, curEval)
-            if verbose:
+            if verbose and iterCount%nIterDisplay==0:
                 out.write(message)
+                if verbose:
+                    out.write(message)
+                if self._writeToLockedLog(
+                    message=message,
+                    logLock=logLock,
+                    logStream=logStream,
+                    logStreamFN=logStreamFN
+                ):
+                    logStream = io.StringIO()
 #             if verbose and iterCount%nIterDisplay==0:
 #                 self._writeToLockedLog(
 #                     message=displayFmt%(iterCount, curEval),
