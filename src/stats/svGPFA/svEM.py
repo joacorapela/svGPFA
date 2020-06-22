@@ -9,11 +9,12 @@ import plot.svGPFA.plotUtils
 class SVEM:
 
     # @clock
-    def maximize(self, model, measurements, initialParams, quadParams, optimParams, plotLatentsEstimates=True, latentFigFilenamePattern="/tmp/latentsIter{:03d}.png"):
+    def maximize(self, model, measurements, initialParams, quadParams, optimParams, indPointsLocsKMSEpsilon, plotLatentsEstimates=True, latentFigFilenamePattern="/tmp/latentsIter{:03d}.png"):
         model.setMeasurements(measurements=measurements)
         model.setInitialParams(initialParams=initialParams)
         model.setQuadParams(quadParams=quadParams)
         model.buildKernelsMatrices()
+        model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
 
         iter = 0
         lowerBoundHist = []
