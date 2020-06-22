@@ -100,6 +100,7 @@ def test_eval_pointProcess():
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setQuadParams(quadParams=quadParams)
+    svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
 
     lbEval = svlb.eval()

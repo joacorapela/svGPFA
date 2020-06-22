@@ -62,6 +62,7 @@ def test_computeMeansAndVars_allTimes():
 
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
+    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
 
     indPointsLocsAndTimesKMS.setKernels(kernels=kernels)
@@ -123,6 +124,7 @@ def test_computeMeansAndVars_assocTimes():
 
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
+    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
 
     indPointsLocsAndTimesKMS.setKernels(kernels=kernels)

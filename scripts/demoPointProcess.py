@@ -9,8 +9,7 @@ import stats.svGPFA.svGPFAModelFactory
 import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.tsa.stattools
-sys.path.append(os.path.expanduser("../src"))
-import demoUtils
+sys.path.append("../src")
 import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
@@ -19,6 +18,7 @@ import myMath.utils
 import utils.svGPFA.configUtils
 import stats.pointProcess.tests
 import utils.svGPFA.miscUtils
+import utils.svGPFA.initUtils
 
 def main(argv):
     nLatents = None
@@ -59,7 +59,7 @@ def main(argv):
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
     trueLatents = simRes["latents"]
-    simCIFsValues = simRes["cifValues"]
+    # simCIFsValues = simRes["cifValues"]
     trueLatents = [trueLatents[r][:nLatents,:] for r in range(nTrials)]
     trueLatentsMeans = simRes["latentsMeans"]
     trueLatentsSTDs = simRes["latentsSTDs"]
@@ -81,31 +81,31 @@ def main(argv):
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimParams = {}
-    optimParams["emMaxNIter"] = int(optimParamsConfig["emMaxNIter".lower()])
+    optimParams["emMaxIter"] = int(optimParamsConfig["emMaxIter".lower()])
     #
     optimParams["eStepEstimate"] = optimParamsConfig["eStepEstimate".lower()]=="True"
-    optimParams["eStepMaxNIter"] = int(optimParamsConfig["eStepMaxNIter".lower()])
+    optimParams["eStepMaxIter"] = int(optimParamsConfig["eStepMaxIter".lower()])
     optimParams["eStepTol"] = float(optimParamsConfig["eStepTol".lower()])
     optimParams["eStepLR"] = float(optimParamsConfig["eStepLR".lower()])
     optimParams["eStepLineSearchFn"] = optimParamsConfig["eStepLineSearchFn".lower()]
     optimParams["eStepNIterDisplay"] = int(optimParamsConfig["eStepNIterDisplay".lower()])
     #
-    optimParams["mStepModelParamsEstimate"] = optimParamsConfig["mStepModelParamsEstimate".lower()]=="True"
-    optimParams["mStepModelParamsMaxNIter"] = int(optimParamsConfig["mStepModelParamsMaxNIter".lower()])
-    optimParams["mStepModelParamsTol"] = float(optimParamsConfig["mStepModelParamsTol".lower()])
-    optimParams["mStepModelParamsLR"] = float(optimParamsConfig["mStepModelParamsLR".lower()])
-    optimParams["mStepModelParamsLineSearchFn"] = optimParamsConfig["mStepModelParamsLineSearchFn".lower()]
-    optimParams["mStepModelParamsNIterDisplay"] = int(optimParamsConfig["mStepModelParamsNIterDisplay".lower()])
+    optimParams["mStepEmbeddingEstimate"] = optimParamsConfig["mStepEmbeddingEstimate".lower()]=="True"
+    optimParams["mStepEmbeddingMaxIter"] = int(optimParamsConfig["mStepEmbeddingMaxIter".lower()])
+    optimParams["mStepEmbeddingTol"] = float(optimParamsConfig["mStepEmbeddingTol".lower()])
+    optimParams["mStepEmbeddingLR"] = float(optimParamsConfig["mStepEmbeddingLR".lower()])
+    optimParams["mStepEmbeddingLineSearchFn"] = optimParamsConfig["mStepEmbeddingLineSearchFn".lower()]
+    optimParams["mStepEmbeddingNIterDisplay"] = int(optimParamsConfig["mStepEmbeddingNIterDisplay".lower()])
     #
-    optimParams["mStepKernelParamsEstimate"] = optimParamsConfig["mStepKernelParamsEstimate".lower()]=="True"
-    optimParams["mStepKernelParamsMaxNIter"] = int(optimParamsConfig["mStepKernelParamsMaxNIter".lower()])
-    optimParams["mStepKernelParamsTol"] = float(optimParamsConfig["mStepKernelParamsTol".lower()])
-    optimParams["mStepKernelParamsLR"] = float(optimParamsConfig["mStepKernelParamsLR".lower()])
-    optimParams["mStepKernelParamsLineSearchFn"] = optimParamsConfig["mStepKernelParamsLineSearchFn".lower()]
-    optimParams["mStepKernelParamsNIterDisplay"] = int(optimParamsConfig["mStepKernelParamsNIterDisplay".lower()])
+    optimParams["mStepKernelsEstimate"] = optimParamsConfig["mStepKernelsEstimate".lower()]=="True"
+    optimParams["mStepKernelsMaxIter"] = int(optimParamsConfig["mStepKernelsMaxIter".lower()])
+    optimParams["mStepKernelsTol"] = float(optimParamsConfig["mStepKernelsTol".lower()])
+    optimParams["mStepKernelsLR"] = float(optimParamsConfig["mStepKernelsLR".lower()])
+    optimParams["mStepKernelsLineSearchFn"] = optimParamsConfig["mStepKernelsLineSearchFn".lower()]
+    optimParams["mStepKernelsNIterDisplay"] = int(optimParamsConfig["mStepKernelsNIterDisplay".lower()])
     #
     optimParams["mStepIndPointsEstimate"] = optimParamsConfig["mStepIndPointsEstimate".lower()]="True"
-    optimParams["mStepIndPointsMaxNIter"] = int(optimParamsConfig["mStepIndPointsMaxNIter".lower()])
+    optimParams["mStepIndPointsMaxIter"] = int(optimParamsConfig["mStepIndPointsMaxIter".lower()])
     optimParams["mStepIndPointsTol"] = float(optimParamsConfig["mStepIndPointsTol".lower()])
     optimParams["mStepIndPointsLR"] = float(optimParamsConfig["mStepIndPointsLR".lower()])
     optimParams["mStepIndPointsLineSearchFn"] = optimParamsConfig["mStepIndPointsLineSearchFn".lower()]
@@ -115,24 +115,23 @@ def main(argv):
 
     testTimes = torch.linspace(0, torch.max(torch.tensor(spikesTimes[0][0])), nTestPoints)
 
-
-    CFilename = simInitConfig["embedding_params"]["C_filename"],
-    dFilename = simInitConfig["embedding_params"]["d_filename"],
+    CFilename = simInitConfig["embedding_params"]["C_filename"]
+    dFilename = simInitConfig["embedding_params"]["d_filename"]
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=CFilename, dFilename=dFilename)
     C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
     C0 = C0[:,:nLatents]
     d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
 
-    legQuadPoints, legQuadWeights = demoUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
+    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
-    kernelsParams0 = demoUtils.getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
+    kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=kernelsParams0NoiseSTD)
     kernels = kernels[0] # the current code uses the same kernels for all trials
     kernelsParams0 = kernelsParams0[0] # the current code uses the same kernels for all trials
 
-    qMu0, qSVec0, qSDiag0 = demoUtils.getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
+    qMu0, qSVec0, qSDiag0 = utils.svGPFA.initUtils.getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
 
-    Z0 = demoUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent,
+    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent,
                           trialsLengths=trialsLengths, firstIndPoint=firstIndPoint)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
@@ -172,9 +171,9 @@ def main(argv):
     ksTestTimeRescalingNumericalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_numericalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     trueAndEstimatedCIFsFigFilename = "figures/{:08d}_trueAndEstimatedCIFs_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     rocFigFilename = "figures/{:08d}_rocAnalysis_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
-    kernelsParamsFigFilename = "figures/{:08d}_trueAndEstimatedKernelsParams.png".format(estNumber)
-    latentsMeansFigFilename = "figures/{:08d}_trueAndEstimatedLatentsMeans.png".format(estNumber)
-    embeddingParamsFigFilename = "figures/{:08d}_trueAndEstimatedEmbeddingParams.png".format(estNumber)
+    kernelsParamsFigFilename = "figures/{:08d}_trueAndEstimatedKernelsParams.png".format(estResNumber)
+    latentsMeansFigFilename = "figures/{:08d}_trueAndEstimatedLatentsMeans.png".format(estResNumber)
+    embeddingParamsFigFilename = "figures/{:08d}_trueAndEstimatedEmbeddingParams.png".format(estResNumber)
     ksTestTimeRescalingAnalyticalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     timeRescalingDiffCDFsFigFilename = "figures/{:08d}_timeRescalingDiffCDFs_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     timeRescaling1LagScatterPlotFigFilename = "figures/{:08d}_timeRescaling1LagScatterPlot_analyticalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
@@ -214,7 +213,7 @@ def main(argv):
     plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingNumericalCorrectionFigFilename, title=title)
 
     # CIF
-    plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0], simCIFValues=simCIFsValues[trialToPlot][neuronToPlot], estCIFValues=cifsValuesKS, figFilename=trueAndEstimatedCIFsFigFilename, title=title)
+#     plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0], simCIFValues=simCIFsValues[trialToPlot][neuronToPlot], estCIFValues=cifsValuesKS, figFilename=trueAndEstimatedCIFsFigFilename, title=title)
 
     # ROC predictive analysis
     pk = cifValuesKS*dtCIF

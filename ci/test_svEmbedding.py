@@ -70,6 +70,7 @@ def test_computeMeansAndVars_allTimes():
                      "svEmbedding": qHParams0}
     qH.setInitialParams(initialParams=initialParams)
     qH.setTimes(times=t)
+    qH.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     qH.buildKernelsMatrices()
     qHMu, qHVar = qH.computeMeansAndVars()
 
@@ -142,6 +143,7 @@ def test_computeMeansAndVars_assocTimes():
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)
+    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
     # end patches because we are not using SVPosteriorOnLatentsAssocTimes in 
     # conjunction with SVPosteriorOnLatentsAllTimes

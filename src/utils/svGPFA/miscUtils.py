@@ -1,5 +1,6 @@
 
 import torch
+import myMath.utils
 import stats.gaussianProcesses.eval
 
 def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):

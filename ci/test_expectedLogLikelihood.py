@@ -98,6 +98,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     eLL.setInitialParams(initialParams=initialParams)
     eLL.setMeasurements(measurements=YNonStacked)
     eLL.setQuadParams(quadParams=quadParams)
+    eLL.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     eLL.buildKernelsMatrices()
     sELL = eLL.evalSumAcrossTrialsAndNeurons()
 
@@ -189,6 +190,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     eLL.setInitialParams(initialParams=initialParams)
     eLL.setMeasurements(measurements=YNonStacked)
     eLL.setQuadParams(quadParams=quadParams)
+    eLL.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     eLL.buildKernelsMatrices()
     sELL = eLL.evalSumAcrossTrialsAndNeurons()
 

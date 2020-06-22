@@ -53,6 +53,7 @@ def test_eval_IndPointsLocsKMS():
     indPointsLocsKMS = IndPointsLocsKMS()
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
+    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
 
     Kzz = indPointsLocsKMS.getKzz()

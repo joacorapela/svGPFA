@@ -89,14 +89,12 @@ def main(argv):
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernelsParams0[k] = torch.tensor([1.0,
-                                              float(hprs0[k,0][0]),
+            kernelsParams0[k] = torch.tensor([float(hprs0[k,0][0]),
                                               float(hprs0[k,0][1])],
                                              dtype=torch.double).to(device)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernelsParams0[k] = torch.tensor([1.0,
-                                              float(hprs0[k,0][0])],
-                                             dtype=torch.double).to(device)
+            kernelsParams0[k] = torch.tensor([float(hprs0[k,0][0])],
+                                              dtype=torch.double).to(device)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
@@ -109,35 +107,39 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxNIter":0, 
+    optimParams = {"emMaxIter":50,
                    #
-                   "eStepEstimate":True, 
-                   "eStepMaxNIter":100, 
-                   "eStepTol":1e-3, 
-                   "eStepLR":1e-3, 
-                   "eStepLineSearchFn":"strong_wolfe", 
-                   "eStepNIterDisplay":1, 
+                   "eStepEstimate":True,
+                   "eStepMaxIter":100,
+                   "eStepTol":1e-3,
+                   "eStepLR":1e-3,
+                   "eStepLineSearchFn":"strong_wolfe",
+                   # "eStepLineSearchFn":"None",
+                   "eStepNIterDisplay":1,
                    #
-                   "mStepModelParamsEstimate":True, 
-                   "mStepModelParamsMaxNIter":100, 
-                   "mStepModelParamsTol":1e-3, 
-                   "mStepModelParamsLR":1e-3, 
-                   "mStepModelParamsLineSearchFn":"strong_wolfe", 
-                   "mStepModelParamsNIterDisplay":1, 
+                   "mStepEmbeddingEstimate":True,
+                   "mStepEmbeddingMaxIter":100,
+                   "mStepEmbeddingTol":1e-3,
+                   "mStepEmbeddingLR":1e-3,
+                   "mStepEmbeddingLineSearchFn":"strong_wolfe",
+                   # "mStepEmbeddingLineSearchFn":"None",
+                   "mStepEmbeddingNIterDisplay":1,
                    #
-                   "mStepKernelParamsEstimate":True, 
-                   "mStepKernelParamsMaxNIter":10, 
-                   "mStepKernelParamsTol":1e-3, 
-                   "mStepKernelParamsLR":1e-3, 
-                   "mStepKernelParamsLineSearchFn":"strong_wolfe", 
-                   "mStepModelParamsNIterDisplay":1, 
-                   "mStepKernelParamsNIterDisplay":1, 
+                   "mStepKernelsEstimate":True,
+                   "mStepKernelsMaxIter":10,
+                   "mStepKernelsTol":1e-3,
+                   "mStepKernelsLR":1e-3,
+                   "mStepKernelsLineSearchFn":"strong_wolfe",
+                   # "mStepKernelsLineSearchFn":"None",
+                   "mStepKernelsNIterDisplay":1,
+                   "mStepKernelsNIterDisplay":1,
                    #
-                   "mStepIndPointsEstimate":True, 
-                   "mStepIndPointsMaxNIter":20, 
-                   "mStepIndPointsTol":1e-3, 
-                   "mStepIndPointsLR":1e-4, 
-                   "mStepIndPointsLineSearchFn":"strong_wolfe", 
+                   "mStepIndPointsEstimate":True,
+                   "mStepIndPointsMaxIter":20,
+                   "mStepIndPointsTol":1e-3,
+                   "mStepIndPointsLR":1e-4,
+                   "mStepIndPointsLineSearchFn":"strong_wolfe",
+                   # "mStepIndPointsLineSearchFn":"None",
                    "mStepIndPointsNIterDisplay":1,
                    #
                    "verbose":True
@@ -152,7 +154,7 @@ def main(argv):
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels,
-        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    )
 
     # start debug code
     # parametersList = []
@@ -172,13 +174,16 @@ def main(argv):
     if profile:
         pr = cProfile.Profile()
         pr.enable()
+    pdb.set_trace()
     tStart = time.time()
     lowerBoundHist, elapsedTimeHist = \
         svEM.maximize(model=model,
                       measurements=YNonStacked,
                       initialParams=initialParams,
                       quadParams=quadParams,
-                      optimParams=optimParams)
+                      optimParams=optimParams,
+                      indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon,
+                     )
     tElapsed = time.time()-tStart
     print("Completed maximize in {:.2f} seconds".format(tElapsed))
 
@@ -196,7 +201,7 @@ def main(argv):
 
     if profile:
         pr.disable()
-        profilerFilename = profilerFilenamePattern.format(optimParams["emMaxNIter"])
+        profilerFilename = profilerFilenamePattern.format(optimParams["emMaxIter"])
         s = open(profilerFilename, "w")
         sortby = "cumulative"
         ps = pstats.Stats(pr, stream=s)
