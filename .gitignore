@@ -28,3 +28,4 @@ ipynb/results
 # scripts/results/*
 src/stats/gaussianProcesses/kernels.py
 old/
+gui/guiUtils-debug.py
