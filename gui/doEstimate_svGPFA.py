@@ -520,8 +520,8 @@ def main(argv):
                     }],
                     "layout": {
                         "xaxis": {"title": "Iteration", "range": [-1, emMaxIterValue+1]},
-                        # "yaxis": {"title": "Log Likelihood", "range": [minLowerBound, maxLowerBound]},
-                        "yaxis": {"title": "Log Likelihood"},
+                        # "yaxis": {"title": "Lower Bound", "range": [minLowerBound, maxLowerBound]},
+                        "yaxis": {"title": "Lower Bound"},
                         "height": 450, # px
                     }
                 })
@@ -958,7 +958,7 @@ def main(argv):
         for k, nIndPoints in enumerate(values):
             qMu0 = np.zeros((nIndPoints, 1))
             qVec0 = np.zeros((nIndPoints, 1))
-            qVec0[0] = 1.0
+            qVec0[0] = initVar
             qDiag0 = initVar*np.ones((nIndPoints, 1))
             aChildren = html.Div(children=[
                 html.H6("Latent {:d}".format(k+1)),
@@ -1015,7 +1015,7 @@ def main(argv):
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
             nNeurons = spikesTimes.shape[1]
             C0 = np.random.uniform(size=(nNeurons, nLatentsComponentValue))
-            d0 = np.random.uniform(size=(nNeurons, 1))
+            d0 = np.random.uniform(size=(nNeurons,))
             C0style = {"width": nLatentsComponentValue*175, "height": 300}
             d0style={"width": 200, "height": 300}
             # answer = [False, np.array2string(C0), C0style, np.array2string(d0), d0style]
@@ -1205,9 +1205,9 @@ def main(argv):
                         "latentsLock": latentsLock,
                         "latentsStreamFN": latentsStreamFN,
                        }
-            p = mp.Process(target=runner.run, kwargs=keywords)
-            # runner.run()
-            p.start()
+            runner.run()
+            # p = mp.Process(target=runner.run, kwargs=keywords)
+            # p.start()
             estimationProgressGraphsContainerStyle = {"display": "block"}
             logIntervalComponentDisabled = False
             estimationProgressGraphsIntervalComponentDisabled = False
