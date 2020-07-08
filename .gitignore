@@ -29,3 +29,6 @@ ipynb/results
 src/stats/gaussianProcesses/kernels.py
 old/
 gui/guiUtils-debug.py
+scripts/results/
+scripts/data/
+scripts/figures/
