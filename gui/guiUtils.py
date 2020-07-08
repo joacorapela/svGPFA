@@ -4,6 +4,7 @@ import os
 import io
 import base64
 import math
+import pickle
 import importlib
 from scipy.io import loadmat
 import numpy as np
@@ -18,8 +19,8 @@ import utils.svGPFA.miscUtils
 import utils.svGPFA.initUtils
 
 def guessTrialsLengths(spikesTimes):
-    nTrials = spikesTimes.shape[0]
-    nNeurons = spikesTimes.shape[1]
+    nTrials = len(spikesTimes)
+    nNeurons = len(spikesTimes[0])
     guesses = [None for r in range(nTrials)]
     for r in range(nTrials):
         guessedLength = -np.inf
@@ -435,12 +436,15 @@ def getSpikesTimes(contents, filename, spikesTimesVar):
     if extension==".npz" or extension==".npy":
         loadRes = np.load(bytesIO, allow_pickle=True)
         spikesTimes = torch.from_numpy(loadRes[spikesTimesVar])
+    elif extension==".pickle":
+        loadRes = pickle.load(bytesIO)
+        spikesTimes = loadRes[spikesTimesVar]
     elif extension==".mat":
         loadRes = loadmat(bytesIO)
         YNonStacked_tmp = loadRes[spikesTimesVar]
         nTrials = YNonStacked_tmp.shape[0]
         nNeurons = YNonStacked_tmp[0,0].shape[0]
-        spikesTimes = np.empty(shape=(nTrials, nNeurons), dtype=np.object)
+        spikesTimes = torch.empty(shape=(nTrials, nNeurons), dtype=np.object)
         for r in range(nTrials):
             for n in range(nNeurons):
                 spikesTimes[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0])
@@ -453,6 +457,8 @@ def getContentsVarsNames(contents, filename):
     extension = os.path.splitext(filename)[1]
     if extension==".npz" or extension==".npy":
         loadRes = np.load(bytesIO, allow_pickle=True)
+    elif extension==".pickle":
+        loadRes = pickle.load(bytesIO)
     elif extension==".mat":
         loadRes = loadmat(bytesIO)
     varNames = loadRes.keys()
