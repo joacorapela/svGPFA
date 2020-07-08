@@ -5,16 +5,19 @@ import os
 import random
 import torch
 import plotly
-import matplotlib.pyplot as plt
+import plotly
 import pickle
 import configparser
 import pandas as pd
+import matplotlib.pyplot as plt
+import sklearn.metrics
 sys.path.append("../src")
 import simulations.svGPFA.simulations
 import stats.gaussianProcesses.eval
 from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
 from utils.svGPFA.miscUtils import getLatentsSamples, getTrialsTimes
 import plot.svGPFA.plotUtils
+import plot.svGPFA.plotUtilsPlotly
 from stats.pointProcess.tests import KSTestTimeRescalingNumericalCorrection
 
 def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
@@ -59,10 +62,12 @@ def main(argv):
     nNeurons = int(simConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
-    T = torch.tensor(trialsLengths).max()
+    T = torch.tensor(trialsLengths).max().item()
     dtSimulate = float(simConfig["control_variables"]["dt"])
     dtLatentsFig = 1e-1
     gpRegularization = 1e-3
+    rocTrial = 0
+    rocNeuron = 0
 
     randomPrefixUsed = True
     while randomPrefixUsed:
@@ -72,29 +77,29 @@ def main(argv):
         if not os.path.exists(metaDataFilename):
            randomPrefixUsed = False
     simResFilename = "results/{:08d}_simRes.pickle".format(simNumber)
-    latentsFigFilename = \
-        "figures/{:08d}_simulation_latents.png".format(simNumber)
-    cifFigFilename = \
-        "figures/{:08d}_simulation_cif_trial{:03d}_neuron{:03d}.png".format(simNumber, trialCIFToPlot, neuronCIFToPlot)
-    spikesTimesFigFilename = \
-        "figures/{:08d}_simulation_spikesTimes.png".format(simNumber)
-    ksTestTimeRescalingFigFilename = \
-        "figures/{:08d}_simulation_ksTestTimeRescaling.png".format(simNumber)
-    rocFigFilename = "figures/{:08d}_simulation_rocAnalisis_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToAnalyze, neuronToAnalyze)
+    latentsFigFilenamePattern = \
+        "figures/{:08d}_simulation_latents.%s".format(simNumber)
+    cifFigFilenamePattern = \
+        "figures/{:08d}_simulation_cif_trial{:03d}_neuron{:03d}.%s".format(simNumber, trialCIFToPlot, neuronCIFToPlot)
+    spikesTimesFigFilenamePattern = \
+        "figures/{:08d}_simulation_spikesTimes.%s".format(simNumber)
+    ksTestTimeRescalingFigFilenamePattern = \
+        "figures/{:08d}_simulation_ksTestTimeRescaling.%s".format(simNumber)
+    rocFigFilenamePattern = "figures/{:08d}_simulation_rocAnalisis_trial{:03d}_neuron{:03d}.%s".format(simNumber, rocTrial, rocNeuron)
 
     with torch.no_grad():
         kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)
         latentsMeansFuncs = getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simConfig)
         trialsTimes = getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
+        C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=simConfig["embedding_params"]["C_filename"], dFilename=simConfig["embedding_params"]["d_filename"])
         print("Computing latents samples")
-        C, d = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
         latentsSamples = getLatentsSamples(meansFuncs=latentsMeansFuncs,
                                            kernels=kernels,
                                            trialsTimes=trialsTimes,
                                            gpRegularization=gpRegularization,
                                            dtype=C.dtype)
-
         simulator = simulations.svGPFA.simulations.GPFASimulator()
+        print("Getting spikes times")
         res = simulator.simulate(trialsTimes=trialsTimes, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
         spikesTimes = res["spikesTimes"]
         cifTimes = res["cifTimes"]
@@ -116,20 +121,24 @@ def main(argv):
     with open(metaDataFilename, "w") as f:
         simResConfig.write(f)
 
-    pLatents = plot.svGPFA.plotUtils.getSimulatedLatentsPlot(trialsTimes=trialsTimes, latentsSamples=latentsSamples, latentsMeans=latentsMeans, latentsSTDs=latentsSTDs, figFilename=latentsFigFilename)
-    # pLatents = ggplotly(pLatents)
-    # pLatents.show()
+    fig = plot.svGPFA.plotUtilsPlotly.getSimulatedLatentsPlotPlotly(trialsTimes=trialsTimes, latentsSamples=latentsSamples, latentsMeans=latentsMeans, latentsSTDs=latentsSTDs)
+    fig.write_image(latentsFigFilenamePattern%"png")
+    fig.write_html(latentsFigFilenamePattern%"html")
+    fig.show()
 
     timesCIFToPlot = cifTimes[trialCIFToPlot]
     valuesCIFToPlot = cifValues[trialCIFToPlot][neuronCIFToPlot]
-    title = "Trial {:d}, Neuron {:d}".format(trialCIFToPlot, neuronCIFToPlot)
-    plot.svGPFA.plotUtils.plotCIF(times=timesCIFToPlot, values=valuesCIFToPlot, title=title, figFilename=cifFigFilename)
+    title = "Trial {:d}, Neuron {:d}".format(trialCIFToPlota+1, neuronCIFToPlota+1)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotCIFPlotly(times=timesCIFToPlot, values=valuesCIFToPlot, title=title)
+    fig.write_image(cifFigFilenamePattern%"png")
+    fig.write_html(cifFigFilenamePattern%"html")
+    fig.show()
 
-    pSpikes = plot.svGPFA.plotUtils.getSimulatedSpikeTimesPlot(spikesTimes=spikesTimes, figFilename=spikesTimesFigFilename)
-    # pSpikes = ggplotly(pSpikes)
-    # pSpikes.show()
+    fig = plot.svGPFA.plotUtilsPlotly.getSimulatedSpikesTimesPlotPlotly(spikesTimes=spikesTimes)
+    fig.write_image(spikesTimesFigFilenamePattern%"png")
+    fig.write_html(spikesTimesFigFilenamePattern%"html")
+    fig.show()
 
-    T = torch.tensor(trialsLengths).max()
     oneTrialCIFTimes = torch.arange(0, T, dtCIF)
     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
     cifTimesKS = cifTimes[trialKSTestTimeRescaling,:,0]
@@ -137,17 +146,22 @@ def main(argv):
     spikesTimesKS = spikesTimes[trialKSTestTimeRescaling][neuronKSTestTimeRescaling]
     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=cifTimesKS, cifValues=cifValuesKS, gamma=gamma)
     title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialKSTestTimeRescaling, neuronKSTestTimeRescaling, len(spikesTimesKS))
-    plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingFigFilename, title=title)
+    fig = plot.svGPFA.plotUtils.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
+    plt.savefig(fname=ksTestTimeRescalingFigFilenamePattern%"png")
+    # p = ggplotly(p)
+    # plotly.offline.plot(pSpikes, filename=ksTestTimeRescalingFigFilenamePattern%"html")
 
     pk = cifValuesKS*dtCIF
     bins = pd.interval_range(start=0, end=T, periods=len(pk))
     # start binning spikes using pandas
     cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
     Y = torch.from_numpy(cutRes.value_counts().values)
-
-    fpr, tpr, thresholds = metrics.roc_curve(Y, pk, pos_label=1)
-    roc_auc = metrics.auc(fpr, tpr)
-    plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, figFilename=rocFigFilename)
+    fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
+    fig = plot.svGPFA.plotUtils.getPlotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc)
+    plt.savefig(fname=rocFigFilenamePattern%"png")
+    # p = ggplotly(p)
+    # plotly.offline.plot(pSpikes, filename=rocFigFilenamePattern%"html")
 
     plt.show()
 
