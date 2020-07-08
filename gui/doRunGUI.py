@@ -869,8 +869,8 @@ def main(argv):
         # pdb.set_trace()
         if contents is not None and spikesTimesVar is not None:
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
-            nTrials = spikesTimes.shape[0]
-            nNeurons = spikesTimes.shape[1]
+            nTrials = len(spikesTimes)
+            nNeurons = len(spikesTimes[0])
             trialsLengthsGuesses = guessTrialsLengths(spikesTimes=spikesTimes)
             nTrialsAndNNeuronsInfo = "trials: {:d}, neurons: {:d}".format(nTrials, nNeurons)
             trialToPlotRasterOptions = [{"label": str(r+1), "value": r} for r in range(nTrials)]
@@ -910,7 +910,7 @@ def main(argv):
         # pdb.set_trace()
         if trialToPlotRaster>=0 and spikesTimesVar is not None:
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
-            trialSpikesTimes = spikesTimes[trialToPlotRaster,:]
+            trialSpikesTimes = spikesTimes[trialToPlotRaster]
             title="Trial {:d}".format(trialToPlotRaster+1)
             rastergram = getRastergram(trialSpikesTimes=trialSpikesTimes, title=title)
             return rastergram
@@ -1035,7 +1035,7 @@ def main(argv):
         # pdb.set_trace()
         if spikesTimesVar is not None:
             spikesTimes = getSpikesTimes(contents=contents, filename=filename, spikesTimesVar=spikesTimesVar)
-            nNeurons = spikesTimes.shape[1]
+            nNeurons = len(spikesTimes[0])
             C0 = np.random.uniform(size=(nNeurons, nLatentsComponentValue))
             d0 = np.random.uniform(size=(nNeurons,))
             C0style = {"width": nLatentsComponentValue*175, "height": 300}
