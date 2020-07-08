@@ -251,51 +251,113 @@ def plotResKSTestTimeRescalingNumericalCorrection(
     if figFilename is not None:
         plt.savefig(fname=figFilename)
 
-def getSimulatedSpikeTimesPlot(spikesTimes, figFilename=None, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
+def getSimulatedSpikesTimesPlotPlotly(spikesTimes, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
     nTrials = len(spikesTimes)
     sqrtNTrials = math.sqrt(nTrials)
-    # nrow = math.floor(sqrtNTrials)
-    # ncol = math.ceil(sqrtNTrials)
-    # f, axs = plt.subplots(nrow, ncol, sharex=True, sharey=True)
-    # plt.figure()
-    f, axs = plt.subplots(nTrials, 1, sharex=True, sharey=True, squeeze=False)
+    subplotsTitles = ["trial={:d}".format(r+1) for r in range(nTrials)]
+    fig = make_subplots(rows=nTrials, cols=1, shared_xaxes=True, shared_yaxes=True, subplot_titles=subplotsTitles)
     for r in range(nTrials):
-        # row = r//ncol
-        # col = r%ncol
-        # axs[row, col].eventplot(positions=spikesTimes[r])
-        # axs[row, col].set_xlabel(xlabel)
-        # axs[row, col].set_ylabel(ylabel)
-        # axs[row, col].set_title(titlePattern.format(r))
-        row = r
-        col = 0
-        axs[row, col].eventplot(positions=spikesTimes[r])
-        axs[row, col].set_xlabel(xlabel)
-        axs[row, col].set_ylabel(ylabel)
-        axs[row, col].set_title(titlePattern.format(r))
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
-    return f
+        for n in range(len(spikesTimes[r])):
+            trace = go.Scatter(
+                x=spikesTimes[r][n].numpy(),
+                y=n*np.ones(len(spikesTimes[r][n])),
+                mode='markers',
+                marker=dict(size=3, color="black"),
+                showlegend=False,
+                hoverinfo="skip",
+            )
+            fig.add_trace(trace, row=r+1, col=1)
+        if r==nTrials-1:
+            fig.update_xaxes(title_text=xlabel, row=r+1, col=1)
+        if r==math.floor(nTrials/2):
+            fig.update_yaxes(title_text=ylabel, row=r+1, col=1)
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgba(0, 0, 0, 0)",
+            "paper_bgcolor": "rgba(0, 0, 0, 0)",
+        }
+    )
+    return fig
 
-def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans,
-                            latentsSTDs, figFilename=None, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
+def getPlotCIFPlotly(times, values, title="", xlabel="Time (sec)", ylabel="Conditional Intensity Function"):
+    figDic = {
+        "data": [],
+        "layout": {
+            "title": title,
+            "xaxis": {"title": xlabel},
+            "yaxis": {"title": ylabel},
+        },
+    }
+    figDic["data"].append(
+        {
+            "type": "scatter",
+            "x": times,
+            "y": values,
+        },
+    )
+    fig = go.Figure(
+        data=figDic["data"],
+        layout=figDic["layout"],
+    )
+    return fig
+
+def getSimulatedLatentsPlotPlotly(trialsTimes, latentsSamples, latentsMeans,
+                                  latentsSTDs, alpha=0.5, marker="x",
+                                  xlabel="Time (sec)", ylabel="Amplitude",
+                                  width=1250, height=850,
+                                  cbFillColorPattern="rgba(0,100,80,{:f})",
+                                  meanLineColor="rgb(0,100,80)",
+                                  samplesLineColor="rgb(64,64,64)"):
     nTrials = len(latentsSamples)
     nLatents = latentsSamples[0].shape[0]
-    # plt.figure()
-    f, axs = plt.subplots(nTrials, nLatents, sharex=False, sharey=False, squeeze=False)
+    subplotsTitles = ["trial={:d}, latent={:d}".format(r+1, k+1) for r in range(nTrials) for k in range(nLatents)]
+    fig = plotly.subplots.make_subplots(rows=nTrials, cols=nLatents, subplot_titles=subplotsTitles)
     for r in range(nTrials):
-        t = trialsTimes[r]
+        t = trialsTimes[r].numpy()
+        t_rev = t[::-1]
         for k in range(nLatents):
-            latentSamples = latentsSamples[r][k,:]
-            mean = latentsMeans[r][k,:]
-            std = latentsSTDs[r][k,:]
-            axs[r,k].plot(t, latentSamples, marker=marker)
-            axs[r,k].fill_between(t, mean-1.96*std, mean+1.96*std, alpha=alpha)
-            axs[r,k].set_xlabel(xlabel)
-            axs[r,k].set_ylabel(ylabel)
-            axs[r,k].set_title("r={}, k={}".format(r, k))
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
-    return f
+            rkLatentsSamples = latentsSamples[r][k,:].numpy()
+            mean = latentsMeans[r][k,:].numpy()
+            std = latentsSTDs[r][k,:].numpy()
+            upper = mean+1.96*std
+            lower = mean-1.96*std
+            lower_rev = lower[::-1]
+
+            traceCB = go.Scatter(
+                x=np.concatenate((t, t_rev)),
+                y=np.concatenate((upper, lower_rev)),
+                fill='tozerox',
+                fillcolor=cbFillColorPattern.format(alpha),
+                line=dict(color='rgba(255,255,255,0)'),
+                showlegend=False,
+            )
+            traceMean = go.Scatter(
+                x=t,
+                y=mean,
+                line=dict(color=meanLineColor),
+                mode='lines',
+                showlegend=False,
+            )
+            traceSamples = go.Scatter(
+                x=t,
+                y=rkLatentsSamples,
+                line=dict(color=samplesLineColor),
+                mode='lines',
+                showlegend=False,
+            )
+            fig.add_trace(traceCB, row=r+1, col=k+1)
+            fig.add_trace(traceMean, row=r+1, col=k+1)
+            fig.add_trace(traceSamples, row=r+1, col=k+1)
+            if r==nTrials-1 and k==math.floor(nLatents/2):
+                fig.update_xaxes(title_text=xlabel, row=r+1, col=k+1)
+            if r==math.floor(nTrials/2) and k==0:
+                fig.update_yaxes(title_text=ylabel, row=r+1, col=k+1)
+    fig.update_layout(
+        autosize=False,
+        width=width,
+        height=height,
+    )
+    return fig
 
 def plotEstimatedLatents(fig, times, muK, varK, indPointsLocs, title="", figFilename=None):
     nTrials = muK.shape[0]
