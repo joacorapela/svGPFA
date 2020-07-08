@@ -115,14 +115,14 @@ def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
                                                  estimatedParams,
                                                 useLegend=useLegend)
 
-def plotResROCAnalysis(fpr, tpr, auc, figFilename=None, title="",
+def getPlotResROCAnalysis(fpr, tpr, auc, title="",
                        colorROC="red", colorRef="black",
                        linestyleROC="-", linestyleRef="--",
                        labelPattern="ROC curve (area={:0.2f})",
                        xlabel="False Positive Rate",
                        ylabel="True Positive Rate",
                        legendLoc="lower right"):
-    # plt.figure()
+    plt.figure()
     plt.plot(fpr, tpr, color=colorROC, linestyle=linestyleROC, label=labelPattern.format(auc))
     plt.plot([0, 1], [0, 1], color=colorRef, linestyle=linestyleRef)
     plt.xlim([0.0, 1.0])
@@ -131,9 +131,8 @@ def plotResROCAnalysis(fpr, tpr, auc, figFilename=None, title="",
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend(loc=legendLoc)
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
-    plt.show()
+    f = plt.gcf()
+    return f
 
 def plotACF(acf, confint, Fs, figFilename=None, title="", xlabel="Lag (sec)", ylabel="ACF", colorACF="black", colorConfint="red", colorRef="gray", linestyleACF="-", linestyleConfint=":", linestyleRef=":"):
     acf[0] = None
@@ -177,15 +176,14 @@ def plotSimulatedAndEstimatedCIFs(times, simCIFValues, estCIFValues,
     if figFilename is not None:
         plt.savefig(fname=figFilename)
 
-def plotCIF(times, values, figFilename=None, title="", xlabel="Time (sec)",
-            ylabel="Conditional Intensity Function"):
-    # plt.figure()
+def getPlotCIF(times, values, title="", xlabel="Time (sec)", ylabel="Conditional Intensity Function"):
+    plt.figure()
     plt.plot(times, values)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
+    f = plt.gcf()
+    return f
 
 def plotResKSTestTimeRescalingAnalyticalCorrection(
     sUTRISIs, uCDF, cb, figFilename=None,
@@ -219,9 +217,9 @@ def plotDifferenceCDFs(
     if figFilename is not None:
         plt.savefig(fname=figFilename)
 
-def plotResKSTestTimeRescalingNumericalCorrection(
+def getPlotResKSTestTimeRescalingNumericalCorrection(
     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy,
-    cb, figFilename=None, title="",
+    cb, title="",
     dataColor="blue", cbColor="red", refColor="black",
     estECDFcolor="magenta", simECDFcolor="cyan",
     estECDFmarker="+", simECDFmarker="*",
@@ -232,7 +230,7 @@ def plotResKSTestTimeRescalingNumericalCorrection(
     diffLabel="Difference", estECDFlabel="Estimated",
     simECDFlabel="True" ):
 
-    # plt.figure()
+    plt.figure()
     plt.plot(diffECDFsX, diffECDFsY, color=dataColor, marker=dataMarker, linestyle=dataLinestyle, label=diffLabel)
     plt.scatter(estECDFx, estECDFy, color=estECDFcolor, marker=estECDFmarker, label=estECDFlabel)
     plt.scatter(simECDFx, simECDFy, color=simECDFcolor, marker=simECDFmarker, label=simECDFlabel)
@@ -243,16 +241,16 @@ def plotResKSTestTimeRescalingNumericalCorrection(
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend()
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
+    f = plt.gcf()
+    return(f)
 
-def getSimulatedSpikeTimesPlot(spikesTimes, figFilename=None, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
+def getSimulatedSpikeTimesPlot(spikesTimes, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
     nTrials = len(spikesTimes)
     sqrtNTrials = math.sqrt(nTrials)
     # nrow = math.floor(sqrtNTrials)
     # ncol = math.ceil(sqrtNTrials)
     # f, axs = plt.subplots(nrow, ncol, sharex=True, sharey=True)
-    # plt.figure()
+    plt.figure()
     f, axs = plt.subplots(nTrials, 1, sharex=True, sharey=True, squeeze=False)
     for r in range(nTrials):
         # row = r//ncol
@@ -267,15 +265,13 @@ def getSimulatedSpikeTimesPlot(spikesTimes, figFilename=None, xlabel="Time (sec)
         axs[row, col].set_xlabel(xlabel)
         axs[row, col].set_ylabel(ylabel)
         axs[row, col].set_title(titlePattern.format(r))
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
     return f
 
 def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans,
-                            latentsSTDs, figFilename=None, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
+                            latentsSTDs, alpha=0.5, marker="x", xlabel="Time (sec)", ylabel="Amplitude"):
     nTrials = len(latentsSamples)
     nLatents = latentsSamples[0].shape[0]
-    # plt.figure()
+    plt.figure()
     f, axs = plt.subplots(nTrials, nLatents, sharex=False, sharey=False, squeeze=False)
     for r in range(nTrials):
         t = trialsTimes[r]
@@ -288,8 +284,6 @@ def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans,
             axs[r,k].set_xlabel(xlabel)
             axs[r,k].set_ylabel(ylabel)
             axs[r,k].set_title("r={}, k={}".format(r, k))
-    if figFilename is not None:
-        plt.savefig(fname=figFilename)
     return f
 
 def plotEstimatedLatents(fig, times, muK, varK, indPointsLocs, title="", figFilename=None):
