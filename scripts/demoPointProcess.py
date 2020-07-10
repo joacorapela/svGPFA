@@ -2,6 +2,7 @@ import sys
 import os
 import pdb
 import random
+import scipy.io
 import torch
 import pickle
 import configparser
@@ -130,8 +131,7 @@ def main(argv):
 
     qMu0, qSVec0, qSDiag0 = utils.svGPFA.initUtils.getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
 
-    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent,
-                          trialsLengths=trialsLengths, firstIndPoint=firstIndPoint)
+    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPoint=firstIndPoint)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
     qHParams0 = {"C0": C0, "d0": d0}
@@ -142,7 +142,7 @@ def main(argv):
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-
+    # saveConditions0ToMatlab(initialParams=initialParams, quadParams=quadParams)
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
