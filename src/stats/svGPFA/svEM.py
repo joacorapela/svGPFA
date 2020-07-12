@@ -32,8 +32,8 @@ class SVEM:
 
         iter = 0
         lowerBound0 = model.eval()
-        lowerBoundHist = [lowerBound0]
-        elapsedTimeHist = []
+        lowerBoundHist = [lowerBound0.item()]
+        elapsedTimeHist = [0.0]
         startTime = time.time()
 
         if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
@@ -325,7 +325,7 @@ class SVEM:
     def _setupAndMaximizeStep(self, x, evalFunc, optimizer, maxIter, tol,
                               verbose, out, nIterDisplay, logLock, logStream,
                               logStreamFN, 
-                              displayFmt="Step: %d, negative lower bound: %f\n", 
+                              displayFmt="Step: %02d, negative lower bound: %f\n", 
                              ):
         for i in range(len(x)):
             x[i].requires_grad = True
