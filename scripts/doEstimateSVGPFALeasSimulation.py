@@ -213,8 +213,8 @@ def main(argv):
         ps.strip_dirs().sort_stats(sortby).print_stats()
         s.close()
 
-        resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
-        with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
+    with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
     # plot lower bound history
     plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, elapsedTimeHist=elapsedTimeHist, figFilename=lowerBoundHistFigFilename)
