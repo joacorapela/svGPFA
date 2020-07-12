@@ -25,8 +25,10 @@ def main(argv):
     pEstConfig.read(pEstimMetaDataFilename)
     mEstNumber = int(pEstConfig["data"]["mEstNumber"])
 
-    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
-    pModelSaveFilename = "results/{:08d}_leasSimulation_estimatedModel_cpu.pickle".format(pEstNumber)
+    mEstConfig = configparser.ConfigParser()
+    mEstConfig.read("../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber))
+    mSimNumber = int(mEstConfig["data"]["simulationNumber"])
+    ppSimulationFilename = os.path.join(os.path.dirname(__file__), "../../matlabCode/scripts/results/{:08d}-pointProcessSimulation.mat".format(mSimNumber))
 
     marker = 'x'
     lowerBoundVsIterNoStaticFigFilename = "figures/{:08d}-lowerBoundVsIterNo.png".format(pEstNumber)
