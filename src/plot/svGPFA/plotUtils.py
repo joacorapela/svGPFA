@@ -76,7 +76,7 @@ def plotTrueAndEstimatedLatentsMeans(trueLatentsMeans, estimatedLatentsMeans,
                                                    ylabel=ylabelToPlot,
                                                    useLegend=useLegend)
 
-def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
+def getPlotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
     def plotOneSetTrueAndEstimatedKernelsParams(ax, labels,
                                                 trueParams,
                                                 estimatedParams,
@@ -114,6 +114,7 @@ def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
                                                 estimatedParams=
                                                  estimatedParams,
                                                 useLegend=useLegend)
+    return(fig)
 
 def getPlotResROCAnalysis(fpr, tpr, auc, title="",
                        colorROC="red", colorRef="black",
@@ -217,9 +218,9 @@ def plotDifferenceCDFs(
     if figFilename is not None:
         plt.savefig(fname=figFilename)
 
-def getPlotResKSTestTimeRescalingNumericalCorrection(
+def plotResKSTestTimeRescalingNumericalCorrection(
     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy,
-    cb, title="",
+    cb, figFilename=None, title="",
     dataColor="blue", cbColor="red", refColor="black",
     estECDFcolor="magenta", simECDFcolor="cyan",
     estECDFmarker="+", simECDFmarker="*",
@@ -230,7 +231,7 @@ def getPlotResKSTestTimeRescalingNumericalCorrection(
     diffLabel="Difference", estECDFlabel="Estimated",
     simECDFlabel="True" ):
 
-    plt.figure()
+    # plt.figure()
     plt.plot(diffECDFsX, diffECDFsY, color=dataColor, marker=dataMarker, linestyle=dataLinestyle, label=diffLabel)
     plt.scatter(estECDFx, estECDFy, color=estECDFcolor, marker=estECDFmarker, label=estECDFlabel)
     plt.scatter(simECDFx, simECDFy, color=simECDFcolor, marker=simECDFmarker, label=simECDFlabel)
@@ -241,8 +242,8 @@ def getPlotResKSTestTimeRescalingNumericalCorrection(
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend()
-    f = plt.gcf()
-    return(f)
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def getSimulatedSpikeTimesPlot(spikesTimes, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
     nTrials = len(spikesTimes)
