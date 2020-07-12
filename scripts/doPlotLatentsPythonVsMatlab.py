@@ -4,24 +4,40 @@ import os
 import torch
 import pdb
 import pickle
+import argparse
+import configparser
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 sys.path.append(os.path.expanduser("../src"))
-import plot.svGPFA.plotUtils
+import plot.svGPFA.plotUtilsPlotly
 
 def main(argv):
-    if len(argv)!=2:
-        print("{:s} <trial>".format(argv[0]))
-        sys.exit(0)
-    trialToPlot = int(argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("pEstNumber", help="Python's estimation number", type=int)
+    parser.add_argument("trialToPlot", help="Trial to plot", type=int)
+    parser.add_argument("--deviceName", help="name of device (cpu or cuda)", default="cpu")
+    args = parser.parse_args()
+    pEstNumber = args.pEstNumber
+    trialToPlot = args.trialToPlot
+    deviceName = args.deviceName
 
     marker = 'x'
-    mSimFilename = "../../matlabCode/scripts/results/pointProcessSimulation.mat"
-    mModelSaveFilename = "../../matlabCode/scripts/results/pointProcessEstimationRes.mat"
-    # pModelSaveFilename = "results/estimationResLeasSimulation.pickle"
-    pModelSaveFilename = "results/37816127_leasSimulation_estimatedModel_cpu.pickle"
-    staticFigFilenamePattern = "figures/truePythonMatlabLatentsPointProcess_trial{:d}.png"
-    dynamicFigFilenamePattern = "figures/truePythonMatlabLatentsPointProcess_trial{:d}.html"
+
+    pEstimMetaDataFilename = "results/{:08d}_leasSimulation_estimation_metaData_{:s}.ini".format(pEstNumber, deviceName)
+    pEstConfig = configparser.ConfigParser()
+    pEstConfig.read(pEstimMetaDataFilename)
+    mEstNumber = int(pEstConfig["data"]["mEstNumber"])
+
+    mEstParamsFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
+    mEstConfig = configparser.ConfigParser()
+    mEstConfig.read(mEstParamsFilename)
+    mSimNumber = int(mEstConfig["data"]["simulationNumber"])
+
+    mSimFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessSimulation.mat".format(mSimNumber)
+    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
+    pModelSaveFilename = "results/{:08d}_leasSimulation_estimatedModel_cpu.pickle".format(pEstNumber)
+    staticFigFilename = "figures/truePythonMatlabLatentsPointProcess_{:08d}_trial{:d}.png".format(pEstNumber, trialToPlot)
+    dynamicFigFilename = "figures/truePythonMatlabLatentsPointProcess_{:08d}_trial{:d}.html".format(pEstNumber, trialToPlot)
 
     loadRes = loadmat(mSimFilename)
     nLatents = loadRes["trueLatents"].shape[1]
@@ -54,20 +70,19 @@ def main(argv):
         pTestMuK, pTestVarK = pModel.predictLatents(newTimes=mTimes)
         pTimes = mTimes
 
-        plot.svGPFA.plotUtils.\
-            plotTruePythonAndMatlabLatentsPlotly(tTimes=tTimes,
-                                                  tLatents=tLatents,
-                                                  pTimes=pTimes,
-                                                  pMuK=pTestMuK,
-                                                  pVarK=pTestVarK,
-                                                  mTimes=mTimes,
-                                                  mMuK=mMeanLatents,
-                                                  mVarK=mVarLatents,
-                                                  trialToPlot=trialToPlot,
-                                                  staticFigFilenamePattern=
-                                                   staticFigFilenamePattern,
-                                                  dynamicFigFilenamePattern=
-                                                   dynamicFigFilenamePattern)
+        fig = plot.svGPFA.plotUtilsPlotly.\
+            getPlotTruePythonAndMatlabLatentsPlotly(tTimes=tTimes,
+                                                    tLatents=tLatents,
+                                                    pTimes=pTimes,
+                                                    pMuK=pTestMuK,
+                                                    pVarK=pTestVarK,
+                                                    mTimes=mTimes,
+                                                    mMuK=mMeanLatents,
+                                                    mVarK=mVarLatents,
+                                                    trialToPlot=trialToPlot,
+                                                   )
+    fig.write_image(staticFigFilename)
+    fig.write_html(dynamicFigFilename)
 
     pdb.set_trace()
 
