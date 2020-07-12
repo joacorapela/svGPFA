@@ -15,13 +15,13 @@ def getKernels(nLatents, nTrials, config):
                 scale = float(config["kernel_params"]["kScaleLatent{:d}Trial{:d}".format(k, r)])
                 lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}Trial{:d}".format(k, r)])
                 period = float(config["kernel_params"]["kPeriodLatent{:d}Trial{:d}".format(k, r)])
-                kernel = stats.kernels.PeriodicKernel()
-                kernel.setParams(params=torch.Tensor([scale, lengthScale, period]))
+                kernel = stats.kernels.PeriodicKernel(scale=scale)
+                kernel.setParams(params=torch.Tensor([lengthScale, period]))
             elif kernelType=="exponentialQuadratic":
                 scale = float(config["kernel_params"]["kScaleLatent{:d}Trial{:d}".format(k, r)])
                 lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}Trial{:d}".format(k, r)])
-                kernel = stats.kernels.ExponentialQuadraticKernel()
-                kernel.setParams(params=torch.Tensor([scale, lengthScale]))
+                kernel = stats.kernels.ExponentialQuadraticKernel(scale=scale)
+                kernel.setParams(params=torch.Tensor([lengthScale]))
             else:
                 raise ValueError("Invalid kernel type {:s} for latent {:d} and trial {:d}".format(kernelType, k, r))
             kernels[r][k] = kernel
