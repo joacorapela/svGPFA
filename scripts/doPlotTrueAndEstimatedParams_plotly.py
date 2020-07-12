@@ -11,8 +11,8 @@ import plotly
 from plotly.subplots import make_subplots
 import plotly.tools as tls
 sys.path.append("../src")
-from utils.svGPFA.configUtils import getKernels, getLatentsMeansFuncs, getLinearEmbeddingParams
-from utils.svGPFA.miscUtils import getLatentsMeanFuncsSamples, getTrialsTimes
+import utils.svGPFA.configUtils
+import utils.svGPFA.miscUtils
 
 def plotTrueAndEstimatedEmbeddingParams(trueC, trueD, estimatedC, estimatedD,
                                         staticFigFilename,
@@ -167,23 +167,25 @@ def main(argv):
     simMetaDataFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simMetaDataConfig = configparser.ConfigParser()
     simMetaDataConfig.read(simMetaDataFilename)
-    simConfigFilename = simMetaDataConfig["simulation_params"]["simConfigFilename"]
-    simConfig = configparser.ConfigParser()
-    simConfig.read(simConfigFilename)
-    nLatents = int(simConfig["control_variables"]["nLatents"])
-    nNeurons = int(simConfig["control_variables"]["nNeurons"])
-    trialsLengths = [float(str) for str in simConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    simInitConfigFilename = simMetaDataConfig["simulation_params"]["simInitConfigFilename"]
+    simInitConfig = configparser.ConfigParser()
+    simInitConfig.read(simInitConfigFilename)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
+    nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
+    trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
-    dtSimulate = float(simConfig["control_variables"]["dt"])
+    dtSimulate = float(simInitConfig["control_variables"]["dt"])
 
-    kernels = getKernels(nLatents=nLatents, nTrials=nTrials, config=simConfig)[0]
+    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)[0]
     # latentsMeansFuncs[r][k] \in lambda(t)
-    tLatentsMeansFuncs = getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simConfig)
-    trueC, trueD = getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simConfig)
-    trialsTimes = getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
+    tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+    CFilename = simInitConfig["embedding_params"]["C_filename"]
+    dFilename = simInitConfig["embedding_params"]["d_filename"]
+    trueC, trueD = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=CFilename, dFilename=dFilename)
+    trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
 
     # latentsMeansSamples[r][k,t]
-    tLatentsMeans = getLatentsMeanFuncsSamples(latentsMeansFuncs=
+    tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=
                                                 tLatentsMeansFuncs,
                                                trialsTimes=trialsTimes,
                                                dtype=trueC.dtype)
