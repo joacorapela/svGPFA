@@ -6,53 +6,107 @@ import matplotlib.pyplot as plt
 import numpy as np
 import chart_studio.plotly as py
 import plotly.graph_objs as go
-from plotly.subplots import make_subplots
+import plotly.subplots
 import plotly.io as pio
-import plotly.offline
 
-def plotTrueAndEstimatedEmbeddingParams(trueC, trueD, estimatedC, estimatedD,
-                                        linestyleTrue="solid",
-                                        linestyleEstimated="dashed",
-                                        marker="*",
-                                        xlabel="Neuron Index",
-                                        ylabel="Coefficient Value"):
-    # plt.figure()
+def getPlotTrueAndEstimatedEmbeddingParamsPlotly(trueC, trueD, 
+                                                 estimatedC, estimatedD,
+                                                 linestyleTrue="solid",
+                                                 linestyleEstimated="dash",
+                                                 marker="asterisk",
+                                                 xlabel="Neuron Index",
+                                                 ylabel="Coefficient Value"):
+    figDic = {
+        "data": [],
+        "layout": {
+            "xaxis": {"title": xlabel},
+            "yaxis": {"title": ylabel},
+        },
+    }
+    neuronIndices = np.arange(1, trueC.shape[0])
     for i in range(estimatedC.shape[1]):
-        plt.plot(trueC[:,i], label="true C[{:d}]".format(i),
-                 linestyle=linestyleTrue, marker=marker)
-        plt.plot(estimatedC[:,i], label="est. C[{:d}]".format(i),
-                 linestyle=linestyleEstimated, marker=marker)
-    plt.plot(trueD, label="true d", linestyle=linestyleTrue, marker=marker)
-    plt.plot(estimatedD, label="est. d", linestyle=linestyleEstimated,
-             marker=marker)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.legend()
+        figDic["data"].append(
+            {
+                "type": "scatter",
+                "name": "true C[{:d}]".format(i),
+                "x": neuronIndices,
+                "y": trueC[:,i],
+                "line": {"dash": linestyleTrue},
+                "marker_symbol": marker,
+            },
+        )
+        figDic["data"].append(
+            {
+                "type": "scatter",
+                "name": "estimated C[{:d}]".format(i),
+                "x": neuronIndices,
+                "y": estimatedC[:,i],
+                "line": {"dash": linestyleEstimated},
+                "marker_symbol": marker,
+            },
+        )
+    figDic["data"].append(
+        {
+            "type": "scatter",
+            "name": "true d",
+            "x": neuronIndices,
+            "y": trueD[:,0],
+            "line": {"dash": linestyleTrue},
+            "marker_symbol": marker,
+        },
+    )
+    figDic["data"].append(
+        {
+            "type": "scatter",
+            "name": "estimated d",
+            "x": neuronIndices,
+            "y": estimatedD[:,0],
+            "line": {"dash": linestyleEstimated},
+            "marker_symbol": marker,
+        },
+    )
+    fig = go.Figure(
+        data=figDic["data"],
+        layout=figDic["layout"],
+    )
+    return fig
 
-def plotTrueAndEstimatedLatentsMeans(trueLatentsMeans, estimatedLatentsMeans,
-                                     trialsTimes,
-                                     labelTrue="True",
-                                     labelEstimated="Estimated",
-                                     xlabel="Time (sec)",
-                                     ylabel="Latent Value"):
-    def plotOneSetTrueAndEstimatedLatentsMeans(ax, trueLatentMean,
-                                               estimatedLatentMean,
-                                               times,
-                                               labelTrue, labelEstimated,
-                                               xlabel, ylabel, useLegend):
-            ax.plot(times, trueLatentMean, label=labelTrue)
-            ax.plot(times, estimatedLatentMean, label=labelEstimated)
-            ax.set_xlabel(xlabel)
-            ax.set_ylabel(ylabel)
-            if useLegend:
-                ax.legend()
+def getPlotTrueAndEstimatedLatentsMeansPlotly(trueLatentsMeans, 
+                                              estimatedLatentsMeans,
+                                              trialsTimes, 
+                                              colorTrue="blue",
+                                              colorEstimated="red",
+                                              labelTrue="True",
+                                              labelEstimated="Estimated",
+                                              xlabel="Time (sec)",
+                                              ylabel="Latent Value"):
+    def getTracesOneSetTrueAndEstimatedLatentsMeans(
+        trueLatentMean,
+        estimatedLatentMean,
+        times,
+        labelTrue, labelEstimated,
+        useLegend):
+        traceTrue = go.Scatter(
+            x=times,
+            y=trueLatentMean,
+            mode="lines+markers",
+            name=labelTrue,
+            line=dict(color=colorTrue),
+            showlegend=useLegend)
+        traceEstimated = go.Scatter(
+            x=times,
+            y=estimatedLatentMean,
+            mode="lines+markers",
+            name=labelEstimated,
+            line=dict(color=colorEstimated),
+            showlegend=useLegend)
+        return traceTrue, traceEstimated
 
     # trueLatentsMeans[r] \in nLatents x nInd[k]
     # qMu[k] \in nTrials x nInd[k] x 1
     nTrials = len(trueLatentsMeans)
-    nLatents = estimatedLatentsMeans.shape[2]
-    # plt.figure()
-    fig, axs = plt.subplots(nTrials, nLatents, squeeze=False)
+    nLatents = trueLatentsMeans[0].shape[0]
+    fig = plotly.subplots.make_subplots(rows=nTrials, cols=nLatents)
     for r in range(nTrials):
         times = trialsTimes[r]
         for k in range(nLatents):
@@ -62,24 +116,45 @@ def plotTrueAndEstimatedLatentsMeans(trueLatentsMeans, estimatedLatentsMeans,
                 useLegend = True
             else:
                 useLegend = False
-            if r==nTrials//2 and k==0:
-                ylabelToPlot = ylabel
-            else:
-                ylabelToPlot = None
-            if r==nTrials-1 and k==nLatents//2:
-                xlabelToPlot = xlabel
-            else:
-                xlabelToPlot = None
-            plotOneSetTrueAndEstimatedLatentsMeans(ax=axs[r,k],
-                                                   trueLatentMean=trueLatentMean,
-                                                   estimatedLatentMean=estimatedLatentMean,
-                                                   times=times,
-                                                   labelTrue=labelTrue,
-                                                   labelEstimated=
-                                                    labelEstimated,
-                                                   xlabel=xlabelToPlot,
-                                                   ylabel=ylabelToPlot,
-                                                   useLegend=useLegend)
+            traceTrue, traceEstimated = getTracesOneSetTrueAndEstimatedLatentsMeans(
+                trueLatentMean=trueLatentMean,
+                estimatedLatentMean=estimatedLatentMean,
+                times=times,
+                labelTrue=labelTrue,
+                labelEstimated=labelEstimated,
+                useLegend=useLegend)
+            fig.add_trace(traceTrue, row=r+1, col=k+1)
+            fig.add_trace(traceEstimated, row=r+1, col=k+1)
+    fig.update_yaxes(title_text=ylabel, row=nTrials//2+1, col=1)
+    fig.update_xaxes(title_text=xlabel, row=nTrials, col=nLatents//2+1)
+    return fig
+
+def getPlotTrueAndEstimatedKernelsParamsPlotly(trueKernels, estimatedKernelsParams,
+                                      colorTrue="blue",
+                                      colorEstimated="red",
+                                      trueLegend="True",
+                                      estimatedLegend="Estimated"):
+    nLatents = len(trueKernels)
+    titles = ["Kernel {:d}: {:s}".format(i, trueKernels[i].__class__.__name__) for i in range(nLatents)]
+    fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, subplot_titles=titles)
+    for k in range(nLatents):
+        namedParams = trueKernels[k].getNamedParams()
+        labels = list(namedParams.keys())
+        trueParams = [z.item() for z in list(namedParams.values())]
+        estimatedParams = estimatedKernelsParams[k].tolist()
+        # we are fixing scale to 1.0. This is not great :(
+        estimatedParams = [1.0] + estimatedParams
+        if k==0:
+            showLegend = True
+        else:
+            showLegend = False
+        pdb.set_trace()
+        traceTrue = go.Bar(x=labels, y=trueParams, name=trueLegend, marker_color=colorTrue, showlegend=showLegend)
+        traceEstimated = go.Bar(x=labels, y=estimatedParams, name=estimatedLegend, marker_color=colorEstimated, showlegend=showLegend)
+        fig.append_trace(traceTrue, k+1, 1)
+        fig.append_trace(traceEstimated, k+1, 1)
+    fig.update_yaxes(title_text="Parameter Value", row=nLatents//2+1, col=1)
+    return fig
 
 def plotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
     def plotOneSetTrueAndEstimatedKernelsParams(ax, labels,
@@ -255,7 +330,7 @@ def getSimulatedSpikesTimesPlotPlotly(spikesTimes, xlabel="Time (sec)", ylabel="
     nTrials = len(spikesTimes)
     sqrtNTrials = math.sqrt(nTrials)
     subplotsTitles = ["trial={:d}".format(r+1) for r in range(nTrials)]
-    fig = make_subplots(rows=nTrials, cols=1, shared_xaxes=True, shared_yaxes=True, subplot_titles=subplotsTitles)
+    fig = plotly.subplots.make_subplots(rows=nTrials, cols=1, shared_xaxes=True, shared_yaxes=True, subplot_titles=subplotsTitles)
     for r in range(nTrials):
         for n in range(len(spikesTimes[r])):
             trace = go.Scatter(
@@ -481,19 +556,15 @@ def plotTruePythonAndMatlabLatents(tTimes, tLatents,
         plt.savefig(fname=figFilename)
     plt.show()
 
-def plotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
+def getPlotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
                                          pTimes, pMuK, pVarK,
                                          mTimes, mMuK, mVarK,
                                          trialToPlot=0,
-                                         staticFigFilenamePattern=None,
-                                         dynamicFigFilenamePattern=None,
                                          xlabel="Time (sec)",
                                          ylabelPattern="Latent {:d}"):
     pio.renderers.default = "browser"
-    staticFigFilename = staticFigFilenamePattern.format(trialToPlot)
-    dynamicFigFilename = dynamicFigFilenamePattern.format(trialToPlot)
     nLatents = mMuK.shape[2]
-    fig = make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
+    fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
     # titles = ["Trial {:d}".format(trialToPlot)] + ["" for i in range(nLatents)]
     title = "Trial {:d}".format(trialToPlot)
     for k in range(nLatents):
@@ -588,8 +659,5 @@ def plotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
 
     fig.update_layout(title_text=title)
     fig.update_xaxes(title_text=xlabel, row=3, col=1)
-    fig.write_image(staticFigFilename)
-    plotly.offline.plot(fig, filename=dynamicFigFilename)
-    # fig.show()
-    # pdb.set_trace()
+    return fig
 
