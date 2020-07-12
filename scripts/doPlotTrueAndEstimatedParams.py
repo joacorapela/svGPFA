@@ -13,6 +13,7 @@ sys.path.append("../src")
 import utils.svGPFA.configUtils
 import utils.svGPFA.miscUtils
 import plot.svGPFA.plotUtils
+import plot.svGPFA.plotUtilsPlotly
 
 def main(argv):
     if len(argv)!=2:
@@ -23,9 +24,9 @@ def main(argv):
     gpRegularization = 1e-3
     estResConfigFilename = "results/{:08d}_estimation_metaData.ini".format(estNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estNumber)
-    kernelsParamsFigFilename = "figures/{:08d}_trueAndEstimatedKernelsParams.png".format(estNumber)
-    latentsMeansFigFilename = "figures/{:08d}_trueAndEstimatedLatentsMeans.png".format(estNumber)
-    embeddingParamsFigFilename = "figures/{:08d}_trueAndEstimatedEmbeddingParams.png".format(estNumber)
+    kernelsParamsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedKernelsParams.{{:s}}".format(estNumber)
+    latentsMeansFigFilenamePattern = "figures/{:08d}_trueAndEstimatedLatentsMeans.{{:s}}".format(estNumber)
+    embeddingParamsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedEmbeddingParams.{{:s}}".format(estNumber)
 
     estResConfig = configparser.ConfigParser()
     estResConfig.read(estResConfigFilename)
@@ -45,7 +46,9 @@ def main(argv):
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)[0]
     # latentsMeansFuncs[r][k] \in lambda(t)
     tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
-    trueC, trueD = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, config=simInitConfig)
+    CFilename = simInitConfig["embedding_params"]["C_filename"]
+    dFilename = simInitConfig["embedding_params"]["d_filename"]
+    trueC, trueD = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=CFilename, dFilename=dFilename)
     trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
 
     # latentsMeansSamples[r][k,t]
@@ -61,15 +64,21 @@ def main(argv):
         latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
         estimatedC, estimatedD = model.getSVEmbeddingParams()
 
-    plot.svGPFA.plotUtils.plotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
-    plt.savefig(kernelsParamsFigFilename)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParamsPlotly(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
+    fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
+    fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
+    plt.clf()
 
     # qMu[r] \in nTrials x nInd[k] x 1
-    plot.svGPFA.plotUtils.plotTrueAndEstimatedLatentsMeans(trueLatentsMeans=tLatentsMeans, estimatedLatentsMeans=latentsMeans, trialsTimes=trialsTimes)
-    plt.savefig(latentsMeansFigFilename)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatentsMeansPlotly(trueLatentsMeans=tLatentsMeans, estimatedLatentsMeans=latentsMeans, trialsTimes=trialsTimes)
+    fig.write_image(latentsMeansFigFilenamePattern.format("png"))
+    fig.write_html(latentsMeansFigFilenamePattern.format("html"))
+    plt.clf()
 
-    plot.svGPFA.plotUtils.plotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
-    plt.savefig(embeddingParamsFigFilename)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParamsPlotly(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
+    fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
+    fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
+    plt.clf()
 
     pdb.set_trace()
 
