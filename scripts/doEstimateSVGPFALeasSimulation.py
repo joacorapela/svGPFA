@@ -19,7 +19,8 @@ import plot.svGPFA.plotUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument("deviceName", help="name of device (cpu or cuda)")
+    parser.add_argument("mEstNumber", help="Matlab's estimation number", type=int)
+    parser.add_argument("--deviceName", help="name of device (cpu or cuda)", default="cpu")
     parser.add_argument("--profile", help="perform profiling", action="store_true")
     args = parser.parse_args()
     if args.profile:
@@ -27,29 +28,34 @@ def main(argv):
     else:
         profile = False
 
+    mEstNumber = args.mEstNumber
     deviceName = args.deviceName
     if not torch.cuda.is_available():
         deviceName = "cpu"
     device = torch.device(deviceName)
     print("Using {:s}".format(deviceName))
 
-    ppSimulationFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessSimulation.mat")
-    initDataFilename = os.path.join(os.path.dirname(__file__), "data/pointProcessInitialConditions.mat")
+    mEstConfig = configparser.ConfigParser()
+    mEstConfig.read("../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber))
+    mSimNumber = int(mEstConfig["data"]["simulationNumber"])
+    indPointsLocsKMSEpsilon = float(mEstConfig["control_variables"]["epsilon"])
+    ppSimulationFilename = os.path.join(os.path.dirname(__file__), "../../matlabCode/scripts/results/{:08d}-pointProcessSimulation.mat".format(mSimNumber))
+    initDataFilename = os.path.join(os.path.dirname(__file__), "../../matlabCode/scripts/results/{:08d}-pointProcessInitialConditions.mat".format(mEstNumber))
 
     # save estimated values
     estimationPrefixUsed = True
     while estimationPrefixUsed:
-        estimationPrefix = "{:08d}".format(random.randint(0, 10**8))
+        pEstNumber = random.randint(0, 10**8)
         estimMetaDataFilename = \
-            "results/{:s}_leasSimulation_estimation_metaData_{:s}.ini".format(estimationPrefix, deviceName)
+                "results/{:08d}_leasSimulation_estimation_metaData_{:s}.ini".format(pEstNumber, deviceName)
         if not os.path.exists(estimMetaDataFilename):
            estimationPrefixUsed = False
     modelSaveFilename = \
-        "results/{:s}_leasSimulation_estimatedModel_{:s}.pickle".format(estimationPrefix, deviceName)
+        "results/{:08d}_leasSimulation_estimatedModel_{:s}.pickle".format(pEstNumber, deviceName)
     profilerFilenamePattern = \
-        "results/{:s}_leaseSimulation_estimatedModel_{:s}.pstats".format(estimationPrefix, deviceName)
+        "results/{:08d}_leaseSimulation_estimatedModel_{:s}.pstats".format(pEstNumber, deviceName)
     lowerBoundHistFigFilename = \
-        "figures/{:s}_leasSimulation_lowerBoundHist_{:s}.png".format(estimationPrefix, deviceName)
+        "figures/{:08d}_leasSimulation_lowerBoundHist_{:s}.png".format(pEstNumber, deviceName)
 
     mat = loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
@@ -73,15 +79,14 @@ def main(argv):
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
-    indPointsLocsKMSEpsilon = 1e-2
 
     # create kernels
     kernels = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel()
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = stats.kernels.ExponentialQuadraticKernel()
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
@@ -145,8 +150,9 @@ def main(argv):
                    "verbose":True
                   }
     estimConfig = configparser.ConfigParser()
+    estimConfig["data"] = {"mEstNumber": mEstNumber}
     estimConfig["optim_params"] = optimParams
-    estimConfig["other"] = {"indPointsLocsKMSEpsilon": indPointsLocsKMSEpsilon}
+    estimConfig["control_params"] = {"indPointsLocsKMSEpsilon": indPointsLocsKMSEpsilon}
     with open(estimMetaDataFilename, "w") as f: estimConfig.write(f)
 
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
@@ -207,8 +213,8 @@ def main(argv):
         ps.strip_dirs().sort_stats(sortby).print_stats()
         s.close()
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
-    with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+        resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
+        with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
     # plot lower bound history
     plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist, elapsedTimeHist=elapsedTimeHist, figFilename=lowerBoundHistFigFilename)
