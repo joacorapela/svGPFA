@@ -1,5 +1,0 @@
-
-
-results/42037928_estimation_metaData.ini: simple model passing KSTest time rescaling
-
-results/03097533_estimation_metaData.ini: complex model
