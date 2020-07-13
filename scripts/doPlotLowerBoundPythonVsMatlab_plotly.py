@@ -21,12 +21,14 @@ def main(argv):
     deviceName = args.deviceName
 
     pEstimMetaDataFilename = "results/{:08d}_leasSimulation_estimation_metaData_{:s}.ini".format(pEstNumber, deviceName)
+    pModelSaveFilename = "results/{:08d}_leasSimulation_estimatedModel_{:s}.pickle".format(pEstNumber, deviceName)
     pEstConfig = configparser.ConfigParser()
     pEstConfig.read(pEstimMetaDataFilename)
     mEstNumber = int(pEstConfig["data"]["mEstNumber"])
 
     mEstConfig = configparser.ConfigParser()
     mEstConfig.read("../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber))
+    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
     mSimNumber = int(mEstConfig["data"]["simulationNumber"])
     ppSimulationFilename = os.path.join(os.path.dirname(__file__), "../../matlabCode/scripts/results/{:08d}-pointProcessSimulation.mat".format(mSimNumber))
 
