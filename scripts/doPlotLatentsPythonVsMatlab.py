@@ -36,8 +36,8 @@ def main(argv):
     mSimFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessSimulation.mat".format(mSimNumber)
     mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
     pModelSaveFilename = "results/{:08d}_leasSimulation_estimatedModel_cpu.pickle".format(pEstNumber)
-    staticFigFilename = "figures/truePythonMatlabLatentsPointProcess_{:08d}_trial{:d}.png".format(pEstNumber, trialToPlot)
-    dynamicFigFilename = "figures/truePythonMatlabLatentsPointProcess_{:08d}_trial{:d}.html".format(pEstNumber, trialToPlot)
+    staticFigFilename = "figures/{:08d}_truePythonMatlabLatentsPointProcess_trial{:d}.png".format(pEstNumber, trialToPlot)
+    dynamicFigFilename = "figures/{:08d}_truePythonMatlabLatentsPointProcess_trial{:d}.html".format(pEstNumber, trialToPlot)
 
     loadRes = loadmat(mSimFilename)
     nLatents = loadRes["trueLatents"].shape[1]
@@ -83,6 +83,7 @@ def main(argv):
                                                    )
     fig.write_image(staticFigFilename)
     fig.write_html(dynamicFigFilename)
+    fig.show()
 
     pdb.set_trace()
 
