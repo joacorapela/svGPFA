@@ -24,10 +24,14 @@ import utils.networking.multiprocessingUtils
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("ini_filename", help="ini file with configuration parameters")
-    parser.add_argument("--debug", help="start GUI with debug functionality", action="store_true")
+    parser.add_argument("--debug", help="start GUI with debug functionality", action="store_true", default=False)
     parser.add_argument("--non-local", help="provide GUI access in a specified port (default 8050)", action="store_true")
     args = parser.parse_args()
 
+    if args.debug:
+        print("debug on")
+    else:
+        print("debug off")
     guiFilename = args.ini_filename
     guiConfig = configparser.ConfigParser()
     guiConfig.read(guiFilename)
