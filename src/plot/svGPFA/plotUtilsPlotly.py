@@ -661,3 +661,48 @@ def getPlotTruePythonAndMatlabLatentsPlotly(tTimes, tLatents,
     fig.update_xaxes(title_text=xlabel, row=3, col=1)
     return fig
 
+def getPlotTruePythonAndMatlabCIFsPlotly(tTimes, tCIF, tLabel,
+                                         pTimes, pCIF, pLabel,
+                                         mTimes, mCIF, mLabel,
+                                         xlabel="Time (sec)",
+                                         ylabel="CIF",
+                                         title=""
+                                        ):
+    pio.renderers.default = "browser"
+    figDic = {
+        "data": [],
+        "layout": {
+            "xaxis": {"title": xlabel},
+            "yaxis": {"title": ylabel},
+            "title": {"text": title},
+        },
+    }
+    figDic["data"].append(
+            {
+            "type": "scatter",
+            "name": tLabel,
+            "x": tTimes,
+            "y": tCIF,
+        },
+    )
+    figDic["data"].append(
+            {
+            "type": "scatter",
+            "name": pLabel,
+            "x": pTimes,
+            "y": pCIF,
+        },
+    )
+    figDic["data"].append(
+            {
+            "type": "scatter",
+            "name": mLabel,
+            "x": mTimes,
+            "y": mCIF,
+        },
+    )
+    fig = go.Figure(
+        data=figDic["data"],
+        layout=figDic["layout"],
+    )
+    return fig
