@@ -255,7 +255,7 @@ class svGPFA_runner:
         module = importlib.import_module("stats.kernels")
         for k, kernelClass in enumerate(kernelTypeComponentValues):
             class_ = getattr(module, kernelTypeComponentValues[k])
-            kernel = class_()
+            kernel = class_(scale=1.0)
             kernels.append(kernel)
         return kernels
 
@@ -419,11 +419,11 @@ def getKernels(nLatents, config):
         if kernelType=="periodic":
             lengthscale = float(config["kernels"]["kLengthscaleLatent{:d}".format(k+1)])
             period = float(config["kernels"]["kPeriodLatent{:d}".format(k+1)])
-            kernel = stats.kernels.PeriodicKernel()
+            kernel = stats.kernels.PeriodicKernel(scale=1.0)
             kernel.setParams(params=torch.Tensor([lengthscale, period]))
         elif kernelType=="exponentialQuadratic":
             lengthscale = float(config["kernels"]["kLengthscaleLatent{:d}".format(k+1)])
-            kernel = stats.kernels.ExponentialQuadraticKernel()
+            kernel = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernel.setParams(params=torch.Tensor([lengthscale]))
         kernels.append(kernel)
     return kernels
@@ -444,8 +444,9 @@ def getSpikesTimes(contents, filename, spikesTimesVar):
         YNonStacked_tmp = loadRes[spikesTimesVar]
         nTrials = YNonStacked_tmp.shape[0]
         nNeurons = YNonStacked_tmp[0,0].shape[0]
-        spikesTimes = torch.empty(shape=(nTrials, nNeurons), dtype=np.object)
+        spikesTimes = [[] for n in range(nTrials)]
         for r in range(nTrials):
+            spikesTimes[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 spikesTimes[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0])
     return spikesTimes
