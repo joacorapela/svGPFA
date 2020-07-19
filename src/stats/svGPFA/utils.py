@@ -85,6 +85,12 @@ def chol3D(K):
         Kchol[i,:,:] = torch.cholesky(K[i,:,:])
     return Kchol
 
+def pinv3D(K):
+    Kpinv = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
+    for i in range(K.shape[0]):
+        Kpinv[i,:,:] = torch.pinverse(K[i,:,:])
+    return Kpinv
+
 def clock(func):
     def clocked(*args,**kargs):
         t0 = time.perf_counter()

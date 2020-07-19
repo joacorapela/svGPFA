@@ -2,7 +2,7 @@
 import pdb
 import torch
 from abc import ABC, abstractmethod
-from .utils import chol3D
+from .utils import pinv3D
 
 class KernelMatricesStore(ABC):
 
@@ -41,7 +41,7 @@ class IndPointsLocsKMS(KernelMatricesStore):
     def buildKernelsMatrices(self):
         nLatent = len(self._kernels)
         self._Kzz = [[None] for k in range(nLatent)]
-        self._KzzChol = [[None] for k in range(nLatent)]
+        self._KzzPinv = [[None] for k in range(nLatent)]
 
         for k in range(nLatent):
             self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._Z[k])+
@@ -49,13 +49,13 @@ class IndPointsLocsKMS(KernelMatricesStore):
                                                     dtype=self._Z[k].dtype,
                                                     device=self._Z[k].device))
             # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._Z[k])
-            self._KzzChol[k] = chol3D(self._Kzz[k]) # O(n^3)
+            self._KzzPinv[k] = pinv3D(self._Kzz[k]) # O(n^3)
 
     def getKzz(self):
         return self._Kzz
 
-    def getKzzChol(self):
-        return self._KzzChol
+    def getKzzPinv(self):
+        return self._KzzPinv
 
     def getEpsilon(self):
         return self._epsilon

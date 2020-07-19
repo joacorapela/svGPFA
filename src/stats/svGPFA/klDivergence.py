@@ -12,16 +12,16 @@ class KLDivergence:
     def evalSumAcrossLatentsAndTrials(self):
         klDiv = 0
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
-        for k in range(len(self._indPointsLocsKMS.getKzzChol())):
+        for k in range(len(self._indPointsLocsKMS.getKzzPinv())):
             klDivK = self._evalSumAcrossTrials(
                 Kzz=self._indPointsLocsKMS.getKzz()[k],
-                KzzChol=self._indPointsLocsKMS.getKzzChol()[k],
+                KzzPinv=self._indPointsLocsKMS.getKzzPinv()[k],
                 qMu=self._svPosteriorOnIndPoints.getQMu()[k],
                 qSigma=qSigma[k])
             klDiv += klDivK
         return klDiv
 
-    def _evalSumAcrossTrials(self, Kzz, KzzChol, qMu, qSigma):
+    def _evalSumAcrossTrials(self, Kzz, KzzPinv, qMu, qSigma):
         # ESS \in nTrials x nInd x nInd
         ESS = qSigma + torch.matmul(qMu, qMu.permute(0,2,1))
         nTrials = qMu.shape[0]
@@ -30,7 +30,7 @@ class KLDivergence:
             _, logdetKzz = Kzz[trial,:,:].slogdet() # O(n^3)
             _, logdetQSigma = qSigma[trial,:,:].slogdet() # O(n^3)
             traceTerm = torch.trace(
-                torch.cholesky_solve(ESS[trial,:,:], KzzChol[trial,:,:]))
+                torch.matmul(KzzPinv[trial,:,:], ESS[trial,:,:]))
             trialKL = .5*(traceTerm+logdetKzz-logdetQSigma-ESS.shape[1])
             answer += trialKL
         return answer
