@@ -10,10 +10,13 @@ import pandas
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.io as pio
+import plotly.graph_objs as go
 import scipy.io
 import scipy.stats
+import numpy as np
 sys.path.append(os.path.expanduser("../src"))
 import plot.svGPFA.plotUtilsPlotly
+import stats.hypothesisTests.permutationTests
 
 def getCIFs(C, d, latents):
     nTrials = latents.shape[0]
@@ -37,6 +40,7 @@ def main(argv):
     marker = "x"
     tLabel = "True"
     ylim = [-6, 2]
+    nResamples = 10000
     # pLabelPattern = "$\text{Python} (R^2={:.02f})$"
     # mLabelPattern = "$\text{Matlab} (R^2={:.02f})$"
     pLabelPattern = "Python (R<sup>2</sup>={:.02f})"
@@ -130,9 +134,14 @@ def main(argv):
     dfm = pandas.DataFrame(data=d)
     dfu = dfm.set_index(['trial', 'neuron', 'method']).unstack(level=-1)
     dfuNumpy = dfu.to_numpy()
-    pTTestRes = scipy.stats.ttest_rel(a=dfuNumpy[:,0], b=dfuNumpy[:,1])
-    title = "Paired t-test, H<sub>0</sub>: R<sup>2</sup>(Matlab)=R<sup>2</sup>(Python); t={:.02f}, p={:.04f}".format(pTTestRes.statistic, pTTestRes.pvalue)
-    fig = px.box(dfm, x="method", y="r2", points="all", hover_data=["trial", "neuron"], title=title)
+    # pTTestRes = scipy.stats.ttest_rel(a=dfuNumpy[:,0], b=dfuNumpy[:,1])
+    # title = "Paired t-test, H<sub>0</sub>: R<sup>2</sup>(Matlab)=R<sup>2</sup>(Python); t={:.02f}, p={:.04f}".format(pTTestRes.statistic, pTTestRes.pvalue)
+    validIndices = np.nonzero((np.abs(dfuNumpy)<6).all(1))[0]
+    dfOutliersRemoved = dfuNumpy[validIndices,:]
+    permRes = stats.hypothesisTests.permutationTests.permuteDiffPairedMeans(data1=dfOutliersRemoved[:,0], data2=dfOutliersRemoved[:,1], nResamples=nResamples)
+    permResP = float(len(np.nonzero(np.absolute(permRes.t)>abs(permRes.t0))[0]))/len(permRes.t)
+    title = "H<sub>0</sub>: R<sup>2</sup>(Matlab)=R<sup>2</sup>(Python); stat={:.02f}, p={:.04f}".format(permRes.t0, permResP)
+    fig = px.box(dfm, x="method", y="r2", points="all", color="method", hover_data=["trial", "neuron"], title=title)
     fig.update_yaxes(title_text="R<sup>2</sup>", range=ylim)
     fig.update_xaxes(title_text="")
 
