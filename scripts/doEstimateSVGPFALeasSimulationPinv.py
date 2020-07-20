@@ -47,15 +47,15 @@ def main(argv):
     while estimationPrefixUsed:
         pEstNumber = random.randint(0, 10**8)
         estimMetaDataFilename = \
-                "results/{:08d}_leasSimulation_estimation_metaData_{:s}.ini".format(pEstNumber, deviceName)
+                "results/{:08d}_leasSimulation_estimationPinv_metaData_{:s}.ini".format(pEstNumber, deviceName)
         if not os.path.exists(estimMetaDataFilename):
            estimationPrefixUsed = False
     modelSaveFilename = \
-        "results/{:08d}_leasSimulation_estimatedModel_{:s}.pickle".format(pEstNumber, deviceName)
+        "results/{:08d}_leasSimulation_estimatedModelPinv_{:s}.pickle".format(pEstNumber, deviceName)
     profilerFilenamePattern = \
-        "results/{:08d}_leaseSimulation_estimatedModel_{:s}.pstats".format(pEstNumber, deviceName)
+        "results/{:08d}_leaseSimulation_estimatedModelPinv_{:s}.pstats".format(pEstNumber, deviceName)
     lowerBoundHistFigFilename = \
-        "figures/{:08d}_leasSimulation_lowerBoundHist_{:s}.png".format(pEstNumber, deviceName)
+        "figures/{:08d}_leasSimulation_lowerBoundHistPinv_{:s}.png".format(pEstNumber, deviceName)
 
     mat = loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
@@ -142,7 +142,7 @@ def main(argv):
                    "mStepIndPointsEstimate":True,
                    "mStepIndPointsMaxIter":20,
                    "mStepIndPointsTol":1e-3,
-                   "mStepIndPointsLR":1e-4,
+                   "mStepIndPointsLR":1e-8,
                    "mStepIndPointsLineSearchFn":"strong_wolfe",
                    # "mStepIndPointsLineSearchFn":"None",
                    "mStepIndPointsNIterDisplay":1,
