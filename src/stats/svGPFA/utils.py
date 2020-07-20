@@ -2,6 +2,7 @@
 import pdb
 import time
 import torch
+import numpy as np
 
 '''
 def j_cholesky_solve(b, u, upper=False):
@@ -79,16 +80,17 @@ def flattenListsOfArrays(*lists):
             aListOfArrays.append(array.flatten())
     return torch.cat(aListOfArrays)
 
-def chol3D(K):
-    Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
-    for i in range(K.shape[0]):
-        Kchol[i,:,:] = torch.cholesky(K[i,:,:])
-    return Kchol
+# def chol3D(K):
+#     Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
+#     for i in range(K.shape[0]):
+#         Kchol[i,:,:] = torch.cholesky(K[i,:,:])
+#     return Kchol
 
 def pinv3D(K):
     Kpinv = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
     for i in range(K.shape[0]):
-        Kpinv[i,:,:] = torch.pinverse(K[i,:,:])
+        tol = np.max(np.array(K.shape))*np.spacing(torch.norm(K).item())
+        Kpinv[i,:,:] = torch.pinverse(K[i,:,:], rcond=tol)
     return Kpinv
 
 def clock(func):

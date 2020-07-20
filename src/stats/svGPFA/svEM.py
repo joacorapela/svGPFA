@@ -19,7 +19,7 @@ class SVEM:
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
                  verbose=True, out=sys.stdout,
                 ):
-
+        self._model = model
         if latentsStreamFN is not None and latentsTimes is None:
             raise RuntimeError("Please specify latentsTime if you want to save latents")
 
@@ -304,6 +304,9 @@ class SVEM:
                         nIterDisplay, logLock, logStream, logStreamFN):
         x = model.getIndPointsLocs()
         def evalFunc():
+            for k in range(len(x)):
+                if torch.isnan(x[k]).any():
+                    pdb.set_trace()
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
@@ -364,6 +367,17 @@ class SVEM:
 
             prevEval = curEval
             optimizer.step(closure)
+            # begin debug
+            # import warnings
+            # warnings.warn("Debug code on in svEM::_maximizeStep")
+            # Z = self._model.getIndPointsLocs()
+            # for k in range(len(Z)):
+            #     if torch.isnan(Z[k]).any():
+            #         print("NaNs found")
+            #         pdb.set_trace()
+            #     else:
+            #         print("NaNs NOT found")
+            # end debug
             if curEval<prevEval and prevEval-curEval<tol:
                 converged = True
             message = displayFmt%(iterCount, curEval)
