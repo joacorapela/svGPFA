@@ -56,34 +56,12 @@ def backSubstitution(b, u):
     return y
 '''
 
-def getDiagIndicesIn3DArray(N, M, device=torch.device("cpu")):
-    frameDiagIndices = torch.arange(end=N, device=device)*(N+1)
-    frameStartIndices = torch.arange(end=M, device=device)*N**2
-    # torch way of computing an outer sum
-    diagIndices = (frameDiagIndices.reshape(-1,1)+frameStartIndices).flatten()
-    answer, _ = diagIndices.sort()
-    return answer
-
-def build3DdiagFromDiagVector(v, N, M):
-    assert(len(v)==N*M)
-    diagIndices = getDiagIndicesIn3DArray(N=N, M=M)
-    D = torch.zeros(M*N*N, dtype=v.dtype, device=v.device)
-    D[diagIndices] = v
-    reshapedD = D.reshape(shape = (M, N, N))
-    return reshapedD
-
 def flattenListsOfArrays(*lists):
     aListOfArrays = []
     for arraysList in lists:
         for array in arraysList:
             aListOfArrays.append(array.flatten())
     return torch.cat(aListOfArrays)
-
-def chol3D(K):
-    Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
-    for i in range(K.shape[0]):
-        Kchol[i,:,:] = torch.cholesky(K[i,:,:])
-    return Kchol
 
 def clock(func):
     def clocked(*args,**kargs):
