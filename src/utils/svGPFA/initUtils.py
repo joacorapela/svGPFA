@@ -5,6 +5,38 @@ import os
 import torch
 import myMath.utils
 
+def getDiagIndicesIn3DArray(N, M, device=torch.device("cpu")):
+    frameDiagIndices = torch.arange(end=N, device=device)*(N+1)
+    frameStartIndices = torch.arange(end=M, device=device)*N**2
+    # torch way of computing an outer sum
+    diagIndices = (frameDiagIndices.reshape(-1,1)+frameStartIndices).flatten()
+    answer, _ = diagIndices.sort()
+    return answer
+
+def build3DdiagFromDiagVector(v, N, M):
+    assert(len(v)==N*M)
+    diagIndices = getDiagIndicesIn3DArray(N=N, M=M)
+    D = torch.zeros(M*N*N, dtype=v.dtype, device=v.device)
+    D[diagIndices] = v
+    reshapedD = D.reshape(shape = (M, N, N))
+    return reshapedD
+
+def buildQSigmaFromQSVecAndQSDiag(qSVec, qSDiag):
+    K = len(qSVec)
+    R = qSVec[0].shape[0]
+    qSigma = [[None] for k in range(K)]
+    for k in range(K):
+        nIndK = qSDiag[k].shape[1]
+        # qq \in nTrials x nInd[k] x 1
+        qq = qSVec[k].reshape(shape=(R, nIndK, 1))
+        # dd \in nTrials x nInd[k] x 1
+        nIndKVarRnkK = qSVec[k].shape[1]
+        dd = build3DdiagFromDiagVector(v=(qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
+        # qSigma[k] \in nTrials x nInd[k] x nInd[k]
+        qSigma[k] = torch.matmul(qq, torch.transpose(a=qq, dim0=1, dim1=2)) + dd
+    return(qSigma)
+
+
 def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPoint):
     nLatents = len(nIndPointsPerLatent)
     nTrials = len(trialsLengths)

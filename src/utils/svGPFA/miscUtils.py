@@ -3,6 +3,12 @@ import torch
 import myMath.utils
 import stats.gaussianProcesses.eval
 
+def chol3D(K):
+    Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
+    for i in range(K.shape[0]):
+        Kchol[i,:,:] = torch.cholesky(K[i,:,:])
+    return Kchol
+
 def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
     nTrials = len(trialsLengths)
     legQuadPoints = torch.empty((nTrials, nQuad, 1), dtype=dtype)
