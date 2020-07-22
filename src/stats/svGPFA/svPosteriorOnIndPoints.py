@@ -1,7 +1,7 @@
 
 import pdb
 import torch
-from .utils import build3DdiagFromDiagVector
+import utils.svGPFA.initUtils
 
 class SVPosteriorOnIndPoints:
 
@@ -34,7 +34,7 @@ class SVPosteriorOnIndPoints:
             qq = self._qSVec[k].reshape(shape=(R, nIndK, 1))
             # dd \in nTrials x nInd[k] x 1
             nIndKVarRnkK = self._qSVec[k].shape[1]
-            dd = build3DdiagFromDiagVector(v=(self._qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
+            dd = utils.svGPFA.initUtils.build3DdiagFromDiagVector(v=(self._qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
             qSigma[k] = torch.matmul(qq, torch.transpose(a=qq, dim0=1, dim1=2)) + dd
         return(qSigma)
 
