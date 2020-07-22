@@ -16,6 +16,7 @@ import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
+import utils.svGPFA.initUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -47,27 +48,36 @@ def main(argv):
     while estimationPrefixUsed:
         pEstNumber = random.randint(0, 10**8)
         estimMetaDataFilename = \
-                "results/{:08d}_leasSimulation_estimation_metaData_{:s}.ini".format(pEstNumber, deviceName)
+                "results/{:08d}_leasSimulation_estimationChol_metaData_{:s}.ini".format(pEstNumber, deviceName)
         if not os.path.exists(estimMetaDataFilename):
            estimationPrefixUsed = False
     modelSaveFilename = \
-        "results/{:08d}_leasSimulation_estimatedModel_{:s}.pickle".format(pEstNumber, deviceName)
+        "results/{:08d}_leasSimulation_estimatedModelChol_{:s}.pickle".format(pEstNumber, deviceName)
     profilerFilenamePattern = \
-        "results/{:08d}_leaseSimulation_estimatedModel_{:s}.pstats".format(pEstNumber, deviceName)
+        "results/{:08d}_leaseSimulation_estimatedModelChol_{:s}.pstats".format(pEstNumber, deviceName)
     lowerBoundHistFigFilename = \
-        "figures/{:08d}_leasSimulation_lowerBoundHist_{:s}.png".format(pEstNumber, deviceName)
+        "figures/{:08d}_leasSimulation_lowerBoundHistChol_{:s}.png".format(pEstNumber, deviceName)
 
     mat = loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for i in range(nLatents)]
+    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,k)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for k in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,k)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for k in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,k)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for k in range(nLatents)]
+    Z0 = [torch.from_numpy(mat['Z0'][(k,0)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for k in range(nLatents)]
     C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor).to(device)
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().to(device)
     legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).to(device)
     legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).to(device)
+
+    # qSigma0[k] \in nTrials x nInd[k] x nInd[k]
+    qSigma0 = utils.svGPFA.initUtils.buildQSigmaFromQSVecAndQSDiag(qSVec=qSVec0, qSDiag=qSDiag0)
+    qSRSigma0 = [[None] for k in range(nLatents)]
+    for k in range(nLatents):
+        nIndPointsK = qSigma0[k].shape[1]
+        qSRSigma0[k] = torch.empty((nTrials, nIndPointsK, nIndPointsK), dtype=torch.double)
+        for r in range(nTrials):
+            qSRSigma0[k][r,:,:] = torch.cholesky(qSigma0[k][r,:,:])
 
     yMat = loadmat(ppSimulationFilename)
     YNonStacked_tmp = yMat['Y']
@@ -103,7 +113,7 @@ def main(argv):
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "qSRSigma0": qSRSigma0}
     qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
