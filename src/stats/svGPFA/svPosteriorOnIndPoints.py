@@ -1,10 +1,6 @@
 
 import pdb
 import torch
-<<<<<<< HEAD
-=======
-import utils.svGPFA.initUtils
->>>>>>> master
 
 class SVPosteriorOnIndPoints:
 
