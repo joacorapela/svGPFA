@@ -1,13 +1,11 @@
 
-from .kernelMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS,\
-                                IndPointsLocsAndAssocTimesKMS
-from .svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from .svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-                                 SVPosteriorOnLatentsAssocTimes
-from .svEmbedding import LinearSVEmbeddingAllTimes, LinearSVEmbeddingAssocTimes
-from .expectedLogLikelihood import PointProcessELLExpLink
-from .klDivergence import KLDivergence
-from .svLowerBound import SVLowerBound
+import stats.svGPFA.kernelsMatricesStore
+import stats.svGPFA.svPosteriorOnIndPoints
+import stats.svGPFA.svPosteriorOnLatents
+import stats.svGPFA.svEmbedding
+import stats.svGPFA.expectedLogLikelihood
+import stats.svGPFA.klDivergence
+import stats.svGPFA.svLowerBound
 
 #:
 PointProcess = 0
@@ -33,28 +31,28 @@ class SVGPFAModelFactory:
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
                 if linkFunction==ExponentialLink:
-                    qU = SVPosteriorOnIndPoints()
-                    indPointsLocsKMS = IndPointsLocsKMS()
-                    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-                    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-                    qKAllTimes = SVPosteriorOnLatentsAllTimes(
+                    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+                    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+                    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+                    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+                    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
                         svPosteriorOnIndPoints=qU,
                         indPointsLocsKMS=indPointsLocsKMS,
                         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-                    qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
+                    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
                         svPosteriorOnIndPoints=qU,
                         indPointsLocsKMS=indPointsLocsKMS,
                         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-                    qHAllTimes = LinearSVEmbeddingAllTimes(
+                    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(
                         svPosteriorOnLatents=qKAllTimes)
-                    qHAssocTimes = LinearSVEmbeddingAssocTimes(
+                    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(
                         svPosteriorOnLatents=qKAssocTimes)
-                    eLL = PointProcessELLExpLink(
+                    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(
                         svEmbeddingAllTimes=qHAllTimes,
                         svEmbeddingAssocTimes=qHAssocTimes)
-                    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+                    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                                          svPosteriorOnIndPoints=qU)
-                    svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
+                    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
                     svlb.setKernels(kernels=kernels)
                 else:
                     raise ValueError("Invalid linkFunction=%s"%
