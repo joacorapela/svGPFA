@@ -8,7 +8,7 @@ import numpy as np
 import torch
 sys.path.append("../src")
 from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
-from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, \
+from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS, \
         IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
 from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
@@ -62,11 +62,12 @@ def test_computeMeansAndVars_allTimes():
     qH.setKernels(kernels=kernels)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     qH.setInitialParams(initialParams=initialParams)
     qH.setTimes(times=t)
@@ -126,11 +127,12 @@ def test_computeMeansAndVars_assocTimes():
     qH.setKernels(kernels=kernels)
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     qH.setInitialParams(initialParams=initialParams)
     qH.setKernels(kernels=kernels)

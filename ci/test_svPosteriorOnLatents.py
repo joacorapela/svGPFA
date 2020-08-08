@@ -8,7 +8,7 @@ import numpy as np
 import torch
 sys.path.append("../src")
 from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
-from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, \
+from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS, \
         IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
 from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes, \
