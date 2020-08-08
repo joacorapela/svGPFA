@@ -6,7 +6,7 @@ import pdb
 import random
 import argparse
 import cProfile, pstats
-from scipy.io import loadmat
+import scipy.io
 import pickle
 import configparser
 import torch
@@ -17,6 +17,7 @@ import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
 import plot.svGPFA.plotUtils
 import utils.svGPFA.initUtils
+# import utils.svGPFA.miscUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -58,7 +59,7 @@ def main(argv):
     lowerBoundHistFigFilename = \
         "figures/{:08d}_leasSimulation_lowerBoundHistChol_{:s}.png".format(pEstNumber, deviceName)
 
-    mat = loadmat(initDataFilename)
+    mat = scipy.io.loadmat(initDataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
     qMu0 = [torch.from_numpy(mat['q_mu0'][(0,k)]).type(torch.DoubleTensor).permute(2,0,1).to(device) for k in range(nLatents)]
@@ -85,7 +86,11 @@ def main(argv):
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).to(device)
+            spikesTrialNeuron = YNonStacked_tmp[r,0][n,0]
+            if len(spikesTrialNeuron)>0:
+                YNonStacked[r][n] = torch.from_numpy(spikesTrialNeuron[:,0]).type(torch.DoubleTensor).to(device)
+            else:
+                YNonStacked[r][n] = []
 
     kernelNames = mat["kernelNames"]
     hprs0 = mat["hprs0"]
@@ -114,11 +119,12 @@ def main(argv):
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     qUParams0 = {"qMu0": qMu0, "qSRSigma0": qSRSigma0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
@@ -164,6 +170,28 @@ def main(argv):
     estimConfig["optim_params"] = optimParams
     estimConfig["control_params"] = {"indPointsLocsKMSEpsilon": indPointsLocsKMSEpsilon}
     with open(estimMetaDataFilename, "w") as f: estimConfig.write(f)
+
+    trialsLengths = yMat["trLen"].astype(np.float64).flatten().tolist()
+    kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
+    estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(0)
+    # estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
+#     utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
+#         qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
+#         C0=C0, d0=b0,
+#         indPointsLocs0=Z0,
+#         legQuadPoints=legQuadPoints,
+#         legQuadWeights=legQuadWeights,
+#         kernelsTypes=kernelsTypes,
+#         kernelsParams0=kernelsParams0,
+#         spikesTimes=YNonStacked,
+#         indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon,
+#         trialsLengths=np.array(trialsLengths).reshape(-1,1),
+#         emMaxIter=optimParams["emMaxIter"],
+#         eStepMaxIter=optimParams["eStepMaxIter"],
+#         mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
+#         mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
+#         mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
+#         saveFilename=estimationDataForMatlabFilename)
 
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,

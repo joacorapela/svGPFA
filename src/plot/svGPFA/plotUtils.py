@@ -116,14 +116,14 @@ def getPlotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams):
                                                 useLegend=useLegend)
     return(fig)
 
-def getPlotResROCAnalysis(fpr, tpr, auc, title="",
+def plotResROCAnalysis(fpr, tpr, auc, figFilename=None, title="",
                        colorROC="red", colorRef="black",
                        linestyleROC="-", linestyleRef="--",
                        labelPattern="ROC curve (area={:0.2f})",
                        xlabel="False Positive Rate",
                        ylabel="True Positive Rate",
                        legendLoc="lower right"):
-    plt.figure()
+    # plt.figure()
     plt.plot(fpr, tpr, color=colorROC, linestyle=linestyleROC, label=labelPattern.format(auc))
     plt.plot([0, 1], [0, 1], color=colorRef, linestyle=linestyleRef)
     plt.xlim([0.0, 1.0])
@@ -132,8 +132,8 @@ def getPlotResROCAnalysis(fpr, tpr, auc, title="",
     plt.ylabel(ylabel)
     plt.title(title)
     plt.legend(loc=legendLoc)
-    f = plt.gcf()
-    return f
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def plotACF(acf, confint, Fs, figFilename=None, title="", xlabel="Lag (sec)", ylabel="ACF", colorACF="black", colorConfint="red", colorRef="gray", linestyleACF="-", linestyleConfint=":", linestyleRef=":"):
     acf[0] = None
@@ -177,14 +177,15 @@ def plotSimulatedAndEstimatedCIFs(times, simCIFValues, estCIFValues,
     if figFilename is not None:
         plt.savefig(fname=figFilename)
 
-def getPlotCIF(times, values, title="", xlabel="Time (sec)", ylabel="Conditional Intensity Function"):
-    plt.figure()
+def plotCIF(times, values, figFilename=None, title="", xlabel="Time (sec)",
+            ylabel="Conditional Intensity Function"):
+    # plt.figure()
     plt.plot(times, values)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
-    f = plt.gcf()
-    return f
+    if figFilename is not None:
+        plt.savefig(fname=figFilename)
 
 def plotResKSTestTimeRescalingAnalyticalCorrection(
     sUTRISIs, uCDF, cb, figFilename=None,
@@ -332,7 +333,6 @@ def plotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="I
     plt.ylabel(ylabel)
     if figFilename is not None:
         plt.savefig(fname=figFilename)
-    plt.show()
 
 def plotTrueAndEstimatedLatents(timesEstimatedValues, muK, varK, indPointsLocs, timesTrueValues, trueLatents, trueLatentsMeans, trueLatentsSTDs, trialToPlot=0, figFilename=None):
     nLatents = muK.shape[2]
@@ -365,7 +365,6 @@ def plotTrueAndEstimatedLatents(timesEstimatedValues, muK, varK, indPointsLocs, 
     # plt.xlim(left=torch.min(allTimes), right=torch.max(allTimes))
     if figFilename is not None:
         plt.savefig(fname=figFilename)
-    plt.show()
 
 def plotTruePythonAndMatlabLatents(tTimes, tLatents,
                                    pTimes, pMuK, pVarK,
@@ -407,5 +406,4 @@ def plotTruePythonAndMatlabLatents(tTimes, tLatents,
     plt.xlim(left=torch.min(tTimes)-1, right=torch.max(tTimes)+1)
     if figFilename is not None:
         plt.savefig(fname=figFilename)
-    plt.show()
 

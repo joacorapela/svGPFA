@@ -9,7 +9,7 @@ import torch
 sys.path.append("../src")
 from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
 from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS
+from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS
 from stats.svGPFA.klDivergence import KLDivergence
 
 def test_evalSumAcrossLatentsTrials():

@@ -10,17 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 sys.path.append(os.path.expanduser("../src"))
 import plot.svGPFA.plotUtilsPlotly
-
-def getCIFs(C, d, latents):
-    nTrials = latents.shape[0]
-    nLatents = latents.shape[2]
-    nSamples = latents.shape[1]
-    nNeurons = C.shape[0]
-    embeddings = torch.empty((nTrials, nSamples, nNeurons))
-    for r in range(nTrials):
-        embeddings[r,:,:] = torch.matmul(latents[r,:,:], torch.transpose(C, 0, 1))+d[:,0]
-    CIFs = torch.exp(embeddings)
-    return(CIFs)
+import utils.svGPFA.miscUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -70,7 +60,7 @@ def main(argv):
 
     tC = torch.from_numpy(loadRes['prs'][0,0][0]).type(torch.DoubleTensor)
     td = torch.from_numpy(loadRes['prs'][0,0][1]).type(torch.DoubleTensor)
-    tCIFs = getCIFs(C=tC, d=td, latents=tLatents)
+    tCIFs = utils.svGPFA.miscUtils.getCIFs(C=tC, d=td, latents=tLatents)
 
     loadRes = loadmat(mModelSaveFilename)
     mTimes = torch.from_numpy(loadRes["testTimes"][:,0]).type(torch.DoubleTensor).squeeze()
@@ -86,7 +76,7 @@ def main(argv):
             mVarLatents[t,:,l] = mVarLatents_tmp[:,l,t]
     mC = torch.from_numpy(loadRes["m"]['prs'][0,0]["C"][0,0]).type(torch.DoubleTensor)
     md = torch.from_numpy(loadRes["m"]['prs'][0,0]["b"][0,0]).type(torch.DoubleTensor)
-    mCIFs = getCIFs(C=mC, d=md, latents=mMeanLatents)
+    mCIFs = utils.svGPFA.miscUtils.getCIFs(C=mC, d=md, latents=mMeanLatents)
 
     with open(pModelSaveFilename, "rb") as f: res = pickle.load(f)
     pModel = res["model"]
@@ -96,7 +86,7 @@ def main(argv):
 
     with torch.no_grad():
         pTestMuK, _ = pModel.predictLatents(newTimes=mTimes)
-        pCIFs = getCIFs(C=pC, d=pd, latents=pTestMuK)
+        pCIFs = utils.svGPFA.miscUtils.getCIFs(C=pC, d=pd, latents=pTestMuK)
         pTimes = mTimes
 
         tCIF = tCIFs[trialToPlot,:,neuronToPlot]

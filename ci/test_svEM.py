@@ -10,7 +10,7 @@ import numpy as np
 import time
 sys.path.append("../src")
 from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
-from stats.svGPFA.kernelMatricesStore import IndPointsLocsKMS, \
+from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS, \
         IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
 from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
@@ -70,11 +70,12 @@ def test_eStep_pointProcess():
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
@@ -102,11 +103,12 @@ def test_eStep_pointProcess():
     svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
 
     svlb.setKernels(kernels=kernels)
@@ -167,12 +169,12 @@ def test_eStep_pointProcess():
 # 
 # 
 #     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-#     kernelMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
-#     qH = ApproxPosteriorForHForAllNeuronsAllTimes(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore)
+#     kernelsMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
+#     qH = ApproxPosteriorForHForAllNeuronsAllTimes(C=C, d=b, inducingPointsPrior=qU, kernelsMatricesStore=kernelsMatricesStore)
 #     eLL = PoissonExpectedLogLikelihood(approxPosteriorForHForAllNeuronsAllTimes=qH, hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction, Y=Y, binWidth=binWidth)
-#     klDiv = KLDivergence(kernelMatricesStore=kernelMatricesStore, inducingPointsPrior=qU)
+#     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
-#     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelMatricesStore=kernelMatricesStore)
+#     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
 #     res = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 # 
 #     assert(res["lowerBound"]-(-nLowerBound)>0)
@@ -247,11 +249,12 @@ def test_mStepModelParams_pointProcess():
     svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
@@ -341,11 +344,12 @@ def test_mStepKernelParams_pointProcess():
     svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
@@ -403,15 +407,15 @@ def test_mStepKernelParams_pointProcess():
 #             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 # 
 #     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
-#     kernelMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
+#     kernelsMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
 # 
-#     qH_allNeuronsAllTimes = ApproxPosteriorForHForAllNeuronsAllTimes(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore)
-#     qH_allNeuronsAssociatedTimes = ApproxPosteriorForHForAllNeuronsAssociatedTimes(C=C, d=b, inducingPointsPrior=qU, kernelMatricesStore=kernelMatricesStore, neuronForSpikeIndex=index)
+#     qH_allNeuronsAllTimes = ApproxPosteriorForHForAllNeuronsAllTimes(C=C, d=b, inducingPointsPrior=qU, kernelsMatricesStore=kernelsMatricesStore)
+#     qH_allNeuronsAssociatedTimes = ApproxPosteriorForHForAllNeuronsAssociatedTimes(C=C, d=b, inducingPointsPrior=qU, kernelsMatricesStore=kernelsMatricesStore, neuronForSpikeIndex=index)
 # 
 #     eLL = PointProcessExpectedLogLikelihood(approxPosteriorForHForAllNeuronsAllTimes=qH_allNeuronsAllTimes, approxPosteriorForHForAllNeuronsAssociatedTimes=qH_allNeuronsAssociatedTimes, hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, legQuadPoints=legQuadPoints, legQuadWeights=legQuadWeights, linkFunction=linkFunction)
-#     klDiv = KLDivergence(kernelMatricesStore=kernelMatricesStore, inducingPointsPrior=qU)
+#     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
-#     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelMatricesStore=kernelMatricesStore)
+#     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
 #     res = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
 # 
 #     assert(res["lowerBound"]>(-nLowerBound))
@@ -487,11 +491,12 @@ def test_mStepIndPoints_pointProcess():
     svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
@@ -587,11 +592,12 @@ def test_maximize_pointProcess():
     svEM = SVEM()
 
     qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
-    qHParams0 = {"C0": C0, "d0": b0}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
-    initialParams = {"svPosteriorOnIndPoints": qUParams0,
-                     "kernelsMatricesStore": kmsParams0,
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": b0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}

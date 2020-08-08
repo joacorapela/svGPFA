@@ -8,9 +8,10 @@ import argparse
 import configparser
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
-sys.path.append(os.path.expanduser("../src"))
 import plotly.graph_objs as go
 import plotly.offline
+import plotly.io as pio
+sys.path.append(os.path.expanduser("../src"))
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -33,10 +34,8 @@ def main(argv):
     ppSimulationFilename = os.path.join(os.path.dirname(__file__), "../../matlabCode/scripts/results/{:08d}-pointProcessSimulation.mat".format(mSimNumber))
 
     marker = 'x'
-    lowerBoundVsIterNoStaticFigFilename = "figures/{:08d}-lowerBoundVsIterNo.png".format(pEstNumber)
-    lowerBoundVsIterNoDynamicFigFilename = "figures/{:08d}-lowerBoundVsIterNo.html".format(pEstNumber)
-    lowerBoundVsElapsedTimeStaticFigFilename = "figures/{:08d}-lowerBoundVsRuntime.png".format(pEstNumber)
-    lowerBoundVsElapsedTimeDynamicFigFilename = "figures/{:08d}-lowerBoundVsRuntime.html".format(pEstNumber)
+    lowerBoundVsIterNoFigFilenamePattern = "figures/{:08d}-lowerBoundVsIterNo.{{:s}}".format(pEstNumber)
+    lowerBoundVsElapsedTimeFigFilenamePattern = "figures/{:08d}-lowerBoundVsRuntime.{{:s}}".format(pEstNumber)
 
     with open(pModelSaveFilename, "rb") as f: res = pickle.load(f)
     # pLowerBound = -torch.stack(res["lowerBoundHist"]).detach().numpy()
@@ -81,21 +80,25 @@ def main(argv):
         name='Matlab',
         showlegend=True,
     )
+    pio.renderers.default = "browser"
+
     fig = go.Figure()
     fig.add_trace(trace1)
     fig.add_trace(trace2)
     fig.update_xaxes(title_text="Iteration Number")
     fig.update_yaxes(title_text="Lower Bound")
-    fig.write_image(lowerBoundVsIterNoStaticFigFilename)
-    plotly.offline.plot(fig, filename=lowerBoundVsIterNoDynamicFigFilename)
+    fig.write_image(lowerBoundVsIterNoFigFilenamePattern.format("png"))
+    fig.write_html(lowerBoundVsIterNoFigFilenamePattern.format("html"))
+    fig.show()
 
     fig = go.Figure()
     fig.add_trace(trace3)
     fig.add_trace(trace4)
     fig.update_xaxes(title_text="Elapsed Time (sec)")
     fig.update_yaxes(title_text="Lower Bound")
-    fig.write_image(lowerBoundVsElapsedTimeStaticFigFilename)
-    plotly.offline.plot(fig, filename=lowerBoundVsElapsedTimeDynamicFigFilename)
+    fig.write_image(lowerBoundVsElapsedTimeFigFilenamePattern.format("png"))
+    fig.write_html(lowerBoundVsElapsedTimeFigFilenamePattern.format("html"))
+    fig.show()
 
     pdb.set_trace()
 
