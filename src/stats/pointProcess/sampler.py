@@ -58,13 +58,13 @@ class Sampler:
         :return: samples of the inhomogeneous point process with cif function cifFun.
         :rtype: list
         """
-        s = [0]
-        i = 1
+        s = []
+        i = 0
         dt = cifTimes[1]-cifTimes[0]
         while i<(len(cifTimes)-1):
             u = torch.rand(1)
             z = -torch.log(u)   # z~exponential(1.0)
-            anInt = 0
+            anInt = cifValues[i]*dt
             j = i+1
             while j<len(cifTimes) and anInt<=z:
                 anInt += cifValues[j]*dt
@@ -72,5 +72,4 @@ class Sampler:
             if anInt>z:
                 s.append(cifTimes[j-1].item())
             i = j
-        answer = s[1:]
-        return answer
+        return s
