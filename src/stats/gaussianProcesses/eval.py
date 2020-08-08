@@ -19,7 +19,7 @@ class GaussianProcess(object):
         cov = cov + regularization*torch.eye(cov.shape[0])
         mn = scipy.stats.multivariate_normal(mean=mean, cov=cov)
         samples = torch.from_numpy(mn.rvs())
-        return samples
+        return samples, mean, cov
 
     def mean(self, t):
         return self._mean(t)
