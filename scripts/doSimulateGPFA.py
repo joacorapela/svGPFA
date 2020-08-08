@@ -22,7 +22,7 @@ def main(argv):
     parser.add_argument("simInitConfigNumber", help="Simulation initialization configuration number", type=int)
     parser.add_argument("--latentTrialToPlot", help="Trial on which to plot the Latent", type=int, default=0)
     parser.add_argument("--cifTrialToPlot", help="Trial on which to plot the CIF", type=int, default=0)
-    parser.add_argument("--cifNeuronToPlot", help="Neuron on which to plot the CIF", type=int, default=0)
+    parser.add_argument("--cifNeuronToPlot", help="Neuron on which to plot the CIF", type=int, default=5)
     args = parser.parse_args()
 
     simInitConfigNumber = args.simInitConfigNumber
@@ -54,55 +54,56 @@ def main(argv):
 
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig)
     kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
-    qMu0 = utils.svGPFA.configUtils.getQMu0(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
-    indPointsLocsKMS.setEpsilon(epsilon=latentsGPRegularizationEpsilon)
-    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU,
-        indPointsLocsKMS=indPointsLocsKMS,
-        indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS
-    )
-    qKAllTimes.setKernels(kernels=kernels)
-    nIndPointsPerLatent = [qMu0[r].shape[1] for r in range(len(qMu0))]
-    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qMu0, "qSDiag0": qMu0}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
-    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
-                 "kernelsMatricesStore": kmsParams0}
-    qKAllTimes.setInitialParams(initialParams=qKParams0)
-    # latentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
-    # latentsMeansFuncs = utils.svGPFA.miscUtils.getSVGPFALatentsMeansFuncs(kernels=kernels, scales=svGPFALatentsScales)
+#     qMu0 = utils.svGPFA.configUtils.getQMu0(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
+#     qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+#     indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+#     indPointsLocsKMS.setEpsilon(epsilon=latentsGPRegularizationEpsilon)
+#     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+#     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
+#         svPosteriorOnIndPoints=qU,
+#         indPointsLocsKMS=indPointsLocsKMS,
+#         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS
+#     )
+#     qKAllTimes.setKernels(kernels=kernels)
+#     nIndPointsPerLatent = [qMu0[r].shape[1] for r in range(len(qMu0))]
+#     Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
+#     qUParams0 = {"qMu0": qMu0, "qSVec0": qMu0, "qSDiag0": qMu0}
+#     kmsParams0 = {"kernelsParams0": kernelsParams0,
+#                   "inducingPointsLocs0": Z0}
+#     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+#                  "kernelsMatricesStore": kmsParams0}
+#     qKAllTimes.setInitialParams(initialParams=qKParams0)
+#     latentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+#     latentsMeansFuncs = utils.svGPFA.miscUtils.getSVGPFALatentsMeansFuncs(kernels=kernels, scales=svGPFALatentsScales)
     cifTrialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
     cifTrialsTimesMatrix = torch.empty((nTrials, len(cifTrialsTimes[0]), 1))
     # patch to accomodate unreasonable need to have trial times of equal length
     # across trials
-    for r in range(nTrials):
-        cifTrialsTimesMatrix[r,:,0] = cifTrialsTimes[r]
+#     for r in range(nTrials):
+#         cifTrialsTimesMatrix[r,:,0] = cifTrialsTimes[r]
     # end patch
-    indPointsLocsAndAllTimesKMS.setTimes(times=cifTrialsTimesMatrix)
-    qKAllTimes.buildKernelsMatrices()
+#     indPointsLocsAndAllTimesKMS.setTimes(times=cifTrialsTimesMatrix)
+#     qKAllTimes.buildKernelsMatrices()
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=simInitConfig["embedding_params"]["C_filename"], dFilename=simInitConfig["embedding_params"]["d_filename"])
     print("Computing latents samples")
-    sampledLatentsMeans = qKAllTimes.computeMeans(times=cifTrialsTimesMatrix)
+    latentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+#     sampledLatentsMeans = qKAllTimes.computeMeans(times=cifTrialsTimesMatrix)
 #     latentsSamples, latentsMeans, latentsVariances = qKAllTimes.sample(times=cifTrialsTimesMatrix, regFactor=latentsGPRegularizationEpsilon)
 #     latentsSTDs = [latentsVariances[k].sqrt() for k in range(nLatents)]
-#     latentsSamples = utils.svGPFA.miscUtils.getLatentsSamples(
-#         nTrials=nTrials,
-#         meansFuncs=latentsMeansFuncs,
-#         kernels=kernels,
-#         trialsTimes=cifTrialsTimes,
-#         latentsGPRegularizationEpsilon=latentsGPRegularizationEpsilon,
-#         dtype=C.dtype)
-    latentsSamples, latentsMeans, latentsSTDs = utils.svGPFA.miscUtils.getLatentsSamplesMeansAndSTDsFromSampledMeans(
+    latentsSamples, latentsMeans, latentsSTDs = utils.svGPFA.miscUtils.getLatentsSamplesMeansAndSTDs(
         nTrials=nTrials,
-        sampledMeans=sampledLatentsMeans,
+        meansFuncs=latentsMeansFuncs,
         kernels=kernels,
         trialsTimes=cifTrialsTimes,
         latentsGPRegularizationEpsilon=latentsGPRegularizationEpsilon,
         dtype=C.dtype)
+#     latentsSamples, latentsMeans, latentsSTDs = utils.svGPFA.miscUtils.getLatentsSamplesMeansAndSTDsFromSampledMeans(
+#         nTrials=nTrials,
+#         sampledMeans=sampledLatentsMeans,
+#         kernels=kernels,
+#         trialsTimes=cifTrialsTimes,
+#         latentsGPRegularizationEpsilon=latentsGPRegularizationEpsilon,
+#         dtype=C.dtype)
     simulator = simulations.svGPFA.simulations.GPFASimulator()
     cifValues = simulator.getCIF(nTrials=nTrials, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
 
@@ -124,7 +125,6 @@ def main(argv):
     plt.title("Trial: {:d}, Neuron: {:d}".format(cifTrialToPlot, cifNeuronToPlot))
 
     plt.show()
-    pdb.set_trace()
 
     print("Getting spikes times")
     spikesTimes = simulator.simulate(cifTrialsTimes=cifTrialsTimes, cifValues=cifValues)
