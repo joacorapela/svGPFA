@@ -28,7 +28,6 @@ class SVEM:
         model.setQuadParams(quadParams=quadParams)
         model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
         model.buildKernelsMatrices()
-        model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
 
         iter = 0
         lowerBound0 = model.eval()
@@ -72,6 +71,7 @@ class SVEM:
                     lineSearchFn = None
                 else:
                     lineSearchFn = optimParams["eStepLineSearchFn"]
+                # pdb.set_trace()
                 maxRes = self._eStep(
                     model=model,
                     maxIter=optimParams["eStepMaxIter"],
@@ -94,9 +94,9 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
-            # begin debug
-            # pdb.set_trace()
-            # end debug
+                # begin debug
+                # pdb.set_trace()
+                # end debug
             if optimParams["mStepEmbeddingEstimate"]:
                 message = "Iteration %02d, M-Step Model Params start\n"%(iter+1)
                 if verbose:
