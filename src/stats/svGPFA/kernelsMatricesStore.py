@@ -4,7 +4,7 @@ import torch
 from abc import ABC, abstractmethod
 import utils.svGPFA.miscUtils
 
-class KernelMatricesStore(ABC):
+class KernelsMatricesStore(ABC):
 
     @abstractmethod
     def buildKernelsMatrices(self):
@@ -33,7 +33,7 @@ class KernelMatricesStore(ABC):
             answer.append(self._kernels[i].getParams())
         return answer
 
-class IndPointsLocsKMS(KernelMatricesStore):
+class IndPointsLocsKMS(KernelsMatricesStore):
 
     def setEpsilon(self, epsilon):
         self._epsilon = epsilon
@@ -60,7 +60,7 @@ class IndPointsLocsKMS(KernelMatricesStore):
     def getEpsilon(self):
         return self._epsilon
 
-class IndPointsLocsAndTimesKMS(KernelMatricesStore):
+class IndPointsLocsAndTimesKMS(KernelsMatricesStore):
 
     def setTimes(self, times):
         self._t = times
