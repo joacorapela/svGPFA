@@ -41,23 +41,23 @@ def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPointLoc):
     nLatents = len(nIndPointsPerLatent)
     nTrials = len(trialsLengths)
 
-    Z0 = [None]*nLatents
-    for i in range(nLatents):
-        Z0[i] = torch.empty((nTrials, nIndPointsPerLatent[i], 1), dtype=torch.double)
-    for i in range(nLatents):
-        for j in range(nTrials):
-            Z0[i][j,:,0] = torch.linspace(firstIndPointLoc, trialsLengths[j], nIndPointsPerLatent[i])
+    Z0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        Z0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
+    for k in range(nLatents):
+        for r in range(nTrials):
+            Z0[k][r,:,0] = torch.linspace(firstIndPointLoc, trialsLengths[r], nIndPointsPerLatent[k])
     return Z0
 
 def getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent, nLatents, nTrials, scale):
-    qMu0 = [None]*nLatents
-    qSVec0 = [None]*nLatents
-    qSDiag0 = [None]*nLatents
-    for i in range(nLatents):
-        # qMu0[i] = torch.rand(nTrials, nIndPointsPerLatent[i], 1, dtype=torch.double)
-        qMu0[i] = torch.zeros(nTrials, nIndPointsPerLatent[i], 1, dtype=torch.double)
-        qSVec0[i] = scale*torch.eye(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
-        qSDiag0[i] = scale*torch.ones(nIndPointsPerLatent[i], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+    qMu0 = [[] for k in range(nLatents)]
+    qSVec0 = [[] for k in range(nLatents)]
+    qSDiag0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        # qMu0[k] = torch.rand(nTrials, nIndPointsPerLatent[k], 1, dtype=torch.double)
+        qMu0[k] = torch.zeros(nTrials, nIndPointsPerLatent[k], 1, dtype=torch.double)
+        qSVec0[k] = scale*torch.eye(nIndPointsPerLatent[k], 1, dtype=torch.double).repeat(nTrials, 1, 1)
+        qSDiag0[k] = scale*torch.ones(nIndPointsPerLatent[k], 1, dtype=torch.double).repeat(nTrials, 1, 1)
     return qMu0, qSVec0, qSDiag0
 
 def getKernelsParams0(kernels, noiseSTD):
