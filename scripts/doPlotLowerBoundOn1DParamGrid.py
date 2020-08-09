@@ -18,7 +18,7 @@ import utils.svGPFA.configUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument("estResNumber", help="estimation result number", type=int)
+    parser.add_argument("simResNumber", help="simulation result number", type=int)
     parser.add_argument("--paramValueStart", help="Start parameter value", type=float, default=0.1)
     parser.add_argument("--paramValueEnd", help="End parameters value", type=float, default=20.0)
     parser.add_argument("--paramValueStep", help="Step for parameter values", type=float, default=0.1)
@@ -28,11 +28,56 @@ def main(argv):
     paramValueEnd = args.paramValueEnd
     paramValueStep = args.paramValueStep
 
-    modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
+    # load data and initial values
+    simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
+    simResConfig = configparser.ConfigParser()
+    simResConfig.read(simResConfigFilename)
+    simInitConfigFilename = simResConfig["simulation_params"]["simInitConfigFilename"]
+    simResFilename = simResConfig["simulation_results"]["simResFilename"]
 
-    with open(modelSaveFilename, "rb") as f: estResults = pickle.load(f)
-    model = estResults["model"]
+    simInitConfig = configparser.ConfigParser()
+    simInitConfig.read(simInitConfigFilename)
+    nIndPointsPerLatent = [float(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
+    nLatents = len(nIndPointsPerLatent)
+    nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
+    trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
+    nTrials = len(trialsLengths)
 
+    with open(simResFilename, "rb") as f: simRes = pickle.load(f)
+    spikesTimes = simRes["spikes"]
+    Kzz = simRes["Kzz"]
+    indPointsMeans = simRes["indPointsMeans"]
+
+    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
+
+    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig)
+    kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
+
+    qMu0, qSVec0, qSDiag0 = utils.svGPFA.initUtils.getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent=nIndPointsPerLatent, nLatents=nLatents, nTrials=nTrials, scale=initCondIndPointsScale)
+
+    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
+    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    kmsParams0 = {"kernelsParams0": kernelsParams0,
+                  "inducingPointsLocs0": Z0}
+    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
+                 "kernelsMatricesStore": kmsParams0}
+    qHParams0 = {"C0": C0, "d0": d0}
+    initialParams = {"svPosteriorOnLatents": qKParams0,
+                     "svEmbedding": qHParams0}
+    quadParams = {"legQuadPoints": legQuadPoints,
+                  "legQuadWeights": legQuadWeights}
+
+    # create model
+    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
+        conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
+        linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
+        embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
+        kernels=kernels)
+    model.setMeasurements(measurements=spikes)
+    model.setInitialParams(initialParams=initialParams)
+    model.setQuadParams(quadParams=quadParams)
+    model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    model.buildKernelsMatrices()
 
 #     periodValues = np.arange(periodStart, periodEnd, periodBy)
 #     lowerBoundValues = np.empty(periodValues.shape)
