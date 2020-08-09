@@ -180,22 +180,3 @@ def getLatentsSamplesMeansAndSTDsFromSampledMeans(nTrials, sampledMeans, kernels
             plt.show()
     return latentsSamples, latentsMeans, latentsSTDs
 
-def getLatentsSamplesMeansAndSTDs(nTrials, meansFuncs, kernels, trialsTimes, latentsGPRegularizationEpsilon, dtype):
-    nLatents = len(kernels)
-    latentsSamples = [[] for r in range(nTrials)]
-    latentsMeans = [[] for r in range(nTrials)]
-    latentsSTDs = [[] for r in range(nTrials)]
-
-    for r in range(nTrials):
-        latentsSamples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
-        latentsMeans[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
-        latentsSTDs[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
-        for k in range(nLatents):
-            print("Processing trial {:d} and latent {:d}".format(r, k))
-            gp = stats.gaussianProcesses.eval.GaussianProcess(mean=meansFuncs[k], kernel=kernels[k])
-            sample, mean, cov  = gp.eval(t=trialsTimes[r], regularization=latentsGPRegularizationEpsilon)
-            latentsSamples[r][k,:] = sample
-            latentsMeans[r][k,:] = mean
-            latentsSTDs[r][k,:] = torch.diag(cov).sqrt()
-    return latentsSamples, latentsMeans, latentsSTDs
-

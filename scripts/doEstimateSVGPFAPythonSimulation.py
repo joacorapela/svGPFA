@@ -30,7 +30,6 @@ def main(argv):
     estInitNumber = args.estInitNumber
     nLatents = args.nLatents
 
-    estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(simResNumber)
     # load data and initial values
     simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simResConfig = configparser.ConfigParser()

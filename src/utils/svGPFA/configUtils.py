@@ -37,6 +37,17 @@ def getQMu0(nLatents, nTrials, config):
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
 
+def getIndPointsMeans(nIndPointsPerLatent, nTrials, config):
+    nLatents = len(nIndPointsPerLatent)
+    indPointsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        indPointsMeans[r] = [[] for k in range(nLatents)]
+        for k in range(nLatents):
+            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")])
+            if len(indPointsMeans[r][k])!=nIndPointsPerLatent[k]:
+                   raise RuntimeError("Incorrect indPointsMeanLatent{:d}Trial{:d}".format(k,r))
+    return indPointsMeans
+
 def getLatentsMeansFuncs(nLatents, nTrials, config):
     def getLatentMeanFunc(ampl, tau, freq, phase):
         mean = lambda t: ampl*torch.exp(-t/tau)*torch.sin(2*math.pi*freq*t + phase)
