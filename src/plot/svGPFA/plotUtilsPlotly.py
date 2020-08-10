@@ -36,6 +36,34 @@ def getPlotSpikeRatesForAllTrialsAndAllNeurons(spikesRates, xlabel="Neuron", yla
     )
     return fig
 
+def getSimulatedSpikesTimesPlot(spikesTimes, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
+    nTrials = len(spikesTimes)
+    sqrtNTrials = math.sqrt(nTrials)
+    subplotsTitles = ["trial={:d}".format(r+1) for r in range(nTrials)]
+    fig = plotly.subplots.make_subplots(rows=nTrials, cols=1, shared_xaxes=True, shared_yaxes=True, subplot_titles=subplotsTitles)
+    for r in range(nTrials):
+        for n in range(len(spikesTimes[r])):
+            trace = go.Scatter(
+                x=spikesTimes[r][n].numpy(),
+                y=n*np.ones(len(spikesTimes[r][n])),
+                mode="markers",
+                marker=dict(size=3, color="black"),
+                showlegend=False,
+                hoverinfo="skip",
+            )
+            fig.add_trace(trace, row=r+1, col=1)
+        if r==nTrials-1:
+            fig.update_xaxes(title_text=xlabel, row=r+1, col=1)
+        if r==math.floor(nTrials/2):
+            fig.update_yaxes(title_text=ylabel, row=r+1, col=1)
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgba(0, 0, 0, 0)",
+            "paper_bgcolor": "rgba(0, 0, 0, 0)",
+        }
+    )
+    return fig
+
 # embedding
 def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD, 
                                            estimatedC, estimatedD,
@@ -45,7 +73,7 @@ def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
                                            xlabel="Neuron Index",
                                            ylabel="Coefficient Value"):
     figDic = {
- `       "data": [],
+        "data": [],
         "layout": {
             "xaxis": {"title": xlabel},
             "yaxis": {"title": ylabel},
@@ -393,7 +421,7 @@ def getSimulatedLatentsPlot(trialsTimes, latentsSamples, latentsMeans,
                             samplesLineColor="rgb(64,64,64)"):
     nTrials = len(latentsSamples)
     nLatents = latentsSamples[0].shape[0]
-    subplotsTitles = ["trial={:d}, latent={:d}".format(r+1, k+1) for r in range(nTrials) for k in range(nLatents)]
+    subplotsTitles = ["trial={:d}, latent={:d}".format(r, k) for r in range(nTrials) for k in range(nLatents)]
     fig = plotly.subplots.make_subplots(rows=nTrials, cols=nLatents, subplot_titles=subplotsTitles)
     for r in range(nTrials):
         t = trialsTimes[r].numpy()
