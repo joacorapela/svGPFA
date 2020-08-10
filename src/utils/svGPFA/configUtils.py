@@ -5,20 +5,26 @@ import pandas as pd
 import torch
 import stats.kernels
 
-def getKernels(nLatents, config):
+def getKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     for k in range(nLatents):
         kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
         if kernelType=="periodic":
-            # scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
+            else:
+                scale = 1.0
             lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}".format(k)])
             period = float(config["kernel_params"]["kPeriodLatent{:d}".format(k)])
-            kernel = stats.kernels.PeriodicKernel(scale=1.0)
+            kernel = stats.kernels.PeriodicKernel(scale=scale)
             kernel.setParams(params=torch.Tensor([lengthScale, period]))
         elif kernelType=="exponentialQuadratic":
-            # scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
+            else:
+                scale = 1.0
             lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}".format(k)])
-            kernel = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
+            kernel = stats.kernels.ExponentialQuadraticKernel(scale=scale)
             kernel.setParams(params=torch.Tensor([lengthScale]))
         else:
             raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
@@ -43,7 +49,7 @@ def getIndPointsMeans(nIndPointsPerLatent, nTrials, config):
     for r in range(nTrials):
         indPointsMeans[r] = [[] for k in range(nLatents)]
         for k in range(nLatents):
-            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")])
+            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
             if len(indPointsMeans[r][k])!=nIndPointsPerLatent[k]:
                    raise RuntimeError("Incorrect indPointsMeanLatent{:d}Trial{:d}".format(k,r))
     return indPointsMeans
