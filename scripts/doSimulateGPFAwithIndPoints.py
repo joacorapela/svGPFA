@@ -41,7 +41,7 @@ def main(argv):
     nTrials = len(trialsLengths)
     T = torch.tensor(trialsLengths).max().item()
     dtCIF = float(simInitConfig["control_variables"]["dtCIF"])
-    latentsGPRegularizationEpsilon = float(simInitConfig["control_variables"]["latentsGPRegularizationEpsilon"])
+    indPointsLocsKMSEpsilon = float(simInitConfig["control_variables"]["indPointsLocsKMSEpsilon"])
     firstIndPointLoc = float(simInitConfig["control_variables"]["firstIndPointLoc"])
 
     randomPrefixUsed = True
@@ -53,7 +53,7 @@ def main(argv):
            randomPrefixUsed = False
     simResFilename = "results/{:08d}_simRes.pickle".format(simNumber)
 
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig)
+    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=False)
     indPointsLocs = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
     cifTrialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
     cifTrialsTimesMatrix = torch.empty((nTrials, len(cifTrialsTimes[0]), 1))
@@ -63,25 +63,25 @@ def main(argv):
         cifTrialsTimesMatrix[r,:,0] = cifTrialsTimes[r]
     # end patch
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=simInitConfig["embedding_params"]["C_filename"], dFilename=simInitConfig["embedding_params"]["d_filename"])
-    indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nLatents=nLatents, nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent, config=simInitConfig)
+    indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent, config=simInitConfig)
     simulator = simulations.svGPFA.simulations.GPFAwithIndPointsSimulator()
     print("Computing latents samples")
-    latentsSamples, latentsMeans, latentsSTDs, Kzz = simulator.getLatentsSamplesMeansAndSTDs(
+    latentsMeans, KzzChol = simulator.getLatentsMeans(
         indPointsMeans=indPointsMeans,
         kernels=kernels,
         indPointsLocs=indPointsLocs,
         trialsTimes=cifTrialsTimesMatrix,
-        regularizationEpsilon=latentsGPRegularizationEpsilon,
+        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon,
         dtype=C.dtype)
-    cifValues = simulator.getCIF(nTrials=nTrials, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
+    cifValues = simulator.getCIF(nTrials=nTrials, latentsMeans=latentsMeans, C=C, d=d, linkFunction=torch.exp)
 
     plt.figure()
 
     for k in range(nLatents):
         plt.subplot(nLatents,1,k+1)
-        plt.plot(cifTrialsTimes[latentTrialToPlot], latentsSamples[latentTrialToPlot][k])
+        plt.plot(cifTrialsTimes[latentTrialToPlot], latentsMeans[latentTrialToPlot][k])
         plt.xlabel("Time (sec)")
-        plt.ylabel("Latent")
+        plt.ylabel("Latent Mean")
         if k==0:
             plt.title("Trial: {:d}".format(latentTrialToPlot))
 
@@ -99,7 +99,7 @@ def main(argv):
     spikesTimes = simulator.simulate(cifTrialsTimes=cifTrialsTimes, cifValues=cifValues)
 
     spikesRates = utils.svGPFA.miscUtils.computeSpikeRates(trialsTimes=cifTrialsTimes, spikesTimes=spikesTimes)
-    simRes = {"times": cifTrialsTimes, "latents": latentsSamples, "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs, "indPointsMeans": indPointsMeans, "Kzz": Kzz, "C": C, "d": d, "cifValues": cifValues, "spikes": spikesTimes}
+    simRes = {"times": cifTrialsTimes, "latentsMeans": latentsMeans, "indPointsMeans": indPointsMeans, "KzzChol": KzzChol, "C": C, "d": d, "cifValues": cifValues, "spikes": spikesTimes}
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
 
     simResConfig = configparser.ConfigParser()
