@@ -7,12 +7,12 @@ import stats.svGPFA.kernelsMatricesStore
 
 class BaseSimulator:
 
-    def getCIF(self, nTrials, latentsMeans, C, d, linkFunction):
+    def getCIF(self, nTrials, latentsSamples, C, d, linkFunction):
         nNeurons = C.shape[0]
         nLatents = C.shape[1]
         cifValues = [[] for n in range(nTrials)]
         for r in range(nTrials):
-            embeddings = torch.matmul(C, latentsMeans[r]) + d
+            embeddings = torch.matmul(C, latentsSamples[r]) + d
             cifValues[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 cifValues[r][n] = linkFunction(embeddings[n,:])
@@ -75,53 +75,17 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
                 indPoints[r][k] = torch.from_numpy(mn.rvs()).unsqueeze(1)
         return indPoints
 
-#     def getLatentsSamplesMeansAndSTDs(self, indPointsMeans, kernels, indPointsLocs, trialsTimes, regularizationEpsilon, dtype):
-#         nLatents = len(kernels)
-#         nTrials = len(indPointsLocs)
-# 
-#         indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
-#         indPointsLocsKMS.setKernels(kernels=kernels)
-#         indPointsLocsKMS.setIndPointsLocs(indPointsLocs=indPointsLocs)
-#         indPointsLocsKMS.setEpsilon(epsilon=regularizationEpsilon)
-#         indPointsLocsKMS.buildKernelsMatrices()
-#         Kzz = indPointsLocsKMS.getKzz()
-#         KzzChol = indPointsLocsKMS.getKzzChol()
-# 
-#         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-#         indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
-#         indPointsLocsAndAllTimesKMS.setIndPointsLocs(indPointsLocs=indPointsLocs)
-#         indPointsLocsAndAllTimesKMS.setTimes(times=trialsTimes)
-#         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
-#         Ktz = indPointsLocsAndAllTimesKMS.getKtz()
-# 
-#         latentsSamples = [[] for r in range(nTrials)]
-#         latentsMeans = [[] for r in range(nTrials)]
-#         latentsSTDs = [[] for r in range(nTrials)]
-#         for r in range(nTrials):
-#             latentsSamples[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
-#             latentsMeans[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
-#             latentsSTDs[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
-#             for k in range(nLatents):
-#                 Ak = torch.cholesky_solve(indPointsMeans[r][k].unsqueeze(1), KzzChol[k][r,:,:])
-#                 mean = torch.matmul(Ktz[k][r,:,:], Ak).squeeze()
-#                 cov = kernels[k].buildKernelMatrix(trialsTimes[r,:,0])
-#                 cov += torch.eye(cov.shape[0])*regularizationEpsilon
-#                 std = torch.diag(cov).sqrt()
-#                 mn = scipy.stats.multivariate_normal(mean=mean, cov=cov)
-#                 sample = torch.from_numpy(mn.rvs())
-#                 latentsSamples[r][k,:] = sample
-#                 latentsMeans[r][k,:] = mean
-#                 latentsSTDs[r][k,:] = std
-#         return latentsSamples, latentsMeans, latentsSTDs, KzzChol
-
-    def getLatentsMeans(self, indPointsMeans, kernels, indPointsLocs, trialsTimes, indPointsLocsKMSEpsilon, dtype):
+    def getLatentsSamplesMeansAndSTDs(self, indPointsMeans, kernels,
+                                      indPointsLocs, trialsTimes,
+                                      indPointsLocsKMSRegEpsilon,
+                                      latentsCovRegEpsilon, dtype):
         nLatents = len(kernels)
-        nTrials = len(indPointsLocs)
+        nTrials = indPointsLocs[0].shape[0]
 
         indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
         indPointsLocsKMS.setKernels(kernels=kernels)
         indPointsLocsKMS.setIndPointsLocs(indPointsLocs=indPointsLocs)
-        indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSEpsilon)
+        indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSRegEpsilon)
         indPointsLocsKMS.buildKernelsMatrices()
         Kzz = indPointsLocsKMS.getKzz()
         KzzChol = indPointsLocsKMS.getKzzChol()
@@ -133,11 +97,22 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
         Ktz = indPointsLocsAndAllTimesKMS.getKtz()
 
+        latentsSamples = [[] for r in range(nTrials)]
         latentsMeans = [[] for r in range(nTrials)]
+        latentsSTDs = [[] for r in range(nTrials)]
         for r in range(nTrials):
+            latentsSamples[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
             latentsMeans[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
+            latentsSTDs[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
             for k in range(nLatents):
-                Ak = torch.cholesky_solve(indPointsMeans[r][k].unsqueeze(1), KzzChol[k][r,:,:])
-                latentsMeans[r][k,:] = torch.matmul(Ktz[k][r,:,:], Ak).squeeze()
-        return latentsMeans, KzzChol
+                mean = torch.matmul(Ktz[k][r,:,:], torch.cholesky_solve(indPointsMeans[r][k], KzzChol[k][r,:,:])).squeeze()
+                cov = kernels[k].buildKernelMatrix(trialsTimes[r,:,0])
+                cov += torch.eye(cov.shape[0])*latentsCovRegEpsilon
+                std = torch.diag(cov).sqrt()
+                mn = scipy.stats.multivariate_normal(mean=mean, cov=cov)
+                sample = torch.from_numpy(mn.rvs())
+                latentsSamples[r][k,:] = sample
+                latentsMeans[r][k,:] = mean
+                latentsSTDs[r][k,:] = std
+        return latentsSamples, latentsMeans, latentsSTDs, KzzChol
 
