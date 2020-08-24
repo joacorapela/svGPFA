@@ -21,14 +21,12 @@ import utils.svGPFA.initUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument("simResNumber", help="Simuluation result number", type=int)
+    parser.add_argument("simResNumber", help="simuluation result number", type=int)
     parser.add_argument("estInitNumber", help="estimation init number", type=int)
-    parser.add_argument("--nLatents", help="number of latents to use in the estimation", type=int, default=-1)
     args = parser.parse_args()
 
     simResNumber = args.simResNumber
     estInitNumber = args.estInitNumber
-    nLatents = args.nLatents
 
     # load data and initial values
     simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
@@ -40,36 +38,24 @@ def main(argv):
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
     nIndPointsPerLatent = [int(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nLatents = len(nIndPointsPerLatent)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
-    KzzChol = simRes["KzzChol"]
-    indPointsMeans = simRes["indPointsMeans"]
-
-    # patch to acommodate Lea's equal number of inducing points across trials
-    qMu0 = [[] for k in range(nLatents)]
-    for k in range(nLatents):
-        qMu0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
-        for r in range(nTrials):
-            qMu0[k][r,:,0] = indPointsMeans[r][k]
-    # end patch
+    # KzzChol = simRes["KzzChol"]
+    indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
 
     estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in estInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nIndPointsPerLatent = nIndPointsPerLatent[:nLatents]
     nTestPoints = int(estInitConfig["control_variables"]["nTestPoints"])
-    firstIndPointLoc = float(estInitConfig["control_variables"]["firstIndPointLoc"])
     randomEmbedding = estInitConfig["control_variables"]["randomEmbedding"].lower()=="true"
     if not randomEmbedding:
         initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
-    initCondIndPointsScale = float(estInitConfig["control_variables"]["initCondIndPointsScale"])
-    indPointsLocsKMSEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
+    indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
@@ -97,7 +83,7 @@ def main(argv):
     optimParams["mStepKernelsLineSearchFn"] = optimParamsConfig["mStepKernelsLineSearchFn".lower()]
     optimParams["mStepKernelsNIterDisplay"] = int(optimParamsConfig["mStepKernelsNIterDisplay".lower()])
     #
-    optimParams["mStepIndPointsEstimate"] = optimParamsConfig["mStepIndPointsEstimate".lower()]="True"
+    optimParams["mStepIndPointsEstimate"] = optimParamsConfig["mStepIndPointsEstimate".lower()]=="True"
     optimParams["mStepIndPointsMaxIter"] = int(optimParamsConfig["mStepIndPointsMaxIter".lower()])
     optimParams["mStepIndPointsTol"] = float(optimParamsConfig["mStepIndPointsTol".lower()])
     optimParams["mStepIndPointsLR"] = float(optimParamsConfig["mStepIndPointsLR".lower()])
@@ -112,18 +98,28 @@ def main(argv):
     else:
         CFilename = simInitConfig["embedding_params"]["C_filename"]
         dFilename = simInitConfig["embedding_params"]["d_filename"]
-        C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=CFilename, dFilename=dFilename)
+        C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=CFilename, dFilename=dFilename)
         C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
-        C0 = C0[:,:nLatents]
         d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
 
     legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
     kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
+    Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
+    nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
+    KzzChol0 = utils.svGPFA.initUtils.getKzzChol0(kernels=kernels, kernelsParams0=kernelsParams0, indPointsLocs0=Z0, epsilon=indPointsLocsKMSRegEpsilon)
+    qSRSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol0)
 
-    Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0": KzzChol}
+    # patch to acommodate Lea's equal number of inducing points across trials
+    qMu0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        qMu0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
+        for r in range(nTrials):
+            qMu0[k][r,:,:] = indPointsMeans[r][k]
+    # end patch
+
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": qSRSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -144,23 +140,24 @@ def main(argv):
 
     kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
     estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
-#     utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
-#         qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
-#         C0=C0, d0=d0,
-#         indPointsLocs0=Z0,
-#         legQuadPoints=legQuadPoints,
-#         legQuadWeights=legQuadWeights,
-#         kernelsTypes=kernelsTypes,
-#         kernelsParams0=kernelsParams0,
-#         spikesTimes=spikesTimes,
-#         indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon,
-#         trialsLengths=np.array(trialsLengths).reshape(-1,1),
-#         emMaxIter=optimParams["emMaxIter"],
-#         eStepMaxIter=optimParams["eStepMaxIter"],
-#         mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
-#         mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
-#         mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
-#         saveFilename=estimationDataForMatlabFilename)
+    qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(qSRSigmaVecs=qSRSigma0Vecs)
+    utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
+        qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
+        C0=C0, d0=d0,
+        indPointsLocs0=Z0,
+        legQuadPoints=legQuadPoints,
+        legQuadWeights=legQuadWeights,
+        kernelsTypes=kernelsTypes,
+        kernelsParams0=kernelsParams0,
+        spikesTimes=spikesTimes,
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+        trialsLengths=np.array(trialsLengths).reshape(-1,1),
+        emMaxIter=optimParams["emMaxIter"],
+        eStepMaxIter=optimParams["eStepMaxIter"],
+        mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
+        mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
+        mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
+        saveFilename=estimationDataForMatlabFilename)
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
@@ -174,7 +171,7 @@ def main(argv):
     lowerBoundHist, elapsedTimeHist  = svEM.maximize(
         model=model, measurements=spikesTimes, initialParams=initialParams,
         quadParams=quadParams, optimParams=optimParams,
-        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
