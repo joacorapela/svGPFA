@@ -7,14 +7,12 @@ from scipy.io import loadmat
 import numpy as np
 import torch
 sys.path.append("../src")
-from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
-from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS, \
-        IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
-from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-        SVPosteriorOnLatentsAssocTimes
-from stats.svGPFA.svEmbedding import LinearSVEmbeddingAllTimes, \
-        LinearSVEmbeddingAssocTimes
+import utils.svGPFA.initUtils
+import stats.kernels
+import stats.svGPFA.kernelsMatricesStore
+import stats.svGPFA.svPosteriorOnIndPoints
+import stats.svGPFA.svPosteriorOnLatents
+import stats.svGPFA.svEmbedding
 
 def test_computeMeansAndVars_allTimes():
     tol = 5e-6
@@ -26,6 +24,7 @@ def test_computeMeansAndVars_allTimes():
     qMu0 = [torch.from_numpy(mat["q_mu"][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat["q_sqrt"][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat["q_diag"][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     t = torch.from_numpy(mat["ttQuad"]).type(torch.DoubleTensor).permute(2, 0, 1)
     Z0 = [torch.from_numpy(mat["Z"][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     Y = [torch.from_numpy(mat["Y"][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
@@ -40,28 +39,28 @@ def test_computeMeansAndVars_allTimes():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
                                               float(hprs[k,0][1])], 
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-    qK = SVPosteriorOnLatentsAllTimes(svPosteriorOnIndPoints=qU, 
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    qK = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(svPosteriorOnIndPoints=qU, 
                                       indPointsLocsKMS=indPointsLocsKMS, 
                                       indPointsLocsAndTimesKMS=
                                        indPointsLocsAndAllTimesKMS)
-    qH = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qK)
+    qH = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qK)
     qH.setKernels(kernels=kernels)
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -71,7 +70,7 @@ def test_computeMeansAndVars_allTimes():
                      "svEmbedding": qHParams0}
     qH.setInitialParams(initialParams=initialParams)
     qH.setTimes(times=t)
-    qH.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    qH.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     qH.buildKernelsMatrices()
     qHMu, qHVar = qH.computeMeansAndVars()
 
@@ -90,6 +89,7 @@ def test_computeMeansAndVars_assocTimes():
     qMu0 = [torch.from_numpy(mat["q_mu"][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat["q_sqrt"][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat["q_diag"][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
+    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     t = torch.from_numpy(mat["ttQuad"]).type(torch.DoubleTensor).permute(2, 0, 1)
     Z0 = [torch.from_numpy(mat["Z"][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     Y = [torch.from_numpy(mat["Y"][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
@@ -105,28 +105,28 @@ def test_computeMeansAndVars_assocTimes():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
                                               float(hprs[k,0][1])], 
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qK = SVPosteriorOnLatentsAssocTimes(svPosteriorOnIndPoints=qU, 
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qK = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(svPosteriorOnIndPoints=qU, 
                                         indPointsLocsKMS=indPointsLocsKMS, 
                                         indPointsLocsAndTimesKMS=
                                          indPointsLocsAndAssocTimesKMS)
-    qH = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=qK)
+    qH = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=qK)
     qH.setKernels(kernels=kernels)
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -145,7 +145,7 @@ def test_computeMeansAndVars_assocTimes():
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)
-    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
     # end patches because we are not using SVPosteriorOnLatentsAssocTimes in 
     # conjunction with SVPosteriorOnLatentsAllTimes
