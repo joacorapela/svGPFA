@@ -36,8 +36,9 @@ def main(argv):
 
     pSimInitConfig = configparser.ConfigParser()
     pSimInitConfig.read(pSimInitConfigFilename)
-    nLatents = int(pSimInitConfig["control_variables"]["nLatents"])
-    tKernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=pSimInitConfig)
+    nIndPointsPerLatent = [int(str) for str in pSimInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
+    nLatents = len(nIndPointsPerLatent)
+    tKernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=pSimInitConfig, forceUnitScale=True)
     kernelsTypes = [type(tKernels[k]).__name__ for k in range(nLatents)]
     tKernelsParams = utils.svGPFA.initUtils.getKernelsParams0(kernels=tKernels, noiseSTD=0.0)
 
@@ -54,7 +55,7 @@ def main(argv):
     for k in range(nLatents):
         mKernelsParams[k] = loadRes["m"][0,0]["kerns"][k,0]["hprs"][0,0].squeeze()
 
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTruePythonAndMatlabKernelsParamsPlotly(
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTruePythonAndMatlabKernelsParams(
         kernelsTypes=kernelsTypes,
         trueKernelsParams=tKernelsParams,
         pythonKernelsParams=pKernelsParams,
