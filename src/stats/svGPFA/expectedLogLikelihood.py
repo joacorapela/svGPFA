@@ -61,8 +61,8 @@ class ExpectedLogLikelihood(ABC):
     def predictLatents(self, newTimes):
         return self._svEmbeddingAllTimes.predictLatents(newTimes=newTimes)
 
-    def setIndPointsLocsKMSEpsilon(self, indPointsLocsKMSEpsilon):
-        self._svEmbeddingAllTimes.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
+        self._svEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
 class PointProcessELL(ExpectedLogLikelihood):
     def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction):
