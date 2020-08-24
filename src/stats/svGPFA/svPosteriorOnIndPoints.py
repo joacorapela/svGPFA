@@ -1,6 +1,8 @@
 
 import pdb
+import math
 import torch
+import utils.svGPFA.miscUtils
 
 class SVPosteriorOnIndPoints:
 
@@ -10,25 +12,25 @@ class SVPosteriorOnIndPoints:
     def setInitialParams(self, initialParams):
         nLatents = len(initialParams["qMu0"])
         self._qMu = [initialParams["qMu0"][k] for k in range(nLatents)]
-        self._qSRSigma = [initialParams["qSRSigma0"][k] for k in range(nLatents)]
+        self._srQSigmaVecs = [initialParams["srQSigma0Vecs"][k] for k in range(nLatents)]
 
     def getParams(self):
         listOfTensors = []
         listOfTensors.extend([self._qMu[k] for k in range(len(self._qMu))])
-        listOfTensors.extend([self._qSRSigma[k] for k in range(len(self._qSRSigma))])
+        listOfTensors.extend([self._srQSigmaVecs[k] for k in range(len(self._srQSigmaVecs))])
         return listOfTensors
 
     def getQMu(self):
         return self._qMu
 
     def buildQSigma(self):
-        K = len(self._qSRSigma)
-        R = self._qSRSigma[0].shape[0]
-        qSigma = [[None] for k in range(K)]
-        for k in range(K):
-            nIndPointsK = self._qSRSigma[k].shape[1]
-            qSigma[k] = torch.empty((R, nIndPointsK, nIndPointsK), dtype=torch.double)
-            for r in range(R):
-                qSigma[k][r,:,:] = torch.matmul(self._qSRSigma[k][r,:,:], torch.transpose(self._qSRSigma[k][r,:,:], 0, 1))
-        return(qSigma)
+        # begin patch for older version of the code
+        if hasattr(self, "_qSRSigmaVec"):
+            self._srQSigmaVecs = [self._qSRSigmaVec[k].unsqueeze(-1) for k in range(len(self._qSRSigmaVec))]
+        elif self._srQSigmaVecs[0].dim()==2:
+            self._srQSigmaVecs = [self._srQSigmaVecs[k].unsqueeze(-1) for k in range(len(self._srQSigmaVecs))]
+        # end patch for older version of the code
+        qSigma = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
+        return qSigma
+
 
