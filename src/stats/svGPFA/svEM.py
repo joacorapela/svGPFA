@@ -13,7 +13,7 @@ class SVEM:
 
     # @clock
     def maximize(self, model, measurements, initialParams, quadParams,
-                 optimParams, indPointsLocsKMSEpsilon,
+                 optimParams, indPointsLocsKMSRegEpsilon,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -26,7 +26,7 @@ class SVEM:
         model.setMeasurements(measurements=measurements)
         model.setInitialParams(initialParams=initialParams)
         model.setQuadParams(quadParams=quadParams)
-        model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+        model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
         model.buildKernelsMatrices()
 
         iter = 0
@@ -94,9 +94,9 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
-                # begin debug
-                # pdb.set_trace()
-                # end debug
+            # begin debug
+            # pdb.set_trace()
+            # end debug
             if optimParams["mStepEmbeddingEstimate"]:
                 message = "Iteration %02d, M-Step Model Params start\n"%(iter+1)
                 if verbose:
@@ -192,7 +192,7 @@ class SVEM:
                     lineSearchFn = None
                 else:
                     lineSearchFn = optimParams["eStepLineSearchFn"]
-                maxRes = self._mStepIndPoints(
+                maxRes = self._mStepIndPointsLocs(
                     model=model,
                     maxIter=optimParams["mStepIndPointsMaxIter"],
                     tol=optimParams["mStepIndPointsTol"],
@@ -281,6 +281,62 @@ class SVEM:
     def _mStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
                       nIterDisplay, logLock, logStream, logStreamFN):
         x = model.getKernelsParams()
+        # begin debug periodic kernel
+#         with torch.no_grad():
+#             import pandas as pd
+#             import plotly.io as pio
+#             import plotly.express as px
+#             import plotly.graph_objs as go
+#             startLB = model.eval()
+#             xStart = x[0].clone()
+#             displacements = np.arange(-4.0, 4.0, .1)
+#             uniqueLengthscales = x[0][0].item() + displacements
+#             uniquePeriods = x[0][1].item() + displacements
+#             allLengthscales = []
+#             allPeriods = []
+#             allLowerBounds = []
+#             for ls in uniqueLengthscales:
+#                 for p in uniquePeriods:
+#                     allLengthscales.append(ls)
+#                     allPeriods.append(p)
+#                     x[0][0] = ls
+#                     x[0][1] = p
+#                     model.buildKernelsMatrices()
+#                     lowerBound = model.eval().item()
+#                     allLowerBounds.append(lowerBound)
+#                     # print("Lower bound for lengthscale {:.02f} and period {:.02f} is {:.02f}".format(ls, p, lowerBound))
+#             x[0][0] = xStart[0]
+#             x[0][1] = xStart[1]
+#             data = {"lenghtscale": allLengthscales, "period": allPeriods, "lowerBound": allLowerBounds}
+#             df = pd.DataFrame(data)
+#             fig = px.scatter_3d(df, x='lenghtscale', y='period', z='lowerBound')
+#         pdb.set_trace()
+        # end debug periodic kernel
+        # begin debug exponential quadratic kernel
+#         with torch.no_grad():
+#             import pandas as pd
+#             import plotly.io as pio
+#             import plotly.express as px
+#             import plotly.graph_objs as go
+#             startLB = model.eval()
+#             xStart = x[0].clone()
+#             displacements = np.arange(-4.0, 4.0, .1)
+#             uniqueLengthscales = x[0][0].item() + displacements
+#             allLengthscales = []
+#             allLowerBounds = []
+#             for ls in uniqueLengthscales:
+#                 allLengthscales.append(ls)
+#                 x[0][0] = ls
+#                 model.buildKernelsMatrices()
+#                 lowerBound = model.eval().item()
+#                 allLowerBounds.append(lowerBound)
+#                 # print("Lower bound for lengthscale {:.02f} and period {:.02f} is {:.02f}".format(ls, p, lowerBound))
+#             x[0][0] = xStart[0]
+#             data = {"lenghtscale": allLengthscales, "lowerBound": allLowerBounds}
+#             df = pd.DataFrame(data)
+#             fig = px.scatter(df, x='lenghtscale', y='lowerBound')
+#         pdb.set_trace()
+        # end debug exponential quadratic kernel
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
@@ -295,12 +351,37 @@ class SVEM:
                                             nIterDisplay=nIterDisplay,
                                             logLock=logLock,
                                             logStream=logStream,
-                                            logStreamFN=logStreamFN, 
+                                            logStreamFN=logStreamFN,
                                            )
-        # pdb.set_trace()
+        # begin debug periodic kernel
+#         with torch.no_grad():
+#             endLB = model.eval()
+#             xStart = xStart.numpy()
+#             xEnd = model.getKernelsParams()[0].clone().numpy()
+#             fig.add_trace(go.Scatter3d(x=[xStart[0],xEnd[0]], y=[xStart[1],xEnd[1]], z=[startLB, endLB], type="scatter3d", text=["start","end"], mode="text"))
+#             fig.update_layout(scene = dict(zaxis = dict(range=[df.lowerBound.max()-1000,df.lowerBound.max()],),),)
+#             fig.write_image("/tmp/tmp.png")
+#             fig.write_html("/tmp/tmp.html")
+#             pio.renderers.default = "browser"
+#             fig.show()
+#         pdb.set_trace()
+        # end debug periodic kernel
+        # begin debug exponential quadratic kernel
+#         with torch.no_grad():
+#             endLB = model.eval()
+#             xStart = xStart.numpy()
+#             xEnd = model.getKernelsParams()[0].clone().numpy()
+#             fig.add_trace(go.Scatter(x=[xStart[0],xEnd[0]], y=[startLB, endLB], type="scatter", text=["start","end"], mode="text"))
+#             fig.update_layout(scene = dict(yaxis = dict(range=[df.lowerBound.max()-1000,df.lowerBound.max()],),),)
+#             fig.write_image("/tmp/tmp.png")
+#             fig.write_html("/tmp/tmp.html")
+#             pio.renderers.default = "browser"
+#             fig.show()
+#         pdb.set_trace()
+        # end debug exponential quadratic kernel
         return answer
 
-    def _mStepIndPoints(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
+    def _mStepIndPointsLocs(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
                         nIterDisplay, logLock, logStream, logStreamFN):
         x = model.getIndPointsLocs()
         def evalFunc():
@@ -364,7 +445,7 @@ class SVEM:
 
             prevEval = curEval
             optimizer.step(closure)
-            if curEval<prevEval and prevEval-curEval<tol:
+            if curEval<=prevEval and prevEval-curEval<tol:
                 converged = True
             message = displayFmt%(iterCount, curEval)
             if verbose and iterCount%nIterDisplay==0:
