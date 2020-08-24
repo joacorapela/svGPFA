@@ -45,8 +45,8 @@ class SVPosteriorOnLatents(ABC):
     def getIndPointsLocs(self):
         return self._indPointsLocsKMS.getIndPointsLocs()
 
-    def setIndPointsLocsKMSEpsilon(self, indPointsLocsKMSEpsilon):
-        self._indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSEpsilon)
+    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
+        self._indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSRegEpsilon)
 
 class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
@@ -224,10 +224,11 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
         KzzChol = self._indPointsLocsKMS.getKzzChol()
         Ktz = self._indPointsLocsAndTimesKMS.getKtz()
         KttDiag = self._indPointsLocsAndTimesKMS.getKttDiag()
-        return self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz,
+        qKMu, qKVar = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz,
                                                              KzzChol=KzzChol,
                                                              Ktz=Ktz,
                                                              KttDiag=KttDiag)
+        return qKMu, qKVar
 
     def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz,
                                                  KttDiag):
