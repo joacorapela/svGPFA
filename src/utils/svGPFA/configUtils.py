@@ -43,16 +43,24 @@ def getQMu0(nLatents, nTrials, config):
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
 
-def getIndPointsMeans(nIndPointsPerLatent, nTrials, config):
-    nLatents = len(nIndPointsPerLatent)
+def getIndPointsMeans(nTrials, nLatents, config):
     indPointsMeans = [[] for r in range(nTrials)]
     for r in range(nTrials):
         indPointsMeans[r] = [[] for k in range(nLatents)]
         for k in range(nLatents):
-            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
-            if len(indPointsMeans[r][k])!=nIndPointsPerLatent[k]:
-                   raise RuntimeError("Incorrect indPointsMeanLatent{:d}Trial{:d}".format(k,r))
+            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double).unsqueeze(dim=1)
     return indPointsMeans
+
+def getIndPointsLocs0(nLatents, nTrials, config):
+    Z0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        Z0_k_r0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,0)][1:-1].split(", ")], dtype=torch.double)
+        nIndPointsForLatent = len(Z0_k_r0)
+        Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1), dtype=torch.double)
+        Z0[k][0,:,0] = Z0_k_r0
+        for r in range(1, nTrials):
+            Z0[k][r,:,0] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
+    return Z0
 
 def getLatentsMeansFuncs(nLatents, nTrials, config):
     def getLatentMeanFunc(ampl, tau, freq, phase):
@@ -69,7 +77,7 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
         meansFuncs[k] = meanFunc
     return meansFuncs
 
-def getLinearEmbeddingParams(nNeurons, nLatents, CFilename, dFilename):
+def getLinearEmbeddingParams(CFilename, dFilename):
     df = pd.read_csv(CFilename, header=None)
     C = torch.from_numpy(df.values)
     df = pd.read_csv(dFilename, header=None)
