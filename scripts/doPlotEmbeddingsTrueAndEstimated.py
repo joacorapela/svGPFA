@@ -23,7 +23,7 @@ def main(argv):
 
     estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
-    figFilename = "figures/{:08d}_trueAndEstimatedEmbedding_trial{:d}_neuron{:d}.{{:s}}".format(estResNumber, trialToPlot, neuronToPlot)
+    figFilenamePattern = "figures/{:08d}_trueAndEstimatedEmbedding_trial{:d}_neuron{:d}.{{:s}}".format(estResNumber, trialToPlot, neuronToPlot)
 
     estimResConfig = configparser.ConfigParser()
     estimResConfig.read(estimResMetaDataFilename)
@@ -76,8 +76,8 @@ def main(argv):
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbedding(tTimes=tTimes[0], tSamples=tSamplesToPlot, tMeans=tMeansToPlot, tSTDs=tSTDsToPlot, eTimes=eTimes[0], eMeans=eMeansToPlot, eSTDs=eSTDsToPlot, title=title)
 
-    fig.write_image(figFilename.format("png"))
-    fig.write_html(figFilename.format("html"))
+    fig.write_image(figFilenamePattern.format("png"))
+    fig.write_html(figFilenamePattern.format("html"))
     fig.show()
 
     pdb.set_trace()
