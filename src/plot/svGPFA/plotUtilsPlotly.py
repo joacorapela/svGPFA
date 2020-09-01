@@ -7,8 +7,8 @@ import numpy as np
 import chart_studio.plotly as py
 import plotly.graph_objs as go
 import plotly.subplots
-import plotly.io as pio
 import plotly
+import plotly.io as pio
 
 # spike rates and times
 def getPlotSpikeRatesForAllTrialsAndAllNeurons(spikesRates, xlabel="Neuron", ylabel="Average Spike Rate (Hz)", legendLabelPattern = "Trial {:d}"):
@@ -445,42 +445,118 @@ def getPlotTrueAndEstimatedIndPointsMeans(trueIndPointsMeans,
 def getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(
     trueIndPointsMeans,
     estimatedIndPointsMeans,
+    trueIndPointsSTDs,
+    estimatedIndPointsSTDs,
     title,
-    linetypeTrue="solid",
-    linetypeEstimated="dash",
-    labelTrue="True",
-    labelEstimated="Estimated",
+    cbAlpha = 0.2,
+    trueCBFillColorPattern="rgba(0,0,255,{:f})",
+    trueMeanLineColor="blue",
+    estimatedCBFillColorPattern="rgba(255,0,0,{:f})",
+    estimatedMeanLineColor="red",
     xlabel="Inducing Point Index",
     ylabel="Inducing Point Mean"):
 
-    def getTracesOneSetTrueAndEstimatedIndPointsMeans(
-        trueIndPointsMeans,
-        estimatedIndPointsMeans,
-        labelTrue, labelEstimated,
-        useLegend):
-        traceTrue = go.Scatter(
-            y=trueIndPointsMeans,
-            mode="lines+markers",
-            name=labelTrue,
-            line=dict(dash=linetypeTrue),
-            showlegend=useLegend)
-        traceEstimated = go.Scatter(
-            y=estimatedIndPointsMeans,
-            mode="lines+markers",
-            name=labelEstimated,
-            line=dict(dash=linetypeEstimated),
-            showlegend=useLegend)
-        return traceTrue, traceEstimated
+    indPointsIndices = torch.arange(len(trueIndPointsMeans))
 
-    # qMu[k] \in nTrials x nInd[k] x 1
+    eCI = 1.96*estimatedIndPointsSTDs
+    xE = indPointsIndices
+    xE_rev = xE.flip(dims=[0])
+    yE = estimatedIndPointsMeans
+    yE_upper = yE + eCI
+    yE_lower = yE - eCI
+    yE_lower = yE_lower.flip(dims=[0])
+
+    xE = xE.detach().numpy()
+    yE = yE.detach().numpy()
+    yE_upper = yE_upper.detach().numpy()
+    yE_lower = yE_lower.detach().numpy()
+
+    tCI = 1.96*trueIndPointsSTDs
+    xT = indPointsIndices
+    xT_rev = xT.flip(dims=[0])
+    yT = trueIndPointsMeans
+    yT_upper = yT + tCI
+    yT_lower = yT - tCI
+    yT_lower = yT_lower.flip(dims=[0])
+
+    xT = xT.detach().numpy()
+    yT = yT.detach().numpy()
+    yT_upper = yT_upper.detach().numpy()
+    yT_lower = yT_lower.detach().numpy()
+
+    traceECB = go.Scatter(
+        x=np.concatenate((xE, xE_rev)),
+        y=np.concatenate((yE_upper, yE_lower)),
+        fill="tozerox",
+        fillcolor=estimatedCBFillColorPattern.format(cbAlpha),
+        line=dict(color="rgba(255,255,255,0)"),
+        showlegend=False,
+        name="Estimated",
+    )
+    traceEMean = go.Scatter(
+        x=xE,
+        y=yE,
+        # line=dict(color="rgb(0,100,80)"),
+        line=dict(color=estimatedMeanLineColor),
+        mode="lines+markers",
+        name="Estimated Mean",
+        showlegend=True,
+    )
+    traceTCB = go.Scatter(
+        x=np.concatenate((xT, xT_rev)),
+        y=np.concatenate((yT_upper, yT_lower)),
+        fill="tozerox",
+        fillcolor=trueCBFillColorPattern.format(cbAlpha),
+        line=dict(color="rgba(255,255,255,0)"),
+        showlegend=False,
+        name="True",
+    )
+    traceTMean = go.Scatter(
+        x=xT,
+        y=yT,
+        line=dict(color=trueMeanLineColor),
+        mode="lines+markers",
+        name="True Mean",
+        showlegend=True,
+    )
     fig = go.Figure()
-    traceTrue, traceEstimated = getTracesOneSetTrueAndEstimatedIndPointsMeans(trueIndPointsMeans=trueIndPointsMeans, estimatedIndPointsMeans=estimatedIndPointsMeans, labelTrue=labelTrue, labelEstimated=labelEstimated, useLegend=True)
-    fig.add_trace(traceTrue)
-    fig.add_trace(traceEstimated)
-    fig.update_layout(title=title)
+    fig.add_trace(traceECB)
+    fig.add_trace(traceEMean)
+    fig.add_trace(traceTCB)
+    fig.add_trace(traceTMean)
     fig.update_yaxes(title_text=ylabel)
     fig.update_xaxes(title_text=xlabel)
+    fig.update_layout(title=title)
     return fig
+
+#     def getTracesOneSetTrueAndEstimatedIndPointsMeans(
+#         trueIndPointsMeans,
+#         estimatedIndPointsMeans,
+#         labelTrue, labelEstimated,
+#         useLegend):
+#         traceTrue = go.Scatter(
+#             y=trueIndPointsMeans,
+#             mode="lines+markers",
+#             name=labelTrue,
+#             line=dict(dash=linetypeTrue),
+#             showlegend=useLegend)
+#         traceEstimated = go.Scatter(
+#             y=estimatedIndPointsMeans,
+#             mode="lines+markers",
+#             name=labelEstimated,
+#             line=dict(dash=linetypeEstimated),
+#             showlegend=useLegend)
+#         return traceTrue, traceEstimated
+# 
+#     # qMu[k] \in nTrials x nInd[k] x 1
+#     fig = go.Figure()
+#     traceTrue, traceEstimated = getTracesOneSetTrueAndEstimatedIndPointsMeans(trueIndPointsMeans=trueIndPointsMeans, estimatedIndPointsMeans=estimatedIndPointsMeans, labelTrue=labelTrue, labelEstimated=labelEstimated, useLegend=True)
+#     fig.add_trace(traceTrue)
+#     fig.add_trace(traceEstimated)
+#     fig.update_layout(title=title)
+#     fig.update_yaxes(title_text=ylabel)
+#     fig.update_xaxes(title_text=xlabel)
+#     return fig
 
 def getPlotTrueAndEstimatedIndPointsCovs(trueIndPointsCovs,
                                          estimatedIndPointsCovs,
@@ -1359,3 +1435,47 @@ def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber
     fig.update_yaxes(title_text="Lower Bound")
     return fig
 
+def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParam, title, yMin, yMax, lowerBoundLineColor, refParamLineColor, percMargin=0.1):
+    if math.isinf(yMin):
+        yMin = lowerBoundValues.min()
+    if math.isinf(yMax):
+        yMax = lowerBoundValues.max()
+    margin = percMargin*max(abs(yMin), abs(yMax))
+    yMin = yMin - margin
+    yMax = yMax + margin
+
+    layout = {
+        "title": title,
+        "xaxis": {"title": "Parameter Value"},
+        # "yaxis": {"title": "Lower Bound"},
+        "yaxis": {"title": "Lower Bound", "range": [yMin, yMax]},
+    }
+    data = []
+    data.append(
+        {
+            "type": "scatter",
+            "mode": "lines+markers",
+            "x": paramValues,
+            "y": lowerBoundValues,
+            "line": dict(color=lowerBoundLineColor),
+            "name": "lower bound",
+        },
+    )
+    fig = go.Figure(
+        data=data,
+        layout=layout,
+    )
+    fig.add_shape(
+        # Line Vertical
+        dict(
+            type="line",
+            x0=refParam,
+            y0=yMin,
+            x1=refParam,
+            y1=yMax,
+            line=dict(
+                color=refParamLineColor,
+                width=3
+            )
+    ))
+    return fig
