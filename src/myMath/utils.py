@@ -9,8 +9,8 @@ def leggaussVarLimits(n, a, b, dtype=torch.double):
     """
     x, w = leggauss(deg=n)
     # reversing x and w to make them compatible with Lea's Matlab legquad function
-    x = x[::-1].copy()
-    w = w[::-1].copy()
+    # x = x[::-1].copy()
+    # w = w[::-1].copy()
     x = torch.from_numpy(x)
     w = torch.from_numpy(w)
     xVarLimits = (x*(b-a)+(b+a))/2
