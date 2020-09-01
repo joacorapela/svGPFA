@@ -37,7 +37,6 @@ def main(argv):
 
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
     nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
@@ -46,8 +45,6 @@ def main(argv):
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
     # KzzChol = simRes["KzzChol"]
-    indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
-
     estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
@@ -111,6 +108,7 @@ def main(argv):
     KzzChol0 = utils.svGPFA.initUtils.getKzzChol0(kernels=kernels, kernelsParams0=kernelsParams0, indPointsLocs0=Z0, epsilon=indPointsLocsKMSRegEpsilon)
     qSRSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol0)
 
+    indPointsMeans = utils.svGPFA.initUtils.getUniformIndPointsMeans(nTrials=nTrials, nLatents=nLatents, nIndPointsPerLatent=nIndPointsPerLatent)
     # patch to acommodate Lea's equal number of inducing points across trials
     qMu0 = [[] for k in range(nLatents)]
     for k in range(nLatents):
