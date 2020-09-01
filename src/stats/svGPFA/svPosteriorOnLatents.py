@@ -164,9 +164,35 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
         for k in range(len(self._svPosteriorOnIndPoints.getQMu())):
+
+            # begin debug code
+            # print("*** Warning debug code in svPosteriorOnLatents ***")
+#             trialIndex = 0
+#             auxS = qSigma[k][trialIndex,:,:]
+#             auxKzz = Kzz[k][trialIndex,:,:]
+#             auxKzzChol = KzzChol[k][trialIndex,:,:]
+#             diff = auxS-auxKzz
+#             mAux1 = torch.cholesky_solve(diff, auxKzzChol)
+#             mAux2 = torch.transpose(torch.cholesky_solve(torch.transpose(mAux1, 0, 1), auxKzzChol), 0, 1)
+
+            # condition number of Kzz
+#             eValsKzz, _ = torch.eig(auxKzz)
+#             print((eValsKzz[:,0].max()/eValsKzz[:,0].min()).item())
+
+            # # l2 norm of K_{zz}^{-1} (S-K_{zz}) K_{zz}^{-1}
+            # _, sValsMAux2, _ = torch.svd(input=mAux2, compute_uv=False)
+            # print(sValsMAux2[0].item())
+
+            # # varK
+            # mAux3 = Ktz[k][trialIndex,:,:]
+            # auxVars = KttDiag[0,:,k]+(torch.matmul(mAux3, mAux2)*mAux3).sum(dim=1)
+            # print(auxVars.max().item())
+
+            # pdb.set_trace()
+            # end debug code
+
             # Ak \in nTrials x nInd[k] x 1
-            Ak = torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k],
-                                      KzzChol[k])
+            Ak = torch.cholesky_solve(self._svPosteriorOnIndPoints.getQMu()[k], KzzChol[k])
             # qKMu \in  nTrial x nQuad x nLatent
             qKMu[:,:,k] = torch.squeeze(torch.matmul(Ktz[k], Ak))
 
