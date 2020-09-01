@@ -48,8 +48,7 @@ def main(argv):
     simInitConfigFilename = simMetaDataConfig["simulation_params"]["simInitConfigFilename"]
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nLatents = len(nIndPointsPerLatent)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
@@ -117,16 +116,18 @@ def main(argv):
     eIndPointsMeans = svPosteriorOnIndPointsParams[:nLatents]
     tIndPointsMeansToPlot = tIndPointsMeans[trialToPlot][latentToPlot][:,0]
     eIndPointsMeansToPlot = eIndPointsMeans[latentToPlot][trialToPlot,:,0]
+    srQSigmaVecs = svPosteriorOnIndPointsParams[nLatents:]
+    eIndPointsCovs = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=srQSigmaVecs)
+    tIndPointsCovToPlot = tIndPointsCovs[latentToPlot][trialToPlot,:,:]
+    tIndPointsSTDsToPlot = torch.diag(tIndPointsCovToPlot)
+    eIndPointsCovToPlot = eIndPointsCovs[latentToPlot][trialToPlot,:,:]
+    eIndPointsSTDsToPlot = torch.diag(eIndPointsCovToPlot)
     title = "Trial {:d}, Latent {:d}".format(trialToPlot, latentToPlot)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(trueIndPointsMeans=tIndPointsMeansToPlot, estimatedIndPointsMeans=eIndPointsMeansToPlot, title=title,)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(trueIndPointsMeans=tIndPointsMeansToPlot, estimatedIndPointsMeans=eIndPointsMeansToPlot, trueIndPointsSTDs=tIndPointsSTDsToPlot, estimatedIndPointsSTDs=eIndPointsSTDsToPlot, title=title,)
     fig.write_image(indPointsMeanFigFilenamePattern.format("png"))
     fig.write_html(indPointsMeanFigFilenamePattern.format("html"))
     fig.show()
 
-    srQSigmaVecs = svPosteriorOnIndPointsParams[nLatents:]
-    eIndPointsCovs = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=srQSigmaVecs)
-    tIndPointsCovToPlot = tIndPointsCovs[latentToPlot][trialToPlot,:,:]
-    eIndPointsCovToPlot = eIndPointsCovs[latentToPlot][trialToPlot,:,:]
     title = "Trial {:d}, Latent {:d}".format(trialToPlot, latentToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent(
         trueIndPointsCov=tIndPointsCovToPlot,
