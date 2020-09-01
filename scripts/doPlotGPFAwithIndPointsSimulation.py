@@ -41,8 +41,7 @@ def main(argv):
 
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nLatents = len(nIndPointsPerLatent)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     dtCIF = float(simInitConfig["control_variables"]["dtCIF"])
@@ -56,7 +55,7 @@ def main(argv):
     latentFigFilenamePattern = \
         "figures/{:08d}_simulation_latent_trial{:03d}_latent{:03d}.{{:s}}".format(simResNumber, trialToPlot, latentToPlot)
     embeddingFigFilenamePattern = \
-        "figures/{:08d}_simulation_embeddding_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
+        "figures/{:08d}_simulation_embedding_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
     cifFigFilenamePattern = \
         "figures/{:08d}_simulation_cif_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
     spikesTimesFigFilenamePattern = \
