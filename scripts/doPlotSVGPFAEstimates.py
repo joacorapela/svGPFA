@@ -71,7 +71,7 @@ def main(argv):
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
     CFilename = simInitConfig["embedding_params"]["C_filename"]
     dFilename = simInitConfig["embedding_params"]["d_filename"]
-    C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=CFilename, dFilename=dFilename)
+    C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=CFilename, dFilename=dFilename)
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
     trueLatents = simRes["latents"]
@@ -89,20 +89,20 @@ def main(argv):
     model = estResults["model"]
 
     # plot lower bound history
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHistPlotly(lowerBoundHist=lowerBoundHist)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHist(lowerBoundHist=lowerBoundHist)
     fig.write_image(lowerBoundHistVsIterNoFigFilenamePattern.format("png"))
     fig.write_html(lowerBoundHistVsIterNoFigFilenamePattern.format("html"))
 
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHistPlotly(elapsedTimeHist=elapsedTimeHist, lowerBoundHist=lowerBoundHist)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHist(elapsedTimeHist=elapsedTimeHist, lowerBoundHist=lowerBoundHist)
     fig.write_image(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("png"))
     fig.write_html(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("html"))
 
     # plot true and estimated latents
-    testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
-    indPointsLocs = model.getIndPointsLocs()
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatentsPlotly(tTimes=trueLatentsTimes[0], tLatentsSTDs=trueLatentsSTDs, eTimes=trueLatentsTimes[0], eMuK=testMuK, eVarK=testVarK, indPointsLocs=indPointsLocs, trialToPlot=trialToPlot)
-    fig.write_image(latentsFigFilenamePattern.format("png"))
-    fig.write_html(latentsFigFilenamePattern.format("html"))
+#     testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
+#     indPointsLocs = model.getIndPointsLocs()
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSTDs=trueLatentsSTDs, eTimes=trueLatentsTimes[0], eMuK=testMuK, eVarK=testVarK, indPointsLocs=indPointsLocs, trialToPlot=trialToPlot)
+#     fig.write_image(latentsFigFilenamePattern.format("png"))
+#     fig.write_html(latentsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with numerical correction
     T = torch.tensor(trialsLengths).max()
@@ -121,7 +121,7 @@ def main(argv):
     plt.close("all")
 
     # CIF
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFsPlotly( tTimes=cifTimes[trialToPlot, :, 0], tCIF=simCIFsValues[trialToPlot][neuronToPlot], tLabel="True", eTimes=cifTimes[trialToPlot, :, 0], eCIF=cifValuesKS, eLabel="Estimated", title=title)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs( tTimes=cifTimes[trialToPlot, :, 0], tCIF=simCIFsValues[trialToPlot][neuronToPlot], tLabel="True", eTimes=cifTimes[trialToPlot, :, 0], eCIF=cifValuesKS, eLabel="Estimated", title=title)
     fig.write_image(trueAndEstimatedCIFsFigFilenamePattern.format("png"))
     fig.write_html(trueAndEstimatedCIFsFigFilenamePattern.format("html"))
 
@@ -137,21 +137,21 @@ def main(argv):
 
     # plot model params
     # tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
-    trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
-    # tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=tLatentsMeansFuncs, trialsTimes=trialsTimes, dtype=C.dtype)
-    kernelsParams = model.getKernelsParams()
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig)
-    with torch.no_grad():
-        latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
-    estimatedC, estimatedD = model.getSVEmbeddingParams()
-
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParamsPlotly(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
-    fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
-    fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
-
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParamsPlotly(trueC=C, trueD=d, estimatedC=estimatedC, estimatedD=estimatedD)
-    fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
-    fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
+#     trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
+#     # tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=tLatentsMeansFuncs, trialsTimes=trialsTimes, dtype=C.dtype)
+#     kernelsParams = model.getKernelsParams()
+#     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
+#     with torch.no_grad():
+#         latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
+#     estimatedC, estimatedD = model.getSVEmbeddingParams()
+# 
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
+#     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
+#     fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
+# 
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=C, trueD=d, estimatedC=estimatedC, estimatedD=estimatedD)
+#     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
+#     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with analytical correction
     t0 = math.floor(cifTimesKS.min())
