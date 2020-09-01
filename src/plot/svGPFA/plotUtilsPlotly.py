@@ -4,11 +4,13 @@ import math
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import chart_studio.plotly as py
 import plotly.graph_objs as go
 import plotly.subplots
 import plotly
 import plotly.io as pio
+import plotly.express as px
 
 # spike rates and times
 def getPlotSpikeRatesForAllTrialsAndAllNeurons(spikesRates, xlabel="Neuron", ylabel="Average Spike Rate (Hz)", legendLabelPattern = "Trial {:d}"):
@@ -1267,6 +1269,7 @@ def getPlotTrueAndEstimatedKernelsParamsOneLatent(
     fig.add_trace(traceTrue)
     fig.add_trace(traceEstimated)
     fig.update_yaxes(title_text="Parameter Value")
+    fig.update_layout(title=title)
     return fig
 
 def getPlotTruePythonAndMatlabKernelsParams(kernelsTypes,
@@ -1305,6 +1308,48 @@ def getPlotTruePythonAndMatlabKernelsParams(kernelsTypes,
         fig.append_trace(tracePython, k+1, 1)
         fig.append_trace(traceMatlab, k+1, 1)
     fig.update_yaxes(title_text="Parameter Value", row=nLatents//2+1, col=1)
+    return fig
+
+def getPlotLowerBoundVsTwoParamsParam(param1Values,
+                                      param2Values,
+                                      lowerBoundValues,
+                                      refParam1,
+                                      refParam2,
+                                      refParamsLowerBound,
+                                      refParamText,
+                                      title,
+                                      minPerc = 0.01,
+                                      xlabel="Parameter 1",
+                                      ylabel="Parameter 2",
+                                      zlabel="Lower Bound",
+                                      zMin=None, zMax=None,
+                                     ):
+    data = {"x": param1Values, "y": param2Values, "z": lowerBoundValues}
+    df = pd.DataFrame(data)
+    if zMin is None:
+        sortedZ = df.z.sort_values()
+        zMin = sortedZ[round(minPerc*len(sortedZ))]
+        # zMin = df.z.min()
+    if zMax is None:
+        zMax = df.z.max()
+    fig = px.scatter_3d(df, x='x', y='y', z='z')
+    fig.add_trace(
+        go.Scatter3d(
+            x=[refParam1],
+            y=[refParam2],
+            z=[refParamsLowerBound],
+            type="scatter3d", text=[refParamText], mode="text",
+        )
+    )
+    fig.update_layout(
+        title=title,
+        scene = dict(
+            xaxis_title = xlabel,
+            yaxis_title = ylabel,
+            zaxis_title = zlabel,
+            zaxis = dict(range=[zMin,zMax]),
+        )
+    )
     return fig
 
 # CIF
