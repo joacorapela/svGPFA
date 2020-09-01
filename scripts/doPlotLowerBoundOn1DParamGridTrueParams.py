@@ -3,32 +3,47 @@ import sys
 import pdb
 import math
 import argparse
-import scipy.io
 import pickle
 import configparser
 import torch
 import numpy as np
-import plotly.graph_objs as go
 import plotly.io as pio
 sys.path.append("../src")
 import utils.svGPFA.initUtils
 import utils.svGPFA.configUtils
 import utils.svGPFA.miscUtils
 import stats.svGPFA.svGPFAModelFactory
+import plot.svGPFA.plotUtilsPlotly
+import lowerBoundVsOneParamUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("simResNumber", help="simulation result number", type=int)
+    parser.add_argument("paramType", help="Parameter type: indPointsPosteriorMean, indPointsPosteriorCov, indPointsLocs, kernel, embeddingC, embeddingD")
     parser.add_argument("indPointsLocsKMSRegEpsilon", help="regularization epsilong for the inducing points locations covariance", type=float)
+    parser.add_argument("--trial", help="Parameter trial number", type=int, default=0)
+    parser.add_argument("--latent", help="Parameter latent number", type=int, default=0)
+    parser.add_argument("--neuron", help="Parameter neuron number", type=int, default=0)
+    parser.add_argument("--kernelParamIndex", help="Kernel parameter index", type=int, default=0)
+    parser.add_argument("--indPointIndex", help="Parameter inducing point index", type=int, default=0)
+    parser.add_argument("--indPointIndex2", help="Parameter inducing point index2 (used for inducing points covariance parameters)", type=int, default=0)
     parser.add_argument("--paramValueStart", help="Start parameter value", type=float, default=1.0)
     parser.add_argument("--paramValueEnd", help="End parameters value", type=float, default=20.0)
     parser.add_argument("--paramValueStep", help="Step for parameter values", type=float, default=0.01)
     parser.add_argument("--yMin", help="Minimum y value", type=float, default=-math.inf)
     parser.add_argument("--yMax", help="Minimum y value", type=float, default=+math.inf)
     parser.add_argument("--nQuad", help="Number of quadrature points", type=int, default=200)
+
     args = parser.parse_args()
     simResNumber = args.simResNumber
+    paramType = args.paramType
     indPointsLocsKMSRegEpsilon = args.indPointsLocsKMSRegEpsilon
+    trial = args.trial
+    latent = args.latent
+    neuron = args.neuron
+    kernelParamIndex = args.kernelParamIndex
+    indPointIndex = args.indPointIndex
+    indPointIndex2 = args.indPointIndex2
     paramValueStart = args.paramValueStart
     paramValueEnd = args.paramValueEnd
     paramValueStep = args.paramValueStep
@@ -45,8 +60,7 @@ def main(argv):
 
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nLatents = len(nIndPointsPerLatent)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
@@ -59,14 +73,6 @@ def main(argv):
     indPointsMeans = simRes["indPointsMeans"]
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=simInitConfig["embedding_params"]["C_filename"], dFilename=simInitConfig["embedding_params"]["d_filename"])
 
-    # patch to acommodate Lea's equal number of inducing points across trials
-    qMu0 = [[] for k in range(nLatents)]
-    for k in range(nLatents):
-        qMu0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
-        for r in range(nTrials):
-            qMu0[k][r,:,:] = indPointsMeans[r][k]
-    # end patch
-
     legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
@@ -74,6 +80,15 @@ def main(argv):
 
     # Z0 = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+    nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
+
+    # patch to acommodate Lea's equal number of inducing points across trials
+    qMu0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        qMu0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
+        for r in range(nTrials):
+            qMu0[k][r,:,:] = indPointsMeans[r][k]
+    # end patch
 
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol)
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
@@ -97,192 +112,36 @@ def main(argv):
     model.setMeasurements(measurements=spikesTimes)
     model.setInitialParams(initialParams=initialParams)
     model.setQuadParams(quadParams=quadParams)
-    pdb.set_trace()
     model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     model.buildKernelsMatrices()
-#     paramValueStart = 1.0
-#     paramValueEnd = 20
-#     paramValueStep = .01
-#     yMax = None
-#     yMin = None
-#     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
-#     lowerBoundValues = np.empty(paramValues.shape)
-#     kernelsParams = model.getKernelsParams()
-#     trueParam = kernelsParams[0][1].item()
-#     # begin debug
-#     kernelsParams[0][1] = 4.45
-#     # kernelsParams[0][1] = 5.0
-#     model.buildKernelsMatrices()
-#     # aux = model.eval()
-#     # pdb.set_trace()
-#     # end debug
-#     for i in range(len(paramValues)):
-#         kernelsParams[0][1] = paramValues[i]
-#         model.buildKernelsMatrices()
-#         lowerBoundValues[i] = model.eval()
-#     xlabel = "Period Value"
 
-    paramValueStart = 1.0
-    paramValueEnd = 5.0
-    paramValueStep = .01
-    yMax = None
-    yMin = None
+    refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
     lowerBoundValues = np.empty(paramValues.shape)
-    conditionNumbers = np.empty((nTrials, len(paramValues)))
-    eValues = np.empty((nTrials, len(paramValues), 10, 2))
-    kernelsParams = model.getKernelsParams()
-    trueParam = kernelsParams[0][0].item()
     for i in range(len(paramValues)):
-        kernelsParams[0][0] = paramValues[i]
-        model.buildKernelsMatrices()
-        lowerBoundValues[i] = model.eval()
+        paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
         Kzz = model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._indPointsLocsKMS._Kzz
-        for r in range(nTrials):
-            eValues[r,i,:,:], _ = torch.eig(Kzz[0][r,:,:])
-            conditionNumbers[r,i] = eValues[r,i,0,0]/eValues[r,i,-1,0]
-    xlabel = "Lengthscale Value"
-
-#     embeddingParams = model.getSVEmbeddingParams()
-#     trueParam = embeddingParams[0][0,0].item()
-#     paramValueStart = -4
-#     paramValueEnd = 4
-#     paramValueStep = .01
-#     yMax = 0
-#     yMin = -5000
-#     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
-#     lowerBoundValues = np.empty(paramValues.shape)
-#     for i in range(len(paramValues)):
-#         embeddingParams[0][0,0] = paramValues[i]
-#         lowerBoundValues[i] = model.eval()
-#     xlabel = "C[0,0] Value"
-
-#     embeddingParams = model.getSVEmbeddingParams()
-#     trueParam = embeddingParams[1][0].item()
-#     paramValueStart = -4
-#     paramValueEnd = 4
-#     paramValueStep = .01
-#     yMax = math.inf
-#     yMin = -math.inf
-#     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
-#     lowerBoundValues = np.empty(paramValues.shape)
-#     for i in range(len(paramValues)):
-#         embeddingParams[1][0] = paramValues[i]
-#         lowerBoundValues[i] = model.eval()
-#     xlabel = "d[0] Value"
-
-    layoutLowerBound = {
-        "xaxis": {"title": xlabel},
-        # "yaxis": {"title": "Lower Bound"},
-        "yaxis": {"title": "Lower Bound", "range": [yMin, yMax]},
-    }
-    layoutConditionNumber = {
-        "xaxis": {"title": xlabel},
-        # "yaxis": {"title": "Lower Bound"},
-        "yaxis": {"title": "Condition Number", "range": [yMin, yMax]},
-    }
-    layoutEvals = {
-        "xaxis": {"title": xlabel},
-        # "yaxis": {"title": "Lower Bound"},
-        "yaxis": {"title": "Eigenvalue", "range": [yMin, yMax]},
-    }
-    dataLowerBound = []
-    dataLowerBound.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": lowerBoundValues,
-                "name": "lower bound",
-            },
-    )
-    dataConditionNumber = []
-    dataConditionNumber.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": conditionNumbers[0,:],
-                "name": "cNum trial 0",
-            },
-    )
-    dataConditionNumber.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": conditionNumbers[1,:],
-                "name": "cNum trial 1",
-            },
-    )
-    dataEvals = []
-    for i in range(10):
-        # eValues = np.empyt((nTrials, len(paramValues), 10, 2))
-        dataEvals.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": eValues[0,:,i,0],
-                "name": "real eigval {:d}, trial 0".format(i),
-            },
-        )
-        dataEvals.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": eValues[0,:,i,1],
-                "name": "imag eigval {:d}, trial 0".format(i),
-            },
-        )
-        dataEvals.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": eValues[1,:,i,0],
-                "name": "real eigval {:d}, trial 1".format(i),
-            },
-        )
-        dataEvals.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "x": paramValues,
-                "y": eValues[1,:,i,1],
-                "name": "imag eigval {:d}, trial 1".format(i),
-            },
-        )
-    figLowerBound = go.Figure(
-        data=dataLowerBound,
-        layout=layoutLowerBound,
-    )
-    figLowerBound.add_shape(
-        # Line Vertical
-        dict(
-            type="line",
-            x0=trueParam,
-            y0=yMin,
-            x1=trueParam,
-            y1=yMax,
-            line=dict(
-                color="Red",
-                width=3
-            )
-    ))
-    figConditionNumber = go.Figure(
-        data=dataConditionNumber,
-        layout=layoutConditionNumber,
-    )
-    figEvals = go.Figure(
-        data=dataEvals,
-        layout=layoutEvals,
-    )
+        # begin debug code
+        for k in range(nLatents):
+            nTrial = Kzz[k].shape[0]
+            for r in range(nTrial):
+                # torch.sum(torch.abs(torch.eig(Kzz[k][0,:,:]).eigenvalues[:,1]))==0
+                imEigenval = torch.eig(Kzz[k][0,:,:]).eigenvalues[:,1]
+#                 if torch.any(imEigenval!=0.0):
+#                     print("{:f}".format(paramValues[i]))
+#         if paramValues[i]>=16.48:
+#             pdb.set_trace()
+        # end debug code
+        lowerBoundValues[i] = model.eval()
+    title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="trueParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamLineColor="blue")
+    fig.write_image(figFilenamePattern.format("png"))
+    fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"
-    figLowerBound.show()
-    figConditionNumber.show()
-    figEvals.show()
+    fig.show()
+
     pdb.set_trace()
 
 if __name__=="__main__":
