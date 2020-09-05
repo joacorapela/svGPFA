@@ -189,7 +189,8 @@ class PointProcessELLExpLink(PointProcessELL):
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
-        eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
+        # eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
+        eLogLink = torch.cat([eMean[trial] for trial in range(len(eMean))])
         return eLogLink
 
 class PointProcessELLQuad(PointProcessELL):
