@@ -1318,38 +1318,48 @@ def getPlotLowerBoundVsTwoParamsParam(param1Values,
                                       refParamsLowerBound,
                                       refParamText,
                                       title,
-                                      minPerc = 0.01,
-                                      xlabel="Parameter 1",
-                                      ylabel="Parameter 2",
-                                      zlabel="Lower Bound",
+                                      lowerBoundQuantile = 0.5,
+                                      param1Label="Parameter 1",
+                                      param2Label="Parameter 2",
+                                      lowerBoundLabel="Lower Bound",
+                                      markerSize=3.0,
+                                      markerOpacity=0.8,
+                                      markerColorscale="Viridis",
                                       zMin=None, zMax=None,
                                      ):
     data = {"x": param1Values, "y": param2Values, "z": lowerBoundValues}
     df = pd.DataFrame(data)
     if zMin is None:
-        sortedZ = df.z.sort_values()
-        zMin = sortedZ[round(minPerc*len(sortedZ))]
-        # zMin = df.z.min()
+        zMin = df.z.quantile(lowerBoundQuantile)
     if zMax is None:
         zMax = df.z.max()
-    fig = px.scatter_3d(df, x='x', y='y', z='z')
-    fig.add_trace(
-        go.Scatter3d(
-            x=[refParam1],
-            y=[refParam2],
-            z=[refParamsLowerBound],
-            type="scatter3d", text=[refParamText], mode="text",
-        )
-    )
-    fig.update_layout(
-        title=title,
-        scene = dict(
-            xaxis_title = xlabel,
-            yaxis_title = ylabel,
-            zaxis_title = zlabel,
-            zaxis = dict(range=[zMin,zMax]),
-        )
-    )
+    dfTrimmed = df[df.z>zMin]
+    # fig = go.Figure(data=[go.Scatter3d(x=param1Values, y=param2Values, z=lowerBoundValues, mode="markers")])
+#     fig = go.Figure(data=[go.Scatter3d(x=dfTrimmed.x, y=dfTrimmed.y, z=dfTrimmed.z, mode="markers")])
+    # fig.update_layout(scene=dict(zaxis=dict(range=[df.z.max()-1000,df.z.max()+500],)),width=700,)
+    # fig = px.scatter_3d(dfTrimmed, x='x', y='y', z='z')
+    fig = go.Figure(data=[go.Scatter3d(x=dfTrimmed.x, y=dfTrimmed.y,
+                                       z=dfTrimmed.z, mode="markers",
+                                       marker=dict(size=markerSize,
+                                                   color=dfTrimmed.z,
+                                                   colorscale=markerColorscale,
+                                                   opacity=markerOpacity)) ])
+
+#     fig = go.Figure(go.Mesh3d(x=dfTrimmed.x, y=dfTrimmed.y, z=dfTrimmed.z))
+#     fig.add_trace(
+#         go.Scatter3d(
+#             x=[refParam1],
+#             y=[refParam2],
+#             z=[refParamsLowerBound],
+#             type="scatter3d", text=[refParamText], mode="text",
+#         )
+#     )
+    fig.update_layout(title=title, scene = dict(xaxis_title = param1Label, yaxis_title = param2Label, zaxis_title = lowerBoundLabel,))
+#     fig.update_layout(scene = dict(zaxis = dict(range=[zMin,zMax]),))
+#     fig.update_layout(scene = dict(zaxis=dict(range=[df.z.max()-1000,df.z.max()+500],),),)
+#     pio.renderers.default = "browser"
+#     fig.show()
+#     pdb.set_trace()
     return fig
 
 # CIF
