@@ -172,14 +172,14 @@ def main(argv):
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     # save estimated values
-    estimResConfig = configparser.ConfigParser()
-    estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
-    estimResConfig["optim_params"] = optimParams
-    estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
-    with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
+#     estimResConfig = configparser.ConfigParser()
+#     estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
+#     estimResConfig["optim_params"] = optimParams
+#     estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
+#     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
-    with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+#     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
+#     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
     pdb.set_trace()
 
