@@ -1490,7 +1490,7 @@ def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber
     fig.update_yaxes(title_text="Lower Bound")
     return fig
 
-def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParam, title, yMin, yMax, lowerBoundLineColor, refParamLineColor, percMargin=0.1):
+def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParam, title, yMin, yMax, lowerBoundLineColor, refParamLineColor, percMargin=1.0):
     if math.isinf(yMin):
         yMin = lowerBoundValues.min()
     if math.isinf(yMax):
