@@ -56,6 +56,8 @@ def main(argv):
     lowerBoundValues = np.empty(paramValues.shape)
     for i in range(len(paramValues)):
         paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+#         if paramValues[i]>=6.62:
+#             pdb.set_trace()
         lowerBoundValues[i] = model.eval()
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
