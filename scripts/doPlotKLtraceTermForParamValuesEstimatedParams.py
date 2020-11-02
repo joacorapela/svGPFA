@@ -5,10 +5,20 @@ import math
 import argparse
 import pickle
 import numpy as np
+import torch
 import plotly.io as pio
 sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import lowerBoundVsOneParamUtils
+
+def computeKLtraceTerm(model, k, trial):
+    qSigma = model._klDiv._svPosteriorOnIndPoints.buildQSigma()[k]
+    qMu = model._klDiv._svPosteriorOnIndPoints.getQMu()[k]
+    Kzz =  model._klDiv._indPointsLocsKMS.getKzz()[k]
+    KzzChol = model._klDiv._indPointsLocsKMS.getKzzChol()[k]
+    ESS = qSigma + torch.matmul(qMu, qMu.permute(0,2,1))
+    klTraceTerm = torch.trace(torch.cholesky_solve(ESS[trial,:,:], KzzChol[trial,:,:]))
+    return(klTraceTerm)
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -25,7 +35,6 @@ def main(argv):
     parser.add_argument("--paramValueStep", help="Step for parameter values", type=float, default=0.01)
     parser.add_argument("--yMin", help="Minimum y value", type=float, default=-math.inf)
     parser.add_argument("--yMax", help="Minimum y value", type=float, default=+math.inf)
-    parser.add_argument("--percMargin", help="Percentage value for margin=perecMargin*max(abs(yMin), abs(yMax))", type=float, default=0.1)
     parser.add_argument("--nQuad", help="Number of quadrature points", type=int, default=200)
 
     args = parser.parse_args()
@@ -42,7 +51,6 @@ def main(argv):
     paramValueStep = args.paramValueStep
     yMin = args.yMin
     yMax = args.yMax
-    percMargin = args.percMargin
     nQuad = args.nQuad
 
     modelFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
@@ -55,15 +63,13 @@ def main(argv):
     refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
     paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
-    lowerBoundValues = np.empty(paramValues.shape)
+    klTraceTerms = np.empty(paramValues.shape)
     for i in range(len(paramValues)):
         paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-#         if paramValues[i]>=6.62:
-#             pdb.set_trace()
-        lowerBoundValues[i] = model.eval()
+        klTraceTerms[i] = -computeKLtraceTerm(model=model, k=0, trial=0)
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="lowerBoundVs1DParam_estimatedParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="magenta", percMargin=percMargin)
+    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="klTraceTerm_estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=klTraceTerms, refParam=refParam, ylab="-KL Trace Term", title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="magenta")
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"

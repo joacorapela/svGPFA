@@ -4,11 +4,19 @@ import pdb
 import math
 import argparse
 import pickle
+import configparser
+import torch
 import numpy as np
 import plotly.io as pio
+import plotly.graph_objs as go
 sys.path.append("../src")
+import utils.svGPFA.initUtils
+import utils.svGPFA.configUtils
+import utils.svGPFA.miscUtils
+import stats.svGPFA.svGPFAModelFactory
 import plot.svGPFA.plotUtilsPlotly
 import lowerBoundVsOneParamUtils
+import condNumberVsOneParamUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -25,7 +33,6 @@ def main(argv):
     parser.add_argument("--paramValueStep", help="Step for parameter values", type=float, default=0.01)
     parser.add_argument("--yMin", help="Minimum y value", type=float, default=-math.inf)
     parser.add_argument("--yMax", help="Minimum y value", type=float, default=+math.inf)
-    parser.add_argument("--percMargin", help="Percentage value for margin=perecMargin*max(abs(yMin), abs(yMax))", type=float, default=0.1)
     parser.add_argument("--nQuad", help="Number of quadrature points", type=int, default=200)
 
     args = parser.parse_args()
@@ -42,7 +49,6 @@ def main(argv):
     paramValueStep = args.paramValueStep
     yMin = args.yMin
     yMax = args.yMax
-    percMargin = args.percMargin
     nQuad = args.nQuad
 
     modelFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
@@ -55,15 +61,34 @@ def main(argv):
     refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
     paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
-    lowerBoundValues = np.empty(paramValues.shape)
+    conditionNumbers = np.empty(len(paramValues))
     for i in range(len(paramValues)):
         paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-#         if paramValues[i]>=6.62:
-#             pdb.set_trace()
-        lowerBoundValues[i] = model.eval()
+        Kzz = model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._indPointsLocsKMS._Kzz
+        eValues, _ = torch.eig(Kzz[0][trial,:,:])
+        conditionNumbers[i] = eValues[0,0]/eValues[-1,0]
+
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="lowerBoundVs1DParam_estimatedParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="magenta", percMargin=percMargin)
+    figFilenamePattern = condNumberVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    layout = {
+        "title": title,
+        "xaxis": {"title": "Parameter Value"},
+        "yaxis": {"title": "Condition Number", "range": [yMin, yMax]},
+    }
+    data = []
+    data.append(
+            {
+                "type": "scatter",
+                "mode": "lines+markers",
+                "x": paramValues,
+                "y": conditionNumbers,
+                "name": "cNum trial 0",
+            },
+    )
+    fig = go.Figure(
+        data=data,
+        layout=layout,
+    )
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"

@@ -133,8 +133,8 @@ def main(argv):
 #         if paramValues[i]>=16.48:
 #             pdb.set_trace()
         # end debug code
-        if paramValues[i]>4.62:
-            pdb.set_trace()
+#         if paramValues[i]>=1.43:
+#             pdb.set_trace()
         lowerBoundValues[i] = model.eval()
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="lowerBoundVs1DParam_generativeParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)

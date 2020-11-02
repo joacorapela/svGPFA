@@ -5,10 +5,19 @@ import math
 import argparse
 import pickle
 import numpy as np
+import torch
 import plotly.io as pio
 sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import lowerBoundVsOneParamUtils
+
+def computeElinkTerm(model):
+    eMeanAllTimes, eVarAllTimes = model._eLL._svEmbeddingAllTimes.computeMeansAndVars()
+    eLinkValues = model._eLL._getELinkValues(eMean=eMeanAllTimes, eVar=eVarAllTimes)
+    aux0 = torch.transpose(input=model._eLL._legQuadWeights, dim0=1, dim1=2)
+    aux1 = torch.matmul(aux0, eLinkValues)
+    sELLTerm1 = -torch.sum(aux1)
+    return sELLTerm1
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -25,7 +34,6 @@ def main(argv):
     parser.add_argument("--paramValueStep", help="Step for parameter values", type=float, default=0.01)
     parser.add_argument("--yMin", help="Minimum y value", type=float, default=-math.inf)
     parser.add_argument("--yMax", help="Minimum y value", type=float, default=+math.inf)
-    parser.add_argument("--percMargin", help="Percentage value for margin=perecMargin*max(abs(yMin), abs(yMax))", type=float, default=0.1)
     parser.add_argument("--nQuad", help="Number of quadrature points", type=int, default=200)
 
     args = parser.parse_args()
@@ -42,7 +50,6 @@ def main(argv):
     paramValueStep = args.paramValueStep
     yMin = args.yMin
     yMax = args.yMax
-    percMargin = args.percMargin
     nQuad = args.nQuad
 
     modelFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
@@ -55,15 +62,13 @@ def main(argv):
     refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
     paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
-    lowerBoundValues = np.empty(paramValues.shape)
+    eLinkTerms = np.empty(paramValues.shape)
     for i in range(len(paramValues)):
         paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-#         if paramValues[i]>=6.62:
-#             pdb.set_trace()
-        lowerBoundValues[i] = model.eval()
+        eLinkTerms[i] = computeElinkTerm(model=model)
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="lowerBoundVs1DParam_estimatedParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="magenta", percMargin=percMargin)
+    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="eLinkTerm_estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=eLinkTerms, refParam=refParam, ylab="Expected Log Likelihood: Expected Link Function Term", title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="magenta")
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"
