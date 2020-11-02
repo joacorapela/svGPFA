@@ -123,16 +123,18 @@ def main(argv):
         paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
         Kzz = model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._indPointsLocsKMS._Kzz
         # begin debug code
-        for k in range(nLatents):
-            nTrial = Kzz[k].shape[0]
-            for r in range(nTrial):
-                # torch.sum(torch.abs(torch.eig(Kzz[k][0,:,:]).eigenvalues[:,1]))==0
-                imEigenval = torch.eig(Kzz[k][0,:,:]).eigenvalues[:,1]
+#         for k in range(nLatents):
+#             nTrial = Kzz[k].shape[0]
+#             for r in range(nTrial):
+#                 # torch.sum(torch.abs(torch.eig(Kzz[k][0,:,:]).eigenvalues[:,1]))==0
+#                 imEigenval = torch.eig(Kzz[k][0,:,:]).eigenvalues[:,1]
 #                 if torch.any(imEigenval!=0.0):
 #                     print("{:f}".format(paramValues[i]))
 #         if paramValues[i]>=16.48:
 #             pdb.set_trace()
         # end debug code
+#         if paramValues[i]>=1.43:
+#             pdb.set_trace()
         lowerBoundValues[i] = model.eval()
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="trueParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
