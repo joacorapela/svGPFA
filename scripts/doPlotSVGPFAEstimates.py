@@ -10,7 +10,7 @@ import argparse
 import configparser
 import pandas as pd
 import sklearn.metrics
-import statsmodels.tsa.stattools
+# import statsmodels.tsa.stattools
 
 import matplotlib
 matplotlib.use('Agg')
@@ -100,7 +100,7 @@ def main(argv):
     # plot true and estimated latents
 #     testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
 #     indPointsLocs = model.getIndPointsLocs()
-#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSTDs=trueLatentsSTDs, eTimes=trueLatentsTimes[0], eMuK=testMuK, eVarK=testVarK, indPointsLocs=indPointsLocs, trialToPlot=trialToPlot)
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSTDs=trueLatentsSTDs, eTimes=trueLatentsTimes[0], eLatentsMeans=testMuK, eLatentsSTDs=torch.sqrt(testVarK), eIndPointsLocs=indPointsLocs, trialToPlot=trialToPlot)
 #     fig.write_image(latentsFigFilenamePattern.format("png"))
 #     fig.write_html(latentsFigFilenamePattern.format("html"))
 
@@ -166,9 +166,9 @@ def main(argv):
     plt.close("all")
     plot.svGPFA.plotUtils.plotScatter1Lag(x=utRISIs, title=title, figFilename=timeRescaling1LagScatterPlotFigFilename)
     plt.close("all")
-    acfRes, confint = statsmodels.tsa.stattools.acf(x=utRISIs, unbiased=True, alpha=0.05)
-    plot.svGPFA.plotUtils.plotACF(acf=acfRes, Fs=1/dt, confint=confint, title=title, figFilename=timeRescalingACFFigFilename),
-    plt.close("all")
+#     acfRes, confint = statsmodels.tsa.stattools.acf(x=utRISIs, unbiased=True, alpha=0.05)
+#     plot.svGPFA.plotUtils.plotACF(acf=acfRes, Fs=1/dt, confint=confint, title=title, figFilename=timeRescalingACFFigFilename),
+#     plt.close("all")
 
     pdb.set_trace()
 
