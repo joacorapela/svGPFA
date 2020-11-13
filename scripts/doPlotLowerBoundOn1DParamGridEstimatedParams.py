@@ -3,10 +3,12 @@ import sys
 import pdb
 import math
 import argparse
+import configparser
 import pickle
 import numpy as np
 import plotly.io as pio
 sys.path.append("../src")
+import utils.svGPFA.configUtils
 import plot.svGPFA.plotUtilsPlotly
 import lowerBoundVsOneParamUtils
 
@@ -43,14 +45,30 @@ def main(argv):
     yMax = args.yMax
     nQuad = args.nQuad
 
+    if paramType=="kernel":
+        estMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
+        estMetaDataConfig = configparser.ConfigParser()
+        estMetaDataConfig.read(estMetaDataFilename)
+        estInitNumber = int(estMetaDataConfig["estimation_params"]["estInitNumber"])
+        estInitConfig = configparser.ConfigParser()
+        estInitFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
+        estInitConfig.read(estInitFilename)
+        if kernelParamIndex==1:
+            refParam0 = float(estInitConfig["kernel_params"]["kPeriodLatent{:d}".format(latent)])
+        else:
+            raise NotImplementedError("Currently only kernelParamIndex=1 is supported")
+    else:
+        raise NotImplementedError("Currently only paramType=kernel is supported")
+
     modelFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
 
     # create model
     with open(modelFilename, "rb") as f: modelRes = pickle.load(f)
     model = modelRes["model"]
 
+    refParams = [refParam0]
     indPointsLocsKMSRegEpsilon = model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._indPointsLocsKMS._epsilon
-    refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    refParams.append(lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2))
     paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
     lowerBoundValues = np.empty(paramValues.shape)
@@ -61,7 +79,7 @@ def main(argv):
         lowerBoundValues[i] = model.eval()
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="red")
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParams=refParams, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamsLineColors=["orange", "red"])
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"
