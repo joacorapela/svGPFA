@@ -1490,7 +1490,7 @@ def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber
     fig.update_yaxes(title_text="Lower Bound")
     return fig
 
-def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParam, title, yMin, yMax, lowerBoundLineColor, refParamLineColor, percMargin=0.1, xlab="Parameter Value", ylab="Lower Bound"):
+def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParams, title, yMin, yMax, lowerBoundLineColor, refParamsLineColors, percMargin=0.1, xlab="Parameter Value", ylab="Lower Bound"):
     if math.isinf(yMin):
         yMin = lowerBoundValues.min()
     if math.isinf(yMax):
@@ -1510,8 +1510,10 @@ def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParam, title, 
         {
             "type": "scatter",
             "mode": "lines+markers",
+            # "mode": "markers",
             "x": paramValues,
             "y": lowerBoundValues,
+            "marker": dict(color=lowerBoundLineColor),
             "line": dict(color=lowerBoundLineColor),
             "name": "lower bound",
         },
@@ -1520,17 +1522,18 @@ def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParam, title, 
         data=data,
         layout=layout,
     )
-    fig.add_shape(
-        # Line Vertical
-        dict(
-            type="line",
-            x0=refParam,
-            y0=yMin,
-            x1=refParam,
-            y1=yMax,
-            line=dict(
-                color=refParamLineColor,
-                width=3
-            )
-    ))
+    for i in range(len(refParams)):
+        fig.add_shape(
+            # Line Vertical
+            dict(
+                type="line",
+                x0=refParams[i],
+                y0=yMin,
+                x1=refParams[i],
+                y1=yMax,
+                line=dict(
+                    color=refParamsLineColors[i],
+                    width=3
+                )
+        ))
     return fig
