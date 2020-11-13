@@ -20,7 +20,7 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("simResNumber", help="simulation result number", type=int)
     parser.add_argument("paramType", help="Parameter type: indPointsPosteriorMean, indPointsPosteriorCov, indPointsLocs, kernel, embeddingC, embeddingD")
-    parser.add_argument("indPointsLocsKMSRegEpsilon", help="regularization epsilong for the inducing points locations covariance", type=float)
+    parser.add_argument("indPointsLocsKMSRegEpsilon", help="regularization epsilon for the inducing points locations covariance", type=float)
     parser.add_argument("--trial", help="Parameter trial number", type=int, default=0)
     parser.add_argument("--latent", help="Parameter latent number", type=int, default=0)
     parser.add_argument("--neuron", help="Parameter neuron number", type=int, default=0)
@@ -64,7 +64,7 @@ def main(argv):
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
-    firstIndPointLoc = float(simInitConfig["control_variables"]["firstIndPointLoc"])
+    # firstIndPointLoc = float(simInitConfig["control_variables"]["firstIndPointLoc"])
     # indPointsLocsKMSRegEpsilon = float(simInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
@@ -136,9 +136,24 @@ def main(argv):
 #         if paramValues[i]>=1.43:
 #             pdb.set_trace()
         lowerBoundValues[i] = model.eval()
+    # begin fix plotly problem with nInf values
+    # nInfIndices = np.where(lowerBoundValues==-np.inf)[0]
+    # minNoNInfLowerBound = lowerBoundValues[nInfIndices.max()+1]
+    # lowerBoundNoNInfValues = lowerBoundValues
+    # lowerBoundNoNInfValues[nInfIndices] = minNoNInfLowerBound
+    # end fix plotly problem with nInf values
+
+    # begin fix plotly problem with nInf values
+    boundedLowerBound = lowerBoundValues
+    smallIndices = np.where(lowerBoundValues<yMin)[0]
+    boundedLowerBound[smallIndices] = None
+    largeIndices = np.where(lowerBoundValues>yMax)[0]
+    boundedLowerBound[largeIndices] = None
+    # end fix plotly problem with nInf values
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="trueParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamLineColor="blue")
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=boundedLowerBound, refParams=[refParam], title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamsLineColors=["blue"])
+    # fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamLineColor="blue")
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"
