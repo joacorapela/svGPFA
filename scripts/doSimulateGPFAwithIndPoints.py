@@ -42,7 +42,6 @@ def main(argv):
     dtCIF = float(simInitConfig["control_variables"]["dtCIF"])
     indPointsLocsKMSRegEpsilon = float(simInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
     latentsCovRegEpsilon = float(simInitConfig["control_variables"]["latentsCovRegEpsilon"])
-    firstIndPointLoc = float(simInitConfig["control_variables"]["firstIndPointLoc"])
 
     randomPrefixUsed = True
     while randomPrefixUsed:
