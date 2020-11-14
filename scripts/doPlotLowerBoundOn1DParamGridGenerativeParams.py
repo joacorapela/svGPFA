@@ -151,9 +151,8 @@ def main(argv):
     boundedLowerBound[largeIndices] = None
     # end fix plotly problem with nInf values
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="trueParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=boundedLowerBound, refParams=[refParam], title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamsLineColors=["blue"])
-    # fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamLineColor="blue")
+    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="lowerBoundVs1DParam_generativeParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamLineColor="green")
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"

@@ -27,6 +27,7 @@ def main(argv):
     parser.add_argument("--paramValueStep", help="Step for parameter values", type=float, default=0.01)
     parser.add_argument("--yMin", help="Minimum y value", type=float, default=-math.inf)
     parser.add_argument("--yMax", help="Minimum y value", type=float, default=+math.inf)
+    parser.add_argument("--percMargin", help="Percentage value for margin=perecMargin*max(abs(yMin), abs(yMax))", type=float, default=0.1)
     parser.add_argument("--nQuad", help="Number of quadrature points", type=int, default=200)
 
     args = parser.parse_args()
@@ -43,6 +44,7 @@ def main(argv):
     paramValueStep = args.paramValueStep
     yMin = args.yMin
     yMax = args.yMax
+    percMargin = args.percMargin
     nQuad = args.nQuad
 
     if paramType=="kernel":
@@ -78,8 +80,8 @@ def main(argv):
 #             pdb.set_trace()
         lowerBoundValues[i] = model.eval()
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParams=refParams, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamsLineColors=["orange", "red"])
+    figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="lowerBoundVs1DParam_estimatedParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="red", refParamLineColor="magenta", percMargin=percMargin)
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"

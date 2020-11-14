@@ -6,6 +6,8 @@ slurm-*
 .nfs*
 toRsync*
 fromRsync*
+toSyncData
+fromSyncData
 nextRefractoring.txt
 todo.txt
 .ipynb*

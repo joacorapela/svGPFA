@@ -88,6 +88,17 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
         indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSRegEpsilon)
         indPointsLocsKMS.buildKernelsMatrices()
         Kzz = indPointsLocsKMS.getKzz()
+        # pdb.set_trace()
+        # begin debug
+        condNumberThr = 1e+6
+        eigRes = torch.eig(Kzz[0][0,:,:], eigenvectors=True)
+        if any(eigRes.eigenvalues[:,1]>0):
+            raise RuntimeError("Some eigenvalues of Kzz are imaginary")
+        sortedEigVals = eigRes.eigenvalues[:,0].sort(descending=True).values
+        condNumber = sortedEigVals[0]/sortedEigVals[-1]
+        if condNumber>condNumberThr:
+            raise RuntimeError(sprintf("Poorly conditioned Kzz (condition number=%.02f)", condNumber))
+        # end debug
         KzzChol = indPointsLocsKMS.getKzzChol()
 
         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
