@@ -31,7 +31,7 @@ def test_eStep_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
@@ -67,7 +67,7 @@ def test_eStep_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -100,7 +100,7 @@ def test_eStep_pointProcess():
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -189,7 +189,7 @@ def test_mStepModelParams_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
@@ -247,7 +247,7 @@ def test_mStepModelParams_pointProcess():
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -285,7 +285,7 @@ def test_mStepKernelParams_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
@@ -343,7 +343,7 @@ def test_mStepKernelParams_pointProcess():
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -433,7 +433,7 @@ def test_mStepIndPoints_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
@@ -491,7 +491,7 @@ def test_mStepIndPoints_pointProcess():
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
     svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -534,7 +534,7 @@ def test_maximize_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
@@ -593,7 +593,7 @@ def test_maximize_pointProcess():
     svlb.setKernels(kernels=kernels)
     svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -668,8 +668,8 @@ if __name__=='__main__':
     # test_eStep_pointProcess() # passed
     # # test_eStep_poisson() # not tested
     test_mStepModelParams_pointProcess() # passed
-    test_mStepKernelParams_pointProcess() # passed
-    test_mStepIndPoints_pointProcess() # passed
+    # test_mStepKernelParams_pointProcess() # passed
+    # test_mStepIndPoints_pointProcess() # passed
 
     t0 = time.perf_counter()
     test_maximize_pointProcess() # passed
