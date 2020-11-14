@@ -16,11 +16,11 @@ def test_buildQSigma():
     nTrials = mat['q_sqrt'][(0,0)].shape[2]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSRSigma0Vec = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     q_sigma = [torch.from_numpy(mat['q_sigma'][(0,k)]).permute(2,0,1) for k in range(nLatents)]
     qMu0 = [[] for i in range(nLatents)]
 
-    params0 = {"qMu0": qMu0, "qSRSigma0Vec": qSRSigma0Vec}
+    params0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
     qU.setInitialParams(initialParams=params0)
     qSigma = qU.buildQSigma();
