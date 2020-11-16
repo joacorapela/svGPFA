@@ -89,3 +89,29 @@ class PeriodicKernel(Kernel):
         answer = {"scale": scale, "lengthScale": lengthScale, "period": period}
         return answer
 
+class ParamsScaledKernel(Kernel):
+    def __init__(self, baseKernel, paramsScales, dtype=torch.double, device=torch.device("cpu")):
+        self._baseKernel = baseKernel
+        self._paramsScales = paramsScales
+
+    def setParams(self, params):
+        unscaledParams = params/torch.tensor(self._paramsScales)
+        self._baseKernel.setParams(params=unscaledParams)
+
+    def getParams(self):
+        unscaledParams = self._baseKernel.getParams()
+        scaledParams = unscaledParams*torch.tensor(self._paramsScales)
+        return scaledParams
+
+    def buildKernelMatrix(self, X1, X2=None):
+        return self._baseKernel.buildKernelMatrix(X1=X1, X2=X2)
+
+    def buildKernelMatrixDiag(self, X):
+        return self._baseKernel.buildKernelMatrixDiag(X=X)
+
+    def _getAllParams(self):
+        return self._baseKernel._getAllParams()
+
+    def getNamedParams(self):
+        return self._baseKernel._getNamedParams()
+
