@@ -343,16 +343,64 @@ class SVEM:
             return answer
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
         # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-                                            optimizer=optimizer,
-                                            maxIter=maxIter, tol=tol,
-                                            verbose=verbose,
-                                            out=out,
-                                            nIterDisplay=nIterDisplay,
-                                            logLock=logLock,
-                                            logStream=logStream,
-                                            logStreamFN=logStreamFN,
-                                           )
+        # answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
+        #                                     optimizer=optimizer,
+        #                                     maxIter=maxIter, tol=tol,
+        #                                     verbose=verbose,
+        #                                     out=out,
+        #                                     nIterDisplay=nIterDisplay,
+        #                                     logLock=logLock,
+        #                                     logStream=logStream,
+        #                                     logStreamFN=logStreamFN,
+        #                                    )
+        for i in range(len(x)):
+            x[i].requires_grad = True
+        iterCount = 0
+        lowerBoundHist = []
+        curEval = torch.tensor([float("inf")])
+        converged = False
+        def closure():
+            # details on this closure at http://sagecal.sourceforge.net/pytorch/index.html
+            nonlocal curEval
+
+            if torch.is_grad_enabled():
+                optimizer.zero_grad()
+            curEval = -evalFunc()
+            if curEval.requires_grad:
+                curEval.backward(retain_graph=True)
+            return curEval
+
+        while not converged and iterCount<maxIter:
+            prevEval = curEval
+            optimizer.step(closure)
+            x[1].clamp_(0.5)
+            if curEval<=prevEval and prevEval-curEval<tol:
+                converged = True
+            message = displayFmt%(iterCount, curEval)
+            if verbose and iterCount%nIterDisplay==0:
+                out.write(message)
+                self._writeToLockedLog(
+                    message=message,
+                    logLock=logLock,
+                    logStream=logStream,
+                    logStreamFN=logStreamFN
+                )
+            lowerBoundHist.append(-curEval.item())
+            iterCount += 1
+
+        return {"lowerBound": -curEval.item(), "lowerBoundHist": lowerBoundHist, "converged": converged}
+        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer,
+                                    maxIter=maxIter, tol=tol, verbose=verbose,
+                                    out=out,
+                                    nIterDisplay=nIterDisplay,
+                                    logLock=logLock,
+                                    logStream=logStream,
+                                    logStreamFN=logStreamFN,
+                                    displayFmt=displayFmt,
+                                   )
+        for i in range(len(x)):
+            x[i].requires_grad = False
+
         # begin debug periodic kernel
 #         with torch.no_grad():
 #             endLB = model.eval()
