@@ -279,7 +279,10 @@ class SVEM:
         return answer
 
     def _mStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
-                      nIterDisplay, logLock, logStream, logStreamFN):
+                      nIterDisplay, logLock, logStream, logStreamFN,
+                      minScale=0.2,
+                      displayFmt="Step: %02d, negative lower bound: %f\n",
+                     ):
         x = model.getKernelsParams()
         # begin debug periodic kernel
 #         with torch.no_grad():
@@ -373,7 +376,8 @@ class SVEM:
         while not converged and iterCount<maxIter:
             prevEval = curEval
             optimizer.step(closure)
-            x[1].clamp_(0.5)
+            # with torch.no_grad():
+            #     x[0].clamp_(minScale)
             if curEval<=prevEval and prevEval-curEval<tol:
                 converged = True
             message = displayFmt%(iterCount, curEval)
@@ -388,16 +392,8 @@ class SVEM:
             lowerBoundHist.append(-curEval.item())
             iterCount += 1
 
-        return {"lowerBound": -curEval.item(), "lowerBoundHist": lowerBoundHist, "converged": converged}
-        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer,
-                                    maxIter=maxIter, tol=tol, verbose=verbose,
-                                    out=out,
-                                    nIterDisplay=nIterDisplay,
-                                    logLock=logLock,
-                                    logStream=logStream,
-                                    logStreamFN=logStreamFN,
-                                    displayFmt=displayFmt,
-                                   )
+        answer = {"lowerBound": -curEval.item(), "lowerBoundHist": lowerBoundHist, "converged": converged}
+
         for i in range(len(x)):
             x[i].requires_grad = False
 
