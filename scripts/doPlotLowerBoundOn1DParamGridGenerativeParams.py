@@ -91,6 +91,7 @@ def main(argv):
     # end patch
 
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol)
+
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
@@ -133,7 +134,7 @@ def main(argv):
 #         if paramValues[i]>=16.48:
 #             pdb.set_trace()
         # end debug code
-#         if paramValues[i]>=1.43:
+#         if paramValues[i]>=4.0:
 #             pdb.set_trace()
         lowerBoundValues[i] = model.eval()
     # begin fix plotly problem with nInf values
@@ -152,7 +153,7 @@ def main(argv):
     # end fix plotly problem with nInf values
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = lowerBoundVsOneParamUtils.getFigFilenamePattern(prefixNumber=simResNumber, descriptor="lowerBoundVs1DParam_generativeParams", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParam=refParam, title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamLineColor="green")
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundVsOneParam(paramValues=paramValues, lowerBoundValues=lowerBoundValues, refParams=[refParam], title=title, yMin=yMin, yMax=yMax, lowerBoundLineColor="blue", refParamsLineColors=["blue"])
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"
