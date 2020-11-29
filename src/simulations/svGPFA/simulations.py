@@ -1,5 +1,6 @@
 
 import pdb
+import warnings
 import torch
 import scipy.stats
 import stats.pointProcess.sampler
@@ -93,11 +94,11 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
         condNumberThr = 1e+6
         eigRes = torch.eig(Kzz[0][0,:,:], eigenvectors=True)
         if any(eigRes.eigenvalues[:,1]>0):
-            raise RuntimeError("Some eigenvalues of Kzz are imaginary")
+            warnings.warn("Some eigenvalues of Kzz are imaginary")
         sortedEigVals = eigRes.eigenvalues[:,0].sort(descending=True).values
         condNumber = sortedEigVals[0]/sortedEigVals[-1]
         if condNumber>condNumberThr:
-            raise RuntimeError(sprintf("Poorly conditioned Kzz (condition number=%.02f)", condNumber))
+            warnings.warn("Poorly conditioned Kzz (condition number={:.02f})".format(condNumber))
         # end debug
         KzzChol = indPointsLocsKMS.getKzzChol()
 
