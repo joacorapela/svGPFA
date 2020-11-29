@@ -100,8 +100,15 @@ def main(argv):
     legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     # kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
-    kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
+    # kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
+    res = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
+    kernels = res["kernels"]
+    kernelsParamsScales = res["kernelsParamsScales"]
+    unscaledKernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
+
+    kernelsParams0 = []
+    for i in range(len(unscaledKernelsParams0)):
+        kernelsParams0.append(unscaledKernelsParams0[i]/kernelsParamsScales[i])
 
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
@@ -114,14 +121,18 @@ def main(argv):
             qMu0[k][r,:,:] = indPointsMeans[r][k]
     # end patch
 
-    # srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol)
-    srQSigma0s = []
-    for i in range(len(KzzChol)):
-        srQSigma0s.append(torch.unsqueeze(torch.eye(KzzChol[i].shape[1]), dim=0))
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=srQSigma0s)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol)
+    # epsilonSRQSigma0 = 1e4
+    # srQSigma0s = []
+    # for k in range(nLatents):
+    #     srQSigma0sForLatent = torch.empty((nTrials, nIndPointsPerLatent[k], nIndPointsPerLatent[k]))
+    #     for r in range(nTrials):
+    #         srQSigma0sForLatent[r,:,:] = epsilonSRQSigma0*torch.eye(nIndPointsPerLatent[k])
+    #     srQSigma0s.append(srQSigma0sForLatent)
+    # srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=srQSigma0s)
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
+    kmsParams0 = {"kernelsParams0": unscaledKernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
                  "kernelsMatricesStore": kmsParams0}
@@ -131,6 +142,30 @@ def main(argv):
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
+    kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
+    qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
+    estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
+
+    utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
+        qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
+        C0=C, d0=d,
+        indPointsLocs0=Z0,
+        legQuadPoints=legQuadPoints,
+        legQuadWeights=legQuadWeights,
+        kernelsTypes=kernelsTypes,
+        kernelsParams0=kernelsParams0,
+        spikesTimes=spikesTimes,
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+        trialsLengths=np.array(trialsLengths).reshape(-1,1),
+        emMaxIter=optimParams["emMaxIter"],
+        eStepMaxIter=optimParams["eStepMaxIter"],
+        mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
+        mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
+        mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
+        saveFilename=estimationDataForMatlabFilename)
+
+    pdb.set_trace()
+
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
@@ -139,11 +174,14 @@ def main(argv):
         kernels=kernels)
 
     # maximize lower bound
+    modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
+    savePartialFilenamePattern = "results/{:08d}_{{:s}}_estimatedModel.pickle".format(estResNumber)
     svEM = stats.svGPFA.svEM.SVEM()
     lowerBoundHist, elapsedTimeHist  = svEM.maximize(
         model=model, measurements=spikesTimes, initialParams=initialParams,
         quadParams=quadParams, optimParams=optimParams,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+        savePartial=True, savePartialFilenamePattern=savePartialFilenamePattern)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
@@ -153,7 +191,7 @@ def main(argv):
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
-    with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+    # with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
     pdb.set_trace()
 
