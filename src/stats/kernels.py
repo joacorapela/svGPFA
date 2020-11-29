@@ -30,7 +30,7 @@ class ExponentialQuadraticKernel(Kernel):
         self._scale = torch.tensor(scale)
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale, lengthScale = self._getAllParams()
+        scale, lengthscale = self._getAllParams()
 
         if X2 is None:
             X2 = X1
@@ -38,30 +38,34 @@ class ExponentialQuadraticKernel(Kernel):
             distance = (X1-X2.transpose(1, 2))**2
         else:
             distance = (X1.reshape(-1,1)-X2.reshape(1,-1))**2
-        covMatrix = scale**2*torch.exp(-.5*distance/lengthScale**2)
+        covMatrix = scale**2*torch.exp(-.5*distance/lengthscale**2)
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale, lengthScale = self._getAllParams()
+        scale, lengthscale = self._getAllParams()
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
     def _getAllParams(self):
         scale = self._scale
-        lengthScale = self._params[0]
-        return scale, lengthScale
+        lengthscale = self._params[0]
+        return scale, lengthscale
 
     def getNamedParams(self):
-        scale, lengthScale = self._getAllParams()
-        answer = {"scale": scale, "lengthScale": lengthScale}
+        scale, lengthscale = self._getAllParams()
+        answer = {"scale": scale, "lengthscale": lengthscale}
         return answer
 
 class PeriodicKernel(Kernel):
-    def __init__(self, scale, dtype=torch.double, device=torch.device("cpu")):
+    def __init__(self, scale, lengthscaleScale=1.0, periodScale=1.0, dtype=torch.double, device=torch.device("cpu")):
         self._scale = torch.tensor(scale)
+        self._lengthscaleScale = lengthscaleScale
+        self._periodScale = periodScale
 
     def buildKernelMatrix(self, X1, X2=None):
-        scale, lengthScale, period = self._getAllParams()
+        scale, lengthscale, period = self._getAllParams()
+        lengthscale = lengthscale/self._lengthscaleScale
+        period = period/self._periodScale
         if X2 is None:
             X2 = X1
         if X1.ndim==3:
@@ -69,49 +73,23 @@ class PeriodicKernel(Kernel):
         else:
             sDistance = X1.reshape(-1,1)-X2.reshape(1,-1)
         rr = math.pi*sDistance/period
-        covMatrix = scale**2*torch.exp(-2*torch.sin(rr)**2/lengthScale**2)
+        covMatrix = scale**2*torch.exp(-2*torch.sin(rr)**2/lengthscale**2)
         return covMatrix
 
     def buildKernelMatrixDiag(self, X):
-        scale, lengthScale, period = self._getAllParams()
+        scale, lengthscale, period = self._getAllParams()
         covMatrixDiag = scale**2*torch.ones(X.shape, dtype=X.dtype, device=X.device)
         return covMatrixDiag
 
     def _getAllParams(self):
         scale = self._scale
-        lengthScale = self._params[0]
+        lengthscale = self._params[0]
         period = self._params[1]
 
-        return scale, lengthScale, period
+        return scale, lengthscale, period
 
     def getNamedParams(self):
-        scale, lengthScale, period = self._getAllParams()
-        answer = {"scale": scale, "lengthScale": lengthScale, "period": period}
+        scale, lengthscale, period = self._getAllParams()
+        answer = {"scale": scale, "lengthscale": lengthscale, "period": period}
         return answer
-
-class ParamsScaledKernel(Kernel):
-    def __init__(self, baseKernel, paramsScales, dtype=torch.double, device=torch.device("cpu")):
-        self._baseKernel = baseKernel
-        self._paramsScales = paramsScales
-
-    def setParams(self, params):
-        unscaledParams = params/torch.tensor(self._paramsScales)
-        self._baseKernel.setParams(params=unscaledParams)
-
-    def getParams(self):
-        unscaledParams = self._baseKernel.getParams()
-        scaledParams = unscaledParams*torch.tensor(self._paramsScales)
-        return scaledParams
-
-    def buildKernelMatrix(self, X1, X2=None):
-        return self._baseKernel.buildKernelMatrix(X1=X1, X2=X2)
-
-    def buildKernelMatrixDiag(self, X):
-        return self._baseKernel.buildKernelMatrixDiag(X=X)
-
-    def _getAllParams(self):
-        return self._baseKernel._getAllParams()
-
-    def getNamedParams(self):
-        return self._baseKernel._getNamedParams()
 
