@@ -89,19 +89,19 @@ def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
             qSigmas[k][r,:,:] = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
     return(qSigmas)
 
-def getQSVecsAndQSDiagsFromQSRSigmaVecs(qSRSigmaVecs):
-    # qSRSigmaVecs[k] \in nTrial x Pk
-    nLatents = len(qSRSigmaVecs)
-    nTrials = qSRSigmaVecs[0].shape[0]
+def getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs):
+    # srQSigmaVecs[k] \in nTrial x Pk
+    nLatents = len(srQSigmaVecs)
+    nTrials = srQSigmaVecs[0].shape[0]
     qSVec = [[] for k in range(nLatents)]
     qSDiag = [[] for k in range(nLatents)]
     for k in range(nLatents):
-        Pk = qSRSigmaVecs[k].shape[1]
+        Pk = srQSigmaVecs[k].shape[1]
         nIndPointsK = int((-1.0+math.sqrt(1+8*Pk))/2.0)
         qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         for r in range(nTrials):
-            qSRSigmaKR = getSRQSigmaFromVec(vec=qSRSigmaVecs[k][r,:], nIndPoints=nIndPointsK)
+            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:], nIndPoints=nIndPointsK)
             qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
             qSDiagKR = torch.diag(qSigmaKR)
             qSigmaKR = qSigmaKR - torch.diag(qSDiagKR)
