@@ -5,27 +5,50 @@ import pandas as pd
 import torch
 import stats.kernels
 
+def getScaledKernels(nLatents, config, forceUnitScale):
+    kernels = [[] for r in range(nLatents)]
+    kernelsParamsScales = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
+        if kernelType=="periodic":
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscaleScaledValue = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            lengthscaleScale = float(config["kernel_params"]["kLengthscaleScaleLatent{:d}".format(k)])
+            periodScaledValue = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
+            periodScale = float(config["kernel_params"]["kPeriodScaleLatent{:d}".format(k)])
+            kernel = stats.kernels.PeriodicKernel(scale=scale, lengthscaleScale=lengthscaleScale, periodScale=periodScale)
+            kernel.setParams(params=torch.Tensor([lengthscaleScaledValue*lengthscaleScale, periodScaledValue*periodScale]).double())
+            kernelsParamsScales[k] = torch.tensor([lengthscaleScale, periodScale])
+        else:
+            raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
+        kernels[k] = kernel
+    answer = {"kernels": kernels, "kernelsParamsScales": kernelsParamsScales}
+    return answer
+
 def getKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     for k in range(nLatents):
         kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
         if kernelType=="periodic":
             if not forceUnitScale:
-                scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
             else:
                 scale = 1.0
-            lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}".format(k)])
-            period = float(config["kernel_params"]["kPeriodLatent{:d}".format(k)])
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            period = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
             kernel = stats.kernels.PeriodicKernel(scale=scale)
-            kernel.setParams(params=torch.Tensor([lengthScale, period]).double())
+            kernel.setParams(params=torch.Tensor([lengthscale, period]).double())
         elif kernelType=="exponentialQuadratic":
             if not forceUnitScale:
-                scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
             else:
                 scale = 1.0
-            lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}".format(k)])
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
             kernel = stats.kernels.ExponentialQuadraticKernel(scale=scale)
-            kernel.setParams(params=torch.Tensor([lengthScale]).double())
+            kernel.setParams(params=torch.Tensor([lengthscale]).double())
         else:
             raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
         kernels[k] = kernel
