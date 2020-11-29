@@ -5,6 +5,7 @@ import io
 import torch
 import time
 # from .utils import clock
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import plot.svGPFA.plotUtils
@@ -18,6 +19,8 @@ class SVEM:
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
                  verbose=True, out=sys.stdout,
+                 savePartial=False,
+                 savePartialFilenamePattern="00000000_{:s}_estimatedModel.pickle",
                 ):
 
         if latentsStreamFN is not None and latentsTimes is None:
@@ -30,6 +33,10 @@ class SVEM:
         model.buildKernelsMatrices()
 
         iter = 0
+        if savePartial:
+            savePartialFilename = savePartialFilenamePattern.format("initial")
+            resultsToSave = {"model": model}
+            with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
         lowerBound0 = model.eval()
         lowerBoundHist = [lowerBound0.item()]
         elapsedTimeHist = [0.0]
@@ -46,13 +53,13 @@ class SVEM:
             muK, varK = model.predictLatents(newTimes=latentsTimes)
 
             with open(latentsStreamFN, 'wb') as f:
-                np.savez(f, iteration=iter+1, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
+                np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
             lowerBoundLock.unlock()
-
+        iter += 1
         logStream = io.StringIO()
         while iter<optimParams["emMaxIter"]:
             if optimParams["eStepEstimate"]:
-                message = "Iteration %02d, E-Step start\n"%(iter+1)
+                message = "Iteration %02d, E-Step start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -85,7 +92,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, E-Step end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, E-Step end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -94,11 +101,15 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("eStep{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
             if optimParams["mStepEmbeddingEstimate"]:
-                message = "Iteration %02d, M-Step Model Params start\n"%(iter+1)
+                message = "Iteration %02d, M-Step Model Params start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -125,7 +136,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, M-Step Model Params end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, M-Step Model Params end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -134,11 +145,15 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("mStepEmbedding{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
             if optimParams["mStepKernelsEstimate"]:
-                message = "Iteration %02d, M-Step Kernel Params start\n"%(iter+1)
+                message = "Iteration %02d, M-Step Kernel Params start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -165,7 +180,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, M-Step Kernel Params end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, M-Step Kernel Params end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -174,11 +189,15 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("mStepKernels{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
             if optimParams["mStepIndPointsEstimate"]:
-                message = "Iteration %02d, M-Step Ind Points start\n"%(iter+1)
+                message = "Iteration %02d, M-Step Ind Points start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -205,7 +224,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, M-Step Ind Points end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, M-Step Ind Points end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -214,6 +233,10 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("mStepIndPoints{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
@@ -231,7 +254,7 @@ class SVEM:
                 muK, varK = model.predictLatents(newTimes=latentsTimes)
 
                 with open(latentsStreamFN, 'wb') as f:
-                    np.savez(f, iteration=iter+1, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
+                    np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
                 lowerBoundLock.unlock()
 
             iter += 1
@@ -273,17 +296,20 @@ class SVEM:
                                             nIterDisplay=nIterDisplay,
                                             logLock=logLock,
                                             logStream=logStream,
-                                            logStreamFN=logStreamFN, 
+                                            logStreamFN=logStreamFN,
                                            )
         # pdb.set_trace()
         return answer
 
     def _mStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
                       nIterDisplay, logLock, logStream, logStreamFN,
-                      minScale=0.2,
+                      minScale=0.75,
                       displayFmt="Step: %02d, negative lower bound: %f\n",
                      ):
         x = model.getKernelsParams()
+        # out.write("*** Bug in _mStepKernels ***\n")
+        # x = [x[0][0]]
+        out.write("kernel params {}\n".format(x))
         # begin debug periodic kernel
 #         with torch.no_grad():
 #             import pandas as pd
@@ -345,17 +371,17 @@ class SVEM:
             answer = model.eval()
             return answer
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        # optimizer = torch.optim.Adam(x, lr=lr)
-        # answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-        #                                     optimizer=optimizer,
-        #                                     maxIter=maxIter, tol=tol,
-        #                                     verbose=verbose,
-        #                                     out=out,
-        #                                     nIterDisplay=nIterDisplay,
-        #                                     logLock=logLock,
-        #                                     logStream=logStream,
-        #                                     logStreamFN=logStreamFN,
-        #                                    )
+#         optimizer = torch.optim.Adam(x, lr=lr)
+#         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
+#                                             optimizer=optimizer,
+#                                             maxIter=maxIter, tol=tol,
+#                                             verbose=verbose,
+#                                             out=out,
+#                                             nIterDisplay=nIterDisplay,
+#                                             logLock=logLock,
+#                                             logStream=logStream,
+#                                             logStreamFN=logStreamFN,
+#                                            )
         for i in range(len(x)):
             x[i].requires_grad = True
         iterCount = 0
@@ -376,8 +402,8 @@ class SVEM:
         while not converged and iterCount<maxIter:
             prevEval = curEval
             optimizer.step(closure)
-            # with torch.no_grad():
-            #     x[0].clamp_(minScale)
+            with torch.no_grad():
+                x[0].clamp_(minScale)
             if curEval<=prevEval and prevEval-curEval<tol:
                 converged = True
             message = displayFmt%(iterCount, curEval)
