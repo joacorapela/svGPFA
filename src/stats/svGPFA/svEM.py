@@ -58,8 +58,8 @@ class SVEM:
         iter += 1
         logStream = io.StringIO()
         while iter<optimParams["emMaxIter"]:
-            if optimParams["eStepEstimate"]:
-                message = "Iteration %02d, E-Step start\n"%(iter)
+            if optimParams["eStepAndMStepKernelsEstimate"]:
+                message = "Iteration %02d, E-Step and M-Step Kernels start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -74,25 +74,25 @@ class SVEM:
                 # print(logLike)
                 # pdb.set_trace()
                 # end debug
-                if optimParams["eStepLineSearchFn"]=="None":
+                if optimParams["eStepAndMStepKernelsLineSearchFn"]=="None":
                     lineSearchFn = None
                 else:
-                    lineSearchFn = optimParams["eStepLineSearchFn"]
+                    lineSearchFn = optimParams["eStepAndMStepKernelsLineSearchFn"]
                 # pdb.set_trace()
-                maxRes = self._eStep(
+                maxRes = self._eStepAndMStepKernels(
                     model=model,
-                    maxIter=optimParams["eStepMaxIter"],
-                    tol=optimParams["eStepTol"],
-                    lr=optimParams["eStepLR"],
+                    maxIter=optimParams["eStepAndMStepKernelsMaxIter"],
+                    tol=optimParams["eStepAndMStepKernelsTol"],
+                    lr=optimParams["eStepAndMStepKernelsLR"],
                     lineSearchFn=lineSearchFn,
                     verbose=optimParams["verbose"],
                     out=out,
-                    nIterDisplay=optimParams["eStepNIterDisplay"],
+                    nIterDisplay=optimParams["eStepAndMStepKernelsNIterDisplay"],
                     logLock=logLock,
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, E-Step end: %f\n"%(iter, -maxRes['lowerBound'])
+                message = "Iteration %02d, E-Step and M-Step end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -261,10 +261,15 @@ class SVEM:
             # pdb.set_trace()
         return lowerBoundHist, elapsedTimeHist
 
-    def _eStep(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
+    def _eStepAndMStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
                nIterDisplay, logLock, logStream, logStreamFN):
-        x = model.getSVPosteriorOnIndPointsParams()
-        evalFunc = model.eval
+        x = model.getSVPosteriorOnIndPointsParams()+model.getKernelsParams()
+        print("Kernels params: ")
+        print(model.getKernelsParams())
+        def evalFunc():
+            model.buildKernelsMatrices()
+            answer = model.eval()
+            return answer
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
         # optimizer = torch.optim.Adam(x, lr=lr)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
