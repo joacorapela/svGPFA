@@ -22,7 +22,7 @@ def main(argv):
 
     estNumber = int(argv[1])
     gpRegularization = 1e-3
-    estResConfigFilename = "results/{:08d}_estimation_metaData.ini".format(estNumber)
+    estResConfigFilename = "results/{:08d}_estimatedModelMetaData.ini".format(estNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estNumber)
     kernelsParamsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedKernelsParams.{{:s}}".format(estNumber)
     latentsMeansFigFilenamePattern = "figures/{:08d}_trueAndEstimatedLatentsMeans.{{:s}}".format(estNumber)
@@ -41,9 +41,10 @@ def main(argv):
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
-    dtSimulate = float(simInitConfig["control_variables"]["dt"])
+    dtSimulate = float(simInitConfig["control_variables"]["dtCIF"])
 
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)[0]
+    # kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)[0]
+    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)[0]
     # latentsMeansFuncs[r][k] \in lambda(t)
     tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     CFilename = simInitConfig["embedding_params"]["C_filename"]
