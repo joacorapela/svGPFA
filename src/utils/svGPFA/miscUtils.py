@@ -8,6 +8,48 @@ import matplotlib.pyplot as plt
 import myMath.utils
 import stats.gaussianProcesses.eval
 
+def getOptimParams(optimParamsDict):
+    optimParams = {}
+    optimParams["emMaxIter"] = int(optimParamsDict["emMaxIter".lower()])
+    #
+    optimParams["eStepAndMStepKernelsEstimate"] = optimParamsDict["eStepAndMStepKernelsEstimate".lower()]=="True"
+    optimParams["eStepAndMStepKernelsMaxIter"] = int(optimParamsDict["eStepAndMStepKernelsMaxIter".lower()])
+    optimParams["eStepAndMStepKernelsTol"] = float(optimParamsDict["eStepAndMStepKernelsTol".lower()])
+    optimParams["eStepAndMStepKernelsLR"] = float(optimParamsDict["eStepAndMStepKernelsLR".lower()])
+    optimParams["eStepAndMStepKernelsLineSearchFn"] = optimParamsDict["eStepAndMStepKernelsLineSearchFn".lower()]
+    optimParams["eStepAndMStepKernelsNIterDisplay"] = int(optimParamsDict["eStepAndMStepKernelsNIterDisplay".lower()])
+    #
+    optimParams["eStepEstimate"] = optimParamsDict["eStepEstimate".lower()]=="True"
+    optimParams["eStepMaxIter"] = int(optimParamsDict["eStepMaxIter".lower()])
+    optimParams["eStepTol"] = float(optimParamsDict["eStepTol".lower()])
+    optimParams["eStepLR"] = float(optimParamsDict["eStepLR".lower()])
+    optimParams["eStepLineSearchFn"] = optimParamsDict["eStepLineSearchFn".lower()]
+    optimParams["eStepNIterDisplay"] = int(optimParamsDict["eStepNIterDisplay".lower()])
+    #
+    optimParams["mStepEmbeddingEstimate"] = optimParamsDict["mStepEmbeddingEstimate".lower()]=="True"
+    optimParams["mStepEmbeddingMaxIter"] = int(optimParamsDict["mStepEmbeddingMaxIter".lower()])
+    optimParams["mStepEmbeddingTol"] = float(optimParamsDict["mStepEmbeddingTol".lower()])
+    optimParams["mStepEmbeddingLR"] = float(optimParamsDict["mStepEmbeddingLR".lower()])
+    optimParams["mStepEmbeddingLineSearchFn"] = optimParamsDict["mStepEmbeddingLineSearchFn".lower()]
+    optimParams["mStepEmbeddingNIterDisplay"] = int(optimParamsDict["mStepEmbeddingNIterDisplay".lower()])
+    #
+    optimParams["mStepKernelsEstimate"] = optimParamsDict["mStepKernelsEstimate".lower()]=="True"
+    optimParams["mStepKernelsMaxIter"] = int(optimParamsDict["mStepKernelsMaxIter".lower()])
+    optimParams["mStepKernelsTol"] = float(optimParamsDict["mStepKernelsTol".lower()])
+    optimParams["mStepKernelsLR"] = float(optimParamsDict["mStepKernelsLR".lower()])
+    optimParams["mStepKernelsLineSearchFn"] = optimParamsDict["mStepKernelsLineSearchFn".lower()]
+    optimParams["mStepKernelsNIterDisplay"] = int(optimParamsDict["mStepKernelsNIterDisplay".lower()])
+    #
+    optimParams["mStepIndPointsEstimate"] = optimParamsDict["mStepIndPointsEstimate".lower()]=="True"
+    optimParams["mStepIndPointsMaxIter"] = int(optimParamsDict["mStepIndPointsMaxIter".lower()])
+    optimParams["mStepIndPointsTol"] = float(optimParamsDict["mStepIndPointsTol".lower()])
+    optimParams["mStepIndPointsLR"] = float(optimParamsDict["mStepIndPointsLR".lower()])
+    optimParams["mStepIndPointsLineSearchFn"] = optimParamsDict["mStepIndPointsLineSearchFn".lower()]
+    optimParams["mStepIndPointsNIterDisplay"] = int(optimParamsDict["mStepIndPointsNIterDisplay".lower()])
+    #
+    optimParams["verbose"] = optimParamsDict["verbose"]=="True"
+    return(optimParams)
+
 def getCIFs(C, d, latents):
     nTrials = latents.shape[0]
     nLatents = latents.shape[2]
