@@ -39,7 +39,7 @@ def main(argv):
     ksTestGamma = args.ksTestGamma
     nTestPoints = args.nTestPoints
 
-    estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
+    estimResMetaDataFilename = "results/{:08d}_estimatedModelMetaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     lowerBoundHistVsIterNoFigFilenamePattern = "figures/{:08d}_lowerBoundHistVSIterNo.{{:s}}".format(estResNumber)
     lowerBoundHistVsElapsedTimeFigFilenamePattern = "figures/{:08d}_lowerBoundHistVsElapsedTime.{{:s}}".format(estResNumber)
