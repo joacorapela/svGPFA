@@ -29,7 +29,7 @@ def main(argv):
     trialToPlot = args.trialToPlot
     neuronToPlot = args.neuronToPlot
 
-    estMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
+    estMetaDataFilename = "results/{:08d}_estimatedModelMetaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     latentsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedLatents_latent{:03d}_trial_{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
     indPointsMeanFigFilenamePattern = "figures/{:08d}_trueAndEstimatedIndPointsMeans_latent{:03d}_trial_{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
@@ -138,10 +138,10 @@ def main(argv):
     fig.write_html(indPointsCovFigFilenamePattern.format("html"))
     fig.show()
 
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
-    fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
-    fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
-    fig.show()
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
+#     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
+#     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
+#     fig.show()
 
     tIndPointsLocsToPlot = tIndPointsLocs[latentToPlot][trialToPlot,:,0]
     eIndPointsLocsToPlot = eIndPointsLocs[latentToPlot][trialToPlot,:,0]
