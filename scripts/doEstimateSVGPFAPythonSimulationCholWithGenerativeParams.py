@@ -146,25 +146,23 @@ def main(argv):
     qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
     estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
 
-    utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
-        qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
-        C0=C, d0=d,
-        indPointsLocs0=Z0,
-        legQuadPoints=legQuadPoints,
-        legQuadWeights=legQuadWeights,
-        kernelsTypes=kernelsTypes,
-        kernelsParams0=kernelsParams0,
-        spikesTimes=spikesTimes,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
-        trialsLengths=np.array(trialsLengths).reshape(-1,1),
-        emMaxIter=optimParams["emMaxIter"],
-        eStepMaxIter=optimParams["eStepMaxIter"],
-        mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
-        mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
-        mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
-        saveFilename=estimationDataForMatlabFilename)
-
-    pdb.set_trace()
+#     utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
+#         qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
+#         C0=C, d0=d,
+#         indPointsLocs0=Z0,
+#         legQuadPoints=legQuadPoints,
+#         legQuadWeights=legQuadWeights,
+#         kernelsTypes=kernelsTypes,
+#         kernelsParams0=kernelsParams0,
+#         spikesTimes=spikesTimes,
+#         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+#         trialsLengths=np.array(trialsLengths).reshape(-1,1),
+#         emMaxIter=optimParams["emMaxIter"],
+#         eStepMaxIter=optimParams["eStepMaxIter"],
+#         mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
+#         mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
+#         mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
+#         saveFilename=estimationDataForMatlabFilename)
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
