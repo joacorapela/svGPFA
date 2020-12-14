@@ -130,7 +130,7 @@ class SVEM:
                     logStreamFN=logStreamFN
                 )
                 if savePartial:
-                    savePartialFilename = savePartialFilenamePattern.format("eStep{:03d}".format(iter))
+                    savePartialFilename = savePartialFilenamePattern.format("eStepAndMStepKernels{:03d}".format(iter))
                     resultsToSave = {"model": model}
                     with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
