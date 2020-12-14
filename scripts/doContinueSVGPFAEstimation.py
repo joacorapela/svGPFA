@@ -16,7 +16,7 @@ def main(argv):
     parser.add_argument("nIter", help="number of iterations to add", type=int)
     parser.add_argument("--savePartial", action="store_true", help="save partial model estimates")
     parser.add_argument("--estimatedModelFilenamePattern", default="results/{:08d}_estimatedModel.pickle", help="estimated model filename pattern")
-    parser.add_argument("--estimatedModelMetaDataFilenamePattern", default="results/{:08d}_estimation_metaData.ini", help="estimated model meta data filename pattern")
+    parser.add_argument("--estimatedModelMetaDataFilenamePattern", default="results/{:08d}_estimatedModelMetaData.ini", help="estimated model meta data filename pattern")
     parser.add_argument("--estimatedPartialModelFilenamePattern", default="results/{:08d}_{{:s}}_estimatedModel.pickle", help="estimated partial model filename pattern")
     args = parser.parse_args()
 
@@ -30,6 +30,7 @@ def main(argv):
     initialEstModelMetaDataFilename = estimatedModelMetaDataFilenamePattern.format(initialEstResNumber)
     initialEstModelMetaDataConfig = configparser.ConfigParser()
     initialEstModelMetaDataConfig.read(initialEstModelMetaDataFilename)
+    simResNumber = initialEstModelMetaDataConfig["simulation_params"]["simResNumber".lower()]
     initialEstimationMetaDataFilename = initialEstModelMetaDataConfig["estimation_params"]["estimationMetaDataFilename".lower()]
 
     initialEstimationMetaDataConfig = configparser.ConfigParser()
@@ -61,7 +62,8 @@ def main(argv):
 
     # save estimated values
     finalEstimationMetaDataConfig = configparser.ConfigParser()
-    finalEstimationMetaDataConfig["estimation_params"] = {"initialEstResNumber": initialEstResNumber, "nIter": nIter, "estimationMetaDataFilename": initialEstModelMetaDataFilename}
+    finalEstimationMetaDataConfig["simulation_params"] = {"simResNumber": simResNumber}
+    finalEstimationMetaDataConfig["estimation_params"] = {"initialEstResNumber": initialEstResNumber, "nIter": nIter, "estMetaDataFilename": initialEstimationMetaDataFilename}
     with open(finalEstimResMetaDataFilename, "w") as f: finalEstimationMetaDataConfig.write(f)
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
