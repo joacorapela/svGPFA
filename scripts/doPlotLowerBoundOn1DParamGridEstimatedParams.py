@@ -50,13 +50,12 @@ def main(argv):
     nQuad = args.nQuad
 
     if paramType=="kernel":
-        estMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
+        estMetaDataFilename = "results/{:08d}_estimatedModelMetaData.ini".format(estResNumber)
         estMetaDataConfig = configparser.ConfigParser()
         estMetaDataConfig.read(estMetaDataFilename)
-        estInitNumber = int(estMetaDataConfig["estimation_params"]["estInitNumber"])
+        estMetaDataFilename = estMetaDataConfig["estimation_params"]["estMetaDataFilename".lower()]
         estInitConfig = configparser.ConfigParser()
-        estInitFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
-        estInitConfig.read(estInitFilename)
+        estInitConfig.read(estMetaDataFilename)
         if kernelParamIndex==0:
             refParam0 = float(estInitConfig["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(latent)])
             refParam0Scale = float(estInitConfig["kernel_params"]["kLengthscaleScaleLatent{:d}".format(latent)])
