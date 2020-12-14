@@ -85,6 +85,10 @@ def getIndPointsLocs0(nLatents, nTrials, config):
             Z0[k][r,:,0] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
     return Z0
 
+def getDiagsSRQSigma0(config):
+    diagSRQSigma0 = torch.tensor([float(str) for str in config["variational_params"]["diagSRQSigma0"][1:-1].split(", ")], dtype=torch.double)
+    return diagSRQSigma0
+
 def getLatentsMeansFuncs(nLatents, nTrials, config):
     def getLatentMeanFunc(ampl, tau, freq, phase):
         mean = lambda t: ampl*torch.exp(-t/tau)*torch.sin(2*math.pi*freq*t + phase)
