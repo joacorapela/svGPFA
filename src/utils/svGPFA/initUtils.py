@@ -14,6 +14,14 @@ def getUniformIndPointsMeans(nTrials, nLatents, nIndPointsPerLatent, min=-1, max
             indPointsMeans[r][k] = torch.rand(nIndPointsPerLatent[k], 1)*(max-min)+min
     return indPointsMeans
 
+def getZeroIndPointsMeans(nTrials, nLatents, nIndPointsPerLatent):
+    indPointsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        indPointsMeans[r] = [[] for k in range(nLatents)]
+        for k in range(nLatents):
+            indPointsMeans[r][k] = torch.zeros(nIndPointsPerLatent[k], 1)
+    return indPointsMeans
+
 def getKzzChol0(kernels, kernelsParams0, indPointsLocs0, epsilon):
     indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
     indPointsLocsKMS.setKernels(kernels=kernels)
