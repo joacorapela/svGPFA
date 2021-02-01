@@ -8,7 +8,7 @@ import argparse
 import configparser
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plotly.graph_objs as go
 import plotly.offline
 

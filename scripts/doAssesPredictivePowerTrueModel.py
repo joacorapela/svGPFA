@@ -6,7 +6,7 @@ import torch
 import pickle
 import pandas as pd
 from sklearn import metrics
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtils
 
 def main(argv):

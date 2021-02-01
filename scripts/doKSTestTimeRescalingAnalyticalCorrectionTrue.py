@@ -5,7 +5,7 @@ import math
 import torch
 import pickle
 import statsmodels.tsa.stattools
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtils
 from stats.pointProcess.tests import KSTestTimeRescalingAnalyticalCorrectionUnbinned
 def main(argv):

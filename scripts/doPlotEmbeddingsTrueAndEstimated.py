@@ -7,7 +7,7 @@ import pickle
 import argparse
 import configparser
 from scipy.io import loadmat
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import utils.svGPFA.configUtils
 

@@ -4,7 +4,7 @@ import pdb
 import math
 import torch
 import pickle
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtils
 from stats.pointProcess.tests import KSTestTimeRescalingNumericalCorrection
 def main(argv):
