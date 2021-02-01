@@ -62,6 +62,11 @@ class LinearSVEmbedding(SVEmbedding):
         svPosteriorOnLatentsInitialParams = initialParams["svPosteriorOnLatents"]
         self._svPosteriorOnLatents.setInitialParams(initialParams=svPosteriorOnLatentsInitialParams)
 
+    def sample(self, times):
+        latentsSamples = self._svPosteriorOnLatents.sample(times=times)
+        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
+        return answer
+
     def getParams(self):
         return [self._C, self._d]
 
@@ -74,11 +79,6 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
     def predictLatents(self, newTimes):
         return self._svPosteriorOnLatents.predict(newTimes=newTimes)
-
-    def sample(self, times):
-        latentsSamples = self._svPosteriorOnLatents.sample(times=times)
-        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
-        return answer
 
     def computeMeans(self, times):
         qKMu = self._svPosteriorOnLatents.computeMeans(times=times)
