@@ -100,7 +100,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         answer = self.__computeMeansGivenKernelMatrices(Kzz=Kzz, KzzChol=KzzChol, Ktz=Ktz)
         return answer
 
-    def sample(self, times, regFactor=1e-3):
+    def sample(self, times, nSamples=1, regFactor=1e-3):
         Kzz = self._indPointsLocsKMS.getKzz()
         KzzChol = self._indPointsLocsKMS.getKzzChol()
 
@@ -122,7 +122,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         means = [[] for r in range(nTrials)]
         variances = [[] for r in range(nTrials)]
         for r in range(nTrials):
-            samples[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
+            samples[r] = torch.empty((nLatents, nSamples, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
             means[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
             variances[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
             for k in range(nLatents):
@@ -136,7 +136,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
                 ### being compute mean ###
                 b = torch.cholesky_solve(qMurk, KzzCholrk)
-                meanrk = torch.squeeze(Ktzrk.matmul(b))
+                meanrk = torch.squeeze(Ktzrk.matmul(b)).detach().numpy()
                 ### end compute mean ###
 
                 ### being compute covar ###
@@ -145,11 +145,11 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
                 ### end compute covar ###
 
                 covarrk += torch.eye(covarrk.shape[0])*regFactor
-                covarrk = covarrk.detach()
+                covarrk = covarrk.detach().numpy()
                 mn = scipy.stats.multivariate_normal(mean=meanrk, cov=covarrk)
-                samples[r][k,:] = torch.from_numpy(mn.rvs())
-                means[r][k,:] = meanrk
-                variances[r][k,:] = torch.diag(covarrk)
+                samples[r][k,:,:] = torch.from_numpy(mn.rvs(size=nSamples))
+                means[r][k,:] = torch.from_numpy(meanrk)
+                variances[r][k,:] = torch.diag(torch.from_numpy(covarrk))
         return samples, means, variances
 
     def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, KzzChol, Ktz, KttDiag):
