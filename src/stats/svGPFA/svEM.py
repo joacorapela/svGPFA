@@ -264,7 +264,12 @@ class SVEM:
     def _eStep(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
                nIterDisplay, logLock, logStream, logStreamFN):
         x = model.getSVPosteriorOnIndPointsParams()
-        evalFunc = model.eval
+        def evalFunc():
+            value = model.eval()
+            value.backward()
+            value = value.detach().numpy()
+            gradient = x.grad().detach().numpy()
+            return answer
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
         # optimizer = torch.optim.Adam(x, lr=lr)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
