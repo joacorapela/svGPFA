@@ -39,7 +39,7 @@ def main(argv):
     ksTestGamma = args.ksTestGamma
     nTestPoints = args.nTestPoints
 
-    estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
+    estimResMetaDataFilename = "results/{:08d}_estimatedModelMetaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     lowerBoundHistVsIterNoFigFilenamePattern = "figures/{:08d}_lowerBoundHistVSIterNo.{{:s}}".format(estResNumber)
     lowerBoundHistVsElapsedTimeFigFilenamePattern = "figures/{:08d}_lowerBoundHistVsElapsedTime.{{:s}}".format(estResNumber)
@@ -72,15 +72,18 @@ def main(argv):
     CFilename = simInitConfig["embedding_params"]["C_filename"]
     dFilename = simInitConfig["embedding_params"]["d_filename"]
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=CFilename, dFilename=dFilename)
+    tIndPointsLocs = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
-    trueLatents = simRes["latents"]
+    trueLatentsSamples = simRes["latents"]
     simCIFsValues = simRes["cifValues"]
-    trueLatents = [trueLatents[r][:nLatents,:] for r in range(nTrials)]
+    trueLatentsSamples = [trueLatentsSamples[r][:nLatents,:] for r in range(nTrials)]
     trueLatentsTimes = simRes["times"]
+    trueLatentsMeans = simRes["latentsMeans"]
+    trueLatentsMeans = [trueLatentsMeans[r][:nLatents,:] for r in range(nTrials)]
     trueLatentsSTDs = simRes["latentsSTDs"]
     trueLatentsSTDs = [trueLatentsSTDs[r][:nLatents,:] for r in range(nTrials)]
-    timesTrueValues = torch.linspace(0, torch.max(torch.tensor(trialsLengths)), trueLatents[0].shape[1])
+    timesTrueValues = torch.linspace(0, torch.max(torch.tensor(trialsLengths)), trueLatentsSamples[0].shape[1])
     testTimes = torch.linspace(0, torch.max(torch.tensor(spikesTimes[0][0])), nTestPoints)
 
     with open(modelSaveFilename, "rb") as f: estResults = pickle.load(f)
@@ -98,11 +101,11 @@ def main(argv):
     fig.write_html(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("html"))
 
     # plot true and estimated latents
-#     testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
-#     indPointsLocs = model.getIndPointsLocs()
-#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSTDs=trueLatentsSTDs, eTimes=trueLatentsTimes[0], eLatentsMeans=testMuK, eLatentsSTDs=torch.sqrt(testVarK), eIndPointsLocs=indPointsLocs, trialToPlot=trialToPlot)
-#     fig.write_image(latentsFigFilenamePattern.format("png"))
-#     fig.write_html(latentsFigFilenamePattern.format("html"))
+    testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
+    eIndPointsLocs = model.getIndPointsLocs()
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSamples=trueLatentsSamples, tLatentsMeans=trueLatentsMeans, tLatentsSTDs=trueLatentsSTDs, tIndPointsLocs=tIndPointsLocs, eTimes=trueLatentsTimes[0], eLatentsMeans=testMuK, eLatentsSTDs=torch.sqrt(testVarK), eIndPointsLocs=eIndPointsLocs, trialToPlot=trialToPlot)
+    fig.write_image(latentsFigFilenamePattern.format("png"))
+    fig.write_html(latentsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with numerical correction
     T = torch.tensor(trialsLengths).max()
@@ -136,9 +139,9 @@ def main(argv):
     plt.close("all")
 
     # plot model params
-    # tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+#     tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
 #     trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
-#     # tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=tLatentsMeansFuncs, trialsTimes=trialsTimes, dtype=C.dtype)
+#     tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=tLatentsMeansFuncs, trialsTimes=trialsTimes, dtype=C.dtype)
 #     kernelsParams = model.getKernelsParams()
 #     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
 #     with torch.no_grad():
