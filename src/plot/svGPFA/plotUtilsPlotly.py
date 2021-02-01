@@ -920,7 +920,7 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
                 row=k+1,
                 col=1,
             )
-    fig.update_xaxes(title_text=xlabelPattern, row=nLatents, col=1)
+    fig.update_xaxes(title_text=xlabel, row=nLatents, col=1)
     fig.update_layout(title_text=title)
     return fig
 
