@@ -15,8 +15,8 @@ def test_leggaussVarLimits():
     a = mat["a"][0][0]
     b = mat["b"][0][0]
 
-    x = torch.from_numpy(mat["x"]).type(torch.DoubleTensor)
-    w = torch.from_numpy(mat["w"]).type(torch.DoubleTensor)
+    x = torch.flip(input=torch.from_numpy(mat["x"]).type(torch.DoubleTensor), dims=[1])
+    w = torch.flip(input=torch.from_numpy(mat["w"]).type(torch.DoubleTensor), dims=[1])
 
     px, pw = leggaussVarLimits(n=n, a=a, b=b, dtype=torch.double)
     xDiff = torch.mean((x-px)**2)

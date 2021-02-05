@@ -22,7 +22,7 @@ def main(argv):
     parser.add_argument("simInitConfigNumber", help="Simulation initialization configuration number", type=int)
     parser.add_argument("--latentTrialToPlot", help="Trial on which to plot the Latent", type=int, default=0)
     parser.add_argument("--cifTrialToPlot", help="Trial on which to plot the CIF", type=int, default=0)
-    parser.add_argument("--cifNeuronToPlot", help="Neuron on which to plot the CIF", type=int, default=5)
+    parser.add_argument("--cifNeuronToPlot", help="Neuron on which to plot the CIF", type=int, default=0)
     args = parser.parse_args()
 
     simInitConfigNumber = args.simInitConfigNumber
@@ -34,15 +34,14 @@ def main(argv):
     simInitConfigFilename = "data/{:08d}_simulation_metaData.ini".format(simInitConfigNumber)
     simInitConfig = configparser.ConfigParser()
     simInitConfig.read(simInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in simInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nLatents = len(nIndPointsPerLatent)
+    nLatents = int(simInitConfig["control_variables"]["nLatents"])
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
     T = torch.tensor(trialsLengths).max().item()
     dtCIF = float(simInitConfig["control_variables"]["dtCIF"])
-    latentsGPRegularizationEpsilon = float(simInitConfig["control_variables"]["latentsGPRegularizationEpsilon"])
-    firstIndPointLoc = float(simInitConfig["control_variables"]["firstIndPointLoc"])
+    indPointsLocsKMSRegEpsilon = float(simInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
+    latentsCovRegEpsilon = float(simInitConfig["control_variables"]["latentsCovRegEpsilon"])
 
     randomPrefixUsed = True
     while randomPrefixUsed:
@@ -53,8 +52,8 @@ def main(argv):
            randomPrefixUsed = False
     simResFilename = "results/{:08d}_simRes.pickle".format(simNumber)
 
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig)
-    indPointsLocs = utils.svGPFA.initUtils.getIndPointLocs0(nIndPointsPerLatent=nIndPointsPerLatent, trialsLengths=trialsLengths, firstIndPointLoc=firstIndPointLoc)
+    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=False)
+    indPointsLocs = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     cifTrialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
     cifTrialsTimesMatrix = torch.empty((nTrials, len(cifTrialsTimes[0]), 1))
     # patch to accomodate unreasonable need to have trial times of equal length
@@ -62,17 +61,37 @@ def main(argv):
     for r in range(nTrials):
         cifTrialsTimesMatrix[r,:,0] = cifTrialsTimes[r]
     # end patch
-    C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(nNeurons=nNeurons, nLatents=nLatents, CFilename=simInitConfig["embedding_params"]["C_filename"], dFilename=simInitConfig["embedding_params"]["d_filename"])
-    indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nLatents=nLatents, nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent, config=simInitConfig)
+    C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=simInitConfig["embedding_params"]["C_filename"], dFilename=simInitConfig["embedding_params"]["d_filename"])
+    indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
     simulator = simulations.svGPFA.simulations.GPFAwithIndPointsSimulator()
     print("Computing latents samples")
-    latentsSamples, latentsMeans, latentsSTDs, Kzz = simulator.getLatentsSamplesMeansAndSTDs(
+    latentsSamples, latentsMeans, latentsSTDs, KzzChol = simulator.getLatentsSamplesMeansAndSTDs(
         indPointsMeans=indPointsMeans,
         kernels=kernels,
         indPointsLocs=indPointsLocs,
         trialsTimes=cifTrialsTimesMatrix,
-        regularizationEpsilon=latentsGPRegularizationEpsilon,
-        dtype=C.dtype)
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+        latentsCovRegEpsilon=latentsCovRegEpsilon,
+        dtype=C.dtype,
+    )
+#     exit = False
+#     attemptNumber = 1
+#     while not exit:
+#         latentsSamples, latentsMeans, latentsSTDs, KzzChol = simulator.getLatentsSamplesMeansAndSTDs(
+#             indPointsMeans=indPointsMeans,
+#             kernels=kernels,
+#             indPointsLocs=indPointsLocs,
+#             trialsTimes=cifTrialsTimesMatrix,
+#             indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+#             latentsCovRegEpsilon=latentsCovRegEpsilon,
+#             dtype=C.dtype)
+#         maxLatentsSamples = torch.tensor([torch.max(latentsSamples[k]) for k in range(nLatents)]).max()
+#         print("Attempt number: {:d}, max lLatents: {:.02f}".format(attemptNumber, maxLatentsSamples))
+# 
+#         if(maxLatentsSamples>1.0):
+#             exit = True
+#         else:
+#             attemptNumber += 1
     cifValues = simulator.getCIF(nTrials=nTrials, latentsSamples=latentsSamples, C=C, d=d, linkFunction=torch.exp)
 
     plt.figure()
@@ -86,6 +105,7 @@ def main(argv):
             plt.title("Trial: {:d}".format(latentTrialToPlot))
 
     plt.figure()
+    plt.show(block=False)
 
     plt.plot(cifTrialsTimes[cifTrialToPlot], cifValues[cifTrialToPlot][cifNeuronToPlot])
     plt.xlabel("Time (sec)")
@@ -99,7 +119,7 @@ def main(argv):
     spikesTimes = simulator.simulate(cifTrialsTimes=cifTrialsTimes, cifValues=cifValues)
 
     spikesRates = utils.svGPFA.miscUtils.computeSpikeRates(trialsTimes=cifTrialsTimes, spikesTimes=spikesTimes)
-    simRes = {"times": cifTrialsTimes, "latents": latentsSamples, "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs, "indPointsMeans": indPointsMeans, "Kzz": Kzz, "C": C, "d": d, "cifValues": cifValues, "spikes": spikesTimes}
+    simRes = {"times": cifTrialsTimes, "latents": latentsSamples, "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs, "indPointsMeans": indPointsMeans, "indPointsLocs": indPointsLocs, "KzzChol": KzzChol, "C": C, "d": d, "cifValues": cifValues, "spikes": spikesTimes}
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
 
     simResConfig = configparser.ConfigParser()

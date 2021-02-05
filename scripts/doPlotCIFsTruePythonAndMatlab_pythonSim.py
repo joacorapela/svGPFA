@@ -9,7 +9,7 @@ import configparser
 import scipy.io
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import utils.svGPFA.miscUtils
 
@@ -103,7 +103,7 @@ def main(argv):
     pLabel = pLabelPattern.format(pR2)
     mLabel = mLabelPattern.format(mR2)
     fig = plot.svGPFA.plotUtilsPlotly.\
-        getPlotTruePythonAndMatlabCIFsPlotly(tTimes=tTimes,
+        getPlotTruePythonAndMatlabCIFs(tTimes=tTimes,
                                              tCIF=tCIF,
                                              tLabel=tLabel,
                                              pTimes=pTimes,

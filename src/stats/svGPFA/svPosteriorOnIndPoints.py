@@ -1,7 +1,8 @@
 
 import pdb
+import math
 import torch
-import utils.svGPFA.initUtils
+import utils.svGPFA.miscUtils
 
 class SVPosteriorOnIndPoints:
 
@@ -11,30 +12,25 @@ class SVPosteriorOnIndPoints:
     def setInitialParams(self, initialParams):
         nLatents = len(initialParams["qMu0"])
         self._qMu = [initialParams["qMu0"][k] for k in range(nLatents)]
-        self._qSVec = [initialParams["qSVec0"][k] for k in range(nLatents)]
-        self._qSDiag = [initialParams["qSDiag0"][k] for k in range(nLatents)]
+        self._srQSigmaVecs = [initialParams["srQSigma0Vecs"][k] for k in range(nLatents)]
 
     def getParams(self):
         listOfTensors = []
         listOfTensors.extend([self._qMu[k] for k in range(len(self._qMu))])
-        listOfTensors.extend([self._qSVec[k] for k in range(len(self._qSVec))])
-        listOfTensors.extend([self._qSDiag[k] for k in range(len(self._qSDiag))])
+        listOfTensors.extend([self._srQSigmaVecs[k] for k in range(len(self._srQSigmaVecs))])
         return listOfTensors
 
     def getQMu(self):
         return self._qMu
 
     def buildQSigma(self):
-        R = self._qSVec[0].shape[0]
-        K = len(self._qSVec)
-        qSigma = [[None] for k in range(K)]
-        for k in range(K):
-            nIndK = self._qSDiag[k].shape[1]
-            # qq \in nTrials x nInd[k] x 1
-            qq = self._qSVec[k].reshape(shape=(R, nIndK, 1))
-            # dd \in nTrials x nInd[k] x 1
-            nIndKVarRnkK = self._qSVec[k].shape[1]
-            dd = utils.svGPFA.initUtils.build3DdiagFromDiagVector(v=(self._qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
-            qSigma[k] = torch.matmul(qq, torch.transpose(a=qq, dim0=1, dim1=2)) + dd
-        return(qSigma)
+        # begin patch for older version of the code
+        if hasattr(self, "_qSRSigmaVec"):
+            self._srQSigmaVecs = [self._qSRSigmaVec[k].unsqueeze(-1) for k in range(len(self._qSRSigmaVec))]
+        elif self._srQSigmaVecs[0].dim()==2:
+            self._srQSigmaVecs = [self._srQSigmaVecs[k].unsqueeze(-1) for k in range(len(self._srQSigmaVecs))]
+        # end patch for older version of the code
+        qSigma = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
+        return qSigma
+
 

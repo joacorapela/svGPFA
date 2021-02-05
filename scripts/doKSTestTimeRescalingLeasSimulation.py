@@ -8,7 +8,7 @@ from scipy.io import loadmat
 import random
 import configparser
 import matplotlib.pyplot as plt
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtils
 from stats.pointProcess.tests import KSTestTimeRescalingNumericalCorrection
 

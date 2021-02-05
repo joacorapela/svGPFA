@@ -61,8 +61,8 @@ class ExpectedLogLikelihood(ABC):
     def predictLatents(self, newTimes):
         return self._svEmbeddingAllTimes.predictLatents(newTimes=newTimes)
 
-    def setIndPointsLocsKMSEpsilon(self, indPointsLocsKMSEpsilon):
-        self._svEmbeddingAllTimes.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
+        self._svEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
 class PointProcessELL(ExpectedLogLikelihood):
     def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction):
@@ -189,7 +189,8 @@ class PointProcessELLExpLink(PointProcessELL):
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
-        eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
+        # eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
+        eLogLink = torch.cat([eMean[trial] for trial in range(len(eMean))])
         return eLogLink
 
 class PointProcessELLQuad(PointProcessELL):

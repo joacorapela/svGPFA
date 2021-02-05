@@ -5,21 +5,50 @@ import pandas as pd
 import torch
 import stats.kernels
 
-def getKernels(nLatents, config):
+def getScaledKernels(nLatents, config, forceUnitScale):
+    kernels = [[] for r in range(nLatents)]
+    kernelsParamsScales = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
+        if kernelType=="periodic":
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscaleScaledValue = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            lengthscaleScale = float(config["kernel_params"]["kLengthscaleScaleLatent{:d}".format(k)])
+            periodScaledValue = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
+            periodScale = float(config["kernel_params"]["kPeriodScaleLatent{:d}".format(k)])
+            kernel = stats.kernels.PeriodicKernel(scale=scale, lengthscaleScale=lengthscaleScale, periodScale=periodScale)
+            kernel.setParams(params=torch.Tensor([lengthscaleScaledValue*lengthscaleScale, periodScaledValue*periodScale]).double())
+            kernelsParamsScales[k] = torch.tensor([lengthscaleScale, periodScale])
+        else:
+            raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
+        kernels[k] = kernel
+    answer = {"kernels": kernels, "kernelsParamsScales": kernelsParamsScales}
+    return answer
+
+def getKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     for k in range(nLatents):
         kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
         if kernelType=="periodic":
-            # scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
-            lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}".format(k)])
-            period = float(config["kernel_params"]["kPeriodLatent{:d}".format(k)])
-            kernel = stats.kernels.PeriodicKernel(scale=1.0)
-            kernel.setParams(params=torch.Tensor([lengthScale, period]))
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            period = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
+            kernel = stats.kernels.PeriodicKernel(scale=scale)
+            kernel.setParams(params=torch.Tensor([lengthscale, period]).double())
         elif kernelType=="exponentialQuadratic":
-            # scale = float(config["kernel_params"]["kScaleLatent{:d}".format(k)])
-            lengthScale = float(config["kernel_params"]["kLengthscaleLatent{:d}".format(k)])
-            kernel = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
-            kernel.setParams(params=torch.Tensor([lengthScale]))
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            kernel = stats.kernels.ExponentialQuadraticKernel(scale=scale)
+            kernel.setParams(params=torch.Tensor([lengthscale]).double())
         else:
             raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
         kernels[k] = kernel
@@ -37,16 +66,24 @@ def getQMu0(nLatents, nTrials, config):
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
 
-def getIndPointsMeans(nIndPointsPerLatent, nTrials, config):
-    nLatents = len(nIndPointsPerLatent)
+def getIndPointsMeans(nTrials, nLatents, config):
     indPointsMeans = [[] for r in range(nTrials)]
     for r in range(nTrials):
         indPointsMeans[r] = [[] for k in range(nLatents)]
         for k in range(nLatents):
-            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")])
-            if len(indPointsMeans[r][k])!=nIndPointsPerLatent[k]:
-                   raise RuntimeError("Incorrect indPointsMeanLatent{:d}Trial{:d}".format(k,r))
+            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double).unsqueeze(dim=1)
     return indPointsMeans
+
+def getIndPointsLocs0(nLatents, nTrials, config):
+    Z0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        Z0_k_r0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,0)][1:-1].split(", ")], dtype=torch.double)
+        nIndPointsForLatent = len(Z0_k_r0)
+        Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1), dtype=torch.double)
+        Z0[k][0,:,0] = Z0_k_r0
+        for r in range(1, nTrials):
+            Z0[k][r,:,0] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
+    return Z0
 
 def getLatentsMeansFuncs(nLatents, nTrials, config):
     def getLatentMeanFunc(ampl, tau, freq, phase):
@@ -63,7 +100,7 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
         meansFuncs[k] = meanFunc
     return meansFuncs
 
-def getLinearEmbeddingParams(nNeurons, nLatents, CFilename, dFilename):
+def getLinearEmbeddingParams(CFilename, dFilename):
     df = pd.read_csv(CFilename, header=None)
     C = torch.from_numpy(df.values)
     df = pd.read_csv(dFilename, header=None)

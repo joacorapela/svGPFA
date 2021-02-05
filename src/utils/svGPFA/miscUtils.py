@@ -1,5 +1,6 @@
 import pdb
 import scipy.io
+import math
 import numpy as np
 import torch
 import scipy.stats
@@ -33,7 +34,7 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
                                  legQuadPoints, legQuadWeights,
                                  kernelsTypes, kernelsParams0,
                                  spikesTimes,
-                                 indPointsLocsKMSEpsilon, trialsLengths,
+                                 indPointsLocsKMSRegEpsilon, trialsLengths,
                                  emMaxIter, eStepMaxIter, mStepEmbeddingMaxIter,
                                  mStepKernelsMaxIter, mStepIndPointsMaxIter,
                                  saveFilename):
@@ -45,7 +46,7 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
                  C0=C0.numpy(), d0=torch.reshape(input=d0, shape=(-1,1)).numpy(),
                  legQuadPoints=legQuadPoints.numpy(),
                  legQuadWeights=legQuadWeights.numpy(),
-                 indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon,
+                 indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
                  trialsLengths=trialsLengths,
                  emMaxIter=emMaxIter, eStepMaxIter=eStepMaxIter,
                  mStepEmbeddingMaxIter=mStepEmbeddingMaxIter,
@@ -65,6 +66,51 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
         for n in range(nNeurons):
             mdict.update({"spikesTimes_{:d}_{:d}".format(r, n): spikesTimes[r][n].numpy().astype(np.float64)})
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
+
+def getSRQSigmaFromVec(vec, nIndPoints):
+    srQSigma = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
+    trilIndices = torch.tril_indices(nIndPoints, nIndPoints)
+    srQSigma[trilIndices[0,:],trilIndices[1,:]] = vec
+    return srQSigma
+
+def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
+    K = len(srQSigmaVecs)
+    R = srQSigmaVecs[0].shape[0]
+    qSigmas = [[None] for k in range(K)]
+    for k in range(K):
+        # srQSigmaVecs[k] \in nTrials x Pk x 1
+        # Pk = ((nIndPointsK+1)*nIndPointsK)/2
+        # nIndPointsK = (-1+sqrt(1+8*Pk))/2
+        Pk = srQSigmaVecs[k].shape[1]
+        nIndPointsK = int((-1+math.sqrt(1+8*Pk))/2)
+        qSigmas[k] = torch.empty((R, nIndPointsK, nIndPointsK), dtype=torch.double)
+        for r in range(R):
+            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:,0], nIndPoints=nIndPointsK)
+            qSigmas[k][r,:,:] = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
+    return(qSigmas)
+
+def getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs):
+    # srQSigmaVecs[k] \in nTrial x Pk
+    nLatents = len(srQSigmaVecs)
+    nTrials = srQSigmaVecs[0].shape[0]
+    qSVec = [[] for k in range(nLatents)]
+    qSDiag = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        Pk = srQSigmaVecs[k].shape[1]
+        nIndPointsK = int((-1.0+math.sqrt(1+8*Pk))/2.0)
+        qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
+        qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
+        for r in range(nTrials):
+            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:], nIndPoints=nIndPointsK)
+            qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
+            qSDiagKR = torch.diag(qSigmaKR)
+            qSigmaKR = qSigmaKR - torch.diag(qSDiagKR)
+            eValKR, eVecKR = torch.eig(qSigmaKR, eigenvectors=True)
+            maxEvalIKR = torch.argmax(eValKR, dim=0)[0]
+            qSVecKR = eVecKR[:,maxEvalIKR]*torch.sqrt(eValKR[maxEvalIKR,0])
+            qSVec[k][r,:,0] = qSVecKR
+            qSDiag[k][r,:,0] = qSDiagKR
+    return qSVec, qSDiag
 
 def clock(func):
     def clocked(*args,**kargs):
@@ -94,8 +140,19 @@ def clock(func):
     return clocked
 
 def chol3D(K):
+    # begin debug
+#     print("Waning: debug code on in miscUtils.py:chol3D")
+#     nTrial = K.shape[0]
+#     for r in range(nTrial):
+#         Kr = torch.matmul(K[r,:,:], torch.transpose(K[r,:,:], 0, 1))
+#         eigRes = torch.eig(Kr)
+#         cNum = eigRes.eigenvalues[0,0]/eigRes.eigenvalues[-1,0]
+#         print("Condition number for trial {:d}: {:f}".format(r, cNum))
+    # pdb.set_trace()
+    # end debug
     Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
-    for i in range(K.shape[0]):
+    nTrial = K.shape[0]
+    for i in range(nTrial):
         Kchol[i,:,:] = torch.cholesky(K[i,:,:])
     return Kchol
 

@@ -1,5 +1,6 @@
 
 import pdb
+import warnings
 import torch
 import scipy.stats
 import stats.pointProcess.sampler
@@ -75,19 +76,31 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
                 indPoints[r][k] = torch.from_numpy(mn.rvs()).unsqueeze(1)
         return indPoints
 
-    def getLatentsSamplesMeansAndSTDs(self, indPointsMeans, kernels, indPointsLocs, trialsTimes, regularizationEpsilon, dtype):
+    def getLatentsSamplesMeansAndSTDs(self, indPointsMeans, kernels,
+                                      indPointsLocs, trialsTimes,
+                                      indPointsLocsKMSRegEpsilon,
+                                      latentsCovRegEpsilon, dtype):
         nLatents = len(kernels)
-        nTrials = len(indPointsLocs)
+        nTrials = indPointsLocs[0].shape[0]
 
         indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
         indPointsLocsKMS.setKernels(kernels=kernels)
         indPointsLocsKMS.setIndPointsLocs(indPointsLocs=indPointsLocs)
-        indPointsLocsKMS.setEpsilon(epsilon=regularizationEpsilon)
+        indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSRegEpsilon)
         indPointsLocsKMS.buildKernelsMatrices()
         Kzz = indPointsLocsKMS.getKzz()
+        # pdb.set_trace()
+        # begin debug
+        condNumberThr = 1e+6
+        eigRes = torch.eig(Kzz[0][0,:,:], eigenvectors=True)
+        if any(eigRes.eigenvalues[:,1]>0):
+            warnings.warn("Some eigenvalues of Kzz are imaginary")
+        sortedEigVals = eigRes.eigenvalues[:,0].sort(descending=True).values
+        condNumber = sortedEigVals[0]/sortedEigVals[-1]
+        if condNumber>condNumberThr:
+            warnings.warn("Poorly conditioned Kzz (condition number={:.02f})".format(condNumber))
+        # end debug
         KzzChol = indPointsLocsKMS.getKzzChol()
-
-        indPoints = self._getIndPoints(meansZ=indPointsMeans, Kzz=Kzz)
 
         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
         indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
@@ -104,14 +117,14 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
             latentsMeans[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
             latentsSTDs[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
             for k in range(nLatents):
-                mean = torch.matmul(Ktz[k][r,:,:], torch.cholesky_solve(indPoints[r][k], KzzChol[k][r,:,:])).squeeze()
+                mean = torch.matmul(Ktz[k][r,:,:], torch.cholesky_solve(indPointsMeans[r][k], KzzChol[k][r,:,:])).squeeze()
                 cov = kernels[k].buildKernelMatrix(trialsTimes[r,:,0])
-                cov += torch.eye(cov.shape[0])*regularizationEpsilon
+                cov += torch.eye(cov.shape[0])*latentsCovRegEpsilon
                 std = torch.diag(cov).sqrt()
                 mn = scipy.stats.multivariate_normal(mean=mean, cov=cov)
                 sample = torch.from_numpy(mn.rvs())
                 latentsSamples[r][k,:] = sample
                 latentsMeans[r][k,:] = mean
                 latentsSTDs[r][k,:] = std
-        return latentsSamples, latentsMeans, latentsSTDs, Kzz
+        return latentsSamples, latentsMeans, latentsSTDs, KzzChol
 

@@ -9,7 +9,7 @@ from svEmbedding import LinearSVEmbeddingAssocTimes
 from svPosteriorOnLatents import SVPosteriorOnLatentsAssocTimes
 
 def main(argv):
-    yNonStackedFilename = os.path.expanduser("data/YNonStacked.mat")
+    yNonStackedFilename = "data/YNonStacked.mat"
 
     mat = loadmat(yNonStackedFilename)
     nTrials = len(mat['YNonStacked'])

@@ -62,6 +62,11 @@ class LinearSVEmbedding(SVEmbedding):
         svPosteriorOnLatentsInitialParams = initialParams["svPosteriorOnLatents"]
         self._svPosteriorOnLatents.setInitialParams(initialParams=svPosteriorOnLatentsInitialParams)
 
+    def sample(self, times):
+        latentsSamples = self._svPosteriorOnLatents.sample(times=times)
+        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
+        return answer
+
     def getParams(self):
         return [self._C, self._d]
 
@@ -75,18 +80,13 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
     def predictLatents(self, newTimes):
         return self._svPosteriorOnLatents.predict(newTimes=newTimes)
 
-    def sample(self, times):
-        latentsSamples = self._svPosteriorOnLatents.sample(times=times)
-        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
-        return answer
-
     def computeMeans(self, times):
         qKMu = self._svPosteriorOnLatents.computeMeans(times=times)
         qHMu = torch.matmul(qKMu, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
         return qHMu
 
-    def setIndPointsLocsKMSEpsilon(self, indPointsLocsKMSEpsilon):
-        self._svPosteriorOnLatents.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
+        self._svPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
 class LinearSVEmbeddingAssocTimes(LinearSVEmbedding):
 

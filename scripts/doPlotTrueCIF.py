@@ -2,7 +2,7 @@ import sys
 import os
 import pdb
 import pickle
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtils
 
 def main(argv):

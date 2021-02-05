@@ -13,6 +13,8 @@ class SVLowerBound:
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
+        if torch.isinf(theEval).item():
+            raise RuntimeError("infinity lower bound detected")
         return theEval
 
     def sampleCIFs(self, times):
@@ -46,8 +48,8 @@ class SVLowerBound:
     def setIndPointsLocs(self, locs):
         self._eLL.setIndPointsLocs(locs=locs)
 
-    def setIndPointsLocsKMSEpsilon(self, indPointsLocsKMSEpsilon):
-        self._eLL.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
+        self._eLL.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     def setQuadParams(self, quadParams):
         self._eLL.setQuadParams(quadParams=quadParams)

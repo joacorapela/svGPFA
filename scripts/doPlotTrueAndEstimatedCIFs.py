@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plotly
 import plotly.tools as tls
 sys.path.append("../src")
-from plot.svGPFA.plotUtils import plotSimulatedAndEstimatedCIFs
+import plot.svGPFA.plotUtils
 
 def main(argv):
     if len(argv)!=4:
@@ -31,7 +31,8 @@ def main(argv):
 
     simResFilename = "results/{:08d}_simRes.pickle".format(simResNumber)
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
-    cifTimes = simRes["cifTimes"]
+    # cifTimes = simRes["cifTimes"]
+    cifTimes = simRes["times"]
     nTrials = len(cifTimes)
     oneTrialCIFTimes = cifTimes[trialToPlot]
     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
@@ -43,10 +44,7 @@ def main(argv):
     estCIFsValues = model.computeMeanCIFs(times=cifTimes)
 
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
-    plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0],
-                                  simCIFValues=simCIFsValues[trialToPlot][neuronToPlot],
-                                  estCIFValues=estCIFsValues[trialToPlot][neuronToPlot].detach(),
-                                  figFilename=figFilename, title=title)
+    plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0], simCIFValues=simCIFsValues[trialToPlot][neuronToPlot], estCIFValues=estCIFsValues[trialToPlot][neuronToPlot].detach(), figFilename=figFilename, title=title)
 
     plt.show()
 

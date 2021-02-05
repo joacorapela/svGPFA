@@ -5,6 +5,7 @@ import io
 import torch
 import time
 # from .utils import clock
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import plot.svGPFA.plotUtils
@@ -13,11 +14,13 @@ class SVEM:
 
     # @clock
     def maximize(self, model, measurements, initialParams, quadParams,
-                 optimParams, indPointsLocsKMSEpsilon,
+                 optimParams, indPointsLocsKMSRegEpsilon,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
                  verbose=True, out=sys.stdout,
+                 savePartial=False,
+                 savePartialFilenamePattern="00000000_{:s}_estimatedModel.pickle",
                 ):
 
         if latentsStreamFN is not None and latentsTimes is None:
@@ -26,10 +29,14 @@ class SVEM:
         model.setMeasurements(measurements=measurements)
         model.setInitialParams(initialParams=initialParams)
         model.setQuadParams(quadParams=quadParams)
-        model.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+        model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
         model.buildKernelsMatrices()
 
         iter = 0
+        if savePartial:
+            savePartialFilename = savePartialFilenamePattern.format("initial")
+            resultsToSave = {"model": model}
+            with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
         lowerBound0 = model.eval()
         lowerBoundHist = [lowerBound0.item()]
         elapsedTimeHist = [0.0]
@@ -46,13 +53,13 @@ class SVEM:
             muK, varK = model.predictLatents(newTimes=latentsTimes)
 
             with open(latentsStreamFN, 'wb') as f:
-                np.savez(f, iteration=iter+1, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
+                np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
             lowerBoundLock.unlock()
-
+        iter += 1
         logStream = io.StringIO()
         while iter<optimParams["emMaxIter"]:
             if optimParams["eStepEstimate"]:
-                message = "Iteration %02d, E-Step start\n"%(iter+1)
+                message = "Iteration %02d, E-Step start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -85,7 +92,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, E-Step end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, E-Step end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -94,11 +101,15 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
-                # begin debug
-                # pdb.set_trace()
-                # end debug
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("eStep{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
+            # begin debug
+            # pdb.set_trace()
+            # end debug
             if optimParams["mStepEmbeddingEstimate"]:
-                message = "Iteration %02d, M-Step Model Params start\n"%(iter+1)
+                message = "Iteration %02d, M-Step Model Params start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -125,7 +136,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, M-Step Model Params end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, M-Step Model Params end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -134,11 +145,15 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("mStepEmbedding{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
             if optimParams["mStepKernelsEstimate"]:
-                message = "Iteration %02d, M-Step Kernel Params start\n"%(iter+1)
+                message = "Iteration %02d, M-Step Kernel Params start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -165,7 +180,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, M-Step Kernel Params end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, M-Step Kernel Params end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -174,11 +189,15 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("mStepKernels{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
             if optimParams["mStepIndPointsEstimate"]:
-                message = "Iteration %02d, M-Step Ind Points start\n"%(iter+1)
+                message = "Iteration %02d, M-Step Ind Points start\n"%(iter)
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -192,7 +211,7 @@ class SVEM:
                     lineSearchFn = None
                 else:
                     lineSearchFn = optimParams["eStepLineSearchFn"]
-                maxRes = self._mStepIndPoints(
+                maxRes = self._mStepIndPointsLocs(
                     model=model,
                     maxIter=optimParams["mStepIndPointsMaxIter"],
                     tol=optimParams["mStepIndPointsTol"],
@@ -205,7 +224,7 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN,
                 )
-                message = "Iteration %02d, M-Step Ind Points end: %f\n"%(iter+1, -maxRes['lowerBound'])
+                message = "Iteration %02d, M-Step Ind Points end: %f\n"%(iter, -maxRes['lowerBound'])
                 if verbose:
                     out.write(message)
                 self._writeToLockedLog(
@@ -214,6 +233,10 @@ class SVEM:
                     logStream=logStream,
                     logStreamFN=logStreamFN
                 )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("mStepIndPoints{:03d}".format(iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             # begin debug
             # pdb.set_trace()
             # end debug
@@ -231,7 +254,7 @@ class SVEM:
                 muK, varK = model.predictLatents(newTimes=latentsTimes)
 
                 with open(latentsStreamFN, 'wb') as f:
-                    np.savez(f, iteration=iter+1, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
+                    np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
                 lowerBoundLock.unlock()
 
             iter += 1
@@ -273,34 +296,162 @@ class SVEM:
                                             nIterDisplay=nIterDisplay,
                                             logLock=logLock,
                                             logStream=logStream,
-                                            logStreamFN=logStreamFN, 
+                                            logStreamFN=logStreamFN,
                                            )
         # pdb.set_trace()
         return answer
 
     def _mStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
-                      nIterDisplay, logLock, logStream, logStreamFN):
+                      nIterDisplay, logLock, logStream, logStreamFN,
+                      minScale=0.75,
+                      displayFmt="Step: %02d, negative lower bound: %f\n",
+                     ):
         x = model.getKernelsParams()
+        # out.write("*** Bug in _mStepKernels ***\n")
+        # x = [x[0][0]]
+        out.write("kernel params {}\n".format(x))
+        # begin debug periodic kernel
+#         with torch.no_grad():
+#             import pandas as pd
+#             import plotly.io as pio
+#             import plotly.express as px
+#             import plotly.graph_objs as go
+#             startLB = model.eval()
+#             xStart = x[0].clone()
+#             displacements = np.arange(-4.0, 4.0, .1)
+#             uniqueLengthscales = x[0][0].item() + displacements
+#             uniquePeriods = x[0][1].item() + displacements
+#             allLengthscales = []
+#             allPeriods = []
+#             allLowerBounds = []
+#             for ls in uniqueLengthscales:
+#                 for p in uniquePeriods:
+#                     allLengthscales.append(ls)
+#                     allPeriods.append(p)
+#                     x[0][0] = ls
+#                     x[0][1] = p
+#                     model.buildKernelsMatrices()
+#                     lowerBound = model.eval().item()
+#                     allLowerBounds.append(lowerBound)
+#                     # print("Lower bound for lengthscale {:.02f} and period {:.02f} is {:.02f}".format(ls, p, lowerBound))
+#             x[0][0] = xStart[0]
+#             x[0][1] = xStart[1]
+#             data = {"lenghtscale": allLengthscales, "period": allPeriods, "lowerBound": allLowerBounds}
+#             df = pd.DataFrame(data)
+#             fig = px.scatter_3d(df, x='lenghtscale', y='period', z='lowerBound')
+#         pdb.set_trace()
+        # end debug periodic kernel
+        # begin debug exponential quadratic kernel
+#         with torch.no_grad():
+#             import pandas as pd
+#             import plotly.io as pio
+#             import plotly.express as px
+#             import plotly.graph_objs as go
+#             startLB = model.eval()
+#             xStart = x[0].clone()
+#             displacements = np.arange(-4.0, 4.0, .1)
+#             uniqueLengthscales = x[0][0].item() + displacements
+#             allLengthscales = []
+#             allLowerBounds = []
+#             for ls in uniqueLengthscales:
+#                 allLengthscales.append(ls)
+#                 x[0][0] = ls
+#                 model.buildKernelsMatrices()
+#                 lowerBound = model.eval().item()
+#                 allLowerBounds.append(lowerBound)
+#                 # print("Lower bound for lengthscale {:.02f} and period {:.02f} is {:.02f}".format(ls, p, lowerBound))
+#             x[0][0] = xStart[0]
+#             data = {"lenghtscale": allLengthscales, "lowerBound": allLowerBounds}
+#             df = pd.DataFrame(data)
+#             fig = px.scatter(df, x='lenghtscale', y='lowerBound')
+#         pdb.set_trace()
+        # end debug exponential quadratic kernel
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
         optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-                                            optimizer=optimizer,
-                                            maxIter=maxIter, tol=tol,
-                                            verbose=verbose,
-                                            out=out,
-                                            nIterDisplay=nIterDisplay,
-                                            logLock=logLock,
-                                            logStream=logStream,
-                                            logStreamFN=logStreamFN, 
-                                           )
-        # pdb.set_trace()
+#         optimizer = torch.optim.Adam(x, lr=lr)
+#         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
+#                                             optimizer=optimizer,
+#                                             maxIter=maxIter, tol=tol,
+#                                             verbose=verbose,
+#                                             out=out,
+#                                             nIterDisplay=nIterDisplay,
+#                                             logLock=logLock,
+#                                             logStream=logStream,
+#                                             logStreamFN=logStreamFN,
+#                                            )
+        for i in range(len(x)):
+            x[i].requires_grad = True
+        iterCount = 0
+        lowerBoundHist = []
+        curEval = torch.tensor([float("inf")])
+        converged = False
+        def closure():
+            # details on this closure at http://sagecal.sourceforge.net/pytorch/index.html
+            nonlocal curEval
+
+            if torch.is_grad_enabled():
+                optimizer.zero_grad()
+            curEval = -evalFunc()
+            if curEval.requires_grad:
+                curEval.backward(retain_graph=True)
+            return curEval
+
+        while not converged and iterCount<maxIter:
+            prevEval = curEval
+            optimizer.step(closure)
+            with torch.no_grad():
+                x[0].clamp_(minScale)
+            if curEval<=prevEval and prevEval-curEval<tol:
+                converged = True
+            message = displayFmt%(iterCount, curEval)
+            if verbose and iterCount%nIterDisplay==0:
+                out.write(message)
+                self._writeToLockedLog(
+                    message=message,
+                    logLock=logLock,
+                    logStream=logStream,
+                    logStreamFN=logStreamFN
+                )
+            lowerBoundHist.append(-curEval.item())
+            iterCount += 1
+
+        answer = {"lowerBound": -curEval.item(), "lowerBoundHist": lowerBoundHist, "converged": converged}
+
+        for i in range(len(x)):
+            x[i].requires_grad = False
+
+        # begin debug periodic kernel
+#         with torch.no_grad():
+#             endLB = model.eval()
+#             xStart = xStart.numpy()
+#             xEnd = model.getKernelsParams()[0].clone().numpy()
+#             fig.add_trace(go.Scatter3d(x=[xStart[0],xEnd[0]], y=[xStart[1],xEnd[1]], z=[startLB, endLB], type="scatter3d", text=["start","end"], mode="text"))
+#             fig.update_layout(scene = dict(zaxis = dict(range=[df.lowerBound.max()-1000,df.lowerBound.max()],),),)
+#             fig.write_image("/tmp/tmp.png")
+#             fig.write_html("/tmp/tmp.html")
+#             pio.renderers.default = "browser"
+#             fig.show()
+#         pdb.set_trace()
+        # end debug periodic kernel
+        # begin debug exponential quadratic kernel
+#         with torch.no_grad():
+#             endLB = model.eval()
+#             xStart = xStart.numpy()
+#             xEnd = model.getKernelsParams()[0].clone().numpy()
+#             fig.add_trace(go.Scatter(x=[xStart[0],xEnd[0]], y=[startLB, endLB], type="scatter", text=["start","end"], mode="text"))
+#             fig.update_layout(scene = dict(yaxis = dict(range=[df.lowerBound.max()-1000,df.lowerBound.max()],),),)
+#             fig.write_image("/tmp/tmp.png")
+#             fig.write_html("/tmp/tmp.html")
+#             pio.renderers.default = "browser"
+#             fig.show()
+#         pdb.set_trace()
+        # end debug exponential quadratic kernel
         return answer
 
-    def _mStepIndPoints(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
+    def _mStepIndPointsLocs(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
                         nIterDisplay, logLock, logStream, logStreamFN):
         x = model.getIndPointsLocs()
         def evalFunc():
@@ -364,7 +515,7 @@ class SVEM:
 
             prevEval = curEval
             optimizer.step(closure)
-            if curEval<prevEval and prevEval-curEval<tol:
+            if curEval<=prevEval and prevEval-curEval<tol:
                 converged = True
             message = displayFmt%(iterCount, curEval)
             if verbose and iterCount%nIterDisplay==0:

@@ -58,7 +58,7 @@ def main(argv):
     ksTestTimeRescalingFigFilenamePattern = \
         "figures/{:08d}_simulation_ksTestTimeRescaling.{{:s}}".format(simResNumber)
     rocFigFilenamePattern = \
-        "figures/{:08d}_simulation_rocAnalisis_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, exampleTrial, exampleNeuron)
+        "figures/{:08d}_simulation_rocAnalysis_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, exampleTrial, exampleNeuron)
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     times = simRes["times"]

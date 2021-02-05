@@ -6,10 +6,13 @@ slurm-*
 .nfs*
 toRsync*
 fromRsync*
+toSyncData
+fromSyncData
 nextRefractoring.txt
 todo.txt
 .ipynb*
 docs/design/*bak*
+scripts/logs/*
 # docs/Makefile*
 # docs/build
 # docs/make*

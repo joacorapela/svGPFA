@@ -14,7 +14,7 @@ import plotly.graph_objs as go
 import scipy.io
 import scipy.stats
 import numpy as np
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import stats.hypothesisTests.permutationTests
 import utils.svGPFA.miscUtils

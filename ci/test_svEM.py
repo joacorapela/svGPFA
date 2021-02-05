@@ -9,19 +9,16 @@ import torch
 import numpy as np
 import time
 sys.path.append("../src")
-from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
-from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS, \
-        IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
-from stats.svGPFA.svPosteriorOnIndPoints import SVPosteriorOnIndPoints
-from stats.svGPFA.svPosteriorOnLatents import SVPosteriorOnLatentsAllTimes,\
-        SVPosteriorOnLatentsAssocTimes
-from stats.svGPFA.svEmbedding import LinearSVEmbeddingAllTimes, \
-        LinearSVEmbeddingAssocTimes
-from stats.svGPFA.expectedLogLikelihood import PointProcessELLExpLink, \
-        PointProcessELLQuad
-from stats.svGPFA.klDivergence import KLDivergence
-from stats.svGPFA.svLowerBound import SVLowerBound
-from stats.svGPFA.svEM import SVEM
+import utils.svGPFA.initUtils
+import stats.kernels
+import stats.svGPFA.kernelsMatricesStore
+import stats.svGPFA.svPosteriorOnIndPoints
+import stats.svGPFA.svPosteriorOnLatents
+import stats.svGPFA.svEmbedding
+import stats.svGPFA.expectedLogLikelihood
+import stats.svGPFA.klDivergence
+import stats.svGPFA.svLowerBound
+import stats.svGPFA.svEM
 
 def test_eStep_pointProcess():
     tol = 1e-5
@@ -31,16 +28,17 @@ def test_eStep_pointProcess():
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
-    indPointsLocsKMSEpsilon = 1e-5
+    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor).contiguous()
+    b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze().contiguous()
+    indPointsLocsKMSRegEpsilon = 1e-5
     nLowerBound = mat['nLowerBound'][0,0]
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
 
@@ -50,7 +48,7 @@ def test_eStep_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).contiguous()
 
     linkFunction = torch.exp
 
@@ -58,18 +56,18 @@ def test_eStep_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -80,29 +78,29 @@ def test_eStep_pointProcess():
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = SVPosteriorOnLatentsAllTimes(
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
+    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
+    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
+    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
-    eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
+    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
-    svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM()
+    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -115,7 +113,7 @@ def test_eStep_pointProcess():
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setQuadParams(quadParams=quadParams)
-    svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon)
+    svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
@@ -188,16 +186,17 @@ def test_mStepModelParams_pointProcess():
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
-    indPointsLocsKMSEpsilon = 1e-5
+    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor).contiguous()
+    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().contiguous()
+    indPointsLocsKMSRegEpsilon = 1e-5
     nLowerBound = mat['nLowerBound'][0,0]
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
 
     yMat = loadmat(yNonStackedFilename)
     YNonStacked_tmp = yMat['YNonStacked']
@@ -205,7 +204,7 @@ def test_mStepModelParams_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).contiguous()
 
     linkFunction = torch.exp
 
@@ -215,40 +214,40 @@ def test_mStepModelParams_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = SVPosteriorOnLatentsAllTimes(
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
+    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
+    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
+    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
-    eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
+    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
-    svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM()
+    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -263,7 +262,7 @@ def test_mStepModelParams_pointProcess():
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setQuadParams(quadParams=quadParams)
-    svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
@@ -283,16 +282,17 @@ def test_mStepKernelParams_pointProcess():
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
-    indPointsLocsKMSEpsilon = 1e-5
+    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor).contiguous()
+    b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze().contiguous()
+    indPointsLocsKMSRegEpsilon = 1e-5
     nLowerBound = mat['nLowerBound'][0,0]
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
 
     yMat = loadmat(yNonStackedFilename)
     YNonStacked_tmp = yMat['YNonStacked']
@@ -300,7 +300,7 @@ def test_mStepKernelParams_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).contiguous()
 
     linkFunction = torch.exp
 
@@ -310,40 +310,40 @@ def test_mStepKernelParams_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = SVPosteriorOnLatentsAllTimes(
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
+    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
+    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
+    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
-    eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
+    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
-    svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM()
+    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -358,7 +358,7 @@ def test_mStepKernelParams_pointProcess():
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setQuadParams(quadParams=quadParams)
-    svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
@@ -430,16 +430,17 @@ def test_mStepIndPoints_pointProcess():
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
-    indPointsLocsKMSEpsilon = 1e-5
+    qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor).contiguous()
+    b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze().contiguous()
+    indPointsLocsKMSRegEpsilon = 1e-5
     nLowerBound = mat['nLowerBound'][0,0]
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
 
     yMat = loadmat(yNonStackedFilename)
     YNonStacked_tmp = yMat['YNonStacked']
@@ -447,7 +448,7 @@ def test_mStepIndPoints_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor).contiguous()
 
     linkFunction = torch.exp
 
@@ -457,40 +458,40 @@ def test_mStepIndPoints_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = SVPosteriorOnLatentsAllTimes(
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
+    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
+    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
+    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
-    eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
+    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
-    svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = SVEM()
+    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -505,11 +506,11 @@ def test_mStepIndPoints_pointProcess():
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setQuadParams(quadParams=quadParams)
-    svlb.setIndPointsLocsKMSEpsilon(indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepIndPoints(model=svlb, maxIter=10, tol=1e-3, lr=1e-3,
+    res = svEM._mStepIndPointsLocs(model=svlb, maxIter=10, tol=1e-3, lr=1e-3,
                                lineSearchFn="strong_wolfe", verbose=True,
                                out=sys.stdout, nIterDisplay=1, logLock=None,
                                logStream=logStream, logStreamFN=None)
@@ -530,15 +531,16 @@ def test_maximize_pointProcess():
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
-    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor)
-    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze()
-    indPointsLocsKMSEpsilon = 1e-2
-    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
-    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
+    qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
+    C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor).contiguous()
+    b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().contiguous()
+    indPointsLocsKMSRegEpsilon = 1e-2
+    legQuadPoints = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
+    legQuadWeights = torch.from_numpy(mat['wwQuad']).type(torch.DoubleTensor).permute(2, 0, 1).contiguous()
 
     yMat = loadmat(yNonStackedFilename)
     YNonStacked_tmp = yMat['YNonStacked']
@@ -546,7 +548,7 @@ def test_maximize_pointProcess():
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
         for n in range(nNeurons):
-            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).type(torch.DoubleTensor)
+            YNonStacked[r][n] = torch.from_numpy(YNonStacked_tmp[r,0][n,0][:,0]).contiguous().type(torch.DoubleTensor)
 
     linkFunction = torch.exp
 
@@ -557,41 +559,41 @@ def test_maximize_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = SVPosteriorOnIndPoints()
-    indPointsLocsKMS = IndPointsLocsKMS()
-    indPointsLocsAndAllTimesKMS = IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = SVPosteriorOnLatentsAllTimes(
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = SVPosteriorOnLatentsAssocTimes(
+    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
+    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
+    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
-    eLL = PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
+    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
-    svlb = SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
     svlb.setKernels(kernels=kernels)
-    svEM = SVEM()
+    svEM = stats.svGPFA.svEM.SVEM()
 
-    qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -659,12 +661,12 @@ def test_maximize_pointProcess():
         model=svlb, measurements=YNonStacked,
         initialParams=initialParams, quadParams=quadParams,
         optimParams=optimParams,
-        indPointsLocsKMSEpsilon=indPointsLocsKMSEpsilon, out=sys.stdout)
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, out=sys.stdout)
     assert(lowerBoundHist[-1]>leasLowerBound)
 
 if __name__=='__main__':
-    # test_eStep_pointProcess() # passed
-    # # test_eStep_poisson() # not tested
+    test_eStep_pointProcess() # passed
+    # test_eStep_poisson() # not tested
     test_mStepModelParams_pointProcess() # passed
     test_mStepKernelParams_pointProcess() # passed
     test_mStepIndPoints_pointProcess() # passed

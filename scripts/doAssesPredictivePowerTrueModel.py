@@ -6,7 +6,7 @@ import torch
 import pickle
 import pandas as pd
 from sklearn import metrics
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 import plot.svGPFA.plotUtils
 
 def main(argv):
@@ -20,7 +20,7 @@ def main(argv):
     dtCIF = 1e-3
 
     simResFilename = "results/{:08d}_simRes.pickle".format(simResNumber)
-    rocFigFilename = "figures/{:08d}_simulation_rocAnalisis_trial{:03d}_neuron{:03d}.png".format(simResNumber, trialToAnalyze, neuronToAnalyze)
+    rocFigFilename = "figures/{:08d}_simulation_rocAnalysis_trial{:03d}_neuron{:03d}.png".format(simResNumber, trialToAnalyze, neuronToAnalyze)
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]

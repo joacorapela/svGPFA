@@ -6,7 +6,7 @@ import pdb
 import pickle
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
-sys.path.append(os.path.expanduser("../src"))
+sys.path.append("../src")
 
 def main(argv):
     marker = 'x'

@@ -20,7 +20,7 @@ from klDivergence import KLDivergence
 from sparseVariationalEM import SparseVariationalEM
 
 def main(argv):
-    dataFilename = os.path.expanduser("data/demo_PointProcess.mat")
+    dataFilename = "data/demo_PointProcess.mat"
     approxPosteriorForH_allNeuronsAllTimes_pickleFilename = "data/approxPosteriorForH_allNeuronsAllTimes.pickle"
 
     mat = loadmat(dataFilename)
