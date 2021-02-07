@@ -14,6 +14,14 @@ def getUniformIndPointsMeans(nTrials, nLatents, nIndPointsPerLatent, min=-1, max
             indPointsMeans[r][k] = torch.rand(nIndPointsPerLatent[k], 1)*(max-min)+min
     return indPointsMeans
 
+def getConstantIndPointsMeans(constantValue, nTrials, nLatents, nIndPointsPerLatent):
+    indPointsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        indPointsMeans[r] = [[] for k in range(nLatents)]
+        for k in range(nLatents):
+            indPointsMeans[r][k] = constantValue*torch.ones(nIndPointsPerLatent[k], 1, dtype=torch.double)
+    return indPointsMeans
+
 def getKzzChol0(kernels, kernelsParams0, indPointsLocs0, epsilon):
     indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
     indPointsLocsKMS.setKernels(kernels=kernels)
@@ -23,6 +31,16 @@ def getKzzChol0(kernels, kernelsParams0, indPointsLocs0, epsilon):
     indPointsLocsKMS.buildKernelsMatrices()
     KzzChol0 = indPointsLocsKMS.getKzzChol()
     return KzzChol0
+
+def getScaledIdentityQSigma0(scale, nTrials, nIndPointsPerLatent):
+    nLatent = len(nIndPointsPerLatent)
+    qSigma0 = [[None] for k in range(nLatent)]
+
+    for k in range(nLatent):
+        qSigma0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], nIndPointsPerLatent[k]), dtype=torch.double)
+        for r in range(nTrials):
+            qSigma0[k][r,:,:] = scale*torch.eye(nIndPointsPerLatent[k], dtype=torch.double)
+    return qSigma0
 
 def getDiagIndicesIn3DArray(N, M, device=torch.device("cpu")):
     frameDiagIndices = torch.arange(end=N, device=device)*(N+1)
