@@ -54,39 +54,21 @@ def main(argv):
         initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
+    scaleForIdentityQSigma0 = float(estInitConfig["control_variables"]["scaleForIdentityQSigma0"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimParams = {}
-    optimParams["emMaxIter"] = int(optimParamsConfig["emMaxIter".lower()])
-    #
-    optimParams["eStepEstimate"] = optimParamsConfig["eStepEstimate".lower()]=="True"
-    optimParams["eStepMaxIter"] = int(optimParamsConfig["eStepMaxIter".lower()])
-    optimParams["eStepTol"] = float(optimParamsConfig["eStepTol".lower()])
-    optimParams["eStepLR"] = float(optimParamsConfig["eStepLR".lower()])
-    optimParams["eStepLineSearchFn"] = optimParamsConfig["eStepLineSearchFn".lower()]
-    optimParams["eStepNIterDisplay"] = int(optimParamsConfig["eStepNIterDisplay".lower()])
-    #
-    optimParams["mStepEmbeddingEstimate"] = optimParamsConfig["mStepEmbeddingEstimate".lower()]=="True"
-    optimParams["mStepEmbeddingMaxIter"] = int(optimParamsConfig["mStepEmbeddingMaxIter".lower()])
-    optimParams["mStepEmbeddingTol"] = float(optimParamsConfig["mStepEmbeddingTol".lower()])
-    optimParams["mStepEmbeddingLR"] = float(optimParamsConfig["mStepEmbeddingLR".lower()])
-    optimParams["mStepEmbeddingLineSearchFn"] = optimParamsConfig["mStepEmbeddingLineSearchFn".lower()]
-    optimParams["mStepEmbeddingNIterDisplay"] = int(optimParamsConfig["mStepEmbeddingNIterDisplay".lower()])
-    #
-    optimParams["mStepKernelsEstimate"] = optimParamsConfig["mStepKernelsEstimate".lower()]=="True"
-    optimParams["mStepKernelsMaxIter"] = int(optimParamsConfig["mStepKernelsMaxIter".lower()])
-    optimParams["mStepKernelsTol"] = float(optimParamsConfig["mStepKernelsTol".lower()])
-    optimParams["mStepKernelsLR"] = float(optimParamsConfig["mStepKernelsLR".lower()])
-    optimParams["mStepKernelsLineSearchFn"] = optimParamsConfig["mStepKernelsLineSearchFn".lower()]
-    optimParams["mStepKernelsNIterDisplay"] = int(optimParamsConfig["mStepKernelsNIterDisplay".lower()])
-    #
-    optimParams["mStepIndPointsEstimate"] = optimParamsConfig["mStepIndPointsEstimate".lower()]=="True"
-    optimParams["mStepIndPointsMaxIter"] = int(optimParamsConfig["mStepIndPointsMaxIter".lower()])
-    optimParams["mStepIndPointsTol"] = float(optimParamsConfig["mStepIndPointsTol".lower()])
-    optimParams["mStepIndPointsLR"] = float(optimParamsConfig["mStepIndPointsLR".lower()])
-    optimParams["mStepIndPointsLineSearchFn"] = optimParamsConfig["mStepIndPointsLineSearchFn".lower()]
-    optimParams["mStepIndPointsNIterDisplay"] = int(optimParamsConfig["mStepIndPointsNIterDisplay".lower()])
-    #
+    optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
+    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+    for step in steps:
+        optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
+        optimParams["{:s}_optim_params".format(step)] = {
+            "max_iter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
+            "lr": float(optimParamsConfig["{:s}_lr".format(step)]),
+            "tolerance_grad": float(optimParamsConfig["{:s}_tolerance_grad".format(step)]),
+            "tolerance_change": float(optimParamsConfig["{:s}_tolerance_change".format(step)]),
+            "line_search_fn": optimParamsConfig["{:s}_line_search_fn".format(step)],
+        }
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     if randomEmbedding:
@@ -105,8 +87,7 @@ def main(argv):
     kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
-    # KzzChol0 = utils.svGPFA.initUtils.getKzzChol0(kernels=kernels, kernelsParams0=kernelsParams0, indPointsLocs0=Z0, epsilon=indPointsLocsKMSRegEpsilon)
-    scaleForIdentityQSigma0 = 1e-2
+    KzzChol0 = utils.svGPFA.initUtils.getKzzChol0(kernels=kernels, kernelsParams0=kernelsParams0, indPointsLocs0=Z0, epsilon=indPointsLocsKMSRegEpsilon)
     qSigma0 = utils.svGPFA.initUtils.getScaledIdentityQSigma0(scale=scaleForIdentityQSigma0, nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent)
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
 
@@ -152,11 +133,11 @@ def main(argv):
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=np.array(trialsLengths).reshape(-1,1),
-        emMaxIter=optimParams["emMaxIter"],
-        eStepMaxIter=optimParams["eStepMaxIter"],
-        mStepEmbeddingMaxIter=optimParams["mStepEmbeddingMaxIter"],
-        mStepKernelsMaxIter=optimParams["mStepKernelsMaxIter"],
-        mStepIndPointsMaxIter=optimParams["mStepIndPointsMaxIter"],
+        emMaxIter=optimParams["em_max_iter"],
+        eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
+        mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
+        mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
+        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
         saveFilename=estimationDataForMatlabFilename)
 
     # create model
