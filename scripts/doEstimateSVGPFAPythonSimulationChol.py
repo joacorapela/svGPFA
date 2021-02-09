@@ -63,11 +63,9 @@ def main(argv):
     for step in steps:
         optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
         optimParams["{:s}_optim_params".format(step)] = {
-            "max_iter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
-            "lr": float(optimParamsConfig["{:s}_lr".format(step)]),
-            "tolerance_grad": float(optimParamsConfig["{:s}_tolerance_grad".format(step)]),
-            "tolerance_change": float(optimParamsConfig["{:s}_tolerance_change".format(step)]),
-            "line_search_fn": optimParamsConfig["{:s}_line_search_fn".format(step)],
+            "maxiter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
+            "ftol": float(optimParamsConfig["{:s}_tolerance_grad".format(step)]),
+            "gtol": float(optimParamsConfig["{:s}_tolerance_change".format(step)]),
         }
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
@@ -134,10 +132,10 @@ def main(argv):
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=np.array(trialsLengths).reshape(-1,1),
         emMaxIter=optimParams["em_max_iter"],
-        eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
-        mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
-        mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
-        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
+        eStepMaxIter=optimParams["estep_optim_params"]["maxiter"],
+        mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["maxiter"],
+        mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["maxiter"],
+        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["maxiter"],
         saveFilename=estimationDataForMatlabFilename)
 
     # create model
