@@ -7,6 +7,50 @@ sys.path.append("../src")
 import stats.svGPFA.svPosteriorOnIndPoints
 import utils.svGPFA.initUtils
 
+def test_get_flattened_params():
+    nTrials = 2
+    nIndPoints = [2, 2, 2]
+
+    nLatents = len(nIndPoints)
+    qMu0 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
+    srQSigma0Vecs = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
+    initialParams = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
+
+    true_flattened_params = []
+    for k in range(nLatents):
+        true_flattened_params.extend(qMu0[k].flatten().tolist())
+    for k in range(nLatents):
+        true_flattened_params.extend(srQSigma0Vecs[k].flatten().tolist())
+
+    svPosteriorOnIndPoints = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    svPosteriorOnIndPoints.setInitialParams(initialParams=initialParams)
+    flattened_params = svPosteriorOnIndPoints.get_flattened_params()
+
+    assert(flattened_params==true_flattened_params)
+
+def test_set_flattened_params():
+    nTrials = 2
+    nIndPoints = [2, 2, 2]
+
+    nLatents = len(nIndPoints)
+
+    qMu0_1 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
+    srQSigma0Vecs_1 = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
+    initialParams_1 = {"qMu0": qMu0_1, "srQSigma0Vecs": srQSigma0Vecs_1}
+    svPosteriorOnIndPoints_1 = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    svPosteriorOnIndPoints_1.setInitialParams(initialParams=initialParams_1)
+    flattened_params_1 = svPosteriorOnIndPoints_1.get_flattened_params()
+
+    qMu0_2 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
+    srQSigma0Vecs_2 = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
+    initialParams_2 = {"qMu0": qMu0_2, "srQSigma0Vecs": srQSigma0Vecs_2}
+    svPosteriorOnIndPoints_2 = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    svPosteriorOnIndPoints_2.setInitialParams(initialParams=initialParams_2)
+    svPosteriorOnIndPoints_2.set_params_from_flattened(flattened_params=flattened_params_1)
+    flattened_params_2 = svPosteriorOnIndPoints_2.get_flattened_params()
+
+    assert(flattened_params_1==flattened_params_2)
+
 def test_buildQSigma():
     tol = 1e-5
     dataFilename = os.path.join(os.path.dirname(__file__), "data/get_full_from_lowplusdiag.mat")
@@ -30,4 +74,6 @@ def test_buildQSigma():
     assert(error<tol)
 
 if __name__=="__main__":
-    test_buildQSigma()
+    # test_get_flattened_params()
+    test_set_flattened_params()
+    # test_buildQSigma()
