@@ -109,10 +109,22 @@ class SVEM:
         return lowerBoundHist, elapsedTimeHist
 
     def _eStep(self, model, optimParams):
-        x = model.getSVPosteriorOnIndPointsParams()
-        evalFunc = model.eval
-        optimizer = torch.optim.LBFGS(x, **optimParams)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
+        def eval_func(z):
+            model.set_svPosteriorOnIndPoints_params_form_list(z=z.tolist())
+            value = model.eval()
+            value.backward()
+            grad = model.get_flattened_svPosteriorOnIndPoints_params_grad()
+            value = value.item()
+            grad = grad.detach().numpy()
+            return (value, grad)
+
+        z0 = model.get_flattened_svPosteriorOnIndPoints_params().numpy()
+        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
+                                            method=method, jac=True,
+                                            options=optim_params)
+        model.deactivate_svPosteriorOnIndPoints_gradients()
+        model.set_svPosteriorOnIndPoints_params_form_list(z=optim_res.x.tolist())
+        answer = optim_res.x
         return answer
 
     def _mStepEmbedding(self, model, optimParams):
