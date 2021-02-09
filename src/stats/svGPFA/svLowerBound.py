@@ -8,6 +8,8 @@ class SVLowerBound:
         super(SVLowerBound, self).__init__()
         self._eLL = eLL
         self._klDiv = klDiv
+        # shortcuts
+        self._svPosteriorOnIndPoints = klDiv.get_svPosteriorOnIndPoints()
 
     def eval(self):
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
@@ -68,4 +70,15 @@ class SVLowerBound:
 
     def predictLatents(self, newTimes):
         return self._eLL.predictLatents(newTimes=newTimes)
+
+    def get_flattened_svPosteriorOnIndPoints_params(self):
+        flattened_params = self._svPosteriorOnIndPoints.get_flattened_params()
+        return flattened_params
+
+    def get_flattened_svPosteriorOnIndPoints_params_grad(self):
+        flattened_params_grad = self._svPosteriorOnIndPoints.get_flattened_params_grad()
+        return flattened_params_grad
+
+    def set_svPosteriorOnIndPoints_params_form_list(self, z):
+        self._svPosteriorOnIndPoints.set_params_form_list(z=z)
 
