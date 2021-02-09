@@ -6,6 +6,7 @@ import time
 import math
 import pickle
 import numpy as np
+import scipy.optimize
 import torch
 
 class SVEM:
@@ -108,23 +109,24 @@ class SVEM:
             iter += 1
         return lowerBoundHist, elapsedTimeHist
 
-    def _eStep(self, model, optimParams):
+    def _eStep(self, model, optimParams, method="L-BFGS-B"):
         def eval_func(z):
-            model.set_svPosteriorOnIndPoints_params_form_list(z=z.tolist())
-            value = model.eval()
+            model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=z.tolist())
+            model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=True)
+            value = -model.eval()
             value.backward()
-            grad = model.get_flattened_svPosteriorOnIndPoints_params_grad()
+            grad_list = model.get_flattened_svPosteriorOnIndPoints_params_grad()
             value = value.item()
-            grad = grad.detach().numpy()
+            grad = np.array(grad_list)
             return (value, grad)
 
-        z0 = model.get_flattened_svPosteriorOnIndPoints_params().numpy()
+        z0 = np.array(model.get_flattened_svPosteriorOnIndPoints_params())
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
-                                            options=optim_params)
-        model.deactivate_svPosteriorOnIndPoints_gradients()
-        model.set_svPosteriorOnIndPoints_params_form_list(z=optim_res.x.tolist())
-        answer = optim_res.x
+                                            options=optimParams)
+        model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
+        model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
+        answer = optim_res.fun
         return answer
 
     def _mStepEmbedding(self, model, optimParams):
