@@ -79,6 +79,9 @@ class SVLowerBound:
         flattened_params_grad = self._svPosteriorOnIndPoints.get_flattened_params_grad()
         return flattened_params_grad
 
-    def set_svPosteriorOnIndPoints_params_form_list(self, z):
-        self._svPosteriorOnIndPoints.set_params_form_list(z=z)
+    def set_svPosteriorOnIndPoints_params_from_flattened(self, flattened_params):
+        self._svPosteriorOnIndPoints.set_params_from_flattened(flattened_params=flattened_params)
+
+    def set_svPosteriorOnIndPoints_params_requires_grad(self, requires_grad):
+        self._svPosteriorOnIndPoints.set_params_requires_grad(requires_grad=requires_grad)
 
