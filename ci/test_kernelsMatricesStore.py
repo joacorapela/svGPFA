@@ -10,6 +10,124 @@ sys.path.append("../src")
 from stats.kernels import PeriodicKernel, ExponentialQuadraticKernel
 from stats.svGPFA.kernelsMatricesStore import IndPointsLocsKMS, IndPointsLocsAndAllTimesKMS, IndPointsLocsAndAssocTimesKMS
 
+def test_get_flattened_indPointsLocs():
+    true_indPointsLocs = [torch.tensor([10.0, 20.0], dtype=torch.double),
+                          torch.tensor([30.0, 40.0, 50.0], dtype=torch.double)]
+
+    true_flattened_indPointsLocs = true_indPointsLocs[0].tolist() + true_indPointsLocs[1].tolist()
+
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setIndPointsLocs(indPointsLocs=true_indPointsLocs)
+    flattened_indPointsLocs = indPointsLocsKMS.get_flattened_indPointsLocs()
+
+    assert(true_flattened_indPointsLocs==flattened_indPointsLocs)
+
+def test_set_indPointsLocs_from_flattened():
+    initial_indPointsLocs = [torch.tensor([1.0, 2.0], dtype=torch.double),
+                             torch.tensor([3.0, 4.0, 5.0], dtype=torch.double)]
+    true_indPointsLocs = [torch.tensor([10.0, 20.0], dtype=torch.double),
+                          torch.tensor([30.0, 40.0, 50.0], dtype=torch.double)]
+
+    true_flattened_indPointsLocs = true_indPointsLocs[0].tolist() + true_indPointsLocs[1].tolist()
+
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setIndPointsLocs(indPointsLocs=initial_indPointsLocs)
+    indPointsLocsKMS.set_indPointsLocs_from_flattened(flattened_params=true_flattened_indPointsLocs)
+    indPointsLocs = indPointsLocsKMS.getIndPointsLocs()
+
+    for k in range(len(indPointsLocs)):
+        for i in range(len(indPointsLocs[k])):
+            assert(indPointsLocs[k][i]==true_indPointsLocs[k][i])
+
+def test_set_indPointsLocs_requires_grad():
+    initial_indPointsLocs = [torch.tensor([1.0, 2.0], dtype=torch.double),
+                             torch.tensor([3.0, 4.0, 5.0], dtype=torch.double)]
+
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setIndPointsLocs(indPointsLocs=initial_indPointsLocs)
+    indPointsLocsKMS.set_indPointsLocs_requires_grad(requires_grad=True)
+    for k in range(len(initial_indPointsLocs)):
+        assert(initial_indPointsLocs[k].requires_grad)
+    indPointsLocsKMS.set_indPointsLocs_requires_grad(requires_grad=False)
+    for k in range(len(initial_indPointsLocs)):
+        assert(not initial_indPointsLocs[k].requires_grad)
+
+def test_get_flattened_kernels_params():
+    initial_kernels_params = [torch.tensor([10.0, 20.0], dtype=torch.double), # priodic kernel lenghtscale and period
+                              torch.tensor([30.0], dtype=torch.double) #exponential quadratic kernel lengthscale 
+                             ]
+    true_kernels_params = [torch.tensor([1.0, 2.0], dtype=torch.double), # priodic kernel lenghtscale and period
+                           torch.tensor([3.0], dtype=torch.double) #exponential quadratic kernel lengthscale
+                           ]
+
+    true_flattened_kernels_params = true_kernels_params[0].tolist() + true_kernels_params[1].tolist()
+
+    periodicKernel = PeriodicKernel(scale=1.0)
+    periodicKernel.setParams(params=initial_kernels_params[0])
+
+    exponentialQuadraticKernel = ExponentialQuadraticKernel(scale=1.0)
+    exponentialQuadraticKernel.setParams(params=initial_kernels_params[1])
+
+    kernels = [periodicKernel, exponentialQuadraticKernel]
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setKernels(kernels=kernels)
+    indPointsLocsKMS.setKernelsParams(kernelsParams=true_kernels_params)
+    flattened_kernels_params = indPointsLocsKMS.get_flattened_kernels_params()
+
+    assert(true_flattened_kernels_params==flattened_kernels_params)
+
+def test_set_kernels_params_from_flattened():
+    initial_kernels_params = [torch.tensor([10.0, 20.0], dtype=torch.double), # priodic kernel lenghtscale and period
+                              torch.tensor([30.0], dtype=torch.double) #exponential quadratic kernel lengthscale 
+                             ]
+    true_kernels_params = [torch.tensor([1.0, 2.0], dtype=torch.double), # priodic kernel lenghtscale and period
+                           torch.tensor([3.0], dtype=torch.double) #exponential quadratic kernel lengthscale
+                           ]
+
+    true_flattened_kernels_params = true_kernels_params[0].tolist() + true_kernels_params[1].tolist()
+
+    periodicKernel = PeriodicKernel(scale=1.0)
+    periodicKernel.setParams(params=initial_kernels_params[0])
+
+    exponentialQuadraticKernel = ExponentialQuadraticKernel(scale=1.0)
+    exponentialQuadraticKernel.setParams(params=initial_kernels_params[1])
+
+    kernels = [periodicKernel, exponentialQuadraticKernel]
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setKernels(kernels=kernels)
+    indPointsLocsKMS.set_kernels_params_from_flattened(flattened_params=true_flattened_kernels_params)
+    flattened_kernels_params = indPointsLocsKMS.get_flattened_kernels_params()
+
+    assert(true_flattened_kernels_params==flattened_kernels_params)
+
+def test_set_kernels_params_requires_grad():
+    initial_kernels_params = [torch.tensor([10.0, 20.0], dtype=torch.double), # priodic kernel lenghtscale and period
+                              torch.tensor([30.0], dtype=torch.double) #exponential quadratic kernel lengthscale 
+                             ]
+    periodicKernel = PeriodicKernel(scale=1.0)
+    periodicKernel.setParams(params=initial_kernels_params[0])
+
+    exponentialQuadraticKernel = ExponentialQuadraticKernel(scale=1.0)
+    exponentialQuadraticKernel.setParams(params=initial_kernels_params[1])
+
+    kernels = [periodicKernel, exponentialQuadraticKernel]
+    indPointsLocsKMS = IndPointsLocsKMS()
+    indPointsLocsKMS.setKernels(kernels=kernels)
+    indPointsLocsKMS.setKernelsParams(kernelsParams=initial_kernels_params)
+
+    kernelsParams = indPointsLocsKMS.getKernelsParams()
+
+    for i in range(len(kernelsParams)):
+        assert(not kernelsParams[i].requires_grad)
+
+    indPointsLocsKMS.set_kernels_params_requires_grad(requires_grad=True)
+    for i in range(len(kernelsParams)):
+        assert(kernelsParams[i].requires_grad)
+
+    indPointsLocsKMS.set_kernels_params_requires_grad(requires_grad=False)
+    for i in range(len(kernelsParams)):
+        assert(not kernelsParams[i].requires_grad)
+
 def test_eval_IndPointsLocsKMS():
     tol = 1e-5
     tolKzzi = 6e-2
@@ -184,6 +302,12 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
             assert(error<tol)
 
 if __name__=='__main__':
-    test_eval_IndPointsLocsKMS()
-    test_eval_IndPointsLocsAndAllTimesKMS()
-    test_eval_IndPointsLocsAndAssocTimesKMS()
+    # test_eval_IndPointsLocsKMS()
+    # test_eval_IndPointsLocsAndAllTimesKMS()
+    # test_eval_IndPointsLocsAndAssocTimesKMS()
+    # test_get_flattened_kernels_params()
+    # test_set_kernels_params_from_flattened()
+    # test_set_kernels_params_requires_grad()
+    test_get_flattened_indPointsLocs()
+    test_set_indPointsLocs_from_flattened()
+    test_set_indPointsLocs_requires_grad()
