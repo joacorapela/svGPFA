@@ -9,6 +9,9 @@ class KLDivergence:
         self._indPointsLocsKMS = indPointsLocsKMS
         self._svPosteriorOnIndPoints = svPosteriorOnIndPoints
 
+    def get_indPointsLocsKMS(self):
+        return self._indPointsLocsKMS
+
     def get_svPosteriorOnIndPoints(self):
         return self._svPosteriorOnIndPoints
 
