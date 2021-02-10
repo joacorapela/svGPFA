@@ -114,7 +114,7 @@ class SVEM:
             model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=z.tolist())
             model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=True)
             value = -model.eval()
-            value.backward()
+            value.backward(retain_graph=True)
             grad_list = model.get_flattened_svPosteriorOnIndPoints_params_grad()
             value = value.item()
             grad = np.array(grad_list)
@@ -126,30 +126,75 @@ class SVEM:
                                             options=optimParams)
         model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
         model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = optim_res.fun
+        answer = -optim_res.fun
         return answer
 
-    def _mStepEmbedding(self, model, optimParams):
-        x = model.getSVEmbeddingParams()
-        svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
-        # evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-        evalFunc = model.eval
-        optimizer = torch.optim.LBFGS(x, **optimParams)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
+    def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
+        def eval_func(z):
+            model.set_svEmbedding_params_from_flattened(flattened_params=z.tolist())
+            model.set_svEmbedding_params_requires_grad(requires_grad=True)
+#             svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
+#             value = -model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
+            value = -model.eval()
+            value.backward(retain_graph=True)
+            grad_list = model.get_flattened_svEmbedding_params_grad()
+            value = value.item()
+            grad = np.array(grad_list)
+            return (value, grad)
+
+        z0 = np.array(model.get_flattened_svEmbedding_params())
+        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
+                                            method=method, jac=True,
+                                            options=optimParams)
+        model.set_svEmbedding_params_requires_grad(requires_grad=False)
+        model.set_svEmbedding_params_from_flattened(flattened_params=optim_res.x.tolist())
+        answer = -optim_res.fun
         return answer
 
-    def _mStepKernels(self, model, optimParams):
-        x = model.getKernelsParams()
-        def evalFunc():
+    def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
+        def eval_func(z):
+            model.set_kernels_params_from_flattened(flattened_params=z.tolist())
+            model.set_kernels_params_requires_grad(requires_grad=True)
             model.buildKernelsMatrices()
-            answer = model.eval()
-            return answer
-        optimizer = torch.optim.LBFGS(x, **optimParams)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
-        print("Kernel params:", x)
+            value = -model.eval()
+            value.backward(retain_graph=True)
+            grad_list = model.get_flattened_kernels_params_grad()
+            value = value.item()
+            grad = np.array(grad_list)
+            return (value, grad)
+
+        z0 = np.array(model.get_flattened_kernels_params())
+        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
+                                            method=method, jac=True,
+                                            options=optimParams)
+        model.set_kernels_params_requires_grad(requires_grad=False)
+        model.set_kernels_params_from_flattened(flattened_params=optim_res.x.tolist())
+        answer = -optim_res.fun
+        # print("*** kernels parameters: {}".format(model.getKernelsParams()))
+        print("*** kernels parameters: {}".format(optim_res.x))
         return answer
 
-    def _mStepIndPointsLocs(self, model, optimParams):
+    def _mStepIndPointsLocs(self, model, optimParams, method="L-BFGS-B"):
+        def eval_func(z):
+            model.set_indPointsLocs_from_flattened(flattened_params=z.tolist())
+            model.set_indPointsLocs_requires_grad(requires_grad=True)
+            model.buildKernelsMatrices()
+            value = -model.eval()
+            value.backward(retain_graph=True)
+            grad_list = model.get_flattened_indPointsLocs_grad()
+            value = value.item()
+            grad = np.array(grad_list)
+            return (value, grad)
+
+        z0 = np.array(model.get_flattened_indPointsLocs())
+        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
+                                            method=method, jac=True,
+                                            options=optimParams)
+        model.set_indPointsLocs_requires_grad(requires_grad=False)
+        model.set_indPointsLocs_from_flattened(flattened_params=optim_res.x.tolist())
+        answer = -optim_res.fun
+        return answer
+
         x = model.getIndPointsLocs()
         def evalFunc():
             model.buildKernelsMatrices()
