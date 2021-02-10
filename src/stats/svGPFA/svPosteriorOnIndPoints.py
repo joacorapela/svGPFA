@@ -20,6 +20,19 @@ class SVPosteriorOnIndPoints:
         listOfTensors.extend([self._srQSigmaVecs[k] for k in range(len(self._srQSigmaVecs))])
         return listOfTensors
 
+    def getQMu(self):
+        return self._qMu
+
+    def buildQSigma(self):
+        # begin patch for older version of the code
+        if hasattr(self, "_qSRSigmaVec"):
+            self._srQSigmaVecs = [self._qSRSigmaVec[k].unsqueeze(-1) for k in range(len(self._qSRSigmaVec))]
+        elif self._srQSigmaVecs[0].dim()==2:
+            self._srQSigmaVecs = [self._srQSigmaVecs[k].unsqueeze(-1) for k in range(len(self._srQSigmaVecs))]
+        # end patch for older version of the code
+        qSigma = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
+        return qSigma
+
     def get_flattened_params(self):
         flattened_params = []
         for k in range(len(self._qMu)):
@@ -51,18 +64,4 @@ class SVPosteriorOnIndPoints:
             self._qMu[k].requires_grad = requires_grad
         for k in range(len(self._srQSigmaVecs)):
             self._srQSigmaVecs[k].requires_grad = requires_grad
-
-    def getQMu(self):
-        return self._qMu
-
-    def buildQSigma(self):
-        # begin patch for older version of the code
-        if hasattr(self, "_qSRSigmaVec"):
-            self._srQSigmaVecs = [self._qSRSigmaVec[k].unsqueeze(-1) for k in range(len(self._qSRSigmaVec))]
-        elif self._srQSigmaVecs[0].dim()==2:
-            self._srQSigmaVecs = [self._srQSigmaVecs[k].unsqueeze(-1) for k in range(len(self._srQSigmaVecs))]
-        # end patch for older version of the code
-        qSigma = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
-        return qSigma
-
 
