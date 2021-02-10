@@ -10,6 +10,8 @@ class SVLowerBound:
         self._klDiv = klDiv
         # shortcuts
         self._svPosteriorOnIndPoints = klDiv.get_svPosteriorOnIndPoints()
+        self._svEmbedding = eLL.get_svEmbeddingAllTimes()
+        self._indPointsLocsKMS = klDiv.get_indPointsLocsKMS()
 
     def eval(self):
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
@@ -71,6 +73,7 @@ class SVLowerBound:
     def predictLatents(self, newTimes):
         return self._eLL.predictLatents(newTimes=newTimes)
 
+    # svPosterioOnIndPoints
     def get_flattened_svPosteriorOnIndPoints_params(self):
         flattened_params = self._svPosteriorOnIndPoints.get_flattened_params()
         return flattened_params
@@ -84,4 +87,49 @@ class SVLowerBound:
 
     def set_svPosteriorOnIndPoints_params_requires_grad(self, requires_grad):
         self._svPosteriorOnIndPoints.set_params_requires_grad(requires_grad=requires_grad)
+
+    # svEmbedding
+    def get_flattened_svEmbedding_params(self):
+        flattened_params = self._svEmbedding.get_flattened_params()
+        return flattened_params
+
+    def get_flattened_svEmbedding_params_grad(self):
+        flattened_params_grad = self._svEmbedding.get_flattened_params_grad()
+        return flattened_params_grad
+
+    def set_svEmbedding_params_from_flattened(self, flattened_params):
+        self._svEmbedding.set_params_from_flattened(flattened_params=flattened_params)
+
+    def set_svEmbedding_params_requires_grad(self, requires_grad):
+        self._svEmbedding.set_params_requires_grad(requires_grad=requires_grad)
+
+    # kernels_params
+    def get_flattened_kernels_params(self):
+        flattened_params = self._indPointsLocsKMS.get_flattened_kernels_params()
+        return flattened_params
+
+    def get_flattened_kernels_params_grad(self):
+        flattened_params_grad = self._indPointsLocsKMS.get_flattened_kernels_params_grad()
+        return flattened_params_grad
+
+    def set_kernels_params_from_flattened(self, flattened_params):
+        self._indPointsLocsKMS.set_kernels_params_from_flattened(flattened_params=flattened_params)
+
+    def set_kernels_params_requires_grad(self, requires_grad):
+        self._indPointsLocsKMS.set_kernels_params_requires_grad(requires_grad=requires_grad)
+
+    # indPointsLocs
+    def get_flattened_indPointsLocs(self):
+        flattened_params = self._indPointsLocsKMS.get_flattened_indPointsLocs()
+        return flattened_params
+
+    def get_flattened_indPointsLocs_grad(self):
+        flattened_params_grad = self._indPointsLocsKMS.get_flattened_indPointsLocs_grad()
+        return flattened_params_grad
+
+    def set_indPointsLocs_from_flattened(self, flattened_params):
+        self._indPointsLocsKMS.set_indPointsLocs_from_flattened(flattened_params=flattened_params)
+
+    def set_indPointsLocs_requires_grad(self, requires_grad):
+        self._indPointsLocsKMS.set_indPointsLocs_requires_grad(requires_grad=requires_grad)
 
