@@ -14,6 +14,40 @@ import stats.svGPFA.svPosteriorOnIndPoints
 import stats.svGPFA.svPosteriorOnLatents
 import stats.svGPFA.svEmbedding
 
+def test_get_flattened_params():
+    svEmbedding = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=None)
+    C0 = torch.tensor([[1.,2.,3.],[4.,5.,6.]], dtype=torch.double)
+    d0 = torch.tensor([[1.,1.,1.]], dtype=torch.double)
+    svEmbedding._C = C0
+    svEmbedding._d = d0
+    true_flattened_params = torch.cat((C0.flatten(), d0.flatten())).tolist()
+    flattened_params = svEmbedding.get_flattened_params()
+    assert(true_flattened_params==flattened_params)
+
+def test_set_params_from_flattened():
+    svEmbedding = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=None)
+    C0 = torch.tensor([[1.,2.,3.],[4.,5.,6.]], dtype=torch.double)
+    d0 = torch.tensor([[1.,1.,1.]], dtype=torch.double)
+    svEmbedding._C = C0
+    svEmbedding._d = d0
+    C1 = torch.tensor([[10.,20.,30.],[40.,50.,60.]], dtype=torch.double)
+    d1 = torch.tensor([[10.,10.,10.]], dtype=torch.double)
+    to_set_flattened_params = torch.cat((C1.flatten(), d1.flatten())).tolist()
+    svEmbedding.set_params_from_flattened(flattened_params=to_set_flattened_params)
+    flattened_params = svEmbedding.get_flattened_params()
+    assert(to_set_flattened_params==flattened_params)
+
+def test_set_params_requires_grad():
+    svEmbedding = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=None)
+    C0 = torch.tensor([[1.,2.,3.],[4.,5.,6.]], dtype=torch.double)
+    d0 = torch.tensor([[1.,1.,1.]], dtype=torch.double)
+    svEmbedding._C = C0
+    svEmbedding._d = d0
+    svEmbedding.set_params_requires_grad(requires_grad=True)
+    assert(C0.requires_grad and d0.requires_grad)
+    svEmbedding.set_params_requires_grad(requires_grad=False)
+    assert(not C0.requires_grad and not d0.requires_grad)
+
 def test_computeMeansAndVars_allTimes():
     tol = 5e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
@@ -161,5 +195,8 @@ def test_computeMeansAndVars_assocTimes():
         assert(qHVarError<tol)
    
 if __name__=="__main__":
-    test_computeMeansAndVars_allTimes()
-    test_computeMeansAndVars_assocTimes()
+    # test_get_flattened_params()
+    # test_set_params_from_flattened()
+    test_set_params_requires_grad ()
+    # test_computeMeansAndVars_allTimes()
+    # test_computeMeansAndVars_assocTimes()
