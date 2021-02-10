@@ -46,6 +46,9 @@ class ExpectedLogLikelihood(ABC):
     def setQuadParams(self, quadParams):
         pass
 
+    def get_svEmbeddingAllTimes(self):
+        return self._svEmbeddingAllTimes
+
     def getSVPosteriorOnIndPointsParams(self):
         return self._svEmbeddingAllTimes.getSVPosteriorOnIndPointsParams()
 
@@ -162,8 +165,7 @@ class PointProcessELL(ExpectedLogLikelihood):
 
     def setInitialParams(self, initialParams):
         self._svEmbeddingAllTimes.setInitialParams(initialParams=initialParams)
-        self._svEmbeddingAssocTimes.\
-            setInitialParams(initialParams=initialParams)
+        self._svEmbeddingAssocTimes.setInitialParams(initialParams=initialParams)
 
     def setQuadParams(self, quadParams):
         self._svEmbeddingAllTimes.setTimes(times=quadParams["legQuadPoints"])
