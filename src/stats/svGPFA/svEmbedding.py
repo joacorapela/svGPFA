@@ -70,6 +70,30 @@ class LinearSVEmbedding(SVEmbedding):
     def getParams(self):
         return [self._C, self._d]
 
+    def get_flattened_params(self):
+        flattened_params = []
+        flattened_params.extend(self._C.flatten().tolist())
+        flattened_params.extend(self._d.flatten().tolist())
+        return flattened_params
+
+    def get_flattened_params_grad(self):
+        flattened_params_grad = []
+        flattened_params_grad.extend(self._C.grad.flatten().tolist())
+        flattened_params_grad.extend(self._d.grad.flatten().tolist())
+        return flattened_params_grad
+
+    def set_params_from_flattened(self, flattened_params):
+        flattened_param = flattened_params[:self._C.numel()]
+        self._C = torch.tensor(flattened_param, dtype=torch.double).reshape(self._C.shape)
+        flattened_params = flattened_params[self._C.numel():]
+        flattened_param = flattened_params[:self._d.numel()]
+        self._d = torch.tensor(flattened_param, dtype=torch.double).reshape(self._d.shape)
+        flattened_param = flattened_params[self._d.numel():]
+
+    def set_params_requires_grad(self, requires_grad):
+        self._C.requires_grad = requires_grad
+        self._d.requires_grad = requires_grad
+
 class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
     def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
