@@ -51,6 +51,27 @@ def test_set_flattened_params():
 
     assert(flattened_params_1==flattened_params_2)
 
+def test_set_params_requires_grad():
+    nTrials = 2
+    nIndPoints = [2, 2, 2]
+
+    nLatents = len(nIndPoints)
+
+    qMu0 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
+    srQSigma0Vecs = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
+    initialParams = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
+    svPosteriorOnIndPoints = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    svPosteriorOnIndPoints.setInitialParams(initialParams=initialParams)
+    svPosteriorOnIndPoints.set_params_requires_grad(requires_grad=True)
+    params = svPosteriorOnIndPoints.getParams()
+    for param in params:
+        assert(param.requires_grad)
+
+    svPosteriorOnIndPoints.set_params_requires_grad(requires_grad=False)
+    params = svPosteriorOnIndPoints.getParams()
+    for param in params:
+        assert(not param.requires_grad)
+
 def test_buildQSigma():
     tol = 1e-5
     dataFilename = os.path.join(os.path.dirname(__file__), "data/get_full_from_lowplusdiag.mat")
@@ -75,5 +96,6 @@ def test_buildQSigma():
 
 if __name__=="__main__":
     # test_get_flattened_params()
-    test_set_flattened_params()
+    # test_set_flattened_params()
+    test_set_params_requires_grad()
     # test_buildQSigma()
