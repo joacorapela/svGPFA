@@ -117,10 +117,8 @@ def test_eStep_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._eStep(model=svlb, maxIter=1500, tol=1e-3, lr=1e-3,
-                      lineSearchFn="strong_wolfe", verbose=True,
-                      out=sys.stdout, nIterDisplay=1, logLock=None,
-                      logStream=logStream, logStreamFN=None)
+    optimParams = {"eStep_max_iter": 10}
+    res = svEM._eStep(model=svlb, optimParams=optimParams)
 
     assert(res["lowerBound"]-(-nLowerBound)>0)
 
@@ -666,14 +664,14 @@ def test_maximize_pointProcess():
 
 if __name__=='__main__':
     test_eStep_pointProcess() # passed
-    # test_eStep_poisson() # not tested
-    test_mStepModelParams_pointProcess() # passed
-    test_mStepKernelParams_pointProcess() # passed
-    test_mStepIndPoints_pointProcess() # passed
+    # # test_eStep_poisson() # not tested
+    # test_mStepModelParams_pointProcess() # passed
+    # test_mStepKernelParams_pointProcess() # passed
+    # test_mStepIndPoints_pointProcess() # passed
 
-    t0 = time.perf_counter()
-    test_maximize_pointProcess() # passed
-    elapsed = time.perf_counter()-t0
-    print(elapsed)
+    # t0 = time.perf_counter()
+    # test_maximize_pointProcess() # passed
+    # elapsed = time.perf_counter()-t0
+    # print(elapsed)
 
     pdb.set_trace()
