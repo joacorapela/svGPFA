@@ -61,11 +61,11 @@ class SVEM:
             "mstep_kernels": self._mStepKernels,
             "mstep_indpointslocs": self._mStepIndPointsLocs,
         }
-        maxRes = -math.inf
+        maxRes = {"maximum": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
                 if optimParams["{:s}_estimate".format(step)]:
-                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes)
+                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["maximum"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -75,7 +75,7 @@ class SVEM:
                         logStreamFN=logStreamFN
                     )
                     maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}\n".format(iter, step, maxRes)
+                    message = "Iteration {:02d}, {:s} end: {:f}\n".format(iter, step, maxRes["maximum"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -89,7 +89,7 @@ class SVEM:
                         resultsToSave = {"model": model}
                         with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             elapsedTimeHist.append(time.time()-startTime)
-            lowerBoundHist.append(maxRes)
+            lowerBoundHist.append(maxRes["maximum"].item())
 
             if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
@@ -118,8 +118,8 @@ class SVEM:
     def _mStepEmbedding(self, model, optimParams):
         x = model.getSVEmbeddingParams()
         svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
-        # evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-        evalFunc = model.eval
+        evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
+        # evalFunc = model.eval
         optimizer = torch.optim.LBFGS(x, **optimParams)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
@@ -154,16 +154,20 @@ class SVEM:
         return maxRes
 
     def _maximizeStep(self, evalFunc, optimizer):
-        curEval = torch.tensor([float("inf")])
-        converged = False
+        global nfeval
+
+        nfeval = 0
         def closure():
+            global nfeval
+
             optimizer.zero_grad()
             curEval = -evalFunc()
             curEval.backward(retain_graph=True)
+            nfeval = nfeval + 1
             return curEval
         optimizer.step(closure)
-        maxRes = -evalFunc()
-        return maxRes
+        maximum = evalFunc()
+        return {"maximum": maximum, "nfeval": nfeval}
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
