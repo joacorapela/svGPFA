@@ -81,12 +81,12 @@ def getSRQSigmaVecsFromSRMatrices(srMatrices):
     for k in range(nLatents):
         nIndPointsK = srMatrices[k].shape[1]
         Pk = int((nIndPointsK+1)*nIndPointsK/2)
-        srQSigmaVec[k] = torch.empty((nTrials, Pk), dtype=torch.double)
+        srQSigmaVec[k] = torch.empty((nTrials, Pk, 1), dtype=torch.double)
         for r in range(nTrials):
             cholKR = srMatrices[k][r,:,:]
             trilIndices = torch.tril_indices(nIndPointsK, nIndPointsK)
             cholKRVec = cholKR[trilIndices[0,:], trilIndices[1,:]]
-            srQSigmaVec[k][r,:] = cholKRVec
+            srQSigmaVec[k][r,:,0] = cholKRVec
     return srQSigmaVec
 
 def getSRQSigmaVec(qSVec, qSDiag):
@@ -97,12 +97,12 @@ def getSRQSigmaVec(qSVec, qSDiag):
     for k in range(nLatents):
         nIndPointsK = qSigma[k].shape[1]
         Pk = int((nIndPointsK+1)*nIndPointsK/2)
-        srQSigmaVec[k] = torch.empty((nTrials, Pk), dtype=torch.double)
+        srQSigmaVec[k] = torch.empty((nTrials, Pk, 1), dtype=torch.double)
         for r in range(nTrials):
             cholKR = torch.cholesky(qSigma[k][r,:,:])
             trilIndices = torch.tril_indices(nIndPointsK, nIndPointsK)
             cholKRVec = cholKR[trilIndices[0,:], trilIndices[1,:]]
-            srQSigmaVec[k][r,:] = cholKRVec
+            srQSigmaVec[k][r,:,0] = cholKRVec
     return srQSigmaVec
 
 # def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPointLoc):
