@@ -146,11 +146,12 @@ def main(argv):
         kernels=kernels)
 
     # maximize lower bound
+    model.setInitialParamsAndData(measurements=spikesTimes,
+                                  initialParams=initialParams,
+                                  quadParams=quadParams,
+                                  indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(
-        model=model, measurements=spikesTimes, initialParams=initialParams,
-        quadParams=quadParams, optimParams=optimParams,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, optimParams=optimParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
