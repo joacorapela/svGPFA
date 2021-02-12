@@ -11,8 +11,7 @@ import torch
 
 class SVEM:
 
-    def maximize(self, model, measurements, initialParams, quadParams,
-                 optimParams, indPointsLocsKMSRegEpsilon,
+    def maximize(self, model, optimParams,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -23,12 +22,6 @@ class SVEM:
 
         if latentsStreamFN is not None and latentsTimes is None:
             raise RuntimeError("Please specify latentsTime if you want to save latents")
-
-        model.setMeasurements(measurements=measurements)
-        model.setInitialParams(initialParams=initialParams)
-        model.setQuadParams(quadParams=quadParams)
-        model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-        model.buildKernelsMatrices()
 
         iter = 0
         if savePartial:
