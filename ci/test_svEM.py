@@ -521,10 +521,6 @@ def test_maximize_pointProcess():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
-    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
-    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
-    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
-    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
@@ -601,29 +597,6 @@ def test_maximize_pointProcess():
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    '''
-    optimParams = {"emMaxNIter":20, 
-                   #
-                   "eStepMaxNIter":100,
-                   "eStepTol":1e-3,
-                   "eStepLR":1e-3,
-                   "eStepNIterDisplay":10,
-                   #
-                   "mStepModelParamsMaxNIter":100,
-                   "mStepModelParamsTol":1e-3,
-                   "mStepModelParamsLR":1e-3,
-                   "mStepModelParamsNIterDisplay":10,
-                   #
-                   "mStepKernelParamsMaxNIter":100, 
-                   "mStepKernelParamsTol":1e-3,
-                   "mStepKernelParamsLR":1e-5,
-                   "mStepKernelParamsNIterDisplay":10,
-                   #
-                   "mStepIndPointsMaxNIter":100,
-                   "mStepIndPointsParamsTol":1e-3,
-                   "mStepIndPointsLR":1e-3, 
-                   "mStepIndPointsNIterDisplay":10}
-    '''
     optimParams = {"emMaxIter":3,
                    #
                    "eStepEstimate": True,
