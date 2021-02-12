@@ -39,13 +39,13 @@ class KernelsMatricesStore(ABC):
     def get_flattened_kernels_params(self):
         flattened_params = []
         for k in range(len(self._kernels)):
-            flattened_params.extend(self._kernels[k].getParams().tolist())
+            flattened_params.extend(self._kernels[k].getParams().flatten().tolist())
         return flattened_params
 
     def get_flattened_kernels_params_grad(self):
         flattened_params_grad = []
         for k in range(len(self._kernels)):
-            flattened_params_grad.extend(self._kernels[k].getParams().grad.tolist())
+            flattened_params_grad.extend(self._kernels[k].getParams().grad.flatten().tolist())
         return flattened_params_grad
 
     def set_kernels_params_from_flattened(self, flattened_params):
@@ -62,13 +62,13 @@ class KernelsMatricesStore(ABC):
     def get_flattened_indPointsLocs(self):
         flattened_params = []
         for k in range(len(self._indPointsLocs)):
-            flattened_params.extend(self._indPointsLocs[k].tolist())
+            flattened_params.extend(self._indPointsLocs[k].flatten().tolist())
         return flattened_params
 
     def get_flattened_indPointsLocs_grad(self):
         flattened_params_grad = []
         for k in range(len(self._indPointsLocs)):
-            flattened_params_grad.extend(self._indPointsLocs[k].grad.tolist())
+            flattened_params_grad.extend(self._indPointsLocs[k].grad.flatten().tolist())
         return flattened_params_grad
 
     def set_indPointsLocs_from_flattened(self, flattened_params):
