@@ -101,7 +101,7 @@ def getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs):
         qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         for r in range(nTrials):
-            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:], nIndPoints=nIndPointsK)
+            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:,0], nIndPoints=nIndPointsK)
             qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
             qSDiagKR = torch.diag(qSigmaKR)
             qSigmaKR = qSigmaKR - torch.diag(qSDiagKR)
