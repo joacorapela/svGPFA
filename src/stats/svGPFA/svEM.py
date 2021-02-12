@@ -69,7 +69,7 @@ class SVEM:
                         logStreamFN=logStreamFN
                     )
                     maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}\n".format(iter, step, maxRes["maximum"])
+                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["maximum"], maxRes["niter"], maxRes["nfeval"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -83,7 +83,7 @@ class SVEM:
                         resultsToSave = {"model": model}
                         with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             elapsedTimeHist.append(time.time()-startTime)
-            lowerBoundHist.append(maxRes["maximum"].item())
+            lowerBoundHist.append(maxRes["maximum"])
 
             if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
@@ -119,7 +119,7 @@ class SVEM:
                                             options=optimParams)
         model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
         model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
+        answer = {"maximum": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         return answer
 
     def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
@@ -141,7 +141,7 @@ class SVEM:
                                             options=optimParams)
         model.set_svEmbedding_params_requires_grad(requires_grad=False)
         model.set_svEmbedding_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
+        answer = {"maximum": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         return answer
 
     def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
@@ -162,7 +162,7 @@ class SVEM:
                                             options=optimParams)
         model.set_kernels_params_requires_grad(requires_grad=False)
         model.set_kernels_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
+        answer = {"maximum": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         print("*** kernels parameters: {}".format(optim_res.x))
         return answer
 
@@ -184,7 +184,7 @@ class SVEM:
                                             options=optimParams)
         model.set_indPointsLocs_requires_grad(requires_grad=False)
         model.set_indPointsLocs_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
+        answer = {"maximum": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         return answer
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
