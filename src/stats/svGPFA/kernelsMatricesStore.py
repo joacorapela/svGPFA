@@ -47,9 +47,11 @@ class IndPointsLocsKMS(KernelsMatricesStore):
         self._KzzChol = [[None] for k in range(nLatent)]
 
         for k in range(nLatent):
-            self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])+self._epsilon*torch.eye(n=self._indPointsLocs[k].shape[1], dtype=self._indPointsLocs[k].dtype, device=self._indPointsLocs[k].device))
-            # self._Kzz[k] =
-            # self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])
+            self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])+
+                            self._epsilon*torch.eye(n=self._indPointsLocs[k].shape[1],
+                                                    dtype=self._indPointsLocs[k].dtype,
+                                                    device=self._indPointsLocs[k].device))
+            # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])
             self._KzzChol[k] = utils.svGPFA.miscUtils.chol3D(self._Kzz[k]) # O(n^3)
 
     def getKzz(self):
@@ -84,8 +86,7 @@ class IndPointsLocsAndAllTimesKMS(IndPointsLocsAndTimesKMS):
         self._KttDiag = torch.zeros(self._t.shape[0], self._t.shape[1], nLatent,
                                     dtype=self._t.dtype, device=self._t.device)
         for k in range(nLatent):
-            self._Ktz[k] = self._kernels[k].buildKernelMatrix(X1=self._t,
-                                                              X2=self._indPointsLocs[k])
+            self._Ktz[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._indPointsLocs[k])
             self._KttDiag[:,:,k] = self._kernels[k].buildKernelMatrixDiag(X=self._t).squeeze()
 
     def buildKttKernelsMatrices(self):
