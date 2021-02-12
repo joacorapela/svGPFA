@@ -55,11 +55,11 @@ class SVEM:
             "mstep_kernels": self._mStepKernels,
             "mstep_indpointslocs": self._mStepIndPointsLocs,
         }
-        maxRes = -math.inf
+        maxRes = {"maximum": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
                 if optimParams["{:s}_estimate".format(step)]:
-                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes)
+                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["maximum"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -69,7 +69,7 @@ class SVEM:
                         logStreamFN=logStreamFN
                     )
                     maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}\n".format(iter, step, maxRes)
+                    message = "Iteration {:02d}, {:s} end: {:f}\n".format(iter, step, maxRes["maximum"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -83,7 +83,7 @@ class SVEM:
                         resultsToSave = {"model": model}
                         with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             elapsedTimeHist.append(time.time()-startTime)
-            lowerBoundHist.append(maxRes)
+            lowerBoundHist.append(maxRes["maximum"].item())
 
             if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
@@ -119,7 +119,7 @@ class SVEM:
                                             options=optimParams)
         model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
         model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = -optim_res.fun
+        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
         return answer
 
     def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
@@ -141,7 +141,7 @@ class SVEM:
                                             options=optimParams)
         model.set_svEmbedding_params_requires_grad(requires_grad=False)
         model.set_svEmbedding_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = -optim_res.fun
+        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
         return answer
 
     def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
@@ -162,8 +162,7 @@ class SVEM:
                                             options=optimParams)
         model.set_kernels_params_requires_grad(requires_grad=False)
         model.set_kernels_params_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = -optim_res.fun
-        # print("*** kernels parameters: {}".format(model.getKernelsParams()))
+        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
         print("*** kernels parameters: {}".format(optim_res.x))
         return answer
 
@@ -185,37 +184,8 @@ class SVEM:
                                             options=optimParams)
         model.set_indPointsLocs_requires_grad(requires_grad=False)
         model.set_indPointsLocs_from_flattened(flattened_params=optim_res.x.tolist())
-        answer = -optim_res.fun
+        answer = {"maximum": -optim_res.fun, "nfeval": optim_res.nfev}
         return answer
-
-        x = model.getIndPointsLocs()
-        def evalFunc():
-            model.buildKernelsMatrices()
-            answer = model.eval()
-            return answer
-        optimizer = torch.optim.LBFGS(x, **optimParams)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
-        return answer
-
-    def _setupAndMaximizeStep(self, x, evalFunc, optimizer):
-        for i in range(len(x)):
-            x[i].requires_grad = True
-        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer)
-        for i in range(len(x)):
-            x[i].requires_grad = False
-        return maxRes
-
-    def _maximizeStep(self, evalFunc, optimizer):
-        curEval = torch.tensor([float("inf")])
-        converged = False
-        def closure():
-            optimizer.zero_grad()
-            curEval = -evalFunc()
-            curEval.backward(retain_graph=True)
-            return curEval
-        optimizer.step(closure)
-        maxRes = -evalFunc()
-        return maxRes
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
