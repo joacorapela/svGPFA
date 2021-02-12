@@ -145,11 +145,12 @@ def main(argv):
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels)
 
-    # maximize lower bound
     model.setInitialParamsAndData(measurements=spikesTimes,
                                   initialParams=initialParams,
                                   quadParams=quadParams,
                                   indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+
+    # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
     lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, optimParams=optimParams)
 
