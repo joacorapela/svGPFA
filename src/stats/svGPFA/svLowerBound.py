@@ -21,7 +21,6 @@ class SVLowerBound:
         self.buildKernelsMatrices()
 
     def eval(self):
-        # pdb.set_trace()
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
