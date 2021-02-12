@@ -13,7 +13,15 @@ class SVLowerBound:
         self._svEmbedding = eLL.get_svEmbeddingAllTimes()
         self._indPointsLocsKMS = klDiv.get_indPointsLocsKMS()
 
+    def setInitialParamsAndData(self, measurements, initialParams, quadParams, indPointsLocsKMSRegEpsilon):
+        self.setMeasurements(measurements=measurements)
+        self.setInitialParams(initialParams=initialParams)
+        self.setQuadParams(quadParams=quadParams)
+        self.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+        self.buildKernelsMatrices()
+
     def eval(self):
+        # pdb.set_trace()
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
