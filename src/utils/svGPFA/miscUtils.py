@@ -68,9 +68,9 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
 
 def getSRQSigmaFromVec(vec, nIndPoints):
-    srQSigma = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
+    srQSigma = torch.zeros((nIndPoints, nIndPoints, 1), dtype=torch.double)
     trilIndices = torch.tril_indices(nIndPoints, nIndPoints)
-    srQSigma[trilIndices[0,:],trilIndices[1,:]] = vec
+    srQSigma[trilIndices[0,:],trilIndices[1,:], 0] = vec
     return srQSigma
 
 def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
@@ -101,7 +101,7 @@ def getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs):
         qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         for r in range(nTrials):
-            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:], nIndPoints=nIndPointsK)
+            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:,0], nIndPoints=nIndPointsK)
             qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
             qSDiagKR = torch.diag(qSigmaKR)
             qSigmaKR = qSigmaKR - torch.diag(qSDiagKR)
