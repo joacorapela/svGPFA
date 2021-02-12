@@ -9,6 +9,13 @@ class SVLowerBound:
         self._eLL = eLL
         self._klDiv = klDiv
 
+    def setInitialParamsAndData(self, measurements, initialParams, quadParams, indPointsLocsKMSRegEpsilon):
+        self.setMeasurements(measurements=measurements)
+        self.setInitialParams(initialParams=initialParams)
+        self.setQuadParams(quadParams=quadParams)
+        self.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+        self.buildKernelsMatrices()
+
     def eval(self):
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
