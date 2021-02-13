@@ -68,7 +68,7 @@ class SVEM:
                         logStreamFN=logStreamFN
                     )
                     maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}\n".format(iter, step, maxRes["maximum"])
+                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["maximum"], maxRes["niter"], maxRes["nfeval"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -147,20 +147,17 @@ class SVEM:
         return maxRes
 
     def _maximizeStep(self, evalFunc, optimizer):
-        global nfeval
-
-        nfeval = 0
         def closure():
-            global nfeval
-
             optimizer.zero_grad()
             curEval = -evalFunc()
             curEval.backward(retain_graph=True)
-            nfeval = nfeval + 1
             return curEval
         optimizer.step(closure)
         maximum = evalFunc()
-        return {"maximum": maximum, "nfeval": nfeval}
+        stateOneEpoch = optimizer.state[optimizer._params[0]]
+        nfeval = stateOneEpoch["func_evals"]
+        niter = stateOneEpoch["n_iter"]
+        return {"maximum": maximum, "nfeval": nfeval, "niter": niter}
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
