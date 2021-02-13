@@ -68,9 +68,9 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
 
 def getSRQSigmaFromVec(vec, nIndPoints):
-    srQSigma = torch.zeros((nIndPoints, nIndPoints, 1), dtype=torch.double)
+    srQSigma = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
     trilIndices = torch.tril_indices(nIndPoints, nIndPoints)
-    srQSigma[trilIndices[0,:],trilIndices[1,:], 0] = vec
+    srQSigma[trilIndices[0,:],trilIndices[1,:]] = vec
     return srQSigma
 
 def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
