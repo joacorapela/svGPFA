@@ -118,9 +118,9 @@ def test_eStep_pointProcess():
     logStream = io.StringIO()
 
     optimParams = {"eStep_max_iter": 10}
-    res = svEM._eStep(model=svlb, optimParams=optimParams)
+    maxRes = svEM._eStep(model=svlb, optimParams=optimParams)
 
-    assert(res["lowerBound"]-(-nLowerBound)>0)
+    assert(maxRes["lowerBound"]-(-nLowerBound)>0)
 
     # pdb.set_trace()
 
@@ -171,9 +171,9 @@ def test_eStep_pointProcess():
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
-#     res = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
+#     maxRes = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 # 
-#     assert(res["lowerBound"]-(-nLowerBound)>0)
+#     assert(maxRes["lowerBound"]-(-nLowerBound)>0)
 # 
 #     # pdb.set_trace()
 
@@ -264,11 +264,9 @@ def test_mStepModelParams_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepEmbedding(model=svlb, maxIter=3000, tol=1e-6, lr=1e-1,
-                               lineSearchFn="strong_wolfe", verbose=True,
-                               out=sys.stdout, nIterDisplay=1, logLock=None,
-                               logStream=logStream, logStreamFN=None)
-    assert(res["lowerBound"]>-nLowerBound)
+    optimParams={maxiter=3000}
+    maxRes = svEM._mStepEmbedding(model=svlb, optimParams=optimParams)
+    assert(maxRes["lowerBound"]>-nLowerBound)
 
     # pdb.set_trace()
 
@@ -360,12 +358,9 @@ def test_mStepKernelParams_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepKernels(model=svlb, maxIter=50, tol=1e-3, lr=1e-3,
-                             lineSearchFn="strong_wolfe", verbose=True,
-                             out=sys.stdout, nIterDisplay=1, logLock=None,
-                             logStream=logStream, logStreamFN=None)
-
-    assert(res["lowerBound"]>(-nLowerBound))
+    optimParams={maxiter=50}
+    maxRes = svEM._mStepKernels(model=svlb, optimParams=optimParams)
+    assert(maxRes["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
 
@@ -414,9 +409,9 @@ def test_mStepKernelParams_pointProcess():
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
-#     res = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+#     maxRes = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
 # 
-#     assert(res["lowerBound"]>(-nLowerBound))
+#     assert(maxRes["lowerBound"]>(-nLowerBound))
 # 
 #     # pdb.set_trace()
 
@@ -508,12 +503,10 @@ def test_mStepIndPoints_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepIndPointsLocs(model=svlb, maxIter=10, tol=1e-3, lr=1e-3,
-                               lineSearchFn="strong_wolfe", verbose=True,
-                               out=sys.stdout, nIterDisplay=1, logLock=None,
-                               logStream=logStream, logStreamFN=None)
+    optimParams={maxiter=10}
+    maxRes = svEM._mStepIndPointsLocs(model=svlb, optimParams=optimParams)
 
-    assert(res["lowerBound"]>(-nLowerBound))
+    assert(maxRes["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
 
@@ -599,40 +592,36 @@ def test_maximize_pointProcess():
                   "legQuadWeights": legQuadWeights}
     optimParams = {"emMaxIter":3,
                    #
-                   "eStepEstimate": True,
-                   "eStepMaxIter":20,
-                   "eStepTol":1e-2,
-                   "eStepLR":1e-2,
-                   "eStepLineSearchFn": "strong_wolfe",
-                   "eStepNIterDisplay":1,
+                   "estep_estimate": True,
+                   "estep_optim_params": {
+                       "maxiter": 20,
+                   },
                    #
-                   "mStepEmbeddingEstimate": True,
-                   "mStepEmbeddingMaxIter":20,
-                   "mStepEmbeddingTol":1e-2,
-                   "mStepEmbeddingLR":1e-3,
-                   "mStepEmbeddingLineSearchFn": "strong_wolfe",
-                   "mStepEmbeddingNIterDisplay":1,
+                   "mstep_embedding_estimate": True,
+                   "mstep_embedding_optim_params": {
+                       "maxiter": 20,
+                   },
                    #
-                   "mStepKernelsEstimate": True,
-                   "mStepKernelsMaxIter":20,
-                   "mStepKernelsTol":1e-2,
-                   "mStepKernelsLR":1e-4,
-                   "mStepKernelsLineSearchFn": "strong_wolfe",
-                   "mStepKernelsNIterDisplay":1,
+                   "mstep_kernels_estimate": True,
+                   "mstep_kernels_optim_params": {
+                       "maxiter": 20,
+                   },
                    #
-                   "mStepIndPointsEstimate": True,
-                   "mStepIndPointsMaxIter":20,
-                   "mStepIndPointsTol":1e-2,
-                   "mStepIndPointsLR":1e-3,
-                   "mStepIndPointsLineSearchFn": "strong_wolfe",
-                   "mStepIndPointsNIterDisplay":1,
+                   #
+                   "mstep_indpointslocs_estimate": True,
+                   "mstep_indpointslocs_optim_params": {
+                       "maxiter": 20,
+                   },
                    #
                    "verbose": True}
+    svlb.setInitialParamsAndData(
+        measurements=YNonStacked,
+        initialParams=initialParams,
+        quadParams=quadParams,
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     lowerBoundHist, elapsedTimeHist = svEM.maximize(
-        model=svlb, measurements=YNonStacked,
-        initialParams=initialParams, quadParams=quadParams,
-        optimParams=optimParams,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, out=sys.stdout)
+        model=svlb,
+        optimParams=optimParams)
     assert(lowerBoundHist[-1]>leasLowerBound)
 
 if __name__=='__main__':
