@@ -591,12 +591,6 @@ def test_maximize_pointProcess():
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
-    svlb.setInitialParams(initialParams=initialParams)
-    svlb.setMeasurements(measurements=YNonStacked)
-    svlb.setQuadParams(quadParams=quadParams)
-    svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    svlb.buildKernelsMatrices()
-
     optimParams = {"em_max_iter":4,
                    #
                    "estep_estimate": True,
@@ -629,8 +623,8 @@ def test_maximize_pointProcess():
         initialParams=initialParams,
         quadParams=quadParams,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-    maxRes = svEM.maximize(model=svlb, optimParams=optimParams)
-    assert(maxRes[0][-1]>leasLowerBound)
+    lowerBoundHist, elapsedTimeHist = svEM.maximize(model=svlb, optimParams=optimParams)
+    assert(lowerBoundHist[-1]>leasLowerBound)
 
     # pdb.set_trace()
 
