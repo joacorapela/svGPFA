@@ -54,11 +54,11 @@ class SVEM:
             "mstep_kernels": self._mStepKernels,
             "mstep_indpointslocs": self._mStepIndPointsLocs,
         }
-        maxRes = {"maximum": -math.inf}
+        maxRes = {"lowerBound": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
                 if optimParams["{:s}_estimate".format(step)]:
-                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["maximum"])
+                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -68,7 +68,7 @@ class SVEM:
                         logStreamFN=logStreamFN
                     )
                     maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["maximum"], maxRes["niter"], maxRes["nfeval"])
+                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -82,7 +82,7 @@ class SVEM:
                         resultsToSave = {"model": model}
                         with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             elapsedTimeHist.append(time.time()-startTime)
-            lowerBoundHist.append(maxRes["maximum"].item())
+            lowerBoundHist.append(maxRes["lowerBound"].item())
 
             if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
@@ -153,11 +153,11 @@ class SVEM:
             curEval.backward(retain_graph=True)
             return curEval
         optimizer.step(closure)
-        maximum = evalFunc()
+        lowerBound = evalFunc()
         stateOneEpoch = optimizer.state[optimizer._params[0]]
         nfeval = stateOneEpoch["func_evals"]
         niter = stateOneEpoch["n_iter"]
-        return {"maximum": maximum, "nfeval": nfeval, "niter": niter}
+        return {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter}
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
