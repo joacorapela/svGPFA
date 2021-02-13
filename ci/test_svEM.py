@@ -171,9 +171,9 @@ def test_eStep_pointProcess():
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
-#     res = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
+#     maxRes = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 # 
-#     assert(res["lowerBound"]-(-nLowerBound)>0)
+#     assert(maxRes["lowerBound"]-(-nLowerBound)>0)
 # 
 #     # pdb.set_trace()
 
@@ -410,9 +410,9 @@ def test_mStepKernelParams_pointProcess():
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
-#     res = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+#     maxRes = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
 # 
-#     assert(res["lowerBound"]>(-nLowerBound))
+#     assert(maxRes["lowerBound"]>(-nLowerBound))
 # 
 #     # pdb.set_trace()
 
