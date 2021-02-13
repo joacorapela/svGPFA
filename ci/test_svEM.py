@@ -120,7 +120,7 @@ def test_eStep_pointProcess():
     optimParams = {"max_iter": 100, "line_search_fn": "strong_wolfe"}
     maxRes = svEM._eStep(model=svlb, optimParams=optimParams)
 
-    assert(maxRes["maximum"]-(-nLowerBound)>0)
+    assert(maxRes["lowerBound"]-(-nLowerBound)>0)
 
     # pdb.set_trace()
 
@@ -267,7 +267,7 @@ def test_mStepModelParams_pointProcess():
     optimParams = {"max_iter": 3000, "line_search_fn": "strong_wolfe"}
     maxRes = svEM._mStepEmbedding(model=svlb, optimParams=optimParams)
 
-    assert(maxRes["maximum"]-(-nLowerBound))
+    assert(maxRes["lowerBound"]>-nLowerBound)
 
     # pdb.set_trace()
 
@@ -361,7 +361,7 @@ def test_mStepKernelParams_pointProcess():
 
     optimParams = {"max_iter": 200, "line_search_fn": "strong_wolfe"}
     maxRes = svEM._mStepKernels(model=svlb, optimParams=optimParams)
-    assert(maxRes["maximum"]>(-nLowerBound))
+    assert(maxRes["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
 
@@ -506,7 +506,7 @@ def test_mStepIndPoints_pointProcess():
 
     optimParams = {"max_iter": 25, "line_search_fn": "strong_wolfe"}
     maxRes = svEM._mStepIndPointsLocs(model=svlb, optimParams=optimParams)
-    assert(maxRes["maximum"]>(-nLowerBound))
+    assert(maxRes["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
 
@@ -514,10 +514,6 @@ def test_maximize_pointProcess():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
-    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
-    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
-    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
-    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
