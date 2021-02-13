@@ -628,12 +628,12 @@ def test_maximize_pointProcess():
                    },
                    #
                    "verbose": True}
-    maxRes = svEM.maximize(model=svlb,
-                           measurements=YNonStacked,
-                           initialParams=initialParams,
-                           quadParams=quadParams,
-                           optimParams=optimParams,
-                           indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    svlb.setInitialParamsAndData(
+        measurements=YNonStacked,
+        initialParams=initialParams,
+        quadParams=quadParams,
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    maxRes = svEM.maximize(model=svlb, optimParams=optimParams)
     assert(maxRes[0][-1]>leasLowerBound)
 
     # pdb.set_trace()
