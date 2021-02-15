@@ -117,10 +117,10 @@ def test_eStep_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    optimParams = {"eStep_max_iter": 10}
+    optimParams = {"maxiter": 100}
     maxRes = svEM._eStep(model=svlb, optimParams=optimParams)
 
-    assert(maxRes["lowerBound"]-(-nLowerBound)>0)
+    assert(maxRes["lowerBound"]>-nLowerBound)
 
     # pdb.set_trace()
 
@@ -264,14 +264,13 @@ def test_mStepModelParams_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    optimParams={maxiter=3000}
+    optimParams={"maxiter": 10}
     maxRes = svEM._mStepEmbedding(model=svlb, optimParams=optimParams)
     assert(maxRes["lowerBound"]>-nLowerBound)
 
-    # pdb.set_trace()
 
 def test_mStepKernelParams_pointProcess():
-    tol = 1e-5
+    periodScale = 1e3
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/hyperMstep_Update.mat")
 
@@ -306,9 +305,10 @@ def test_mStepKernelParams_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0,
+                                                      periodScale=periodScale)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
-                                              float(hprs[k,0][1])],
+                                              float(hprs[k,0][1])*periodScale],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
@@ -358,11 +358,10 @@ def test_mStepKernelParams_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    optimParams={maxiter=50}
+    optimParams={"maxiter": 100}
     maxRes = svEM._mStepKernels(model=svlb, optimParams=optimParams)
-    assert(maxRes["lowerBound"]>(-nLowerBound))
+    assert(maxRes["lowerBound"]>-nLowerBound)
 
-    # pdb.set_trace()
 
 # def test_mStepKernelParams_poisson():
 #     tol = 1e-5
@@ -503,15 +502,15 @@ def test_mStepIndPoints_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    optimParams={maxiter=10}
+    optimParams={"maxiter": 30}
     maxRes = svEM._mStepIndPointsLocs(model=svlb, optimParams=optimParams)
 
-    assert(maxRes["lowerBound"]>(-nLowerBound))
+    assert(maxRes["lowerBound"]>-nLowerBound)
 
     # pdb.set_trace()
 
 def test_maximize_pointProcess():
-    tol = 1e-5
+    periodScale = 1e3
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
@@ -546,9 +545,10 @@ def test_maximize_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
+            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0,
+                                                      periodScale=periodScale)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
-                                              float(hprs[k,0][1])],
+                                              float(hprs[k,0][1])*periodScale],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
             kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
@@ -590,7 +590,7 @@ def test_maximize_pointProcess():
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    optimParams = {"emMaxIter":3,
+    optimParams = {"em_max_iter":3,
                    #
                    "estep_estimate": True,
                    "estep_optim_params": {
@@ -620,18 +620,19 @@ def test_maximize_pointProcess():
         quadParams=quadParams,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     lowerBoundHist, elapsedTimeHist = svEM.maximize(model=svlb, optimParams=optimParams)
+    pdb.set_trace()
     assert(lowerBoundHist[-1]>leasLowerBound)
 
 if __name__=='__main__':
-    test_eStep_pointProcess() # passed
+    # test_eStep_pointProcess() # passed
     # # test_eStep_poisson() # not tested
     # test_mStepModelParams_pointProcess() # passed
     # test_mStepKernelParams_pointProcess() # passed
     # test_mStepIndPoints_pointProcess() # passed
 
-    # t0 = time.perf_counter()
-    # test_maximize_pointProcess() # passed
-    # elapsed = time.perf_counter()-t0
-    # print(elapsed)
+    t0 = time.perf_counter()
+    test_maximize_pointProcess() # passed
+    elapsed = time.perf_counter()-t0
+    print(elapsed)
 
     pdb.set_trace()
