@@ -47,13 +47,10 @@ class SVEM:
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
+        # steps = ["estep", "mstep_embedding", "estep", "mstep_kernels", "estep", "mstep_indpointslocs"]
+        # functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
         steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-        functions_for_steps = {
-            "estep": self._eStep,
-            "mstep_embedding": self._mStepEmbedding,
-            "mstep_kernels": self._mStepKernels,
-            "mstep_indpointslocs": self._mStepIndPointsLocs,
-        }
+        functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
         maxRes = {"lowerBound": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
