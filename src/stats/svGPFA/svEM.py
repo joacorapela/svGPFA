@@ -10,7 +10,7 @@ import torch
 
 class SVEM:
 
-    def maximize(self, model, optimParams,
+    def maximize(self, model, optimParams, method="EM",
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -47,10 +47,14 @@ class SVEM:
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
-        # steps = ["estep", "mstep_embedding", "estep", "mstep_kernels", "estep", "mstep_indpointslocs"]
-        # functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
-        steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-        functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
+        if method=="EM":
+            steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+            functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
+        elif method=="mECM":
+            steps = ["estep", "mstep_embedding", "estep", "mstep_kernels", "estep", "mstep_indpointslocs"]
+            functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
+        else:
+            raise ValueError("Invalid method={:s}. Supported values are EM and mECM".format(method))
         maxRes = {"lowerBound": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
