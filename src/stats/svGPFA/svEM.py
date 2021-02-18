@@ -18,7 +18,7 @@ class TerminationInfo:
 
 class ErrorTerminationInfo(TerminationInfo):
     def __init__(self, message, error):
-        super.__init__(message=message)
+        super().__init__(message=message)
         self._error = error
 
     @property
