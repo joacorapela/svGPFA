@@ -8,6 +8,23 @@ import pickle
 import numpy as np
 import torch
 
+class TerminationInfo:
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def message(self):
+        return self._message
+
+class ErrorTerminationInfo(TerminationInfo):
+    def __init__(self, message, error):
+        super(message=message)
+        self._error = error
+
+    @property
+    def error(self):
+        return self._error
+
 class SVEM:
 
     def maximize(self, model, optimParams, method="EM",
@@ -68,8 +85,12 @@ class SVEM:
                         logStream=logStream,
                         logStreamFN=logStreamFN
                     )
-                    maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
+                    try:
+                        maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
+                        message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
+                    except:
+                        terminationInfo = ErrorTerminationInfo("Error", sys.exe_info)
+                        return lowerBoundHist, elapsedTimeHist, terminationInfo
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -100,7 +121,8 @@ class SVEM:
                 lowerBoundLock.unlock()
 
             iter += 1
-        return lowerBoundHist, elapsedTimeHist
+        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optimParams["em_max_iter"]))
+        return lowerBoundHist, elapsedTimeHist, terminationInfo
 
     def _eStep(self, model, optimParams):
         x = model.getSVPosteriorOnIndPointsParams()

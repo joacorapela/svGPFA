@@ -156,7 +156,7 @@ def main(argv):
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod)
+    lowerBoundHist, elapsedTimeHist, terminationInfo  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
@@ -165,7 +165,7 @@ def main(argv):
     estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
     pdb.set_trace()
