@@ -54,7 +54,7 @@ def getKernels(nLatents, config, forceUnitScale):
         kernels[k] = kernel
     return kernels
 
-def getQMu0(nLatents, nTrials, config):
+def getVariationalMean0FromList(nLatents, nTrials, config):
     qMu0 = [[] for r in range(nLatents)]
     for k in range(nLatents):
         qMu0k0 = torch.tensor([float(str) for str in config["variational_params"]["qMu0Latent{:d}Trial0".format(k)][1:-1].split(", ")], dtype=torch.double)
@@ -65,6 +65,34 @@ def getQMu0(nLatents, nTrials, config):
             qMu0kr = torch.tensor([float(str) for str in config["variational_params"]["qMu0Latent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")])
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
+
+def getVariationalMean0(nLatents, nTrials, config, keyNamePattern="qMu0Latent{:d}Trial{:d}_filename"):
+    qMu0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qMu0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qMu0k0 = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+        nIndPointsK = len(qMu0k0)
+        qMu0[k] = torch.empty((nTrials, nIndPointsK, 1), dtype=torch.double)
+        qMu0[k][0,:,0] = qMu0k0
+        for r in range(1, nTrials):
+            qMu0Filename = keyNamePattern.format(k, r)
+            qMu0kr = pd.read_csv(qMu0Filename, header=None)
+            qMu0[k][r,:,0] = qMu0kr
+    return qMu0
+
+def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{:d}Trial{:d}_filename"):
+    qSigma0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qSigma0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qSigma0k0 = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).to_numpy())
+        nIndPointsK = qSigma0k0.shape[0]
+        qSigma0[k] = torch.empty((nTrials, nIndPointsK, nIndPointsK), dtype=torch.double)
+        qSigma0[k][0,:,:] = qSigma0k0
+        for r in range(1, nTrials):
+            qSigma0Filename = config["variational_params"][keyNamePattern.format(k, r)]
+            qSigma0kr = pd.read_csv(qSigma0Filename, header=None)
+            qSigma0[k][r,:,:] = qSigma0kr
+    return qSigma0
 
 def getIndPointsMeans(nTrials, nLatents, config):
     indPointsMeans = [[] for r in range(nTrials)]
