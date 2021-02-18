@@ -89,7 +89,7 @@ class SVEM:
                         maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
                         message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
                     except:
-                        terminationInfo = ErrorTerminationInfo("Error", sys.exc_info)
+                        terminationInfo = ErrorTerminationInfo("Error", sys.exc_info())
                         return lowerBoundHist, elapsedTimeHist, terminationInfo
                     if verbose:
                         out.write(message)
