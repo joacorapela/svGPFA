@@ -20,7 +20,6 @@ import utils.svGPFA.miscUtils
 import utils.svGPFA.initUtils
 
 def main(argv):
-    random.seed(2021)
 
     parser = argparse.ArgumentParser()
     parser.add_argument("simResNumber", help="simuluation result number", type=int)
@@ -89,11 +88,7 @@ def main(argv):
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
 
-    qSigma0 = utils.svGPFA.initUtils.getScaledIdentityQSigma0(scale=scaleForIdentityQSigma0, nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent)
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
-
-    indPointsMeans = utils.svGPFA.initUtils.getUniformIndPointsMeans(nTrials=nTrials, nLatents=nLatents, nIndPointsPerLatent=nIndPointsPerLatent)
-
+    indPointsMeans = utils.svGPFA.configUtils.getVariationalMean0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     # patch to acommodate Lea's equal number of inducing points across trials
     qMu0 = [[] for k in range(nLatents)]
     for k in range(nLatents):
@@ -101,6 +96,9 @@ def main(argv):
         for r in range(nTrials):
             qMu0[k][r,:,:] = indPointsMeans[r][k]
     # end patch
+
+    qSigma0 = utils.svGPFA.configUtils.getVariationalCov0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
