@@ -167,6 +167,7 @@ def main(argv):
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+    print("Saved results to {:s}".format(modelSaveFilename))
 
     pdb.set_trace()
 
