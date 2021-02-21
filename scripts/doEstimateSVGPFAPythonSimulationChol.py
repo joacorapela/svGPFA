@@ -37,19 +37,16 @@ def main(argv):
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
-    optimMethod = optimParamsConfig["method"]
     optimParams = {}
     optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
     steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
     for step in steps:
         optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
-        optimParams["{:s}_optim_params".format(step)] = {
-            "max_iter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
-            "lr": float(optimParamsConfig["{:s}_lr".format(step)]),
-            "tolerance_grad": float(optimParamsConfig["{:s}_tolerance_grad".format(step)]),
-            "tolerance_change": float(optimParamsConfig["{:s}_tolerance_change".format(step)]),
-            "line_search_fn": optimParamsConfig["{:s}_line_search_fn".format(step)],
-        }
+        optimParams["{:s}_max_iter".format(step)] = int(optimParamsConfig["{:s}_max_iter".format(step)])
+        optimParams["{:s}_lr".format(step)] = float(optimParamsConfig["{:s}_lr".format(step)])
+        optimParams["{:s}_tol".format(step)] = float(optimParamsConfig["{:s}_tol".format(step)])
+        optimParams["{:s}_niter_display".format(step)] = int(optimParamsConfig["{:s}_niter_display".format(step)])
+        optimParams["{:s}_line_search_fn".format(step)] = optimParamsConfig["{:s}_line_search_fn".format(step)]
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     # load data and initial values
@@ -134,10 +131,10 @@ def main(argv):
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=np.array(trialsLengths).reshape(-1,1),
         emMaxIter=optimParams["em_max_iter"],
-        eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
-        mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
-        mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
-        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
+        eStepMaxIter=optimParams["estep_max_iter"],
+        mStepEmbeddingMaxIter=optimParams["mstep_embedding_max_iter"],
+        mStepKernelsMaxIter=optimParams["mstep_kernels_max_iter"],
+        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_max_iter"],
         saveFilename=estimationDataForMatlabFilename)
 
     # create model
@@ -154,7 +151,7 @@ def main(argv):
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist, terminationInfo  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod)
+    lowerBoundHist, elapsedTimeHist = svEM.maximize(model=model, optimParams=optimParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
@@ -163,7 +160,7 @@ def main(argv):
     estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": c(terminationInfo[0], terminationInfo[1]), "model": model}
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     print("Saved results to {:s}".format(modelSaveFilename))
 
