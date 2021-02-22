@@ -163,7 +163,7 @@ def main(argv):
     estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": (terminationInfo[0], terminationInfo[1]), "model": model}
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     print("Saved results to {:s}".format(modelSaveFilename))
 
