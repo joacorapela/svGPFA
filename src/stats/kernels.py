@@ -88,6 +88,11 @@ class PeriodicKernel(Kernel):
 
         return scale, lengthscale, period
 
+    def getScaledParams(self):
+        scaledParams = torch.tensor([self._params[0]/self._lengthscaleScale,
+                                     self._params[1]/self._periodScale])
+        return scaledParams
+
     def getNamedParams(self):
         scale, lengthscale, period = self._getAllParams()
         answer = {"scale": scale, "lengthscale": lengthscale, "period": period}
