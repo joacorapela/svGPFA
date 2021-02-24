@@ -135,3 +135,11 @@ def getKernelsParams0(kernels, noiseSTD):
         kernelsParams0[k] = noiseSTD*torch.randn(len(trueParams))+trueParams
     return kernelsParams0
 
+def getKernelsScaledParams0(kernels, noiseSTD):
+    nLatents = len(kernels)
+    kernelsParams0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        trueParams = kernels[k].getScaledParams()
+        kernelsParams0[k] = noiseSTD*torch.randn(len(trueParams))+trueParams
+    return kernelsParams0
+
