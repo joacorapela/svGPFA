@@ -85,6 +85,7 @@ def main(argv):
 
     kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
     kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
+    kernelsScaledParams0 = utils.svGPFA.initUtils.getKernelsScaledParams0(kernels=kernels, noiseSTD=0.0)
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
 
@@ -129,7 +130,7 @@ def main(argv):
         legQuadPoints=legQuadPoints,
         legQuadWeights=legQuadWeights,
         kernelsTypes=kernelsTypes,
-        kernelsParams0=kernelsParams0,
+        kernelsParams0=kernelsScaledParams0,
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=np.array(trialsLengths).reshape(-1,1),
@@ -139,6 +140,10 @@ def main(argv):
         mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
         mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
         saveFilename=estimationDataForMatlabFilename)
+
+    def getKernelParams(model):
+        kernelParams = model.getKernelsParams()[0]
+        return kernelParams
 
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
@@ -154,7 +159,7 @@ def main(argv):
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist, terminationInfo  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod)
+    lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod, getIterationModelParamsFn=getKernelParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
@@ -163,7 +168,7 @@ def main(argv):
     estimResConfig["estimation_params"] = {"estInitNumber": estInitNumber, "nIndPointsPerLatent": nIndPointsPerLatent}
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "model": model}
+    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "iterationModelParams": iterationsModelParams, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     print("Saved results to {:s}".format(modelSaveFilename))
 
