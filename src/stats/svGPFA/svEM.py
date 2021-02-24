@@ -27,7 +27,7 @@ class ErrorTerminationInfo(TerminationInfo):
 
 class SVEM:
 
-    def maximize(self, model, optimParams, method="EM",
+    def maximize(self, model, optimParams, method="EM", getIterationModelParamsFn=None,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -72,6 +72,12 @@ class SVEM:
             functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
         else:
             raise ValueError("Invalid method={:s}. Supported values are EM and mECM".format(method))
+        if getIterationModelParamsFn is not None:
+            initialModelsParams = getIterationModelParamsFn(model=model)
+            iterationsModelParams = torch.empty((optimParams["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
+            iterationsModelParams[0,:] = initialModelsParams
+        else:
+            iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
@@ -103,6 +109,8 @@ class SVEM:
                         savePartialFilename = savePartialFilenamePattern.format("{:s}{:03d}".format(step, iter))
                         resultsToSave = {"model": model}
                         with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
+                    if getIterationModelParamsFn is not None:
+                        iterationsModelParams[iter+1,:] = getIterationModelParamsFn(model=model)
             elapsedTimeHist.append(time.time()-startTime)
             lowerBoundHist.append(maxRes["lowerBound"].item())
 
@@ -122,7 +130,7 @@ class SVEM:
 
             iter += 1
         terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optimParams["em_max_iter"]))
-        return lowerBoundHist, elapsedTimeHist, terminationInfo
+        return lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams
 
     def _eStep(self, model, optimParams):
         x = model.getSVPosteriorOnIndPointsParams()
