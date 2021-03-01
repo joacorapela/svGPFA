@@ -109,6 +109,7 @@ class SVEM:
             value = -model.eval()
             value.backward(retain_graph=True)
             grad_list = model.get_flattened_svPosteriorOnIndPoints_params_grad()
+            model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
             value = value.item()
             grad = np.array(grad_list)
             return (value, grad)
@@ -117,9 +118,10 @@ class SVEM:
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
                                             options=optimParams)
-        model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
         model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
+        print("*** variational parameters: {}".format(optim_res.x))
+        # pdb.set_trace()
         return answer
 
     def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
@@ -131,6 +133,7 @@ class SVEM:
             value = -model.eval()
             value.backward(retain_graph=True)
             grad_list = model.get_flattened_svEmbedding_params_grad()
+            model.set_svEmbedding_params_requires_grad(requires_grad=False)
             value = value.item()
             grad = np.array(grad_list)
             return (value, grad)
@@ -139,9 +142,10 @@ class SVEM:
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
                                             options=optimParams)
-        model.set_svEmbedding_params_requires_grad(requires_grad=False)
         model.set_svEmbedding_params_from_flattened(flattened_params=optim_res.x.tolist())
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
+        print("*** embedding parameters: {}".format(optim_res.x))
+        # pdb.set_trace()
         return answer
 
     def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
@@ -152,6 +156,7 @@ class SVEM:
             value = -model.eval()
             value.backward(retain_graph=True)
             grad_list = model.get_flattened_kernels_params_grad()
+            model.set_kernels_params_requires_grad(requires_grad=False)
             value = value.item()
             grad = np.array(grad_list)
             return (value, grad)
@@ -160,10 +165,10 @@ class SVEM:
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
                                             options=optimParams)
-        model.set_kernels_params_requires_grad(requires_grad=False)
         model.set_kernels_params_from_flattened(flattened_params=optim_res.x.tolist())
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         print("*** kernels parameters: {}".format(optim_res.x))
+        # pdb.set_trace()
         return answer
 
     def _mStepIndPointsLocs(self, model, optimParams, method="L-BFGS-B"):
@@ -174,6 +179,7 @@ class SVEM:
             value = -model.eval()
             value.backward(retain_graph=True)
             grad_list = model.get_flattened_indPointsLocs_grad()
+            model.set_indPointsLocs_requires_grad(requires_grad=False)
             value = value.item()
             grad = np.array(grad_list)
             return (value, grad)
@@ -182,9 +188,10 @@ class SVEM:
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
                                             options=optimParams)
-        model.set_indPointsLocs_requires_grad(requires_grad=False)
         model.set_indPointsLocs_from_flattened(flattened_params=optim_res.x.tolist())
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
+        print("*** ind points locs: {}".format(optim_res.x))
+        # pdb.set_trace()
         return answer
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
