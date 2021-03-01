@@ -24,8 +24,8 @@ class SVLowerBound:
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
-        if torch.isinf(theEval):
-            raise RuntimeError("infinity lower bound detected")
+#         if torch.isinf(theEval):
+#             raise RuntimeError("infinity lower bound detected")
         return theEval
 
     def sampleCIFs(self, times):
