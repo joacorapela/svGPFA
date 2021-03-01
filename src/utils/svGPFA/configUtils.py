@@ -5,6 +5,34 @@ import pandas as pd
 import torch
 import stats.kernels
 
+def getVariationalMean0(nLatents, nTrials, config, keyNamePattern="qMu0Latent{:d}Trial{:d}_filename"):
+    qMu0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qMu0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qMu0k0 = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+        nIndPointsK = len(qMu0k0)
+        qMu0[k] = torch.empty((nTrials, nIndPointsK, 1), dtype=torch.double)
+        qMu0[k][0,:,0] = qMu0k0
+        for r in range(1, nTrials):
+            qMu0Filename = keyNamePattern.format(k, r)
+            qMu0kr = pd.read_csv(qMu0Filename, header=None)
+            qMu0[k][r,:,0] = qMu0kr
+    return qMu0
+
+def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{:d}Trial{:d}_filename"):
+    qSigma0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qSigma0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qSigma0k0 = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).to_numpy())
+        nIndPointsK = qSigma0k0.shape[0]
+        qSigma0[k] = torch.empty((nTrials, nIndPointsK, nIndPointsK), dtype=torch.double)
+        qSigma0[k][0,:,:] = qSigma0k0
+        for r in range(1, nTrials):
+            qSigma0Filename = config["variational_params"][keyNamePattern.format(k, r)]
+            qSigma0kr = pd.read_csv(qSigma0Filename, header=None)
+            qSigma0[k][r,:,:] = qSigma0kr
+    return qSigma0
+
 def getScaledKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     kernelsParamsScales = [[] for r in range(nLatents)]
