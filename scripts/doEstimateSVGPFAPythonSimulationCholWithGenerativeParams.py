@@ -35,36 +35,13 @@ def main(argv):
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimParams = {}
-    optimParams["emMaxIter"] = int(optimParamsConfig["emMaxIter".lower()])
-    #
-    optimParams["eStepEstimate"] = optimParamsConfig["eStepEstimate".lower()]=="True"
-    optimParams["eStepMaxIter"] = int(optimParamsConfig["eStepMaxIter".lower()])
-    optimParams["eStepTol"] = float(optimParamsConfig["eStepTol".lower()])
-    optimParams["eStepLR"] = float(optimParamsConfig["eStepLR".lower()])
-    optimParams["eStepLineSearchFn"] = optimParamsConfig["eStepLineSearchFn".lower()]
-    optimParams["eStepNIterDisplay"] = int(optimParamsConfig["eStepNIterDisplay".lower()])
-    #
-    optimParams["mStepEmbeddingEstimate"] = optimParamsConfig["mStepEmbeddingEstimate".lower()]=="True"
-    optimParams["mStepEmbeddingMaxIter"] = int(optimParamsConfig["mStepEmbeddingMaxIter".lower()])
-    optimParams["mStepEmbeddingTol"] = float(optimParamsConfig["mStepEmbeddingTol".lower()])
-    optimParams["mStepEmbeddingLR"] = float(optimParamsConfig["mStepEmbeddingLR".lower()])
-    optimParams["mStepEmbeddingLineSearchFn"] = optimParamsConfig["mStepEmbeddingLineSearchFn".lower()]
-    optimParams["mStepEmbeddingNIterDisplay"] = int(optimParamsConfig["mStepEmbeddingNIterDisplay".lower()])
-    #
-    optimParams["mStepKernelsEstimate"] = optimParamsConfig["mStepKernelsEstimate".lower()]=="True"
-    optimParams["mStepKernelsMaxIter"] = int(optimParamsConfig["mStepKernelsMaxIter".lower()])
-    optimParams["mStepKernelsTol"] = float(optimParamsConfig["mStepKernelsTol".lower()])
-    optimParams["mStepKernelsLR"] = float(optimParamsConfig["mStepKernelsLR".lower()])
-    optimParams["mStepKernelsLineSearchFn"] = optimParamsConfig["mStepKernelsLineSearchFn".lower()]
-    optimParams["mStepKernelsNIterDisplay"] = int(optimParamsConfig["mStepKernelsNIterDisplay".lower()])
-    #
-    optimParams["mStepIndPointsEstimate"] = optimParamsConfig["mStepIndPointsEstimate".lower()]=="True"
-    optimParams["mStepIndPointsMaxIter"] = int(optimParamsConfig["mStepIndPointsMaxIter".lower()])
-    optimParams["mStepIndPointsTol"] = float(optimParamsConfig["mStepIndPointsTol".lower()])
-    optimParams["mStepIndPointsLR"] = float(optimParamsConfig["mStepIndPointsLR".lower()])
-    optimParams["mStepIndPointsLineSearchFn"] = optimParamsConfig["mStepIndPointsLineSearchFn".lower()]
-    optimParams["mStepIndPointsNIterDisplay"] = int(optimParamsConfig["mStepIndPointsNIterDisplay".lower()])
-    #
+    optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
+    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+    for step in steps:
+        optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
+        optimParams["{:s}_optim_params".format(step)] = {
+            "maxiter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
+        }
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     estPrefixUsed = True
@@ -171,15 +148,16 @@ def main(argv):
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels)
 
+    model.setInitialParamsAndData(measurements=spikesTimes,
+                                  initialParams=initialParams,
+                                  quadParams=quadParams,
+                                  indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+
     # maximize lower bound
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     savePartialFilenamePattern = "results/{:08d}_{{:s}}_estimatedModel.pickle".format(estResNumber)
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(
-        model=model, measurements=spikesTimes, initialParams=initialParams,
-        quadParams=quadParams, optimParams=optimParams,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
-        savePartial=True, savePartialFilenamePattern=savePartialFilenamePattern)
+    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, optimParams=optimParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
