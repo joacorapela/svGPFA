@@ -87,8 +87,10 @@ def main(argv):
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
     KzzChol0 = utils.svGPFA.initUtils.getKzzChol0(kernels=kernels, kernelsParams0=kernelsParams0, indPointsLocs0=Z0, epsilon=indPointsLocsKMSRegEpsilon)
-    qSigma0 = utils.svGPFA.initUtils.getScaledIdentityQSigma0(scale=scaleForIdentityQSigma0, nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent)
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
+    # qSigma0 = utils.svGPFA.initUtils.getScaledIdentityQSigma0(scale=scaleForIdentityQSigma0, nTrials=nTrials, nIndPointsPerLatent=nIndPointsPerLatent)
+    # srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
+   qSigma0 = utils.svGPFA.configUtils.getVariationalCov0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
+   srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
 
     indPointsMeans = utils.svGPFA.initUtils.getConstantIndPointsMeans(constantValue=0.0, nTrials=nTrials, nLatents=nLatents, nIndPointsPerLatent=nIndPointsPerLatent)
     # patch to acommodate Lea's equal number of inducing points across trials
