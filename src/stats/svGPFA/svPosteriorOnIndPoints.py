@@ -34,29 +34,29 @@ class SVPosteriorOnIndPoints:
         return qSigma
 
     def get_flattened_params(self):
-        flattened_params = []
+        flattened_params = torch.tensor([], dtype=torch.double)
         for k in range(len(self._qMu)):
-            flattened_params.extend(self._qMu[k].flatten().tolist())
+            flattened_params = torch.cat((flattened_params, self._qMu[k].flatten()))
         for k in range(len(self._srQSigmaVecs)):
-            flattened_params.extend(self._srQSigmaVecs[k].flatten().tolist())
+            flattened_params = torch.cat((flattened_params, self._srQSigmaVecs[k].flatten()))
         return flattened_params
 
     def get_flattened_params_grad(self):
-        flattened_params_grad = []
+        flattened_params_grad = torch.tensor([], dtype=torch.double)
         for k in range(len(self._qMu)):
-            flattened_params_grad.extend(self._qMu[k].grad.flatten().tolist())
+            flattened_params_grad = torch.cat((flattened_params_grad, self._qMu[k].grad.flatten()))
         for k in range(len(self._srQSigmaVecs)):
-            flattened_params_grad.extend(self._srQSigmaVecs[k].grad.flatten().tolist())
+            flattened_params_grad = torch.cat((flattened_params_grad, self._srQSigmaVecs[k].grad.flatten()))
         return flattened_params_grad
 
     def set_params_from_flattened(self, flattened_params):
         for k in range(len(self._qMu)):
             flattened_param = flattened_params[:self._qMu[k].numel()]
-            self._qMu[k] = torch.tensor(flattened_param, dtype=torch.double).reshape(self._qMu[k].shape)
+            self._qMu[k] = flattened_param.reshape(self._qMu[k].shape)
             flattened_params = flattened_params[self._qMu[k].numel():]
         for k in range(len(self._srQSigmaVecs)):
             flattened_param = flattened_params[:self._srQSigmaVecs[k].numel()]
-            self._srQSigmaVecs[k] = torch.tensor(flattened_param, dtype=torch.double).reshape(self._srQSigmaVecs[k].shape)
+            self._srQSigmaVecs[k] = flattened_param.reshape(self._srQSigmaVecs[k].shape)
             flattened_params = flattened_params[self._srQSigmaVecs[k].numel():]
 
     def set_params_requires_grad(self, requires_grad):
