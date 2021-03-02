@@ -102,7 +102,7 @@ class SVEM:
             iter += 1
         return lowerBoundHist, elapsedTimeHist
 
-    def _eStep(self, model, optimParams, method="Newton-CG"):
+    def _eStep(self, model, optimParams, method="L-BFGS-B"):
         def eval_func(x_torch_flat):
             model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=x_torch_flat)
             value = -model.eval()
@@ -118,7 +118,7 @@ class SVEM:
         # pdb.set_trace()
         return answer
 
-    def _mStepEmbedding(self, model, optimParams, method="Newton-CG"):
+    def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
         def eval_func(x_torch_flat):
             model.set_svEmbedding_params_from_flattened(flattened_params=x_torch_flat)
             svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
@@ -137,7 +137,7 @@ class SVEM:
         # pdb.set_trace()
         return answer
 
-    def _mStepKernels(self, model, optimParams, method="Newton-CG"):
+    def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
 
         def eval_func(x_torch_flat):
             model.set_kernels_params_from_flattened(flattened_params=x_torch_flat)
@@ -149,7 +149,8 @@ class SVEM:
         x0 = model.get_flattened_kernels_params().numpy()
         fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
         hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
-        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
+        bounds = ((0, 7), (0, None))
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams, bounds=bounds)
         # model.set_kernels_params_requires_grad(requires_grad=False)
         model.set_kernels_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
@@ -157,7 +158,7 @@ class SVEM:
         # pdb.set_trace()
         return answer
 
-    def _mStepIndPointsLocs(self, model, optimParams, method="Newton-CG"):
+    def _mStepIndPointsLocs(self, model, optimParams, method="L-BFGS-B"):
 
         def eval_func(x_torch_flat):
             model.set_indPointsLocs_from_flattened(flattened_params=x_torch_flat)
