@@ -37,22 +37,22 @@ class KernelsMatricesStore(ABC):
         return answer
 
     def get_flattened_kernels_params(self):
-        flattened_params = []
+        flattened_params = torch.tensor([], dtype=torch.double)
         for k in range(len(self._kernels)):
-            flattened_params.extend(self._kernels[k].getParams().flatten().tolist())
+            flattened_params = torch.cat((flattened_params, self._kernels[k].getParams().flatten()))
         return flattened_params
 
     def get_flattened_kernels_params_grad(self):
-        flattened_params_grad = []
+        flattened_params_grad = torch.tensor([], dtype=torch.double)
         for k in range(len(self._kernels)):
-            flattened_params_grad.extend(self._kernels[k].getParams().grad.flatten().tolist())
+            flattened_params_grad = torch.cat((flattened_params_grad, self._kernels[k].getParams().grad.flatten()))
         return flattened_params_grad
 
     def set_kernels_params_from_flattened(self, flattened_params):
         for k in range(len(self._kernels)):
             kernel_nParams = self._kernels[k].getParams().numel()
             flattened_param = flattened_params[:kernel_nParams]
-            self._kernels[k].setParams(torch.tensor(flattened_param, dtype=torch.double))
+            self._kernels[k].setParams(flattened_param)
             flattened_params = flattened_params[kernel_nParams:]
 
     def set_kernels_params_requires_grad(self, requires_grad):
@@ -60,21 +60,21 @@ class KernelsMatricesStore(ABC):
             self._kernels[k].getParams().requires_grad = requires_grad
 
     def get_flattened_indPointsLocs(self):
-        flattened_params = []
+        flattened_params = torch.tensor([], dtype=torch.double)
         for k in range(len(self._indPointsLocs)):
-            flattened_params.extend(self._indPointsLocs[k].flatten().tolist())
+            flattened_params = torch.cat((flattened_params, self._indPointsLocs[k].flatten()))
         return flattened_params
 
     def get_flattened_indPointsLocs_grad(self):
-        flattened_params_grad = []
+        flattened_params_grad = torch.tensor([], dtype=torch.double)
         for k in range(len(self._indPointsLocs)):
-            flattened_params_grad.extend(self._indPointsLocs[k].grad.flatten().tolist())
+            flattened_params_grad = torch.cat((flattened_params_grad, self._indPointsLocs[k].grad.flatten()))
         return flattened_params_grad
 
     def set_indPointsLocs_from_flattened(self, flattened_params):
         for k in range(len(self._indPointsLocs)):
             numel = self._indPointsLocs[k].numel()
-            self._indPointsLocs[k] = torch.tensor(flattened_params[:numel], dtype=torch.double).reshape(self._indPointsLocs[k].shape)
+            self._indPointsLocs[k] = flattened_params[:numel].reshape(self._indPointsLocs[k].shape)
             flattened_params = flattened_params[numel:]
 
     def set_indPointsLocs_requires_grad(self, requires_grad):
