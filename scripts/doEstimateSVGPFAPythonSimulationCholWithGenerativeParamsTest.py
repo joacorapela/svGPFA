@@ -180,7 +180,7 @@ def main(argv):
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
-    # with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+    with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
 
     pdb.set_trace()
 
