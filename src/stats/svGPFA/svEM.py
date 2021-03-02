@@ -102,97 +102,97 @@ class SVEM:
             iter += 1
         return lowerBoundHist, elapsedTimeHist
 
-    def _eStep(self, model, optimParams, method="L-BFGS-B"):
-        def eval_func(z):
-            model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=z.tolist())
-            model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=True)
+    def _eStep(self, model, optimParams, method="Newton-CG"):
+        def eval_func(x_torch_flat):
+            model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=x_torch_flat)
             value = -model.eval()
-            value.backward(retain_graph=True)
-            grad_list = model.get_flattened_svPosteriorOnIndPoints_params_grad()
-            model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
-            value = value.item()
-            grad = np.array(grad_list)
-            return (value, grad)
+            return value
 
-        z0 = np.array(model.get_flattened_svPosteriorOnIndPoints_params())
-        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
-                                            method=method, jac=True,
-                                            options=optimParams)
-        model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
+        x0 = model.get_flattened_svPosteriorOnIndPoints_params().detach().numpy()
+        fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
+        hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
+        model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         print("*** variational parameters: {}".format(optim_res.x))
         # pdb.set_trace()
         return answer
 
-    def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
-        def eval_func(z):
-            model.set_svEmbedding_params_from_flattened(flattened_params=z.tolist())
-            model.set_svEmbedding_params_requires_grad(requires_grad=True)
-#             svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
-#             value = -model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-            value = -model.eval()
-            value.backward(retain_graph=True)
-            grad_list = model.get_flattened_svEmbedding_params_grad()
-            model.set_svEmbedding_params_requires_grad(requires_grad=False)
-            value = value.item()
-            grad = np.array(grad_list)
-            return (value, grad)
+    def _mStepEmbedding(self, model, optimParams, method="Newton-CG"):
+        def eval_func(x_torch_flat):
+            model.set_svEmbedding_params_from_flattened(flattened_params=x_torch_flat)
+            svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
+            value = -model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
+            # value = -model.eval()
+            return value
 
-        z0 = np.array(model.get_flattened_svEmbedding_params())
-        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
-                                            method=method, jac=True,
-                                            options=optimParams)
-        model.set_svEmbedding_params_from_flattened(flattened_params=optim_res.x.tolist())
+        x0 = model.get_flattened_svEmbedding_params().detach().numpy()
+        fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
+        hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
+        # model.set_svEmbedding_params_requires_grad(requires_grad=False)
+        model.set_svEmbedding_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         print("*** embedding parameters: {}".format(optim_res.x))
         # pdb.set_trace()
         return answer
 
-    def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
-        def eval_func(z):
-            model.set_kernels_params_from_flattened(flattened_params=z.tolist())
-            model.set_kernels_params_requires_grad(requires_grad=True)
+    def _mStepKernels(self, model, optimParams, method="Newton-CG"):
+
+        def eval_func(x_torch_flat):
+            model.set_kernels_params_from_flattened(flattened_params=x_torch_flat)
             model.buildKernelsMatrices()
             value = -model.eval()
-            value.backward(retain_graph=True)
-            grad_list = model.get_flattened_kernels_params_grad()
-            model.set_kernels_params_requires_grad(requires_grad=False)
-            value = value.item()
-            grad = np.array(grad_list)
-            return (value, grad)
+            # pdb.set_trace()
+            return value
 
-        z0 = np.array(model.get_flattened_kernels_params())
-        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
-                                            method=method, jac=True,
-                                            options=optimParams)
-        model.set_kernels_params_from_flattened(flattened_params=optim_res.x.tolist())
+        x0 = model.get_flattened_kernels_params().numpy()
+        fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
+        hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
+        # model.set_kernels_params_requires_grad(requires_grad=False)
+        model.set_kernels_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         print("*** kernels parameters: {}".format(optim_res.x))
         # pdb.set_trace()
         return answer
 
-    def _mStepIndPointsLocs(self, model, optimParams, method="L-BFGS-B"):
-        def eval_func(z):
-            model.set_indPointsLocs_from_flattened(flattened_params=z.tolist())
-            model.set_indPointsLocs_requires_grad(requires_grad=True)
+    def _mStepIndPointsLocs(self, model, optimParams, method="Newton-CG"):
+
+        def eval_func(x_torch_flat):
+            model.set_indPointsLocs_from_flattened(flattened_params=x_torch_flat)
             model.buildKernelsMatrices()
             value = -model.eval()
-            value.backward(retain_graph=True)
-            grad_list = model.get_flattened_indPointsLocs_grad()
-            model.set_indPointsLocs_requires_grad(requires_grad=False)
-            value = value.item()
-            grad = np.array(grad_list)
-            return (value, grad)
+            return value
 
-        z0 = np.array(model.get_flattened_indPointsLocs())
-        optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
-                                            method=method, jac=True,
-                                            options=optimParams)
-        model.set_indPointsLocs_from_flattened(flattened_params=optim_res.x.tolist())
+        x0 = model.get_flattened_indPointsLocs().numpy()
+        fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
+        hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
+        # model.set_indpointslocs_params_requires_grad(requires_grad=False)
+        model.set_indPointsLocs_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
         print("*** ind points locs: {}".format(optim_res.x))
         # pdb.set_trace()
         return answer
+
+    def _eval_func_wrapper(self, x_numpy_flat, eval_func):
+        x_torch_flat = torch.from_numpy(x_numpy_flat)
+        x_torch_flat.requires_grad = True
+        value = eval_func(x_torch_flat)
+        # value.backward(retain_graph=True)
+        value.backward(retain_graph=True)
+        x_torch_flat.requires_grad = False
+        grad_flat = x_torch_flat.grad
+        value = value.item()
+        grad = grad_flat.numpy()
+        # pdb.set_trace()
+        return (value, grad)
+
+    def _hessian_prod(self, x, p, eval_func):
+        hp = torch.autograd.functional.hvp(func=eval_func, inputs=torch.from_numpy(x), v=torch.from_numpy(p))[1].detach().numpy()
+        # pdb.set_trace()
+        return hp
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
