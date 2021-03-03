@@ -632,10 +632,10 @@ def getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent(
         estimatedIndPointsCov,
         labelTruePattern, labelEstimatedPattern,
         useLegend):
-        nCols = trueIndPointsCov.shape[1]
-        tracesTrue = [[] for i in range(nCols)]
-        tracesEstimated = [[] for i in range(nCols)]
-        for i in range(nCols):
+
+        nColsT = trueIndPointsCov.shape[1]
+        tracesTrue = [[] for i in range(nColsT)]
+        for i in range(nColsT):
             color = colorsList[i%len(colorsList)]
             tracesTrue[i] = go.Scatter(
                 y=trueIndPointsCov[:,i],
@@ -643,12 +643,18 @@ def getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent(
                 name=labelTruePattern.format(i),
                 line=dict(dash=linetypeTrue, color=color),
                 showlegend=useLegend)
+
+        nColsE = estimatedIndPointsCov.shape[1]
+        tracesEstimated = [[] for i in range(nColsE)]
+        for i in range(nColsE):
+            color = colorsList[i%len(colorsList)]
             tracesEstimated[i] = go.Scatter(
                 y=estimatedIndPointsCov[:,i],
                 mode="lines+markers",
                 name=labelEstimatedPattern.format(i),
                 line=dict(dash=linetypeEstimated, color=color),
                 showlegend=useLegend)
+
         return tracesTrue, tracesEstimated
 
     # trueIndPointsCovs[r][k] \in nInd[k]
@@ -657,6 +663,7 @@ def getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent(
     tracesTrue, tracesEstimated = getTracesOneSetTrueAndEstimatedIndPointsCovs(trueIndPointsCov=trueIndPointsCov, estimatedIndPointsCov=estimatedIndPointsCov, labelTruePattern=labelTruePattern, labelEstimatedPattern=labelEstimatedPattern, useLegend=True)
     for i in range(len(tracesTrue)):
         fig.add_trace(tracesTrue[i])
+    for i in range(len(tracesEstimated)):
         fig.add_trace(tracesEstimated[i])
     fig.update_layout(title=title)
     fig.update_yaxes(title_text=ylabel)
