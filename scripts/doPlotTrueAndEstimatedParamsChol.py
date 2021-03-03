@@ -138,7 +138,7 @@ def main(argv):
     fig.write_html(indPointsCovFigFilenamePattern.format("html"))
     fig.show()
 
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC.detach().numpy(), estimatedD=estimatedD.detach().numpy())
     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
     fig.show()
