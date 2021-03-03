@@ -25,13 +25,13 @@ def test_get_flattened_indPointsLocs():
     true_indPointsLocs = [torch.tensor([10.0, 20.0], dtype=torch.double),
                           torch.tensor([30.0, 40.0, 50.0], dtype=torch.double)]
 
-    true_flattened_indPointsLocs = true_indPointsLocs[0].tolist() + true_indPointsLocs[1].tolist()
+    true_flattened_indPointsLocs = torch.cat((true_indPointsLocs[0], true_indPointsLocs[1]))
 
     indPointsLocsKMS = IndPointsLocsKMS()
     indPointsLocsKMS.setIndPointsLocs(indPointsLocs=true_indPointsLocs)
     flattened_indPointsLocs = indPointsLocsKMS.get_flattened_indPointsLocs()
 
-    assert(true_flattened_indPointsLocs==flattened_indPointsLocs)
+    assert(torch.all(torch.eq(true_flattened_indPointsLocs, flattened_indPointsLocs)))
 
 def test_set_indPointsLocs_from_flattened():
     initial_indPointsLocs = [torch.tensor([1.0, 2.0], dtype=torch.double),
@@ -39,7 +39,7 @@ def test_set_indPointsLocs_from_flattened():
     true_indPointsLocs = [torch.tensor([10.0, 20.0], dtype=torch.double),
                           torch.tensor([30.0, 40.0, 50.0], dtype=torch.double)]
 
-    true_flattened_indPointsLocs = true_indPointsLocs[0].tolist() + true_indPointsLocs[1].tolist()
+    true_flattened_indPointsLocs = torch.cat((true_indPointsLocs[0], true_indPointsLocs[1]))
 
     indPointsLocsKMS = IndPointsLocsKMS()
     indPointsLocsKMS.setIndPointsLocs(indPointsLocs=initial_indPointsLocs)
@@ -71,8 +71,7 @@ def test_get_flattened_kernels_params():
                            torch.tensor([3.0], dtype=torch.double) #exponential quadratic kernel lengthscale
                            ]
 
-    true_flattened_kernels_params = true_kernels_params[0].tolist() + true_kernels_params[1].tolist()
-
+    true_flattened_kernels_params = torch.cat((true_kernels_params[0], true_kernels_params[1]))
     periodicKernel = PeriodicKernel(scale=1.0)
     periodicKernel.setParams(params=initial_kernels_params[0])
 
@@ -85,7 +84,7 @@ def test_get_flattened_kernels_params():
     indPointsLocsKMS.setKernelsParams(kernelsParams=true_kernels_params)
     flattened_kernels_params = indPointsLocsKMS.get_flattened_kernels_params()
 
-    assert(true_flattened_kernels_params==flattened_kernels_params)
+    assert(torch.all(torch.eq(true_flattened_kernels_params, flattened_kernels_params)))
 
 def test_set_kernels_params_from_flattened():
     initial_kernels_params = [torch.tensor([10.0, 20.0], dtype=torch.double), # priodic kernel lenghtscale and period
@@ -95,7 +94,7 @@ def test_set_kernels_params_from_flattened():
                            torch.tensor([3.0], dtype=torch.double) #exponential quadratic kernel lengthscale
                            ]
 
-    true_flattened_kernels_params = true_kernels_params[0].tolist() + true_kernels_params[1].tolist()
+    true_flattened_kernels_params = torch.cat((true_kernels_params[0], true_kernels_params[1]))
 
     periodicKernel = PeriodicKernel(scale=1.0)
     periodicKernel.setParams(params=initial_kernels_params[0])
@@ -109,7 +108,7 @@ def test_set_kernels_params_from_flattened():
     indPointsLocsKMS.set_kernels_params_from_flattened(flattened_params=true_flattened_kernels_params)
     flattened_kernels_params = indPointsLocsKMS.get_flattened_kernels_params()
 
-    assert(true_flattened_kernels_params==flattened_kernels_params)
+    assert(torch.all(torch.eq(true_flattened_kernels_params, flattened_kernels_params)))
 
 def test_set_kernels_params_requires_grad():
     initial_kernels_params = [torch.tensor([10.0, 20.0], dtype=torch.double), # priodic kernel lenghtscale and period
@@ -426,7 +425,7 @@ def test_kernels_grads():
 
     def eval_func(z):
         # pdb.set_trace()
-        svlb.set_kernels_params_from_flattened(flattened_params=z.tolist())
+        svlb.set_kernels_params_from_flattened(flattened_params=z)
         svlb.set_kernels_params_requires_grad(requires_grad=True)
         svlb.buildKernelsMatrices()
         value = -svlb.eval()
@@ -434,21 +433,21 @@ def test_kernels_grads():
 
     def value_func(z):
         # pdb.set_trace()
-        value = eval_func(z=z)
+        value = eval_func(z=torch.tensor(z))
         return value.item()
 
     def grad_func(z):
         # pdb.set_trace()
-        value = eval_func(z=z)
+        value = eval_func(z=torch.tensor(z))
+        flattened_params = svlb.get_flattened_kernels_params()
         value.backward(retain_graph=True)
-        grad_list = svlb.get_flattened_kernels_params_grad()
-        grad = np.array(grad_list)
-        return grad
+        grad = svlb.get_flattened_kernels_params_grad()
+        grad_numpy = grad.numpy()
+        return grad_numpy
 
-    x0 = np.array(svlb.get_flattened_kernels_params())
+    x0 = svlb.get_flattened_kernels_params().numpy()
     err = scipy.optimize.check_grad(func=value_func, grad=grad_func, x0=x0)
     assert(err<tol)
-    pdb.set_trace()
 
 def test_indPointsLocs_grads():
     tol = 2e-3
@@ -564,7 +563,7 @@ def test_indPointsLocs_grads():
 
     def eval_func(z):
         # pdb.set_trace()
-        svlb.set_indPointsLocs_from_flattened(flattened_params=z.tolist())
+        svlb.set_indPointsLocs_from_flattened(flattened_params=z)
         svlb.set_indPointsLocs_requires_grad(requires_grad=True)
         svlb.buildKernelsMatrices()
         value = -svlb.eval()
@@ -572,21 +571,21 @@ def test_indPointsLocs_grads():
 
     def value_func(z):
         # pdb.set_trace()
-        value = eval_func(z=z)
+        value = eval_func(z=torch.tensor(z))
         return value.item()
 
     def grad_func(z):
         # pdb.set_trace()
-        value = eval_func(z=z)
+        value = eval_func(z=torch.tensor(z))
         value.backward(retain_graph=True)
-        grad_list = svlb.get_flattened_indPointsLocs_grad()
-        grad = np.array(grad_list)
-        return grad
+        grad = svlb.get_flattened_indPointsLocs_grad()
+        grad_numpy = grad.numpy()
+        return grad_numpy
 
-    x0 = np.array(svlb.get_flattened_indPointsLocs())
+    x0 = svlb.get_flattened_indPointsLocs().numpy()
     err = scipy.optimize.check_grad(func=value_func, grad=grad_func, x0=x0)
     assert(err<tol)
-    pdb.set_trace()
+    # pdb.set_trace()
 
 if __name__=='__main__':
     # test_eval_IndPointsLocsKMS()
@@ -598,5 +597,5 @@ if __name__=='__main__':
     # test_get_flattened_indPointsLocs()
     # test_set_indPointsLocs_from_flattened()
     # test_set_indPointsLocs_requires_grad()
-    # test_kernels_grads()
-    test_indPointsLocs_grads()
+    test_kernels_grads()
+    # test_indPointsLocs_grads()

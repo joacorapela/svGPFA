@@ -24,9 +24,9 @@ def test_get_flattened_params():
     d0 = torch.tensor([[1.,1.,1.]], dtype=torch.double)
     svEmbedding._C = C0
     svEmbedding._d = d0
-    true_flattened_params = torch.cat((C0.flatten(), d0.flatten())).tolist()
+    true_flattened_params = torch.cat((C0.flatten(), d0.flatten()))
     flattened_params = svEmbedding.get_flattened_params()
-    assert(true_flattened_params==flattened_params)
+    assert(torch.all(torch.eq(true_flattened_params, flattened_params)))
 
 def test_set_params_from_flattened():
     svEmbedding = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=None)
@@ -36,10 +36,10 @@ def test_set_params_from_flattened():
     svEmbedding._d = d0
     C1 = torch.tensor([[10.,20.,30.],[40.,50.,60.]], dtype=torch.double)
     d1 = torch.tensor([[10.,10.,10.]], dtype=torch.double)
-    to_set_flattened_params = torch.cat((C1.flatten(), d1.flatten())).tolist()
+    to_set_flattened_params = torch.cat((C1.flatten(), d1.flatten()))
     svEmbedding.set_params_from_flattened(flattened_params=to_set_flattened_params)
     flattened_params = svEmbedding.get_flattened_params()
-    assert(to_set_flattened_params==flattened_params)
+    torch.all(torch.eq(to_set_flattened_params, flattened_params))
 
 def test_set_params_requires_grad():
     svEmbedding = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=None)
@@ -312,28 +312,27 @@ def test_svEmbedding_grads():
 
     def eval_func(z):
         # pdb.set_trace()
-        svlb.set_svEmbedding_params_from_flattened(flattened_params=z.tolist())
+        svlb.set_svEmbedding_params_from_flattened(flattened_params=z)
         svlb.set_svEmbedding_params_requires_grad(requires_grad=True)
         value = -svlb.eval()
         return value
 
     def value_func(z):
         # pdb.set_trace()
-        value = eval_func(z=z)
+        value = eval_func(z=torch.from_numpy(z))
         return value.item()
 
     def grad_func(z):
         # pdb.set_trace()
-        value = eval_func(z=z)
+        value = eval_func(z=torch.from_numpy(z))
         value.backward(retain_graph=True)
         grad_list = svlb.get_flattened_svEmbedding_params_grad()
         grad = np.array(grad_list)
         return grad
 
-    x0 = np.array(svlb.get_flattened_svEmbedding_params())
+    x0 = svlb.get_flattened_svEmbedding_params().numpy()
     err = scipy.optimize.check_grad(func=value_func, grad=grad_func, x0=x0)
     assert(err<tol)
-    pdb.set_trace()
 
 if __name__=="__main__":
     # test_get_flattened_params()

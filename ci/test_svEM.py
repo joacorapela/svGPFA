@@ -620,7 +620,7 @@ def test_maximize_pointProcess():
         quadParams=quadParams,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     lowerBoundHist, elapsedTimeHist = svEM.maximize(model=svlb, optimParams=optimParams)
-    pdb.set_trace()
+    # pdb.set_trace()
     assert(lowerBoundHist[-1]>leasLowerBound)
 
 if __name__=='__main__':
