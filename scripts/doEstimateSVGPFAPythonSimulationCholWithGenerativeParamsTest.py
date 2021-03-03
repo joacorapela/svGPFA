@@ -39,6 +39,7 @@ def main(argv):
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimParams = {}
+    optimMethod = optimParamsConfig["method"]
     optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
     steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
     for step in steps:
@@ -171,7 +172,7 @@ def main(argv):
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     savePartialFilenamePattern = "results/{:08d}_{{:s}}_estimatedModel.pickle".format(estResNumber)
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, optimParams=optimParams)
+    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, method=optimMethod, optimParams=optimParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
