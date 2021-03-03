@@ -11,7 +11,7 @@ import torch
 
 class SVEM:
 
-    def maximize(self, model, optimParams,
+    def maximize(self, model, optimParams, method="EM",
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -48,7 +48,21 @@ class SVEM:
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
-        steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+        if method=="EM":
+            candidate_steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+            steps = []
+            for candidate_step in candidate_steps:
+                if optimParams["{:s}_estimate".format(candidate_step)]:
+                    steps.append(candidate_step)
+        elif method=="mECM":
+            candidate_steps = ["mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+            steps = []
+            for candidate_step in candidate_steps:
+                if optimParams["{:s}_estimate".format(candidate_step)]:
+                    steps.append("estep")
+                    steps.append(candidate_step)
+        else:
+            raise ValueError("Invalid method=={:s}".format(method))
         functions_for_steps = {
             "estep": self._eStep,
             "mstep_embedding": self._mStepEmbedding,
@@ -129,7 +143,9 @@ class SVEM:
         x0 = model.get_flattened_svEmbedding_params().detach().numpy()
         fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
         hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
-        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
+        C = model.getSVEmbeddingParams()[0]
+        bounds = [(0, None)]*C.shape[1] + [(None,None)]*(len(x0)-C.shape[1])
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, bounds=bounds, options=optimParams)
         # model.set_svEmbedding_params_requires_grad(requires_grad=False)
         model.set_svEmbedding_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
@@ -149,8 +165,7 @@ class SVEM:
         x0 = model.get_flattened_kernels_params().numpy()
         fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
         hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
-        bounds = ((0, 7), (0, None))
-        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams, bounds=bounds)
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
         # model.set_kernels_params_requires_grad(requires_grad=False)
         model.set_kernels_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
