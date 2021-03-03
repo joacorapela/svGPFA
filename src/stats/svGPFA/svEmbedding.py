@@ -79,12 +79,20 @@ class LinearSVEmbedding(SVEmbedding):
         return flattened_params_grad
 
     def set_params_from_flattened(self, flattened_params):
+
+        # It is very important that I modify the current object self._C and not
+        # make it point to a new object since self._C is shared by tow objects
+        # of classes LinearSVEmbeddingAllTimes and LinearSVEmbeddingAssocTimes
         flattened_param = flattened_params[:self._C.numel()]
-        self._C = flattened_param.reshape(self._C.shape)
+        self._C[:,:] = flattened_param.reshape(self._C.shape)
         flattened_params = flattened_params[self._C.numel():]
+
+        # It is very important that I modify the current object self._d and not
+        # make it point to a new object since self._d is shared by two object
+        # of classes LinearSVEmbeddingAllTimes and LinearSVEmbeddingAssocTimes
         flattened_param = flattened_params[:self._d.numel()]
-        self._d = flattened_param.reshape(self._d.shape)
-        flattened_param = flattened_params[self._d.numel():]
+        self._d[:] = flattened_param.reshape(self._d.shape)
+        flattened_params = flattened_params[self._d.numel():]
 
     def set_params_requires_grad(self, requires_grad):
         self._C.requires_grad = requires_grad
