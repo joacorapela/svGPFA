@@ -55,12 +55,13 @@ def main(argv):
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
-    optimMethod = optimParamsConfig["method"]
+    emMethod = optimParamsConfig["em_method"]
     optimParams = {}
     optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
     steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
     for step in steps:
         optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
+        optimParams["{:s}_optim_method".format(step)] = optimParamsConfig["{:s}_optim_method".format(step)]
         optimParams["{:s}_optim_params".format(step)] = {
             "maxiter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
         }
@@ -149,7 +150,7 @@ def main(argv):
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, method=optimMethod, optimParams=optimParams)
+    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, emMethod=emMethod, optimParams=optimParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
@@ -161,6 +162,8 @@ def main(argv):
     resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "model": model}
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
+
+    print("Saved results to {:s}".format(modelSaveFilename))
 
     pdb.set_trace()
 
