@@ -11,7 +11,7 @@ import torch
 
 class SVEM:
 
-    def maximize(self, model, optimParams, method="EM",
+    def maximize(self, model, optimParams, emMethod="EM",
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -48,13 +48,13 @@ class SVEM:
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
-        if method=="EM":
+        if emMethod=="EM":
             candidate_steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
             steps = []
             for candidate_step in candidate_steps:
                 if optimParams["{:s}_estimate".format(candidate_step)]:
                     steps.append(candidate_step)
-        elif method=="mECM":
+        elif emMethod=="mECM":
             candidate_steps = ["mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
             steps = []
             for candidate_step in candidate_steps:
@@ -62,7 +62,7 @@ class SVEM:
                     steps.append("estep")
                     steps.append(candidate_step)
         else:
-            raise ValueError("Invalid method=={:s}".format(method))
+            raise ValueError("Invalid emMethod=={:s}".format(emMethod))
         functions_for_steps = {
             "estep": self._eStep,
             "mstep_embedding": self._mStepEmbedding,
@@ -72,30 +72,31 @@ class SVEM:
         maxRes = {"lowerBound": -math.inf}
         while iter<optimParams["em_max_iter"]:
             for step in steps:
-                if optimParams["{:s}_estimate".format(step)]:
-                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
-                    if verbose:
-                        out.write(message)
-                    self._writeToLockedLog(
-                        message=message,
-                        logLock=logLock,
-                        logStream=logStream,
-                        logStreamFN=logStreamFN
-                    )
-                    maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
-                    if verbose:
-                        out.write(message)
-                    self._writeToLockedLog(
-                        message=message,
-                        logLock=logLock,
-                        logStream=logStream,
-                        logStreamFN=logStreamFN
-                    )
-                    if savePartial:
-                        savePartialFilename = savePartialFilenamePattern.format("{:s}{:03d}".format(step, iter))
-                        resultsToSave = {"model": model}
-                        with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
+                message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
+                if verbose:
+                    out.write(message)
+                self._writeToLockedLog(
+                    message=message,
+                    logLock=logLock,
+                    logStream=logStream,
+                    logStreamFN=logStreamFN
+                )
+                maxRes = functions_for_steps[step](model=model,
+                                                   optimParams=optimParams["{:s}_optim_params".format(step)],
+                                                   method=optimParams["{:s}_optim_method".format(step)])
+                message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
+                if verbose:
+                    out.write(message)
+                self._writeToLockedLog(
+                    message=message,
+                    logLock=logLock,
+                    logStream=logStream,
+                    logStreamFN=logStreamFN
+                )
+                if savePartial:
+                    savePartialFilename = savePartialFilenamePattern.format("{:s}{:03d}".format(step, iter))
+                    resultsToSave = {"model": model}
+                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
             elapsedTimeHist.append(time.time()-startTime)
             lowerBoundHist.append(maxRes["lowerBound"])
 
