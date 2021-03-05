@@ -145,8 +145,9 @@ class SVEM:
         fun = lambda x_numpy_flat: self._eval_func_wrapper(x_numpy_flat=x_numpy_flat, eval_func=eval_func)
         hessp = lambda x, p: self._hessian_prod(x, p, eval_func=eval_func)
         C = model.getSVEmbeddingParams()[0]
-        bounds = [(0, None)]*C.shape[1] + [(None,None)]*(len(x0)-C.shape[1])
-        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, bounds=bounds, options=optimParams)
+        # bounds = [(0, None)]*C.shape[1] + [(None,None)]*(len(x0)-C.shape[1])
+        # optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, bounds=bounds, options=optimParams)
+        optim_res = scipy.optimize.minimize(fun=fun, x0=x0, method=method, jac=True, hessp=hessp, options=optimParams)
         # model.set_svEmbedding_params_requires_grad(requires_grad=False)
         model.set_svEmbedding_params_from_flattened(flattened_params=torch.from_numpy(optim_res.x))
         answer = {"lowerBound": -optim_res.fun, "niter": optim_res.nit, "nfeval": optim_res.nfev}
