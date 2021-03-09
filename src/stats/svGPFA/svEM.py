@@ -9,6 +9,23 @@ import numpy as np
 import scipy.optimize
 import torch
 
+class TerminationInfo:
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def message(self):
+        return self._message
+
+class ErrorTerminationInfo(TerminationInfo):
+    def __init__(self, message, error):
+        super().__init__(message=message)
+        self._error = error
+
+    @property
+    def error(self):
+        return self._error
+
 class SVEM:
 
     def maximize(self, model, optimParams, emMethod="EM",
