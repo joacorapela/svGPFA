@@ -39,11 +39,13 @@ def main(argv):
     steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
     for step in steps:
         optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
-        optimParams["{:s}_max_iter".format(step)] = int(optimParamsConfig["{:s}_max_iter".format(step)])
-        optimParams["{:s}_lr".format(step)] = float(optimParamsConfig["{:s}_lr".format(step)])
-        optimParams["{:s}_tol".format(step)] = float(optimParamsConfig["{:s}_tol".format(step)])
-        optimParams["{:s}_niter_display".format(step)] = int(optimParamsConfig["{:s}_niter_display".format(step)])
-        optimParams["{:s}_line_search_fn".format(step)] = optimParamsConfig["{:s}_line_search_fn".format(step)]
+        optimParams["{:s}_optim_params".format(step)] = {
+            "max_iter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
+            "lr": float(optimParamsConfig["{:s}_lr".format(step)]),
+            "tolerance_grad": float(optimParamsConfig["{:s}_tol".format(step)]),
+            "tolerance_change": 1e-9,
+            "line_search_fn": optimParamsConfig["{:s}_line_search_fn".format(step)],
+        }
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     estPrefixUsed = True
@@ -173,9 +175,9 @@ def main(argv):
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     savePartialFilenamePattern = "results/{:08d}_{{:s}}_estimatedModel.pickle".format(estResNumber)
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(
+    lowerBoundHist, elapsedTimeHist, _  = svEM.maximize(
         model=model, optimParams=optimParams,
-        savePartial=True, savePartialFilenamePattern=savePartialFilenamePattern)
+        savePartial=False, savePartialFilenamePattern=savePartialFilenamePattern)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
