@@ -136,12 +136,71 @@ def main(argv):
         mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["maxiter"],
         saveFilename=estimationDataForMatlabFilename)
 
+    def embeddingParamsLogPrior(embeddingParams):
+        def elementLogPrior(x, mean=0.0, sd=10.0):
+            normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
+            answer = normal.log_prob(x)
+            return answer
+
+        C = embeddingParams[0]
+        ClogProb = 0.0
+        for row in C:
+            for value in row:
+                ClogProb = ClogProb + elementLogPrior(x=value)
+
+        d = embeddingParams[1]
+        dLogProb = 0.0
+        for value in d:
+                dLogProb = dLogProb + elementLogPrior(x=value)
+
+        answer = ClogProb + dLogProb
+        return answer
+
+    def kernelsParamsLogPrior(kernelsParams):
+        def periodLogPrior(x, mean=5.0, sd=0.25):
+            normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
+            answer = normal.log_prob(x)
+            return answer
+
+        def lengthscaleLogPrior(x, mean=2.25, sd=1.0):
+            normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
+            answer = normal.log_prob(x)
+            return answer
+
+        lengthscale = kernelsParams[0][0]
+        lengthscaleLogProb = lengthscaleLogPrior(lengthscale)
+
+        period = kernelsParams[0][1]
+        periodLogProb = periodLogPrior(period)
+
+        answer = lengthscaleLogProb + periodLogProb
+#         if period>=4.9:
+#             pdb.set_trace()
+        return answer
+
+    def indPointsLocsLogPrior(indPointsLocs):
+        def elementLogPrior(x):
+            uniform = torch.distributions.uniform.Uniform(0, torch.tensor(trialsLengths).max())
+            answer = uniform.log_prob(x)
+            return answer
+
+        indPointsLocsLogProb = 0.0
+        for value in indPointsLocs[0][0,:,0]:
+            indPointsLocsLogProb = indPointsLocsLogProb + elementLogPrior(value)
+        return indPointsLocsLogProb
+
+    paramsLogPriors = {
+        "embedding": embeddingParamsLogPrior,
+        "kernels": kernelsParamsLogPrior,
+        "indPointsLocs": indPointsLocsLogPrior,
+    }
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels)
+        kernels=kernels,
+        paramsLogPriors=paramsLogPriors)
 
     model.setInitialParamsAndData(measurements=spikesTimes,
                                   initialParams=initialParams,
