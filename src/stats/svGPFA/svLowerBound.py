@@ -32,8 +32,15 @@ class SVLowerBound:
 
     def _evalParamsLogPrior(self):
         embeddingLogPriorValue = self._paramsLogPriors["embedding"](self.getSVEmbeddingParams())
-        kernelsLogPriorValue = self._paramsLogPriors["kernels"](self.getKernelsParams())
+
+        kernelsLogPriorValue = 0.0
+        kernelsParams = self.getKernelsParams()
+        nLatents = len(kernelsParams)
+        for i in range(nLatents):
+            kernelsLogPriorValue = kernelsLogPriorValue + self._paramsLogPriors["kernels"][i](kernelParams=kernelsParams[i])
+
         indPointsLogPriorValue = self._paramsLogPriors["indPointsLocs"](self.getIndPointsLocs())
+
         answer = embeddingLogPriorValue + kernelsLogPriorValue + indPointsLogPriorValue
         return answer
 
