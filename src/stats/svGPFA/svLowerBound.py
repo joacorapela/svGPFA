@@ -4,10 +4,11 @@ import torch
 
 class SVLowerBound:
 
-    def __init__(self, eLL, klDiv):
+    def __init__(self, eLL, klDiv, paramsLogPriors):
         super(SVLowerBound, self).__init__()
         self._eLL = eLL
         self._klDiv = klDiv
+        self._paramsLogPriors = paramsLogPriors
         # shortcuts
         self._svPosteriorOnIndPoints = klDiv.get_svPosteriorOnIndPoints()
         self._svEmbedding = eLL.get_svEmbeddingAllTimes()
@@ -23,23 +24,33 @@ class SVLowerBound:
     def eval(self):
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
-        theEval = eLLEval-klDivEval
+        paramsLogPriorEval = self._evalParamsLogPrior()
+        theEval = eLLEval-klDivEval+paramsLogPriorEval
 #         if torch.isinf(theEval):
 #             raise RuntimeError("infinity lower bound detected")
         return theEval
+
+    def _evalParamsLogPrior(self):
+        embeddingLogPriorValue = self._paramsLogPriors["embedding"](self.getSVEmbeddingParams())
+        kernelsLogPriorValue = self._paramsLogPriors["kernels"](self.getKernelsParams())
+        indPointsLogPriorValue = self._paramsLogPriors["indPointsLocs"](self.getIndPointsLocs())
+        answer = embeddingLogPriorValue + kernelsLogPriorValue + indPointsLogPriorValue
+        return answer
 
     def sampleCIFs(self, times):
         answer = self._eLL.sampleCIFs(times=times)
         return answer
 
     def computeMeanCIFs(self, times):
-        answer = self._eLL.computeMeanCIFs(times=times)
+        eLLEval = self._eLL.computeMeanCIFs(times=times)
         return answer
 
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
-        answer = self._eLL.evalSumAcrossTrialsAndNeurons(
+        eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons(
             svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-        return answer
+        paramsLogPriorsEval = self._evalParamsLogPrior()
+        theEval = eLLEval+paramsLogPriorsEval
+        return theEval
 
     def buildKernelsMatrices(self):
         self._eLL.buildKernelsMatrices()
