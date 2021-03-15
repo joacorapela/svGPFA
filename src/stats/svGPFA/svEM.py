@@ -96,6 +96,7 @@ class SVEM:
                         maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
                         message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
                     except Exception as e:
+                        raise e
                         ex_type, ex_value, ex_traceback = sys.exc_info()
                         # Extract unformatter stack traces as tuples
                         trace_back = traceback.extract_tb(ex_traceback)
@@ -111,7 +112,7 @@ class SVEM:
                         print("Stack trace : %s" %stack_trace)
 
                         terminationInfo = ErrorTerminationInfo("Error", sys.exc_info()[:2])
-                        return lowerBoundHist, elapsedTimeHist, terminationInfo
+                        return lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -127,7 +128,7 @@ class SVEM:
                     if getIterationModelParamsFn is not None:
                         iterationsModelParams[iter+1,:] = getIterationModelParamsFn(model=model)
             elapsedTimeHist.append(time.time()-startTime)
-            lowerBoundHist.append(maxRes["lowerBound"].item())
+            lowerBoundHist.append(maxRes["lowerBound"])
 
             if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
@@ -199,10 +200,11 @@ class SVEM:
             curEval.backward(retain_graph=True)
             return curEval
         optimizer.step(closure)
-        lowerBound = evalFunc()
+        lowerBound = evalFunc().item()
         stateOneEpoch = optimizer.state[optimizer._params[0]]
         nfeval = stateOneEpoch["func_evals"]
         niter = stateOneEpoch["n_iter"]
+        pdb.set_trace()
         return {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter}
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
