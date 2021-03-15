@@ -137,7 +137,12 @@ def main(argv):
         saveFilename=estimationDataForMatlabFilename)
 
     def embeddingParamsLogPrior(embeddingParams):
-        def elementLogPrior(x, mean=0.0, sd=10.0):
+        def cElementLogPrior(x, min=0.1, max=10.0):
+            uniform = torch.distributions.uniform.Uniform(min, max)
+            answer = uniform.log_prob(x)
+            return answer
+
+        def dElementLogPrior(x, mean=0.0, sd=10.0):
             normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
             answer = normal.log_prob(x)
             return answer
@@ -146,12 +151,12 @@ def main(argv):
         ClogProb = 0.0
         for row in C:
             for value in row:
-                ClogProb = ClogProb + elementLogPrior(x=value)
+                ClogProb = ClogProb + cElementLogPrior(x=value)
 
         d = embeddingParams[1]
         dLogProb = 0.0
         for value in d:
-                dLogProb = dLogProb + elementLogPrior(x=value)
+                dLogProb = dLogProb + dElementLogPrior(x=value)
 
         answer = ClogProb + dLogProb
         return answer
@@ -174,8 +179,6 @@ def main(argv):
         periodLogProb = periodLogPrior(period)
 
         answer = lengthscaleLogProb + periodLogProb
-#         if period>=4.9:
-#             pdb.set_trace()
         return answer
 
     def indPointsLocsLogPrior(indPointsLocs):
