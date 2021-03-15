@@ -136,67 +136,8 @@ def main(argv):
         mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["maxiter"],
         saveFilename=estimationDataForMatlabFilename)
 
-    def embeddingParamsLogPrior(embeddingParams):
-        def cElementLogPrior(x, min=0.1, max=10.0):
-            uniform = torch.distributions.uniform.Uniform(min, max)
-            answer = uniform.log_prob(x)
-            return answer
+    paramsLogPriors = utils.svGPFA.configUtils.getParamsLogPriors(nLatents=nLatents, config=estInitConfig)
 
-        def dElementLogPrior(x, mean=0.0, sd=10.0):
-            normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
-            answer = normal.log_prob(x)
-            return answer
-
-        C = embeddingParams[0]
-        ClogProb = 0.0
-        for row in C:
-            for value in row:
-                ClogProb = ClogProb + cElementLogPrior(x=value)
-
-        d = embeddingParams[1]
-        dLogProb = 0.0
-        for value in d:
-                dLogProb = dLogProb + dElementLogPrior(x=value)
-
-        answer = ClogProb + dLogProb
-        return answer
-
-    def kernelsParamsLogPrior(kernelsParams):
-        def periodLogPrior(x, mean=5.0, sd=0.25):
-            normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
-            answer = normal.log_prob(x)
-            return answer
-
-        def lengthscaleLogPrior(x, mean=2.25, sd=1.0):
-            normal = torch.distributions.normal.Normal(loc=mean, scale=sd)
-            answer = normal.log_prob(x)
-            return answer
-
-        lengthscale = kernelsParams[0][0]
-        lengthscaleLogProb = lengthscaleLogPrior(lengthscale)
-
-        period = kernelsParams[0][1]
-        periodLogProb = periodLogPrior(period)
-
-        answer = lengthscaleLogProb + periodLogProb
-        return answer
-
-    def indPointsLocsLogPrior(indPointsLocs):
-        def elementLogPrior(x):
-            uniform = torch.distributions.uniform.Uniform(0, torch.tensor(trialsLengths).max())
-            answer = uniform.log_prob(x)
-            return answer
-
-        indPointsLocsLogProb = 0.0
-        for value in indPointsLocs[0][0,:,0]:
-            indPointsLocsLogProb = indPointsLocsLogProb + elementLogPrior(value)
-        return indPointsLocsLogProb
-
-    paramsLogPriors = {
-        "embedding": embeddingParamsLogPrior,
-        "kernels": kernelsParamsLogPrior,
-        "indPointsLocs": indPointsLocsLogPrior,
-    }
     # create model
     model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
