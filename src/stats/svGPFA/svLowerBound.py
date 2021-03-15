@@ -4,10 +4,11 @@ import torch
 
 class SVLowerBound:
 
-    def __init__(self, eLL, klDiv):
+    def __init__(self, eLL, klDiv, paramsLogPriors):
         super(SVLowerBound, self).__init__()
         self._eLL = eLL
         self._klDiv = klDiv
+        self._paramsLogPriors = paramsLogPriors
 
     def setInitialParamsAndData(self, measurements, initialParams, quadParams, indPointsLocsKMSRegEpsilon):
         self.setMeasurements(measurements=measurements)
@@ -20,9 +21,19 @@ class SVLowerBound:
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
-        if torch.isinf(theEval):
-            raise RuntimeError("infinity lower bound detected")
+        paramsLogPriorEval = self._evalParamsLogPrior()
+        theEval = eLLEval-klDivEval+paramsLogPriorEval
+#         if torch.isinf(theEval):
+#             raise RuntimeError("infinity lower bound detected")
+#         pdb.set_trace()
         return theEval
+
+    def _evalParamsLogPrior(self):
+        embeddingLogPriorValue = self._paramsLogPriors["embedding"](self.getSVEmbeddingParams())
+        kernelsLogPriorValue = self._paramsLogPriors["kernels"](self.getKernelsParams())
+        indPointsLogPriorValue = self._paramsLogPriors["indPointsLocs"](self.getIndPointsLocs())
+        answer = embeddingLogPriorValue + kernelsLogPriorValue + indPointsLogPriorValue
+        return answer
 
     def sampleCIFs(self, times):
         answer = self._eLL.sampleCIFs(times=times)
