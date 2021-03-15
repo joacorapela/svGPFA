@@ -5,7 +5,7 @@ import random
 import scipy.io
 import numpy as np
 import torch
-import pickle
+import dill as pickle
 import argparse
 import configparser
 import scipy.io
