@@ -26,7 +26,8 @@ NonExponentialLink = 1001
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModel(conditionalDist, linkFunction, embeddingType, kernels):
+    def buildModel(conditionalDist, linkFunction, embeddingType, kernels,
+                   paramsLogPriors):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
@@ -52,7 +53,9 @@ class SVGPFAModelFactory:
                         svEmbeddingAssocTimes=qHAssocTimes)
                     klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                                          svPosteriorOnIndPoints=qU)
-                    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+                    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL,
+                                                                  klDiv=klDiv,
+                                                                  paramsLogPriors=paramsLogPriors)
                     svlb.setKernels(kernels=kernels)
                 else:
                     raise ValueError("Invalid linkFunction=%s"%
