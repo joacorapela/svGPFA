@@ -95,8 +95,8 @@ def main(argv):
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     if randomEmbedding:
-        C0 = torch.rand(nNeurons, nLatents, dtype=torch.double)-0.5*2
-        d0 = torch.rand(nNeurons, 1, dtype=torch.double)-0.5*2
+        C0 = (torch.rand(nNeurons, nLatents, dtype=torch.double)-0.5)*2
+        d0 = (torch.rand(nNeurons, 1, dtype=torch.double)-0.5)*2
     else:
         CFilename = simInitConfig["embedding_params"]["C_filename"]
         dFilename = simInitConfig["embedding_params"]["d_filename"]

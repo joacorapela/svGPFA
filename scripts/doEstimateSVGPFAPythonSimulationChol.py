@@ -75,8 +75,8 @@ def main(argv):
            estPrefixUsed = False
 
     if randomEmbedding:
-        C0 = torch.rand(nNeurons, nLatents, dtype=torch.double)-0.5*2
-        d0 = torch.rand(nNeurons, 1, dtype=torch.double)-0.5*2
+        C0 = (torch.rand(nNeurons, nLatents, dtype=torch.double)-0.5)*2
+        d0 = (torch.rand(nNeurons, 1, dtype=torch.double)-0.5)*2
     else:
         CFilename = estInitConfig["embedding_params"]["C_filename"]
         dFilename = estInitConfig["embedding_params"]["d_filename"]
