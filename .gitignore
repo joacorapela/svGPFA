@@ -1,7 +1,12 @@
 *.pyc
 *.swp
 *~
-slurm-*
+slurm/scripts/*.sbatch
+slurm/scripts/*.csh
+slurm/data/*
+slurm/figures/*
+slurm/notes/*
+slurm/outputs/*
 # *.html
 .nfs*
 toRsync*
