@@ -151,9 +151,12 @@ def main(argv):
                                   quadParams=quadParams,
                                   indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
+    def getKernelParams(model):
+        kernelParams = model.getKernelsParams()[0]
+        return kernelParams
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist  = svEM.maximize(model=model, emMethod=emMethod, optimParams=optimParams)
+    lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod, getIterationModelParamsFn=getKernelParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
