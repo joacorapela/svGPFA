@@ -33,7 +33,6 @@ def main(argv):
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
-    scaleForIdentityQSigma0 = float(estInitConfig["control_variables"]["scaleForIdentityQSigma0"])
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
