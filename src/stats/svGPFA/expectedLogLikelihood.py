@@ -113,7 +113,6 @@ class PointProcessELL(ExpectedLogLikelihood):
         answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
         return answer
 
-
     def buildKernelsMatrices(self):
         self._svEmbeddingAllTimes.buildKernelsMatrices()
         self._svEmbeddingAssocTimes.buildKernelsMatrices()
@@ -191,6 +190,18 @@ class PointProcessELLExpLink(PointProcessELL):
         # eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
         eLogLink = torch.cat([eMean[trial] for trial in range(len(eMean))])
         return eLogLink
+
+    def computeExpectedCIFs(self, times):
+        # h \in nTrials x times x nNeurons
+        # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
+        # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
+        # return answer
+
+        eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
+        nTrials = eMean.shape[0]
+        nNeurons = eMean.shape[2]
+        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+        return answer
 
 class PointProcessELLQuad(PointProcessELL):
 
