@@ -28,8 +28,16 @@ class SVLowerBound:
         answer = self._eLL.sampleCIFs(times=times)
         return answer
 
-    def computeMeanCIFs(self, times):
-        answer = self._eLL.computeMeanCIFs(times=times)
+    def computeCIFsMeans(self, times):
+        answer = self._eLL.computeCIFsMeans(times=times)
+        return answer
+
+    def computeExpectedCIFs(self, times):
+        answer = self._eLL.computeExpectedCIFs(times=times)
+        return answer
+
+    def computeEmbeddingMeansAndVarsAtTimes(self, times):
+        answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
         return answer
 
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
