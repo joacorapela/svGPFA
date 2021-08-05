@@ -5,10 +5,6 @@ import torch
 import scipy.stats
 import stats.svGPFA.kernelsMatricesStore
 
-import sys
-sys.path.append("../../../scripts")
-import myGlobals
-
 class SVPosteriorOnLatents(ABC):
 
     def __init__(self, svPosteriorOnIndPoints, indPointsLocsKMS,
@@ -228,21 +224,6 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
             aux3 = KttDiag[:,:,k]+aux2
             # qKVar \in nTrials x nQuad x nLatent
             qKVar[:,:,k] = aux3
-
-            mm1f_meanCondVar = torch.matmul(-Kzz[k], Bkf)
-            aux1_meanCondVar = Bkf*mm1f_meanCondVar
-            aux2_meanCondVar = torch.sum(input=aux1_meanCondVar, dim=1)
-            aux3_meanCondVar = KttDiag[:,:,k]+aux2_meanCondVar
-            # myGlobals.meanCondVar[:,:,k,myGlobals.iteration] = aux3_meanCondVar
-            assert aux3_meanCondVar.min()>=0
-
-            mm1f_varCondMean = torch.matmul(qSigma[k], Bkf)
-            aux1_varCondMean = Bkf*mm1f_varCondMean
-            aux2_varCondMean = torch.sum(input=aux1_varCondMean, dim=1)
-            # myGlobals.varCondMean[:,:,k,myGlobals.iteration] = aux2_varCondMean
-            assert aux2_varCondMean.min()>=0
-
-        # myGlobals.iteration += 1
         return qKMu, qKVar
 
     def __computeMeansGivenKernelMatrices(self, Kzz, KzzChol, Ktz):
