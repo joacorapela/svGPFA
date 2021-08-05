@@ -92,26 +92,26 @@ class SVEM:
                         logStream=logStream,
                         logStreamFN=logStreamFN
                     )
-                    try:
-                        maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
-                        message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
-                    except Exception as e:
-                        ex_type, ex_value, ex_traceback = sys.exc_info()
-                        # Extract unformatter stack traces as tuples
-                        trace_back = traceback.extract_tb(ex_traceback)
-
-                        # Format stacktrace
-                        stack_trace = list()
-
-                        for trace in trace_back:
-                            stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
-
-                        print("Exception type : %s " % ex_type.__name__)
-                        print("Exception message : %s" %ex_value)
-                        print("Stack trace : %s" %stack_trace)
-
-                        terminationInfo = ErrorTerminationInfo("Error", sys.exc_info()[:2])
-                        return lowerBoundHist, elapsedTimeHist, terminationInfo
+#                     try:
+                    maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
+                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
+#                     except Exception as e:
+#                         ex_type, ex_value, ex_traceback = sys.exc_info()
+#                         # Extract unformatter stack traces as tuples
+#                         trace_back = traceback.extract_tb(ex_traceback)
+# 
+#                         # Format stacktrace
+#                         stack_trace = list()
+# 
+#                         for trace in trace_back:
+#                             stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+# 
+#                         print("Exception type : %s " % ex_type.__name__)
+#                         print("Exception message : %s" %ex_value)
+#                         print("Stack trace : %s" %stack_trace)
+# 
+#                         terminationInfo = ErrorTerminationInfo("Error", sys.exc_info()[:2])
+#                         return lowerBoundHist, elapsedTimeHist, terminationInfo
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -156,7 +156,8 @@ class SVEM:
 
     def _mStepEmbedding(self, model, optimParams):
         x = model.getSVEmbeddingParams()
-        x = [i.contiguous() for i in x]
+        # pdb.set_trace()
+        # x = [i.contiguous() for i in x]
         svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
         evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
         # evalFunc = model.eval
