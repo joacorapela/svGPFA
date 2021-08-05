@@ -31,11 +31,11 @@ def main(argv):
 
     estMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
-    latentsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedLatents_latent{:03d}_trial_{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
+    latentsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedLatents_latent{:03d}_trial{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
     indPointsMeanFigFilenamePattern = "figures/{:08d}_trueAndEstimatedIndPointsMeans_latent{:03d}_trial_{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
     indPointsCovFigFilenamePattern = "figures/{:08d}_trueAndEstimatedIndPointsCovs_latent{:03d}_trial_{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
     indPointsLocsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedIndPointsLocs_latent{:03d}_trial_{:03d}.{{:s}}".format(estResNumber, latentToPlot, trialToPlot)
-    kernelsParamsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedKernelsParams.{{:s}}".format(estResNumber)
+    kernelsParamsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedKernelsParams_latent{:03d}.{{:s}}".format(estResNumber, latentToPlot)
     embeddingParamsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedEmbeddingParams.{{:s}}".format(estResNumber)
 
     estMetaDataConfig = configparser.ConfigParser()
