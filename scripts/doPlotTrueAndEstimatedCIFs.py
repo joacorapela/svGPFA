@@ -41,10 +41,15 @@ def main(argv):
     with open(modelFilename, "rb") as f: modelRes = pickle.load(f)
 
     model = modelRes["model"]
-    estCIFsValues = model.computeMeanCIFs(times=cifTimes)
+    estMeanCIFsValues = model.computeCIFsMeans(times=cifTimes)
+    estExpectedCIFsValues = model.computeExpectedCIFs(times=cifTimes)
 
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
-    plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0], simCIFValues=simCIFsValues[trialToPlot][neuronToPlot], estCIFValues=estCIFsValues[trialToPlot][neuronToPlot].detach(), figFilename=figFilename, title=title)
+    plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0],
+                                                        simCIFValues=simCIFsValues[trialToPlot][neuronToPlot],
+                                                        estMeanCIFValues=estMeanCIFsValues[trialToPlot][neuronToPlot].detach(),
+                                                        estExpectedCIFValues=estExpectedCIFsValues[trialToPlot][neuronToPlot].detach(),
+                                                        figFilename=figFilename, title=title)
 
     plt.show()
 

@@ -2,19 +2,33 @@
 import pdb
 import sys
 import io
-import torch
 import time
-# from .utils import clock
+import math
 import pickle
 import numpy as np
-import matplotlib.pyplot as plt
-import plot.svGPFA.plotUtils
+import torch
+import traceback
+
+class TerminationInfo:
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def message(self):
+        return self._message
+
+class ErrorTerminationInfo(TerminationInfo):
+    def __init__(self, message, error):
+        super().__init__(message=message)
+        self._error = error
+
+    @property
+    def error(self):
+        return self._error
 
 class SVEM:
 
-    # @clock
-    def maximize(self, model, measurements, initialParams, quadParams,
-                 optimParams, indPointsLocsKMSRegEpsilon,
+    def maximize(self, model, optimParams, method="EM", getIterationModelParamsFn=None,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -25,12 +39,6 @@ class SVEM:
 
         if latentsStreamFN is not None and latentsTimes is None:
             raise RuntimeError("Please specify latentsTime if you want to save latents")
-
-        model.setMeasurements(measurements=measurements)
-        model.setInitialParams(initialParams=initialParams)
-        model.setQuadParams(quadParams=quadParams)
-        model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
-        model.buildKernelsMatrices()
 
         iter = 0
         if savePartial:
@@ -57,191 +65,69 @@ class SVEM:
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
-        while iter<optimParams["emMaxIter"]:
-            if optimParams["eStepEstimate"]:
-                message = "Iteration %02d, E-Step start\n"%(iter)
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                # begin debug
-                # with torch.no_grad():
-                #     logLike = model.eval()
-                # print(logLike)
-                # pdb.set_trace()
-                # end debug
-                if optimParams["eStepLineSearchFn"]=="None":
-                    lineSearchFn = None
-                else:
-                    lineSearchFn = optimParams["eStepLineSearchFn"]
-                # pdb.set_trace()
-                maxRes = self._eStep(
-                    model=model,
-                    maxIter=optimParams["eStepMaxIter"],
-                    tol=optimParams["eStepTol"],
-                    lr=optimParams["eStepLR"],
-                    lineSearchFn=lineSearchFn,
-                    verbose=optimParams["verbose"],
-                    out=out,
-                    nIterDisplay=optimParams["eStepNIterDisplay"],
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN,
-                )
-                message = "Iteration %02d, E-Step end: %f\n"%(iter, -maxRes['lowerBound'])
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                if savePartial:
-                    savePartialFilename = savePartialFilenamePattern.format("eStep{:03d}".format(iter))
-                    resultsToSave = {"model": model}
-                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
-            # begin debug
-            # pdb.set_trace()
-            # end debug
-            if optimParams["mStepEmbeddingEstimate"]:
-                message = "Iteration %02d, M-Step Model Params start\n"%(iter)
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                # pdb.set_trace()
-                if optimParams["eStepLineSearchFn"]=="None":
-                    lineSearchFn = None
-                else:
-                    lineSearchFn = optimParams["eStepLineSearchFn"]
-                maxRes = self._mStepEmbedding(
-                    model=model,
-                    maxIter=optimParams["mStepEmbeddingMaxIter"],
-                    tol=optimParams["mStepEmbeddingTol"],
-                    lr=optimParams["mStepEmbeddingLR"],
-                    lineSearchFn=lineSearchFn,
-                    verbose=optimParams["verbose"],
-                    out=out,
-                    nIterDisplay=optimParams["mStepEmbeddingNIterDisplay"],
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN,
-                )
-                message = "Iteration %02d, M-Step Model Params end: %f\n"%(iter, -maxRes['lowerBound'])
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                if savePartial:
-                    savePartialFilename = savePartialFilenamePattern.format("mStepEmbedding{:03d}".format(iter))
-                    resultsToSave = {"model": model}
-                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
-            # begin debug
-            # pdb.set_trace()
-            # end debug
-            if optimParams["mStepKernelsEstimate"]:
-                message = "Iteration %02d, M-Step Kernel Params start\n"%(iter)
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                # pdb.set_trace()
-                if optimParams["eStepLineSearchFn"]=="None":
-                    lineSearchFn = None
-                else:
-                    lineSearchFn = optimParams["eStepLineSearchFn"]
-                maxRes = self._mStepKernels(
-                    model=model,
-                    maxIter=optimParams["mStepKernelsMaxIter"],
-                    tol=optimParams["mStepKernelsTol"],
-                    lr=optimParams["mStepKernelsLR"],
-                    lineSearchFn=lineSearchFn,
-                    verbose=optimParams["verbose"],
-                    out=out,
-                    nIterDisplay=optimParams["mStepKernelsNIterDisplay"],
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN,
-                )
-                message = "Iteration %02d, M-Step Kernel Params end: %f\n"%(iter, -maxRes['lowerBound'])
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                if savePartial:
-                    savePartialFilename = savePartialFilenamePattern.format("mStepKernels{:03d}".format(iter))
-                    resultsToSave = {"model": model}
-                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
-            # begin debug
-            # pdb.set_trace()
-            # end debug
-            if optimParams["mStepIndPointsEstimate"]:
-                message = "Iteration %02d, M-Step Ind Points start\n"%(iter)
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                # pdb.set_trace()
-                if optimParams["eStepLineSearchFn"]=="None":
-                    lineSearchFn = None
-                else:
-                    lineSearchFn = optimParams["eStepLineSearchFn"]
-                maxRes = self._mStepIndPointsLocs(
-                    model=model,
-                    maxIter=optimParams["mStepIndPointsMaxIter"],
-                    tol=optimParams["mStepIndPointsTol"],
-                    lr=optimParams["mStepIndPointsLR"],
-                    lineSearchFn=lineSearchFn,
-                    verbose=optimParams["verbose"],
-                    out=out,
-                    nIterDisplay=optimParams["mStepIndPointsNIterDisplay"],
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN,
-                )
-                message = "Iteration %02d, M-Step Ind Points end: %f\n"%(iter, -maxRes['lowerBound'])
-                if verbose:
-                    out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                if savePartial:
-                    savePartialFilename = savePartialFilenamePattern.format("mStepIndPoints{:03d}".format(iter))
-                    resultsToSave = {"model": model}
-                    with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
-            # begin debug
-            # pdb.set_trace()
-            # end debug
+        if method=="EM":
+            steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+            functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
+        elif method=="mECM":
+            steps = ["estep", "mstep_embedding", "estep", "mstep_kernels", "estep", "mstep_indpointslocs"]
+            functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
+        else:
+            raise ValueError("Invalid method={:s}. Supported values are EM and mECM".format(method))
+        if getIterationModelParamsFn is not None:
+            initialModelsParams = getIterationModelParamsFn(model=model)
+            iterationsModelParams = torch.empty((optimParams["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
+            iterationsModelParams[0,:] = initialModelsParams
+        else:
+            iterationsModelParams = None
+        maxRes = {"lowerBound": -math.inf}
+        while iter<optimParams["em_max_iter"]:
+            for step in steps:
+                if optimParams["{:s}_estimate".format(step)]:
+                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
+                    if verbose:
+                        out.write(message)
+                    self._writeToLockedLog(
+                        message=message,
+                        logLock=logLock,
+                        logStream=logStream,
+                        logStreamFN=logStreamFN
+                    )
+#                     try:
+                    maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
+                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
+#                     except Exception as e:
+#                         ex_type, ex_value, ex_traceback = sys.exc_info()
+#                         # Extract unformatter stack traces as tuples
+#                         trace_back = traceback.extract_tb(ex_traceback)
+# 
+#                         # Format stacktrace
+#                         stack_trace = list()
+# 
+#                         for trace in trace_back:
+#                             stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
+# 
+#                         print("Exception type : %s " % ex_type.__name__)
+#                         print("Exception message : %s" %ex_value)
+#                         print("Stack trace : %s" %stack_trace)
+# 
+#                         terminationInfo = ErrorTerminationInfo("Error", sys.exc_info()[:2])
+#                         return lowerBoundHist, elapsedTimeHist, terminationInfo
+                    if verbose:
+                        out.write(message)
+                    self._writeToLockedLog(
+                        message=message,
+                        logLock=logLock,
+                        logStream=logStream,
+                        logStreamFN=logStreamFN
+                    )
+                    if savePartial:
+                        savePartialFilename = savePartialFilenamePattern.format("{:s}{:03d}".format(step, iter))
+                        resultsToSave = {"model": model}
+                        with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
+                    if getIterationModelParamsFn is not None:
+                        iterationsModelParams[iter+1,:] = getIterationModelParamsFn(model=model)
             elapsedTimeHist.append(time.time()-startTime)
-            lowerBoundHist.append(maxRes['lowerBound'])
+            lowerBoundHist.append(maxRes["lowerBound"].item())
 
             if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
@@ -258,152 +144,68 @@ class SVEM:
                 lowerBoundLock.unlock()
 
             iter += 1
-            # pdb.set_trace()
-        return lowerBoundHist, elapsedTimeHist
+        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optimParams["em_max_iter"]))
+        return lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams
 
-    def _eStep(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
-               nIterDisplay, logLock, logStream, logStreamFN):
+    def _eStep(self, model, optimParams):
         x = model.getSVPosteriorOnIndPointsParams()
         evalFunc = model.eval
-        optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-                                            optimizer=optimizer,
-                                            maxIter=maxIter, tol=tol,
-                                            verbose=verbose,
-                                            out=out,
-                                            nIterDisplay=nIterDisplay,
-                                            logLock=logLock,
-                                            logStream=logStream,
-                                            logStreamFN=logStreamFN,
-                                           )
+        optimizer = torch.optim.LBFGS(x, **optimParams)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _mStepEmbedding(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
-                        nIterDisplay, logLock, logStream, logStreamFN):
+    def _mStepEmbedding(self, model, optimParams):
         x = model.getSVEmbeddingParams()
-        svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
-        evalFunc = lambda: \
-            model.evalELLSumAcrossTrialsAndNeurons(
-                svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-        optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-                                            optimizer=optimizer,
-                                            maxIter=maxIter, tol=tol,
-                                            verbose=verbose,
-                                            out=out,
-                                            nIterDisplay=nIterDisplay,
-                                            logLock=logLock,
-                                            logStream=logStream,
-                                            logStreamFN=logStreamFN,
-                                           )
         # pdb.set_trace()
+        # x = [i.contiguous() for i in x]
+        svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
+        evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
+        # evalFunc = model.eval
+        optimizer = torch.optim.LBFGS(x, **optimParams)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _mStepKernels(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
-                      nIterDisplay, logLock, logStream, logStreamFN,
-                      minScale=0.75,
-                      displayFmt="Step: %02d, negative lower bound: %f\n",
-                     ):
+    def _mStepKernels(self, model, optimParams):
         x = model.getKernelsParams()
-        out.write("kernel params {}\n".format(x))
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
-        optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-                                            optimizer=optimizer,
-                                            maxIter=maxIter, tol=tol,
-                                            verbose=verbose,
-                                            out=out,
-                                            nIterDisplay=nIterDisplay,
-                                            logLock=logLock,
-                                            logStream=logStream,
-                                            logStreamFN=logStreamFN,
-                                           )
+        optimizer = torch.optim.LBFGS(x, **optimParams)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
+        print("Kernel params:", x)
         return answer
 
-    def _mStepIndPointsLocs(self, model, maxIter, tol, lr, lineSearchFn, verbose, out,
-                        nIterDisplay, logLock, logStream, logStreamFN):
+    def _mStepIndPointsLocs(self, model, optimParams):
         x = model.getIndPointsLocs()
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
-        optimizer = torch.optim.LBFGS(x, lr=lr, line_search_fn=lineSearchFn)
-        # optimizer = torch.optim.Adam(x, lr=lr)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc,
-                                            optimizer=optimizer,
-                                            maxIter=maxIter, tol=tol,
-                                            verbose=verbose,
-                                            out=out,
-                                            nIterDisplay=nIterDisplay,
-                                            logLock=logLock,
-                                            logStream=logStream,
-                                            logStreamFN=logStreamFN, 
-                                           )
-        # pdb.set_trace()
+        optimizer = torch.optim.LBFGS(x, **optimParams)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _setupAndMaximizeStep(self, x, evalFunc, optimizer, maxIter, tol,
-                              verbose, out, nIterDisplay, logLock, logStream,
-                              logStreamFN, 
-                              displayFmt="Step: %02d, negative lower bound: %f\n", 
-                             ):
+    def _setupAndMaximizeStep(self, x, evalFunc, optimizer):
         for i in range(len(x)):
             x[i].requires_grad = True
-        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer,
-                                    maxIter=maxIter, tol=tol, verbose=verbose,
-                                    out=out,
-                                    nIterDisplay=nIterDisplay,
-                                    logLock=logLock,
-                                    logStream=logStream,
-                                    logStreamFN=logStreamFN,
-                                    displayFmt=displayFmt,
-                                   )
+        maxRes = self._maximizeStep(evalFunc=evalFunc, optimizer=optimizer)
         for i in range(len(x)):
             x[i].requires_grad = False
         return maxRes
 
-    def _maximizeStep(self, evalFunc, optimizer, maxIter, tol, verbose, out,
-                      nIterDisplay, logLock, logStream, logStreamFN,
-                      displayFmt="Step: %d, negative lower bound: %f\n",
-                     ):
-        iterCount = 0
-        lowerBoundHist = []
-        curEval = torch.tensor([float("inf")])
-        converged = False
-        while not converged and iterCount<maxIter:
-            def closure():
-                # details on this closure at http://sagecal.sourceforge.net/pytorch/index.html
-                nonlocal curEval
-
-                if torch.is_grad_enabled():
-                    optimizer.zero_grad()
-                curEval = -evalFunc()
-                if curEval.requires_grad:
-                    curEval.backward(retain_graph=True)
-                return curEval
-
-            prevEval = curEval
-            optimizer.step(closure)
-            if curEval<=prevEval and prevEval-curEval<tol:
-                converged = True
-            message = displayFmt%(iterCount, curEval)
-            if verbose and iterCount%nIterDisplay==0:
-                out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-            lowerBoundHist.append(-curEval.item())
-            iterCount += 1
-
-        return {"lowerBound": -curEval.item(), "lowerBoundHist": lowerBoundHist, "converged": converged}
+    def _maximizeStep(self, evalFunc, optimizer):
+        def closure():
+            optimizer.zero_grad()
+            curEval = -evalFunc()
+            curEval.backward(retain_graph=True)
+            return curEval
+        optimizer.step(closure)
+        lowerBound = evalFunc()
+        stateOneEpoch = optimizer.state[optimizer._params[0]]
+        nfeval = stateOneEpoch["func_evals"]
+        niter = stateOneEpoch["n_iter"]
+        return {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter}
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
@@ -414,3 +216,4 @@ class SVEM:
             logLock.unlock()
             logStream.truncate(0)
             logStream.seek(0)
+

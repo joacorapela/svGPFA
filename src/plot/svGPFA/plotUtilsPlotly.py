@@ -458,10 +458,11 @@ def getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(
     xlabel="Inducing Point Index",
     ylabel="Inducing Point Mean"):
 
-    indPointsIndices = torch.arange(len(trueIndPointsMeans))
+    tIndPointsIndices = torch.arange(len(trueIndPointsMeans))
+    eIndPointsIndices = torch.arange(len(estimatedIndPointsMeans))
 
     eCI = 1.96*estimatedIndPointsSTDs
-    xE = indPointsIndices
+    xE = eIndPointsIndices
     xE_rev = xE.flip(dims=[0])
     yE = estimatedIndPointsMeans
     yE_upper = yE + eCI
@@ -474,7 +475,7 @@ def getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(
     yE_lower = yE_lower.detach().numpy()
 
     tCI = 1.96*trueIndPointsSTDs
-    xT = indPointsIndices
+    xT = tIndPointsIndices
     xT_rev = xT.flip(dims=[0])
     yT = trueIndPointsMeans
     yT_upper = yT + tCI
@@ -781,7 +782,11 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
                                    tIndPointsLocsColor="rgba(0,0,255,0.5)",
                                    eIndPointsLocsColor="rgba(255,0,0,0.5)",
                                    xlabel="Time (sec)",
-                                   ylabelPattern="Trial {:d}"):
+                                   ylabelPattern="Latent {:d}"):
+    eLatentsMeans = eLatentsMeans.detach()
+    eLatentsSTDs = eLatentsSTDs.detach()
+    eIndPointsLocs = [item.detach() for item in eIndPointsLocs]
+
     pio.renderers.default = "browser"
     nLatents = eLatentsMeans.shape[2]
     fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
@@ -887,7 +892,7 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
         fig.add_trace(traceTCB, row=k+1, col=1)
         fig.add_trace(traceTMean, row=k+1, col=1)
         fig.add_trace(traceTSamples, row=k+1, col=1)
-        fig.update_yaxes(title_text=ylabelPattern.format(k+1), row=k+1, col=1)
+        fig.update_yaxes(title_text=ylabelPattern.format(k), row=k+1, col=1)
 
         for n in range(tIndPointsLocs[k].shape[1]):
             fig.add_shape(
@@ -1409,7 +1414,10 @@ def getPlotTruePythonAndMatlabCIFs(tTimes, tCIF, tLabel,
     )
     return fig
 
-def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel, eTimes, eCIF, eLabel, xlabel="Time (sec)", ylabel="CIF", title=""):
+def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel, 
+                                     eMeanTimes=None, eMeanCIF=None, eMeanLabel=None,
+                                     ePosteriorMeanTimes=None, ePosteriorMeanCIF=None, ePosteriorMeanLabel=None,
+                                     xlabel="Time (sec)", ylabel="CIF", title=""):
     pio.renderers.default = "browser"
     figDic = {
         "data": [],
@@ -1427,14 +1435,24 @@ def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel, eTimes, eCIF, eLabel,
             "y": tCIF,
         },
     )
-    figDic["data"].append(
+    if eMeanCIF is not None:
+        figDic["data"].append(
             {
-            "type": "scatter",
-            "name": eLabel,
-            "x": eTimes,
-            "y": eCIF,
-        },
-    )
+                "type": "scatter",
+                "name": eMeanLabel,
+                "x": eMeanTimes,
+                "y": eMeanCIF,
+            },
+        )
+    if ePosteriorMeanCIF is not None:
+        figDic["data"].append(
+            {
+                "type": "scatter",
+                "name": ePosteriorMeanLabel,
+                "x": ePosteriorMeanTimes,
+                "y": ePosteriorMeanCIF,
+            },
+        )
     fig = go.Figure(
         data=figDic["data"],
         layout=figDic["layout"],

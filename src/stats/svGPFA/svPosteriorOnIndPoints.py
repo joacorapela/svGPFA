@@ -25,10 +25,10 @@ class SVPosteriorOnIndPoints:
 
     def buildQSigma(self):
         # begin patch for older version of the code
-        if hasattr(self, "_qSRSigmaVec"):
-            self._srQSigmaVecs = [self._qSRSigmaVec[k].unsqueeze(-1) for k in range(len(self._qSRSigmaVec))]
-        elif self._srQSigmaVecs[0].dim()==2:
-            self._srQSigmaVecs = [self._srQSigmaVecs[k].unsqueeze(-1) for k in range(len(self._srQSigmaVecs))]
+#         if hasattr(self, "_qSRSigmaVec"):
+#             self._srQSigmaVecs = [self._qSRSigmaVec[k].unsqueeze(-1) for k in range(len(self._qSRSigmaVec))]
+#         elif self._srQSigmaVecs[0].dim()==2:
+#             self._srQSigmaVecs = [self._srQSigmaVecs[k].unsqueeze(-1) for k in range(len(self._srQSigmaVecs))]
         # end patch for older version of the code
         qSigma = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
         return qSigma

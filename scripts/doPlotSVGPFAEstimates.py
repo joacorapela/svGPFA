@@ -39,11 +39,11 @@ def main(argv):
     ksTestGamma = args.ksTestGamma
     nTestPoints = args.nTestPoints
 
-    estimResMetaDataFilename = "results/{:08d}_estimatedModelMetaData.ini".format(estResNumber)
+    estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
     lowerBoundHistVsIterNoFigFilenamePattern = "figures/{:08d}_lowerBoundHistVSIterNo.{{:s}}".format(estResNumber)
     lowerBoundHistVsElapsedTimeFigFilenamePattern = "figures/{:08d}_lowerBoundHistVsElapsedTime.{{:s}}".format(estResNumber)
-    latentsFigFilenamePattern = "figures/{:08d}_estimatedLatents.{{:s}}".format(estResNumber)
+    latentsFigFilenamePattern = "figures/{:08d}_estimatedLatent_trial{:03d}_neuron{:03d}.{{:s}}".format(estResNumber, trialToPlot, neuronToPlot)
     ksTestTimeRescalingNumericalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_numericalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     trueAndEstimatedCIFsFigFilenamePattern = "figures/{:08d}_trueAndEstimatedCIFs_trial{:03d}_neuron{:03d}.{{:s}}".format(estResNumber, trialToPlot, neuronToPlot)
     rocFigFilename = "figures/{:08d}_rocAnalysis_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
@@ -112,19 +112,20 @@ def main(argv):
     oneTrialCIFTimes = torch.arange(0, T, dtCIF)
     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
     with torch.no_grad():
-        cifValues = model.computeMeanCIFs(times=cifTimes)
+        emcifValues = model.computeCIFsMeans(times=cifTimes)
+        epmcifValues = model.computeExpectedCIFs(times=cifTimes)
     spikesTimesKS = spikesTimes[trialToPlot][neuronToPlot]
     cifTimesKS = cifTimes[trialToPlot,:,0]
-    cifValuesKS = cifValues[trialToPlot][neuronToPlot]
+    cifValuesKS = epmcifValues[trialToPlot][neuronToPlot]
 
     title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
 
-    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = stats.pointProcess.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=cifTimesKS, cifValues=cifValuesKS, gamma=ksTestGamma)
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = stats.pointProcess.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=oneTrialCIFTimes, cifValues=cifValuesKS, gamma=ksTestGamma)
     plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingNumericalCorrectionFigFilename, title=title)
     plt.close("all")
 
     # CIF
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs( tTimes=cifTimes[trialToPlot, :, 0], tCIF=simCIFsValues[trialToPlot][neuronToPlot], tLabel="True", eTimes=cifTimes[trialToPlot, :, 0], eCIF=cifValuesKS, eLabel="Estimated", title=title)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs(tTimes=timesTrueValues, tCIF=simCIFsValues[trialToPlot][neuronToPlot], tLabel="True", eMeanTimes=oneTrialCIFTimes, eMeanCIF=emcifValues[trialToPlot][neuronToPlot], eMeanLabel="Mean", ePosteriorMeanTimes=oneTrialCIFTimes, ePosteriorMeanCIF=epmcifValues[trialToPlot][neuronToPlot], ePosteriorMeanLabel="Posterior Mean", title=title)
     fig.write_image(trueAndEstimatedCIFsFigFilenamePattern.format("png"))
     fig.write_html(trueAndEstimatedCIFsFigFilenamePattern.format("html"))
 
@@ -146,15 +147,14 @@ def main(argv):
 #     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
 #     with torch.no_grad():
 #         latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
-#     estimatedC, estimatedD = model.getSVEmbeddingParams()
-# 
 #     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
 #     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
 #     fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
 # 
-#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=C, trueD=d, estimatedC=estimatedC, estimatedD=estimatedD)
-#     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
-#     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
+    estimatedC, estimatedD = model.getSVEmbeddingParams()
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=C, trueD=d, estimatedC=estimatedC, estimatedD=estimatedD)
+    fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
+    fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with analytical correction
     t0 = math.floor(cifTimesKS.min())

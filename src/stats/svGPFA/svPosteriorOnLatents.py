@@ -100,6 +100,21 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         answer = self.__computeMeansGivenKernelMatrices(Kzz=Kzz, KzzChol=KzzChol, Ktz=Ktz)
         return answer
 
+    def computeMeansAndVarsAtTimes(self, times):
+        Kzz = self._indPointsLocsKMS.getKzz()
+        KzzChol = self._indPointsLocsKMS.getKzzChol()
+
+        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
+        indPointsLocsAndAllTimesKMS.setIndPointsLocs(indPointsLocs=self._indPointsLocsKMS.getIndPointsLocs())
+        indPointsLocsAndAllTimesKMS.setTimes(times=times)
+        indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
+        Ktz = indPointsLocsAndAllTimesKMS.getKtz()
+        KttDiag = indPointsLocsAndAllTimesKMS.getKttDiag()
+
+        answer = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, KzzChol=KzzChol, Ktz=Ktz, KttDiag=KttDiag)
+        return answer
+
     def sample(self, times, nSamples=1, regFactor=1e-3):
         Kzz = self._indPointsLocsKMS.getKzz()
         KzzChol = self._indPointsLocsKMS.getKzzChol()

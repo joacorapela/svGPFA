@@ -61,7 +61,7 @@ def main(argv):
     spikesTimesFigFilenamePattern = \
         "figures/{:08d}_simulation_spikesTimes_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
     spikesRatesFigFilenamePattern = \
-       "figures/{:08d}_simulation_spikesRates_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
+       "figures/{:08d}_simulation_spikesRates_neuron{:03d}.{{:s}}".format(simResNumber, neuronToPlot)
     ksTestTimeRescalingFigFilenamePattern = \
         "figures/{:08d}_simulation_ksTestTimeRescaling_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
     rocFigFilenamePattern = \

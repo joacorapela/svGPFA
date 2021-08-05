@@ -1,6 +1,7 @@
 
 import pdb
 import math
+import numpy as np
 import pandas as pd
 import torch
 import stats.kernels
@@ -34,7 +35,7 @@ def getKernels(nLatents, config, forceUnitScale):
         kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
         if kernelType=="periodic":
             if not forceUnitScale:
-                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+                scale = float(config["kernel_params"]["kPeriodicScaleValueLatent{:d}".format(k)])
             else:
                 scale = 1.0
             lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
@@ -54,7 +55,7 @@ def getKernels(nLatents, config, forceUnitScale):
         kernels[k] = kernel
     return kernels
 
-def getQMu0(nLatents, nTrials, config):
+def getVariationalMean0FromList(nLatents, nTrials, config):
     qMu0 = [[] for r in range(nLatents)]
     for k in range(nLatents):
         qMu0k0 = torch.tensor([float(str) for str in config["variational_params"]["qMu0Latent{:d}Trial0".format(k)][1:-1].split(", ")], dtype=torch.double)
@@ -66,23 +67,66 @@ def getQMu0(nLatents, nTrials, config):
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
 
+def getVariationalMean0(nLatents, nTrials, config, keyNamePattern="qMu0Latent{:d}Trial{:d}_filename"):
+    qMu0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qMu0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qMu0k0 = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+        nIndPointsK = len(qMu0k0)
+        qMu0[k] = torch.empty((nTrials, nIndPointsK, 1), dtype=torch.double)
+        qMu0[k][0,:,0] = qMu0k0
+        for r in range(1, nTrials):
+            qMu0Filename = config["variational_params"][keyNamePattern.format(k, r)]
+            qMu0kr = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+            qMu0[k][r,:,0] = qMu0kr
+    return qMu0
+
+def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{:d}Trial{:d}_filename"):
+    qSigma0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qSigma0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qSigma0k0 = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).to_numpy())
+        nIndPointsK = qSigma0k0.shape[0]
+        qSigma0[k] = torch.empty((nTrials, nIndPointsK, nIndPointsK), dtype=torch.double)
+        qSigma0[k][0,:,:] = qSigma0k0
+        for r in range(1, nTrials):
+            qSigma0Filename = config["variational_params"][keyNamePattern.format(k, r)]
+            qSigma0kr = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).as_matrix())
+            qSigma0[k][r,:,:] = qSigma0kr
+    return qSigma0
+
 def getIndPointsMeans(nTrials, nLatents, config):
     indPointsMeans = [[] for r in range(nTrials)]
     for r in range(nTrials):
         indPointsMeans[r] = [[] for k in range(nLatents)]
         for k in range(nLatents):
-            indPointsMeans[r][k] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsMeanLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double).unsqueeze(dim=1)
+            indPointsMeansFN = config["indPoints_params"]["indPointsMeanFNLatent{:d}Trial{:d}".format(k,r)]
+            indPointsMeans[r][k] = torch.reshape(torch.from_numpy(np.loadtxt(indPointsMeansFN)), (-1,1))
     return indPointsMeans
 
 def getIndPointsLocs0(nLatents, nTrials, config):
     Z0 = [[] for k in range(nLatents)]
     for k in range(nLatents):
-        Z0_k_r0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,0)][1:-1].split(", ")], dtype=torch.double)
+        option_array = "indPointsLocsLatent{:d}Trial{:d}".format(k,0).lower()
+        option_filename = "indPointsLocsLatent{:d}Trial{:d}_filename".format(k,0).lower()
+        if option_array in config.options("indPoints_params"):
+            Z0_k_r0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,0)][1:-1].split(", ")], dtype=torch.double)
+        elif option_filename in config.options("indPoints_params"):
+            Z0_k_r0 = torch.from_numpy(np.loadtxt(config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}_filename".format(k,0)], delimiter=","))
+        else:
+            raise ValueError("option={:s} not found in config.options('indPoints_params')")
         nIndPointsForLatent = len(Z0_k_r0)
         Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1), dtype=torch.double)
         Z0[k][0,:,0] = Z0_k_r0
         for r in range(1, nTrials):
-            Z0[k][r,:,0] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
+            option_array = "indPointsLocsLatent{:d}Trial{:d}".format(k,r).lower()
+            option_filename = "indPointsLocsLatent{:d}Trial{:d}_filename".format(k,r).lower()
+            if option_array in config.options("indPoints_params"):
+                Z0[k][r,:,0] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
+            elif option_filename in config.options("indPoints_params"):
+                Z0[k][r,:,0] = torch.from_numpy(np.loadtxt(config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}_filename".format(k,r)], delimiter=","))
+            else:
+                raise ValueError("option={:s} not found in config.options('indPoints_params')")
     return Z0
 
 def getLatentsMeansFuncs(nLatents, nTrials, config):

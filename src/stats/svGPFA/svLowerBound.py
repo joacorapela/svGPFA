@@ -9,11 +9,18 @@ class SVLowerBound:
         self._eLL = eLL
         self._klDiv = klDiv
 
+    def setInitialParamsAndData(self, measurements, initialParams, quadParams, indPointsLocsKMSRegEpsilon):
+        self.setMeasurements(measurements=measurements)
+        self.setInitialParams(initialParams=initialParams)
+        self.setQuadParams(quadParams=quadParams)
+        self.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+        self.buildKernelsMatrices()
+
     def eval(self):
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
-        if torch.isinf(theEval).item():
+        if torch.isinf(theEval):
             raise RuntimeError("infinity lower bound detected")
         return theEval
 
@@ -21,8 +28,16 @@ class SVLowerBound:
         answer = self._eLL.sampleCIFs(times=times)
         return answer
 
-    def computeMeanCIFs(self, times):
-        answer = self._eLL.computeMeanCIFs(times=times)
+    def computeCIFsMeans(self, times):
+        answer = self._eLL.computeCIFsMeans(times=times)
+        return answer
+
+    def computeExpectedCIFs(self, times):
+        answer = self._eLL.computeExpectedCIFs(times=times)
+        return answer
+
+    def computeEmbeddingMeansAndVarsAtTimes(self, times):
+        answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
         return answer
 
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):

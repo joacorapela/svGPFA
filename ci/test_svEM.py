@@ -117,12 +117,10 @@ def test_eStep_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._eStep(model=svlb, maxIter=1500, tol=1e-3, lr=1e-3,
-                      lineSearchFn="strong_wolfe", verbose=True,
-                      out=sys.stdout, nIterDisplay=1, logLock=None,
-                      logStream=logStream, logStreamFN=None)
+    optimParams = {"max_iter": 100, "line_search_fn": "strong_wolfe"}
+    maxRes = svEM._eStep(model=svlb, optimParams=optimParams)
 
-    assert(res["lowerBound"]-(-nLowerBound)>0)
+    assert(maxRes["lowerBound"]-(-nLowerBound)>0)
 
     # pdb.set_trace()
 
@@ -173,9 +171,9 @@ def test_eStep_pointProcess():
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
-#     res = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
+#     maxRes = svEM._SparseVariationalEM__eStep(maxIter=1000, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=100)
 # 
-#     assert(res["lowerBound"]-(-nLowerBound)>0)
+#     assert(maxRes["lowerBound"]-(-nLowerBound)>0)
 # 
 #     # pdb.set_trace()
 
@@ -266,11 +264,10 @@ def test_mStepModelParams_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepEmbedding(model=svlb, maxIter=3000, tol=1e-6, lr=1e-1,
-                               lineSearchFn="strong_wolfe", verbose=True,
-                               out=sys.stdout, nIterDisplay=1, logLock=None,
-                               logStream=logStream, logStreamFN=None)
-    assert(res["lowerBound"]>-nLowerBound)
+    optimParams = {"max_iter": 3000, "line_search_fn": "strong_wolfe"}
+    maxRes = svEM._mStepEmbedding(model=svlb, optimParams=optimParams)
+
+    assert(maxRes["lowerBound"]>-nLowerBound)
 
     # pdb.set_trace()
 
@@ -362,12 +359,9 @@ def test_mStepKernelParams_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepKernels(model=svlb, maxIter=50, tol=1e-3, lr=1e-3,
-                             lineSearchFn="strong_wolfe", verbose=True,
-                             out=sys.stdout, nIterDisplay=1, logLock=None,
-                             logStream=logStream, logStreamFN=None)
-
-    assert(res["lowerBound"]>(-nLowerBound))
+    optimParams = {"max_iter": 200, "line_search_fn": "strong_wolfe"}
+    maxRes = svEM._mStepKernels(model=svlb, optimParams=optimParams)
+    assert(maxRes["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
 
@@ -416,9 +410,9 @@ def test_mStepKernelParams_pointProcess():
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     svEM = SparseVariationalEM(lowerBound=svlb, eLL=eLL, kernelsMatricesStore=kernelsMatricesStore)
-#     res = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
+#     maxRes = svEM._SparseVariationalEM__mStepKernelParams(maxIter=50, tol=1e-3, lr=1e-3, verbose=True, nIterDisplay=10)
 # 
-#     assert(res["lowerBound"]>(-nLowerBound))
+#     assert(maxRes["lowerBound"]>(-nLowerBound))
 # 
 #     # pdb.set_trace()
 
@@ -510,12 +504,9 @@ def test_mStepIndPoints_pointProcess():
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
 
-    res = svEM._mStepIndPointsLocs(model=svlb, maxIter=10, tol=1e-3, lr=1e-3,
-                               lineSearchFn="strong_wolfe", verbose=True,
-                               out=sys.stdout, nIterDisplay=1, logLock=None,
-                               logStream=logStream, logStreamFN=None)
-
-    assert(res["lowerBound"]>(-nLowerBound))
+    optimParams = {"max_iter": 25, "line_search_fn": "strong_wolfe"}
+    maxRes = svEM._mStepIndPointsLocs(model=svlb, optimParams=optimParams)
+    assert(maxRes["lowerBound"]>(-nLowerBound))
 
     # pdb.set_trace()
 
@@ -523,10 +514,6 @@ def test_maximize_pointProcess():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
-    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
-    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
-    # yNonStackedFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/YNonStacked.mat")
-    # dataFilename = os.path.expanduser("~/tmp/svGPFA/ci/data/variationalEM.mat")
 
     mat = loadmat(dataFilename)
     nLatents = len(mat['Z0'])
@@ -603,72 +590,49 @@ def test_maximize_pointProcess():
                      "svEmbedding": qHParams0}
     quadParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
-    '''
-    optimParams = {"emMaxNIter":20, 
+
+    optimParams = {"em_max_iter":4,
                    #
-                   "eStepMaxNIter":100,
-                   "eStepTol":1e-3,
-                   "eStepLR":1e-3,
-                   "eStepNIterDisplay":10,
+                   "estep_estimate": True,
+                   "estep_optim_params": {
+                       "max_iter": 20,
+                       "line_search_fn": "strong_wolfe"
+                   },
                    #
-                   "mStepModelParamsMaxNIter":100,
-                   "mStepModelParamsTol":1e-3,
-                   "mStepModelParamsLR":1e-3,
-                   "mStepModelParamsNIterDisplay":10,
+                   "mstep_embedding_estimate": True,
+                   "mstep_embedding_optim_params": {
+                       "max_iter": 20,
+                       "line_search_fn": "strong_wolfe"
+                   },
                    #
-                   "mStepKernelParamsMaxNIter":100, 
-                   "mStepKernelParamsTol":1e-3,
-                   "mStepKernelParamsLR":1e-5,
-                   "mStepKernelParamsNIterDisplay":10,
+                   "mstep_kernels_estimate": True,
+                   "mstep_kernels_optim_params": {
+                       "max_iter": 20,
+                       "line_search_fn": "strong_wolfe"
+                   },
                    #
-                   "mStepIndPointsMaxNIter":100,
-                   "mStepIndPointsParamsTol":1e-3,
-                   "mStepIndPointsLR":1e-3, 
-                   "mStepIndPointsNIterDisplay":10}
-    '''
-    optimParams = {"emMaxIter":3,
-                   #
-                   "eStepEstimate": True,
-                   "eStepMaxIter":20,
-                   "eStepTol":1e-2,
-                   "eStepLR":1e-2,
-                   "eStepLineSearchFn": "strong_wolfe",
-                   "eStepNIterDisplay":1,
-                   #
-                   "mStepEmbeddingEstimate": True,
-                   "mStepEmbeddingMaxIter":20,
-                   "mStepEmbeddingTol":1e-2,
-                   "mStepEmbeddingLR":1e-3,
-                   "mStepEmbeddingLineSearchFn": "strong_wolfe",
-                   "mStepEmbeddingNIterDisplay":1,
-                   #
-                   "mStepKernelsEstimate": True,
-                   "mStepKernelsMaxIter":20,
-                   "mStepKernelsTol":1e-2,
-                   "mStepKernelsLR":1e-4,
-                   "mStepKernelsLineSearchFn": "strong_wolfe",
-                   "mStepKernelsNIterDisplay":1,
-                   #
-                   "mStepIndPointsEstimate": True,
-                   "mStepIndPointsMaxIter":20,
-                   "mStepIndPointsTol":1e-2,
-                   "mStepIndPointsLR":1e-3,
-                   "mStepIndPointsLineSearchFn": "strong_wolfe",
-                   "mStepIndPointsNIterDisplay":1,
+                   "mstep_indpointslocs_estimate": True,
+                   "mstep_indpointslocs_optim_params": {
+                       "max_iter": 20,
+                       "line_search_fn": "strong_wolfe"
+                   },
                    #
                    "verbose": True}
-    lowerBoundHist, elapsedTimeHist = svEM.maximize(
-        model=svlb, measurements=YNonStacked,
-        initialParams=initialParams, quadParams=quadParams,
-        optimParams=optimParams,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, out=sys.stdout)
+    svlb.setInitialParamsAndData(
+        measurements=YNonStacked,
+        initialParams=initialParams,
+        quadParams=quadParams,
+        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    lowerBoundHist, _, _, _ = svEM.maximize(model=svlb, optimParams=optimParams)
     assert(lowerBoundHist[-1]>leasLowerBound)
+
+    # pdb.set_trace()
 
 if __name__=='__main__':
     # test_eStep_pointProcess() # passed
-    ##  test_eStep_poisson() # not tested
-    # test_mStepModelParams_pointProcess() # passed
-    test_mStepKernelParams_pointProcess() # passed
+    # # test_eStep_poisson() # not tested
+    test_mStepModelParams_pointProcess() # passed
+    # test_mStepKernelParams_pointProcess() # passed
     # test_mStepIndPoints_pointProcess() # passed
 
     # t0 = time.perf_counter()

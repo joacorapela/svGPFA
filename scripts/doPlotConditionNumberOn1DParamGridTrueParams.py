@@ -118,7 +118,6 @@ def main(argv):
     model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     model.buildKernelsMatrices()
 
-    refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
     paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
     conditionNumbers = np.empty(len(paramValues))
