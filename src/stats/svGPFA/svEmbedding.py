@@ -73,6 +73,7 @@ class LinearSVEmbedding(SVEmbedding):
 class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
     def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
+        # qHMu, qHVar \in nTrials x nQuad x nNeurons
         qHMu = torch.matmul(means, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
         qHVar = torch.matmul(vars, (torch.t(self._C))**2)
         return qHMu, qHVar
@@ -85,7 +86,7 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
         qHMu = torch.matmul(qKMu, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
         return qHMu
 
-    def computeMeansAndVars(self, times):
+    def computeMeansAndVarsAtTimes(self, times):
         qKMu, qKVar = self._svPosteriorOnLatents.computeMeansAndVarsAtTimes(times=times)
         answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
         return answer
