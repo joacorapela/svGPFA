@@ -2,13 +2,12 @@ import sys
 import os
 import pdb
 import random
-import scipy.io
 import numpy as np
 import torch
 import pickle
 import argparse
 import configparser
-import scipy.io
+
 sys.path.append("../src")
 import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
@@ -36,7 +35,7 @@ def main(argv):
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
-    optimMethod = optimParamsConfig["method"]
+    optimMethod = optimParamsConfig["em_method"]
     optimParams = {}
     optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
     steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
@@ -70,32 +69,33 @@ def main(argv):
 
     randomEmbedding = estInitConfig["control_variables"]["randomEmbedding"].lower()=="true"
     if randomEmbedding:
-        C0 = torch.rand(nNeurons, nLatents, dtype=torch.double)-0.5*2
-        d0 = torch.rand(nNeurons, 1, dtype=torch.double)-0.5*2
+        C0 = torch.rand(nNeurons, nLatents, dtype=torch.double).contiguous()
+        d0 = torch.rand(nNeurons, 1, dtype=torch.double).contiguous()
     else:
         CFilename = estInitConfig["embedding_params"]["C_filename"]
         dFilename = estInitConfig["embedding_params"]["d_filename"]
         C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=CFilename, dFilename=dFilename)
         initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
-        C0 = C + torch.randn(C.shape)*initCondEmbeddingSTD
-        d0 = d + torch.randn(d.shape)*initCondEmbeddingSTD
+        C0 = (C + torch.randn(C.shape)*initCondEmbeddingSTD).contiguous()
+        d0 = (d + torch.randn(d.shape)*initCondEmbeddingSTD).contiguous()
 
     legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
-    kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
-    kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
+    # kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
+    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
     kernelsScaledParams0 = utils.svGPFA.initUtils.getKernelsScaledParams0(kernels=kernels, noiseSTD=0.0)
     Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
 
-    indPointsMeans = utils.svGPFA.configUtils.getVariationalMean0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
-    # patch to acommodate Lea's equal number of inducing points across trials
-    qMu0 = [[] for k in range(nLatents)]
-    for k in range(nLatents):
-        qMu0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
-        for r in range(nTrials):
-            qMu0[k][r,:,:] = indPointsMeans[r][k]
-    # end patch
+    qMu0 = utils.svGPFA.configUtils.getVariationalMean0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
+#     indPointsMeans = utils.svGPFA.configUtils.getVariationalMean0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
+#     # patch to acommodate Lea's equal number of inducing points across trials
+#     qMu0 = [[] for k in range(nLatents)]
+#     for k in range(nLatents):
+#         qMu0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
+#         for r in range(nTrials):
+#             qMu0[k][r,:,:] = indPointsMeans[k][r]
+#     # end patch
 
     qSigma0 = utils.svGPFA.configUtils.getVariationalCov0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
