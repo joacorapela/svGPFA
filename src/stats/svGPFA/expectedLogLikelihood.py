@@ -52,6 +52,9 @@ class ExpectedLogLikelihood(ABC):
     def getSVEmbeddingParams(self):
         return self._svEmbeddingAllTimes.getParams()
 
+    def computeEmbeddingsMeansAndVarsAtTimes(self, times):
+        return self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times)
+
     def getIndPointsLocs(self):
         return self._svEmbeddingAllTimes.getIndPointsLocs()
 
@@ -105,7 +108,7 @@ class PointProcessELL(ExpectedLogLikelihood):
         answer = [self._linkFunction(h[r]) for r in range(nTrials)]
         return answer
 
-    def computeMeanCIFs(self, times):
+    def computeCIFsMeans(self, times):
         # h \in nTrials x times x nNeurons
         h = self._svEmbeddingAllTimes.computeMeans(times=times)
         nTrials = h.shape[0]
@@ -197,7 +200,7 @@ class PointProcessELLExpLink(PointProcessELL):
         # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
         # return answer
 
-        eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
+        eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times=times)
         nTrials = eMean.shape[0]
         nNeurons = eMean.shape[2]
         answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
