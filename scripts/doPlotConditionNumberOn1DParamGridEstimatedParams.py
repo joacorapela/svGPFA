@@ -58,15 +58,14 @@ def main(argv):
     model = modelRes["model"]
 
     indPointsLocsKMSRegEpsilon = model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._indPointsLocsKMS._epsilon
-    refParam = lowerBoundVsOneParamUtils.getReferenceParam(paramType=paramType, model=model, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
     paramUpdateFun = lowerBoundVsOneParamUtils.getParamUpdateFun(paramType=paramType)
     paramValues = np.arange(paramValueStart, paramValueEnd, paramValueStep)
     conditionNumbers = np.empty(len(paramValues))
     for i in range(len(paramValues)):
-        paramUpdateFun(model=model, paramValue=paramValues[i], trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
+        paramUpdateFun(model=model, paramValue=paramValues[i], trial=None, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
         Kzz = model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._indPointsLocsKMS._Kzz
         eValues, _ = torch.eig(Kzz[0][trial,:,:])
-        conditionNumbers[i] = eValues[0,0]/eValues[-1,0]
+        conditionNumbers[i] = eValues[:,0].max()/eValues[:,0].min()
 
     title = lowerBoundVsOneParamUtils.getParamTitle(paramType=paramType, trial=trial, latent=latent, neuron=neuron, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     figFilenamePattern = condNumberVsOneParamUtils.getFigFilenamePattern(prefixNumber=estResNumber, descriptor="estimatedParam", paramType=paramType, trial=trial, latent=latent, neuron=neuron, indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon, kernelParamIndex=kernelParamIndex, indPointIndex=indPointIndex, indPointIndex2=indPointIndex2)
