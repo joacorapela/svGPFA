@@ -43,38 +43,28 @@ def main(argv):
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     tTimes = simRes["times"]
-    # tLatentsSamples[r], tLatentsMeans[r], tLatentsSTDs[r] \in nLatents x nSamples
+    # tLatentsSamples[r], tLatentsMeans[r], tLatentsVars[r] \in nLatents x nSamples
     tLatentsSamples = simRes["latents"]
     tLatentsMeans = simRes["latentsMeans"]
     tLatentsSTDs = simRes["latentsSTDs"]
-
-    with open(modelSaveFilename, "rb") as f: estResults = pickle.load(f)
-    model = estResults["model"]
-    eC, ed = model.getSVEmbeddingParams()
-    with torch.no_grad():
-        # testMuK, testVarK \in nTrial x nSamples x nLatents
-        muK, varK = model.predictLatents(newTimes=tTimes[0])
-    eTimes = tTimes
-    # eLatentsMeans[r], eLatentsSTDs[r] \in nLatents x nSamples
-    eLatentsMeans = [muK[r,:,:].transpose(0, 1) for r in range(nTrials)]
-    eLatentsSTDs = [varK[r,:,:].sqrt().transpose(0, 1) for r in range(nTrials)]
 
     # tEmbeddingSamples[r], tEmbeddingMeans[r], tEmbeddingSTDs \in nNeurons x nSamples
     tEmbeddingSamples = [torch.matmul(tC, tLatentsSamples[r])+td for r in range(nTrials)]
     tEmbeddingMeans = [torch.matmul(tC, tLatentsMeans[r])+td for r in range(nTrials)]
     tEmbeddingSTDs = [torch.matmul(tC, tLatentsSTDs[r]) for r in range(nTrials)]
 
-    # eEmbeddingMeans[r], eEmbeddingSTDs \in nNeurons x nSamples
-    eEmbeddingMeans = [torch.matmul(eC, eLatentsMeans[r]) for r in range(nTrials)]
-    eEmbeddingSTDs = [torch.matmul(eC, eLatentsSTDs[r]) for r in range(nTrials)]
+    eTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), tTimes[0]), dim=2)
+    with open(modelSaveFilename, "rb") as f: estResults = pickle.load(f)
+    model = estResults["model"]
+    eEmbeddingMeans, eEmbeddingVars = model.computeEmbeddingMeansAndVarsAtTimes(times=eTimes)
 
     tSamplesToPlot = tEmbeddingSamples[trialToPlot][neuronToPlot,:]
     tMeansToPlot = tEmbeddingMeans[trialToPlot][neuronToPlot,:]
     tSTDsToPlot = tEmbeddingSTDs[trialToPlot][neuronToPlot,:]
-    eMeansToPlot = eEmbeddingMeans[trialToPlot][neuronToPlot,:]
-    eSTDsToPlot = eEmbeddingSTDs[trialToPlot][neuronToPlot,:]
+    eMeansToPlot = eEmbeddingMeans[trialToPlot,:,neuronToPlot]
+    eSTDsToPlot = eEmbeddingVars[trialToPlot,:,neuronToPlot].sqrt()
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbedding(tTimes=tTimes[0], tSamples=tSamplesToPlot, tMeans=tMeansToPlot, tSTDs=tSTDsToPlot, eTimes=eTimes[0], eMeans=eMeansToPlot, eSTDs=eSTDsToPlot, title=title)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbedding(tTimes=tTimes[trialToPlot], tSamples=tSamplesToPlot, tMeans=tMeansToPlot, tSTDs=tSTDsToPlot, eTimes=eTimes[trialToPlot,:,0], eMeans=eMeansToPlot, eSTDs=eSTDsToPlot, title=title)
 
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
