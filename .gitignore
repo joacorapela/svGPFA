@@ -40,3 +40,4 @@ scripts/doEstimateSVGPFAPythonSimulationChol_021621.py
 scripts/doSearchBug?.py
 slurmOutputs/*
 slurmScripts/*
+gui/doRunGUI.log
