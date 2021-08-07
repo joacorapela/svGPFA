@@ -32,9 +32,10 @@ src/stats/gaussianProcesses/kernels.py
 old/
 gui/guiUtils-debug.py
 scripts/data/*
-!scripts/data/00000005_estimation_metaData.ini
+!scripts/data/00000464_estimation_metaData.ini
 scripts/results/*
-!scripts/results/96784468_*
+!scripts/results/96652136_simulation_metaData.ini
+!scripts/results/96652136_simRes.pickle
 scripts/figures/
 scripts/notes/
 scripts/doEstimateSVGPFAPythonSimulationChol_021621.py
