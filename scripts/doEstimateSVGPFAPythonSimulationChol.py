@@ -2,19 +2,15 @@ import sys
 import os
 import pdb
 import random
-import numpy as np
 import torch
 import pickle
 import argparse
 import configparser
 
 sys.path.append("../src")
-import stats.kernels
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
-import myMath.utils
 import utils.svGPFA.configUtils
-import stats.pointProcess.tests
 import utils.svGPFA.miscUtils
 import utils.svGPFA.initUtils
 
@@ -101,7 +97,7 @@ def main(argv):
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
+    kmsParams0 = {"kernelsParams0": kernelsScaledParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
                  "kernelsMatricesStore": kmsParams0}
@@ -132,7 +128,7 @@ def main(argv):
         kernelsParams0=kernelsScaledParams0,
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
-        trialsLengths=np.array(trialsLengths).reshape(-1,1),
+        trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
         emMaxIter=optimParams["em_max_iter"],
         eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
         mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
