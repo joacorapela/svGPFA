@@ -91,7 +91,7 @@ def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{
         qSigma0[k][0,:,:] = qSigma0k0
         for r in range(1, nTrials):
             qSigma0Filename = config["variational_params"][keyNamePattern.format(k, r)]
-            qSigma0kr = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).values())
+            qSigma0kr = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).values)
             qSigma0[k][r,:,:] = qSigma0kr
     return qSigma0
 
