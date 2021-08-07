@@ -33,6 +33,9 @@ old/
 gui/guiUtils-debug.py
 scripts/data/*
 !scripts/data/00000464_estimation_metaData.ini
+!scripts/data/00000096_simulation_metaData.ini
+!scripts/data/C_Gaussian_means_0.00_0.00_stds_0.30_0.30_100neurons.csv
+!scripts/data/d_Gaussian_mean_0.00_std_0.3_100neurons.csv
 scripts/results/*
 !scripts/results/96652136_simulation_metaData.ini
 !scripts/results/96652136_simRes.pickle
