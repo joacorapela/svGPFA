@@ -26,11 +26,14 @@ class Kernel(ABC):
 
 class ExponentialQuadraticKernel(Kernel):
 
-    def __init__(self, scale, dtype=torch.double):
+    def __init__(self, scale, lengthscaleScale=1.0, dtype=torch.double):
         self._scale = torch.tensor(scale, dtype=dtype)
+        self._scale = torch.tensor(scale, dtype=dtype)
+        self._lengthscaleScale = lengthscaleScale
 
     def buildKernelMatrix(self, X1, X2=None):
         scale, lengthscale = self._getAllParams()
+        lengthscale = lengthscale/self._lengthscaleScale
 
         if X2 is None:
             X2 = X1
@@ -50,6 +53,10 @@ class ExponentialQuadraticKernel(Kernel):
         scale = self._scale
         lengthscale = self._params[0]
         return scale, lengthscale
+
+    def getScaledParams(self):
+        scaledParams = torch.tensor([self._params[0]/self._lengthscaleScale])
+        return scaledParams
 
     def getNamedParams(self):
         scale, lengthscale = self._getAllParams()
