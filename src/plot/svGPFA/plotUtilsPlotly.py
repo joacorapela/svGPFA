@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.graph_objs as go
 import plotly.subplots
 import plotly
-import plotly.io as pio
+# import plotly.io as pio
 import plotly.express as px
 
 # spike rates and times
@@ -140,7 +140,7 @@ def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
             "type": "scatter",
             "name": "estimated d",
             "x": neuronIndices,
-            "y": estimatedD[:,0],
+            "y": estimatedD,
             "line": {"dash": linestyleEstimated},
             # "marker_symbol": marker,
         },
@@ -160,7 +160,7 @@ def getSimulatedEmbeddingPlot(times, samples, means, stds, title,
                               ylabel="Embedding"):
     # tSamples[r], tMeans[r], tSTDs[r],
     # eMean[r], eSTDs[r] \in nNeurons x nSamples
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     #
     ci = 1.96*stds
     x = times
@@ -224,7 +224,7 @@ def getPlotTrueAndEstimatedEmbedding(tTimes, tSamples, tMeans, tSTDs,
                                      title=""):
     # tSamples[r], tMeans[r], tSTDs[r],
     # eMean[r], eSTDs[r] \in nNeurons x nSamples
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     #
     eCI = 1.96*eSTDs
     xE = eTimes
@@ -670,7 +670,7 @@ def getPlotTruePythonAndMatlabLatents(tTimes, tLatents,
                                       trialToPlot=0,
                                       xlabel="Time (sec)",
                                       ylabelPattern="Latent {:d}"):
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     nLatents = mMuK.shape[2]
     fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
     # titles = ["Trial {:d}".format(trialToPlot)] + ["" for i in range(nLatents)]
@@ -786,7 +786,7 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
     eLatentsSTDs = eLatentsSTDs.detach()
     eIndPointsLocs = [item.detach() for item in eIndPointsLocs]
 
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     nLatents = eLatentsMeans.shape[2]
     fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
     title = ylabelPattern.format(trialToPlot)
@@ -941,7 +941,7 @@ def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     xlabel="Time (sec)",
     ylabel="Latent Value"):
 
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     fig = go.Figure()
 
     tCI = 1.96*tLatentsSTDs
@@ -1374,7 +1374,7 @@ def getPlotTruePythonAndMatlabCIFs(tTimes, tCIF, tLabel,
                                    ylabel="CIF",
                                    title=""
                                    ):
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     figDic = {
         "data": [],
         "layout": {
@@ -1417,7 +1417,7 @@ def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel,
                                      eMeanTimes=None, eMeanCIF=None, eMeanLabel=None,
                                      ePosteriorMeanTimes=None, ePosteriorMeanCIF=None, ePosteriorMeanLabel=None,
                                      xlabel="Time (sec)", ylabel="CIF", title=""):
-    pio.renderers.default = "browser"
+    # pio.renderers.default = "browser"
     figDic = {
         "data": [],
         "layout": {
@@ -1481,7 +1481,10 @@ def getPlotCIF(times, values, title="", xlabel="Time (sec)", ylabel="Conditional
     return fig
 
 # Lower bound
-def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber="Iteration Number", xlabelElapsedTime="Elapsed Time (sec)", ylabel="Lower Bound", marker="cross", linestyle="solid", figFilename=None):
+def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None,
+                          xlabelIterNumber="Iteration Number",
+                          xlabelElapsedTime="Elapsed Time (sec)", 
+                          ylabel="Lower Bound", marker="cross", linestyle="solid"):
     if elapsedTimeHist is None:
         trace = go.Scatter(
             y=lowerBoundHist,
@@ -1504,7 +1507,7 @@ def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None, xlabelIterNumber
     fig = go.Figure()
     fig.add_trace(trace)
     fig.update_xaxes(title_text=xlabel)
-    fig.update_yaxes(title_text="Lower Bound")
+    fig.update_yaxes(title_text=ylabel)
     return fig
 
 def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParams, title, yMin, yMax, lowerBoundLineColor, refParamsLineColors, percMargin=0.1, xlab="Parameter Value", ylab="Lower Bound"):
