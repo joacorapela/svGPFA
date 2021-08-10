@@ -28,7 +28,7 @@ def main(argv):
     parser.add_argument("--trialToPlot", help="trial to plot", type=int, default=0)
     parser.add_argument("--neuronToPlot", help="neuron to plot", type=int, default=0)
     parser.add_argument("--dtCIF", help="neuron to plot", type=float, default=1e-3)
-    parser.add_argument("--ksTestGamma", help="neuron to plot", type=int, default=10)
+    parser.add_argument("--ksTestGamma", help="gamma value for KS test", type=int, default=10)
     parser.add_argument("--nTestPoints", help="number of test points where to plot latents", type=int, default=2000)
     args = parser.parse_args()
 
