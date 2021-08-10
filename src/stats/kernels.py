@@ -28,7 +28,6 @@ class ExponentialQuadraticKernel(Kernel):
 
     def __init__(self, scale, lengthscaleScale=1.0, dtype=torch.double):
         self._scale = torch.tensor(scale, dtype=dtype)
-        self._scale = torch.tensor(scale, dtype=dtype)
         self._lengthscaleScale = lengthscaleScale
 
     def buildKernelMatrix(self, X1, X2=None):
