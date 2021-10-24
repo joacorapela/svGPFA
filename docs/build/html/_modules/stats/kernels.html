@@ -184,21 +184,15 @@
 
 <div class="viewcode-block" id="ExponentialQuadraticKernel"><a class="viewcode-back" href="../../stats.html#stats.kernels.ExponentialQuadraticKernel">[docs]</a><span class="k">class</span> <span class="nc">ExponentialQuadraticKernel</span><span class="p">(</span><span class="n">Kernel</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lengthScale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)):</span>
-        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="n">lengthScale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">lengthScale</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscaleScale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span> <span class="o">=</span> <span class="n">lengthscaleScale</span>
 
 <div class="viewcode-block" id="ExponentialQuadraticKernel.buildKernelMatrix"><a class="viewcode-back" href="../../stats.html#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">buildKernelMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_lengtscaleScale&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span>
 
         <span class="k">if</span> <span class="n">X2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">X2</span> <span class="o">=</span> <span class="n">X1</span>
@@ -206,60 +200,38 @@
             <span class="n">distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">X1</span><span class="o">-</span><span class="n">X2</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">X1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">X2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
-        <span class="n">covMatrix</span> <span class="o">=</span> <span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="o">*</span><span class="n">distance</span><span class="o">/</span><span class="n">lengthScale</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">covMatrix</span> <span class="o">=</span> <span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="o">*</span><span class="n">distance</span><span class="o">/</span><span class="n">lengthscale</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">covMatrix</span></div>
 
 <div class="viewcode-block" id="ExponentialQuadraticKernel.buildKernelMatrixDiag"><a class="viewcode-back" href="../../stats.html#stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">[docs]</a>    <span class="k">def</span> <span class="nf">buildKernelMatrixDiag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
         <span class="n">covMatrixDiag</span> <span class="o">=</span> <span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">covMatrixDiag</span></div>
 
     <span class="k">def</span> <span class="nf">_getAllParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScale</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scale and lengthScale cannot be both fixed&quot;</span><span class="p">)</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="n">lengthscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span>
 
-        <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span>
+<div class="viewcode-block" id="ExponentialQuadraticKernel.getScaledParams"><a class="viewcode-back" href="../../stats.html#stats.kernels.ExponentialQuadraticKernel.getScaledParams">[docs]</a>    <span class="k">def</span> <span class="nf">getScaledParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">scaledParams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">scaledParams</span></div>
 
 <div class="viewcode-block" id="ExponentialQuadraticKernel.getNamedParams"><a class="viewcode-back" href="../../stats.html#stats.kernels.ExponentialQuadraticKernel.getNamedParams">[docs]</a>    <span class="k">def</span> <span class="nf">getNamedParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
-        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s2">&quot;lengthScale&quot;</span><span class="p">:</span> <span class="n">lengthScale</span><span class="p">}</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s2">&quot;lengthscale&quot;</span><span class="p">:</span> <span class="n">lengthscale</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">answer</span></div></div>
 
 <div class="viewcode-block" id="PeriodicKernel"><a class="viewcode-back" href="../../stats.html#stats.kernels.PeriodicKernel">[docs]</a><span class="k">class</span> <span class="nc">PeriodicKernel</span><span class="p">(</span><span class="n">Kernel</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lengthScale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PeriodicKernel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="c1"># paramIsNone = torch.tensor([scale is None, lengthScale is None, period is None])</span>
-        <span class="c1"># self._params = torch.nn.Parameter(torch.zeros(torch.sum(paramIsNone), dtype=dtype, device=device))</span>
-
-        <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="n">lengthScale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">lengthScale</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="n">period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_period</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscaleScale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">periodScale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span> <span class="o">=</span> <span class="n">lengthscaleScale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_periodScale</span> <span class="o">=</span> <span class="n">periodScale</span>
 
 <div class="viewcode-block" id="PeriodicKernel.buildKernelMatrix"><a class="viewcode-back" href="../../stats.html#stats.kernels.PeriodicKernel.buildKernelMatrix">[docs]</a>    <span class="k">def</span> <span class="nf">buildKernelMatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X1</span><span class="p">,</span> <span class="n">X2</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">lengthscale</span> <span class="o">=</span> <span class="n">lengthscale</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span>
+        <span class="n">period</span> <span class="o">=</span> <span class="n">period</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_periodScale</span>
         <span class="k">if</span> <span class="n">X2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">X2</span> <span class="o">=</span> <span class="n">X1</span>
         <span class="k">if</span> <span class="n">X1</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
@@ -267,77 +239,30 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sDistance</span> <span class="o">=</span> <span class="n">X1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">X2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">rr</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">sDistance</span><span class="o">/</span><span class="n">period</span>
-        <span class="n">covMatrix</span> <span class="o">=</span> <span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">lengthScale</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">covMatrix</span> <span class="o">=</span> <span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">lengthscale</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">covMatrix</span></div>
 
 <div class="viewcode-block" id="PeriodicKernel.buildKernelMatrixDiag"><a class="viewcode-back" href="../../stats.html#stats.kernels.PeriodicKernel.buildKernelMatrixDiag">[docs]</a>    <span class="k">def</span> <span class="nf">buildKernelMatrixDiag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
-        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
         <span class="n">covMatrixDiag</span> <span class="o">=</span> <span class="n">scale</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">covMatrixDiag</span></div>
 
     <span class="k">def</span> <span class="nf">_getAllParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScale</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_period</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScale</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">period</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScaleFixed</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_periodFixed</span><span class="p">:</span>
-            <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">lengthScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lengthScale</span>
-            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_period</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scale and lengthScale cannot be both fixed&quot;</span><span class="p">)</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
+        <span class="n">lengthscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span><span class="p">,</span> <span class="n">period</span>
+        <span class="k">return</span> <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">,</span> <span class="n">period</span>
+
+<div class="viewcode-block" id="PeriodicKernel.getScaledParams"><a class="viewcode-back" href="../../stats.html#stats.kernels.PeriodicKernel.getScaledParams">[docs]</a>    <span class="k">def</span> <span class="nf">getScaledParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">scaledParams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_lengthscaleScale</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_periodScale</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">scaledParams</span></div>
 
 <div class="viewcode-block" id="PeriodicKernel.getNamedParams"><a class="viewcode-back" href="../../stats.html#stats.kernels.PeriodicKernel.getNamedParams">[docs]</a>    <span class="k">def</span> <span class="nf">getNamedParams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthScale</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
-        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s2">&quot;lengthScale&quot;</span><span class="p">:</span> <span class="n">lengthScale</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="n">period</span><span class="p">}</span>
+        <span class="n">scale</span><span class="p">,</span> <span class="n">lengthscale</span><span class="p">,</span> <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getAllParams</span><span class="p">()</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="n">scale</span><span class="p">,</span> <span class="s2">&quot;lengthscale&quot;</span><span class="p">:</span> <span class="n">lengthscale</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">:</span> <span class="n">period</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">answer</span></div></div>
-
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">class AddDiagKernel(Kernel):</span>
-<span class="sd">    def __init__(self, kernel, epsilon=1e-5):</span>
-<span class="sd">        self.__kernel = kernel</span>
-<span class="sd">        self.__epsilon = epsilon</span>
-
-<span class="sd">    def buildKernelMatrix(self, X1, X2=None):</span>
-<span class="sd">        covMatrix = self.__kernel.buildKernelMatrix(X1=X1, X2=X2)</span>
-<span class="sd">        covMatrixPlusDiag = (covMatrix +</span>
-<span class="sd">                             self.__epsilon*torch.eye(n=covMatrix.shape[0],</span>
-<span class="sd">                                                      dtype=X1.dtype,</span>
-<span class="sd">                                                      device=X.device))</span>
-<span class="sd">        return covMatrixPlusDiag</span>
-
-<span class="sd">    def buildKernelMatrixDiag(self, X):</span>
-<span class="sd">        return self.__kernel.buildKernelMatrixDiag(X=X)</span>
-
-<span class="sd">    def setParams(self, params):</span>
-<span class="sd">        self.__kernel.setParams(params)</span>
-
-<span class="sd">    def getParams(self):</span>
-<span class="sd">        params = self.__kernel.getParams()</span>
-<span class="sd">        return params</span>
-<span class="sd">&#39;&#39;&#39;</span>
 
 </pre></div>
 

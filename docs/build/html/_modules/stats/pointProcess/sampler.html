@@ -216,13 +216,13 @@
 <span class="sd">        :return: samples of the inhomogeneous point process with cif function cifFun.</span>
 <span class="sd">        :rtype: list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">cifTimes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">cifTimes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">while</span> <span class="n">i</span><span class="o">&lt;</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cifTimes</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">u</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>   <span class="c1"># z~exponential(1.0)</span>
-            <span class="n">anInt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">anInt</span> <span class="o">=</span> <span class="n">cifValues</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">dt</span>
             <span class="n">j</span> <span class="o">=</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
             <span class="k">while</span> <span class="n">j</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">cifTimes</span><span class="p">)</span> <span class="ow">and</span> <span class="n">anInt</span><span class="o">&lt;=</span><span class="n">z</span><span class="p">:</span>
                 <span class="n">anInt</span> <span class="o">+=</span> <span class="n">cifValues</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">dt</span>
@@ -230,8 +230,7 @@
             <span class="k">if</span> <span class="n">anInt</span><span class="o">&gt;</span><span class="n">z</span><span class="p">:</span>
                 <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cifTimes</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
             <span class="n">i</span> <span class="o">=</span> <span class="n">j</span>
-        <span class="n">answer</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="k">return</span> <span class="n">answer</span></div></div>
+        <span class="k">return</span> <span class="n">s</span></div></div>
 </pre></div>
 
            </div>

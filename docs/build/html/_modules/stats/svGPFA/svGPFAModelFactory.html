@@ -157,20 +157,21 @@
             
   <h1>Source code for stats.svGPFA.svGPFAModelFactory</h1><div class="highlight"><pre>
 <span></span>
-<span class="kn">from</span> <span class="nn">.kernelMatricesStore</span> <span class="k">import</span> <span class="n">IndPointsLocsKMS</span><span class="p">,</span> <span class="n">IndPointsLocsAndAllTimesKMS</span><span class="p">,</span>\
-                                <span class="n">IndPointsLocsAndAssocTimesKMS</span>
-<span class="kn">from</span> <span class="nn">.svPosteriorOnIndPoints</span> <span class="k">import</span> <span class="n">SVPosteriorOnIndPoints</span>
-<span class="kn">from</span> <span class="nn">.svPosteriorOnLatents</span> <span class="k">import</span> <span class="n">SVPosteriorOnLatentsAllTimes</span><span class="p">,</span>\
-                                 <span class="n">SVPosteriorOnLatentsAssocTimes</span>
-<span class="kn">from</span> <span class="nn">.svEmbedding</span> <span class="k">import</span> <span class="n">LinearSVEmbeddingAllTimes</span><span class="p">,</span> <span class="n">LinearSVEmbeddingAssocTimes</span>
-<span class="kn">from</span> <span class="nn">.expectedLogLikelihood</span> <span class="k">import</span> <span class="n">PointProcessELLExpLink</span>
-<span class="kn">from</span> <span class="nn">.klDivergence</span> <span class="k">import</span> <span class="n">KLDivergence</span>
-<span class="kn">from</span> <span class="nn">.svLowerBound</span> <span class="k">import</span> <span class="n">SVLowerBound</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.kernelsMatricesStore</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.svPosteriorOnIndPoints</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.svPosteriorOnLatents</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.svEmbedding</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.expectedLogLikelihood</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.klDivergence</span>
+<span class="kn">import</span> <span class="nn">stats.svGPFA.svLowerBound</span>
 
 <span class="c1">#:</span>
 <span class="n">PointProcess</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="c1">#:</span>
 <span class="n">Poisson</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="c1">#:</span>
+<span class="n">Gaussian</span> <span class="o">=</span> <span class="mi">2</span>
+
 
 <span class="c1">#:</span>
 <span class="n">LinearEmbedding</span> <span class="o">=</span> <span class="mi">100</span>
@@ -178,38 +179,38 @@
 <span class="c1">#:</span>
 <span class="n">ExponentialLink</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="c1">#:</span>
-<span class="n">OtherLink</span> <span class="o">=</span> <span class="mi">1001</span>
+<span class="n">NonExponentialLink</span> <span class="o">=</span> <span class="mi">1001</span>
 
 <div class="viewcode-block" id="SVGPFAModelFactory"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory">[docs]</a><span class="k">class</span> <span class="nc">SVGPFAModelFactory</span><span class="p">:</span>
 
 <div class="viewcode-block" id="SVGPFAModelFactory.buildModel"><a class="viewcode-back" href="../../../stats.svGPFA.html#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">buildModel</span><span class="p">(</span><span class="n">conditionalDist</span><span class="p">,</span> <span class="n">linkFunction</span><span class="p">,</span> <span class="n">embeddingType</span><span class="p">,</span> <span class="n">kernels</span><span class="p">,</span> <span class="n">indPointsLocsKMSEpsilon</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">buildModel</span><span class="p">(</span><span class="n">conditionalDist</span><span class="p">,</span> <span class="n">linkFunction</span><span class="p">,</span> <span class="n">embeddingType</span><span class="p">,</span> <span class="n">kernels</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">conditionalDist</span><span class="o">==</span><span class="n">PointProcess</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">embeddingType</span><span class="o">==</span><span class="n">LinearEmbedding</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">linkFunction</span><span class="o">==</span><span class="n">ExponentialLink</span><span class="p">:</span>
-                    <span class="n">qU</span> <span class="o">=</span> <span class="n">SVPosteriorOnIndPoints</span><span class="p">()</span>
-                    <span class="n">indPointsLocsKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsKMS</span><span class="p">(</span><span class="n">epsilon</span><span class="o">=</span><span class="n">indPointsLocsKMSEpsilon</span><span class="p">)</span>
-                    <span class="n">indPointsLocsAndAllTimesKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsAndAllTimesKMS</span><span class="p">()</span>
-                    <span class="n">indPointsLocsAndAssocTimesKMS</span> <span class="o">=</span> <span class="n">IndPointsLocsAndAssocTimesKMS</span><span class="p">()</span>
-                    <span class="n">qKAllTimes</span> <span class="o">=</span> <span class="n">SVPosteriorOnLatentsAllTimes</span><span class="p">(</span>
+                    <span class="n">qU</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">svPosteriorOnIndPoints</span><span class="o">.</span><span class="n">SVPosteriorOnIndPoints</span><span class="p">()</span>
+                    <span class="n">indPointsLocsKMS</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">kernelsMatricesStore</span><span class="o">.</span><span class="n">IndPointsLocsKMS</span><span class="p">()</span>
+                    <span class="n">indPointsLocsAndAllTimesKMS</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">kernelsMatricesStore</span><span class="o">.</span><span class="n">IndPointsLocsAndAllTimesKMS</span><span class="p">()</span>
+                    <span class="n">indPointsLocsAndAssocTimesKMS</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">kernelsMatricesStore</span><span class="o">.</span><span class="n">IndPointsLocsAndAssocTimesKMS</span><span class="p">()</span>
+                    <span class="n">qKAllTimes</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">svPosteriorOnLatents</span><span class="o">.</span><span class="n">SVPosteriorOnLatentsAllTimes</span><span class="p">(</span>
                         <span class="n">svPosteriorOnIndPoints</span><span class="o">=</span><span class="n">qU</span><span class="p">,</span>
                         <span class="n">indPointsLocsKMS</span><span class="o">=</span><span class="n">indPointsLocsKMS</span><span class="p">,</span>
                         <span class="n">indPointsLocsAndTimesKMS</span><span class="o">=</span><span class="n">indPointsLocsAndAllTimesKMS</span><span class="p">)</span>
-                    <span class="n">qKAssocTimes</span> <span class="o">=</span> <span class="n">SVPosteriorOnLatentsAssocTimes</span><span class="p">(</span>
+                    <span class="n">qKAssocTimes</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">svPosteriorOnLatents</span><span class="o">.</span><span class="n">SVPosteriorOnLatentsAssocTimes</span><span class="p">(</span>
                         <span class="n">svPosteriorOnIndPoints</span><span class="o">=</span><span class="n">qU</span><span class="p">,</span>
                         <span class="n">indPointsLocsKMS</span><span class="o">=</span><span class="n">indPointsLocsKMS</span><span class="p">,</span>
                         <span class="n">indPointsLocsAndTimesKMS</span><span class="o">=</span><span class="n">indPointsLocsAndAssocTimesKMS</span><span class="p">)</span>
-                    <span class="n">qHAllTimes</span> <span class="o">=</span> <span class="n">LinearSVEmbeddingAllTimes</span><span class="p">(</span>
+                    <span class="n">qHAllTimes</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">svEmbedding</span><span class="o">.</span><span class="n">LinearSVEmbeddingAllTimes</span><span class="p">(</span>
                         <span class="n">svPosteriorOnLatents</span><span class="o">=</span><span class="n">qKAllTimes</span><span class="p">)</span>
-                    <span class="n">qHAssocTimes</span> <span class="o">=</span> <span class="n">LinearSVEmbeddingAssocTimes</span><span class="p">(</span>
+                    <span class="n">qHAssocTimes</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">svEmbedding</span><span class="o">.</span><span class="n">LinearSVEmbeddingAssocTimes</span><span class="p">(</span>
                         <span class="n">svPosteriorOnLatents</span><span class="o">=</span><span class="n">qKAssocTimes</span><span class="p">)</span>
-                    <span class="n">eLL</span> <span class="o">=</span> <span class="n">PointProcessELLExpLink</span><span class="p">(</span>
+                    <span class="n">eLL</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">expectedLogLikelihood</span><span class="o">.</span><span class="n">PointProcessELLExpLink</span><span class="p">(</span>
                         <span class="n">svEmbeddingAllTimes</span><span class="o">=</span><span class="n">qHAllTimes</span><span class="p">,</span>
                         <span class="n">svEmbeddingAssocTimes</span><span class="o">=</span><span class="n">qHAssocTimes</span><span class="p">)</span>
-                    <span class="n">klDiv</span> <span class="o">=</span> <span class="n">KLDivergence</span><span class="p">(</span><span class="n">indPointsLocsKMS</span><span class="o">=</span><span class="n">indPointsLocsKMS</span><span class="p">,</span>
+                    <span class="n">klDiv</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">klDivergence</span><span class="o">.</span><span class="n">KLDivergence</span><span class="p">(</span><span class="n">indPointsLocsKMS</span><span class="o">=</span><span class="n">indPointsLocsKMS</span><span class="p">,</span>
                                          <span class="n">svPosteriorOnIndPoints</span><span class="o">=</span><span class="n">qU</span><span class="p">)</span>
-                    <span class="n">svlb</span> <span class="o">=</span> <span class="n">SVLowerBound</span><span class="p">(</span><span class="n">eLL</span><span class="o">=</span><span class="n">eLL</span><span class="p">,</span> <span class="n">klDiv</span><span class="o">=</span><span class="n">klDiv</span><span class="p">)</span>
+                    <span class="n">svlb</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">svLowerBound</span><span class="o">.</span><span class="n">SVLowerBound</span><span class="p">(</span><span class="n">eLL</span><span class="o">=</span><span class="n">eLL</span><span class="p">,</span> <span class="n">klDiv</span><span class="o">=</span><span class="n">klDiv</span><span class="p">)</span>
                     <span class="n">svlb</span><span class="o">.</span><span class="n">setKernels</span><span class="p">(</span><span class="n">kernels</span><span class="o">=</span><span class="n">kernels</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid linkFunction=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span>

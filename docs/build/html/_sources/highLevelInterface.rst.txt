@@ -45,6 +45,6 @@ and model parameters (e.g., latents).
 
 
 Please refer to the following `notebook
-<https://github.com/joacorapela/svGPFA/blob/master/ipynb/demoPointProcess.ipynb>`_
+<https://github.com/joacorapela/svGPFA/blob/master/ipynb/doEstimateAndPlot_jupyter.ipynb>`_
 for a full piece of code running svGPFA and plotting its estimates.
 

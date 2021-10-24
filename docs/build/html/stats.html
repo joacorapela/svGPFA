@@ -193,7 +193,7 @@
 <li class="toctree-l1"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.expectedLogLikelihood">stats.svGPFA.expectedLogLikelihood module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.kernelMatricesStore">stats.svGPFA.kernelMatricesStore module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#stats-svgpfa-kernelmatricesstore-module">stats.svGPFA.kernelMatricesStore module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.klDivergence">stats.svGPFA.klDivergence module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEM">stats.svGPFA.svEM module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEmbedding">stats.svGPFA.svEmbedding module</a></li>
@@ -201,7 +201,7 @@
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svLowerBound">stats.svGPFA.svLowerBound module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svPosteriorOnIndPoints">stats.svGPFA.svPosteriorOnIndPoints module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svPosteriorOnLatents">stats.svGPFA.svPosteriorOnLatents module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.utils">stats.svGPFA.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#stats-svgpfa-utils-module">stats.svGPFA.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA">Module contents</a></li>
 </ul>
 </li>
@@ -215,7 +215,7 @@
 <span id="stats-kernels-module"></span><h2>stats.kernels module<a class="headerlink" href="#module-stats.kernels" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="stats.kernels.ExponentialQuadraticKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">dtype=torch.double</em>, <em class="sig-param">device=torch.device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">ExponentialQuadraticKernel</code><span class="sig-paren">(</span><em class="sig-param">scale</em>, <em class="sig-param">lengthscaleScale=1.0</em>, <em class="sig-param">dtype=torch.double</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">
@@ -230,6 +230,11 @@
 <dl class="method">
 <dt id="stats.kernels.ExponentialQuadraticKernel.getNamedParams">
 <code class="sig-name descname">getNamedParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.getNamedParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.ExponentialQuadraticKernel.getScaledParams">
+<code class="sig-name descname">getScaledParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#ExponentialQuadraticKernel.getScaledParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.ExponentialQuadraticKernel.getScaledParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -267,7 +272,7 @@
 
 <dl class="class">
 <dt id="stats.kernels.PeriodicKernel">
-<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale=None</em>, <em class="sig-param">lengthScale=None</em>, <em class="sig-param">period=None</em>, <em class="sig-param">dtype=torch.double</em>, <em class="sig-param">device=torch.device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">stats.kernels.</code><code class="sig-name descname">PeriodicKernel</code><span class="sig-paren">(</span><em class="sig-param">scale</em>, <em class="sig-param">lengthscaleScale=1.0</em>, <em class="sig-param">periodScale=1.0</em>, <em class="sig-param">dtype=torch.double</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats.kernels.Kernel" title="stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.kernels.Kernel</span></code></a></p>
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel.buildKernelMatrix">
@@ -282,6 +287,11 @@
 <dl class="method">
 <dt id="stats.kernels.PeriodicKernel.getNamedParams">
 <code class="sig-name descname">getNamedParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.getNamedParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.kernels.PeriodicKernel.getScaledParams">
+<code class="sig-name descname">getScaledParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/kernels.html#PeriodicKernel.getScaledParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.kernels.PeriodicKernel.getScaledParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>

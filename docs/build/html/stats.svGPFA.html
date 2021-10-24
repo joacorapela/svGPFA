@@ -100,7 +100,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">stats.svGPFA package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.expectedLogLikelihood">stats.svGPFA.expectedLogLikelihood module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.kernelMatricesStore">stats.svGPFA.kernelMatricesStore module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats-svgpfa-kernelmatricesstore-module">stats.svGPFA.kernelMatricesStore module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.klDivergence">stats.svGPFA.klDivergence module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.svEM">stats.svGPFA.svEM module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.svEmbedding">stats.svGPFA.svEmbedding module</a></li>
@@ -108,7 +108,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.svLowerBound">stats.svGPFA.svLowerBound module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.svPosteriorOnIndPoints">stats.svGPFA.svPosteriorOnIndPoints module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.svPosteriorOnLatents">stats.svGPFA.svPosteriorOnLatents module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA.utils">stats.svGPFA.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#stats-svgpfa-utils-module">stats.svGPFA.utils module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-stats.svGPFA">Module contents</a></li>
 </ul>
 </li>
@@ -202,6 +202,11 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes">
+<code class="sig-name descname">computeEmbeddingsMeansAndVarsAtTimes</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats">
 <em class="property">abstract </em><code class="sig-name descname">computeSVPosteriorOnLatentsStats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -247,6 +252,11 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocsKMSRegEpsilon">
+<code class="sig-name descname">setIndPointsLocsKMSRegEpsilon</code><span class="sig-paren">(</span><em class="sig-param">indPointsLocsKMSRegEpsilon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setIndPointsLocsKMSRegEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocsKMSRegEpsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams">
 <em class="property">abstract </em><code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#ExpectedLogLikelihood.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -278,8 +288,8 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeMeanCIFs">
-<code class="sig-name descname">computeMeanCIFs</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.computeMeanCIFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeMeanCIFs" title="Permalink to this definition">¶</a></dt>
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeCIFsMeans">
+<code class="sig-name descname">computeCIFsMeans</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELL.computeCIFsMeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL.computeCIFsMeans" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -328,6 +338,11 @@
 <dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.expectedLogLikelihood.</code><code class="sig-name descname">PointProcessELLExpLink</code><span class="sig-paren">(</span><em class="sig-param">svEmbeddingAllTimes</em>, <em class="sig-param">svEmbeddingAssocTimes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLExpLink"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELL" title="stats.svGPFA.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.expectedLogLikelihood.PointProcessELL</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink.computeExpectedCIFs">
+<code class="sig-name descname">computeExpectedCIFs</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/expectedLogLikelihood.html#PointProcessELLExpLink.computeExpectedCIFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink.computeExpectedCIFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -400,128 +415,8 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-stats.svGPFA.kernelMatricesStore">
-<span id="stats-svgpfa-kernelmatricesstore-module"></span><h2>stats.svGPFA.kernelMatricesStore module<a class="headerlink" href="#module-stats.svGPFA.kernelMatricesStore" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS">
-<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">IndPointsLocsAndAllTimesKMS</code><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndAllTimesKMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS" title="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS</span></code></a></p>
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS.buildKernelsMatrices">
-<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndAllTimesKMS.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices">
-<code class="sig-name descname">buildKttKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAssocTimesKMS">
-<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">IndPointsLocsAndAssocTimesKMS</code><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndAssocTimesKMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAssocTimesKMS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS" title="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS</span></code></a></p>
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices">
-<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS">
-<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">IndPointsLocsAndTimesKMS</code><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndTimesKMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore" title="stats.svGPFA.kernelMatricesStore.KernelMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.kernelMatricesStore.KernelMatricesStore</span></code></a></p>
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKtt">
-<code class="sig-name descname">getKtt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndTimesKMS.getKtt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKtt" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKttDiag">
-<code class="sig-name descname">getKttDiag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndTimesKMS.getKttDiag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKttDiag" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKtz">
-<code class="sig-name descname">getKtz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndTimesKMS.getKtz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.getKtz" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.setTimes">
-<code class="sig-name descname">setTimes</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsAndTimesKMS.setTimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsAndTimesKMS.setTimes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS">
-<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">IndPointsLocsKMS</code><span class="sig-paren">(</span><em class="sig-param">epsilon=1e-05</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore" title="stats.svGPFA.kernelMatricesStore.KernelMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.kernelMatricesStore.KernelMatricesStore</span></code></a></p>
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.buildKernelsMatrices">
-<code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getEpsilon">
-<code class="sig-name descname">getEpsilon</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.getEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getEpsilon" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getKzz">
-<code class="sig-name descname">getKzz</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.getKzz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getKzz" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getKzzChol">
-<code class="sig-name descname">getKzzChol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#IndPointsLocsKMS.getKzzChol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.IndPointsLocsKMS.getKzzChol" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore">
-<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.kernelMatricesStore.</code><code class="sig-name descname">KernelMatricesStore</code><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.buildKernelsMatrices">
-<em class="property">abstract </em><code class="sig-name descname">buildKernelsMatrices</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.buildKernelsMatrices"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.getIndPointsLocs">
-<code class="sig-name descname">getIndPointsLocs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.getIndPointsLocs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.getKernels">
-<code class="sig-name descname">getKernels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.getKernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.getKernels" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.getKernelsParams">
-<code class="sig-name descname">getKernelsParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.getKernelsParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.getKernelsParams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setIndPointsLocs">
-<code class="sig-name descname">setIndPointsLocs</code><span class="sig-paren">(</span><em class="sig-param">indPointsLocs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.setIndPointsLocs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setInitialParams">
-<code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setInitialParams" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setKernels">
-<code class="sig-name descname">setKernels</code><span class="sig-paren">(</span><em class="sig-param">kernels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/kernelMatricesStore.html#KernelMatricesStore.setKernels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.kernelMatricesStore.KernelMatricesStore.setKernels" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<div class="section" id="stats-svgpfa-kernelmatricesstore-module">
+<h2>stats.svGPFA.kernelMatricesStore module<a class="headerlink" href="#stats-svgpfa-kernelmatricesstore-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-stats.svGPFA.klDivergence">
 <span id="stats-svgpfa-kldivergence-module"></span><h2>stats.svGPFA.klDivergence module<a class="headerlink" href="#module-stats.svGPFA.klDivergence" title="Permalink to this headline">¶</a></h2>
@@ -540,12 +435,34 @@
 <div class="section" id="module-stats.svGPFA.svEM">
 <span id="stats-svgpfa-svem-module"></span><h2>stats.svGPFA.svEM module<a class="headerlink" href="#module-stats.svGPFA.svEM" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="stats.svGPFA.svEM.ErrorTerminationInfo">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svEM.</code><code class="sig-name descname">ErrorTerminationInfo</code><span class="sig-paren">(</span><em class="sig-param">message</em>, <em class="sig-param">error</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEM.html#ErrorTerminationInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEM.ErrorTerminationInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#stats.svGPFA.svEM.TerminationInfo" title="stats.svGPFA.svEM.TerminationInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">stats.svGPFA.svEM.TerminationInfo</span></code></a></p>
+<dl class="method">
+<dt id="stats.svGPFA.svEM.ErrorTerminationInfo.error">
+<em class="property">property </em><code class="sig-name descname">error</code><a class="headerlink" href="#stats.svGPFA.svEM.ErrorTerminationInfo.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="stats.svGPFA.svEM.SVEM">
 <em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svEM.</code><code class="sig-name descname">SVEM</code><a class="reference internal" href="_modules/stats/svGPFA/svEM.html#SVEM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEM.SVEM" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svEM.SVEM.maximize">
-<code class="sig-name descname">maximize</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">measurements</em>, <em class="sig-param">initialParams</em>, <em class="sig-param">quadParams</em>, <em class="sig-param">optimParams</em>, <em class="sig-param">plotLatentsEstimates=True</em>, <em class="sig-param">latentFigFilenamePattern='/tmp/latentsIter{:03d}.png'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEM.html#SVEM.maximize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEM.SVEM.maximize" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">maximize</code><span class="sig-paren">(</span><em class="sig-param">model</em>, <em class="sig-param">optimParams</em>, <em class="sig-param">method='EM'</em>, <em class="sig-param">getIterationModelParamsFn=None</em>, <em class="sig-param">logLock=None</em>, <em class="sig-param">logStreamFN=None</em>, <em class="sig-param">lowerBoundLock=None</em>, <em class="sig-param">lowerBoundStreamFN=None</em>, <em class="sig-param">latentsTimes=None</em>, <em class="sig-param">latentsLock=None</em>, <em class="sig-param">latentsStreamFN=None</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">out=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em>, <em class="sig-param">savePartial=False</em>, <em class="sig-param">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEM.html#SVEM.maximize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEM.SVEM.maximize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="stats.svGPFA.svEM.TerminationInfo">
+<em class="property">class </em><code class="sig-prename descclassname">stats.svGPFA.svEM.</code><code class="sig-name descname">TerminationInfo</code><span class="sig-paren">(</span><em class="sig-param">message</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEM.html#TerminationInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEM.TerminationInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="stats.svGPFA.svEM.TerminationInfo.message">
+<em class="property">property </em><code class="sig-name descname">message</code><a class="headerlink" href="#stats.svGPFA.svEM.TerminationInfo.message" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -560,6 +477,11 @@
 <dl class="method">
 <dt id="stats.svGPFA.svEmbedding.LinearSVEmbedding.getParams">
 <code class="sig-name descname">getParams</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#LinearSVEmbedding.getParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.LinearSVEmbedding.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.svEmbedding.LinearSVEmbedding.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#LinearSVEmbedding.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.LinearSVEmbedding.sample" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -579,13 +501,18 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes">
+<code class="sig-name descname">computeMeansAndVarsAtTimes</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.predictLatents">
 <code class="sig-name descname">predictLatents</code><span class="sig-paren">(</span><em class="sig-param">newTimes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#LinearSVEmbeddingAllTimes.predictLatents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.predictLatents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.sample">
-<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#LinearSVEmbeddingAllTimes.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.sample" title="Permalink to this definition">¶</a></dt>
+<dt id="stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon">
+<code class="sig-name descname">setIndPointsLocsKMSRegEpsilon</code><span class="sig-paren">(</span><em class="sig-param">indPointsLocsKMSRegEpsilon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svEmbedding.html#LinearSVEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -671,13 +598,18 @@
 <dd></dd></dl>
 
 <dl class="data">
+<dt id="stats.svGPFA.svGPFAModelFactory.Gaussian">
+<code class="sig-prename descclassname">stats.svGPFA.svGPFAModelFactory.</code><code class="sig-name descname">Gaussian</code><em class="property"> = 2</em><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.Gaussian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="data">
 <dt id="stats.svGPFA.svGPFAModelFactory.LinearEmbedding">
 <code class="sig-prename descclassname">stats.svGPFA.svGPFAModelFactory.</code><code class="sig-name descname">LinearEmbedding</code><em class="property"> = 100</em><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.LinearEmbedding" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="data">
-<dt id="stats.svGPFA.svGPFAModelFactory.OtherLink">
-<code class="sig-prename descclassname">stats.svGPFA.svGPFAModelFactory.</code><code class="sig-name descname">OtherLink</code><em class="property"> = 1001</em><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.OtherLink" title="Permalink to this definition">¶</a></dt>
+<dt id="stats.svGPFA.svGPFAModelFactory.NonExponentialLink">
+<code class="sig-prename descclassname">stats.svGPFA.svGPFAModelFactory.</code><code class="sig-name descname">NonExponentialLink</code><em class="property"> = 1001</em><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.NonExponentialLink" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="data">
@@ -696,7 +628,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="method">
 <dt id="stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel">
-<em class="property">static </em><code class="sig-name descname">buildModel</code><span class="sig-paren">(</span><em class="sig-param">conditionalDist</em>, <em class="sig-param">linkFunction</em>, <em class="sig-param">embeddingType</em>, <em class="sig-param">kernels</em>, <em class="sig-param">indPointsLocsKMSEpsilon=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svGPFAModelFactory.html#SVGPFAModelFactory.buildModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">buildModel</code><span class="sig-paren">(</span><em class="sig-param">conditionalDist</em>, <em class="sig-param">linkFunction</em>, <em class="sig-param">embeddingType</em>, <em class="sig-param">kernels</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svGPFAModelFactory.html#SVGPFAModelFactory.buildModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -714,8 +646,18 @@
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="stats.svGPFA.svLowerBound.SVLowerBound.computeMeanCIFs">
-<code class="sig-name descname">computeMeanCIFs</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.computeMeanCIFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.computeMeanCIFs" title="Permalink to this definition">¶</a></dt>
+<dt id="stats.svGPFA.svLowerBound.SVLowerBound.computeCIFsMeans">
+<code class="sig-name descname">computeCIFsMeans</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.computeCIFsMeans"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.computeCIFsMeans" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.svLowerBound.SVLowerBound.computeEmbeddingMeansAndVarsAtTimes">
+<code class="sig-name descname">computeEmbeddingMeansAndVarsAtTimes</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.computeEmbeddingMeansAndVarsAtTimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.computeEmbeddingMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.svLowerBound.SVLowerBound.computeExpectedCIFs">
+<code class="sig-name descname">computeExpectedCIFs</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.computeExpectedCIFs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.computeExpectedCIFs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -769,8 +711,18 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="stats.svGPFA.svLowerBound.SVLowerBound.setIndPointsLocsKMSRegEpsilon">
+<code class="sig-name descname">setIndPointsLocsKMSRegEpsilon</code><span class="sig-paren">(</span><em class="sig-param">indPointsLocsKMSRegEpsilon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.setIndPointsLocsKMSRegEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.setIndPointsLocsKMSRegEpsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="stats.svGPFA.svLowerBound.SVLowerBound.setInitialParams">
 <code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="stats.svGPFA.svLowerBound.SVLowerBound.setInitialParamsAndData">
+<code class="sig-name descname">setInitialParamsAndData</code><span class="sig-paren">(</span><em class="sig-param">measurements</em>, <em class="sig-param">initialParams</em>, <em class="sig-param">quadParams</em>, <em class="sig-param">indPointsLocsKMSRegEpsilon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svLowerBound.html#SVLowerBound.setInitialParamsAndData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svLowerBound.SVLowerBound.setInitialParamsAndData" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -857,6 +809,11 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon">
+<code class="sig-name descname">setIndPointsLocsKMSRegEpsilon</code><span class="sig-paren">(</span><em class="sig-param">indPointsLocsKMSRegEpsilon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.setInitialParams">
 <em class="property">abstract </em><code class="sig-name descname">setInitialParams</code><span class="sig-paren">(</span><em class="sig-param">initialParams</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatents.setInitialParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatents.setInitialParams" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -893,13 +850,18 @@
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes">
+<code class="sig-name descname">computeMeansAndVarsAtTimes</code><span class="sig-paren">(</span><em class="sig-param">times</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.predict">
 <code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param">newTimes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatentsAllTimes.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.predict" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
 <dt id="stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample">
-<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">times</em>, <em class="sig-param">regFactor=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatentsAllTimes.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param">times</em>, <em class="sig-param">nSamples=1</em>, <em class="sig-param">regFactor=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/svPosteriorOnLatents.html#SVPosteriorOnLatentsAllTimes.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -951,33 +913,8 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-stats.svGPFA.utils">
-<span id="stats-svgpfa-utils-module"></span><h2>stats.svGPFA.utils module<a class="headerlink" href="#module-stats.svGPFA.utils" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="stats.svGPFA.utils.build3DdiagFromDiagVector">
-<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">build3DdiagFromDiagVector</code><span class="sig-paren">(</span><em class="sig-param">v</em>, <em class="sig-param">N</em>, <em class="sig-param">M</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#build3DdiagFromDiagVector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.build3DdiagFromDiagVector" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="stats.svGPFA.utils.chol3D">
-<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">chol3D</code><span class="sig-paren">(</span><em class="sig-param">K</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#chol3D"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.chol3D" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="stats.svGPFA.utils.clock">
-<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">clock</code><span class="sig-paren">(</span><em class="sig-param">func</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#clock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.clock" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="stats.svGPFA.utils.flattenListsOfArrays">
-<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">flattenListsOfArrays</code><span class="sig-paren">(</span><em class="sig-param">*lists</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#flattenListsOfArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.flattenListsOfArrays" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="stats.svGPFA.utils.getDiagIndicesIn3DArray">
-<code class="sig-prename descclassname">stats.svGPFA.utils.</code><code class="sig-name descname">getDiagIndicesIn3DArray</code><span class="sig-paren">(</span><em class="sig-param">N</em>, <em class="sig-param">M</em>, <em class="sig-param">device=torch.device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/stats/svGPFA/utils.html#getDiagIndicesIn3DArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#stats.svGPFA.utils.getDiagIndicesIn3DArray" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<div class="section" id="stats-svgpfa-utils-module">
+<h2>stats.svGPFA.utils module<a class="headerlink" href="#stats-svgpfa-utils-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-stats.svGPFA">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-stats.svGPFA" title="Permalink to this headline">¶</a></h2>
