@@ -7,6 +7,17 @@ from scipy.io import loadmat
 import torch
 sys.path.append("../src")
 import utils.svGPFA.initUtils
+import utils.svGPFA.miscUtils
+
+def test_getPropSamplesCovered():
+    N = 100
+    tol = .1
+
+    mean = torch.rand(size=(N,))*2-1
+    std = torch.rand(size=(N,))*0.3
+    sample = torch.normal(mean=mean, std=std)
+    propSamplesCovered = utils.svGPFA.miscUtils.getPropSamplesCovered(sample=sample, mean=mean, std=std, percent=.95)
+    assert(.95-tol<propSamplesCovered and propSamplesCovered<tol+.95)
 
 def test_getDiagIndicesIn3DArray():
     N = 3
@@ -38,6 +49,7 @@ def test_build3DdiagFromDiagVector():
 #     assert(error<tol)
 # 
 if __name__=="__main__":
-    test_getDiagIndicesIn3DArray()
-    test_build3DdiagFromDiagVector()
+    # test_getDiagIndicesIn3DArray()
+    # test_build3DdiagFromDiagVector()
     # test_j_cholesky()
+    test_getPropSamplesCovered()
