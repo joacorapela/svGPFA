@@ -50,9 +50,9 @@ def main(argv):
     with open(pSimResFilename, "rb") as f: simRes = pickle.load(f)
     nTrials = len(simRes["latents"])
     nLatents = len(simRes["latents"][0])
-    nSamples = len(simRes["times"][0])
+    tNSamples = len(simRes["times"][0])
     tTimes = simRes["times"][0]
-    tLatents = torch.empty((nTrials, nSamples, nLatents), dtype=torch.double)
+    tLatents = torch.empty((nTrials, tNSamples, nLatents), dtype=torch.double)
     for r in range(nTrials):
         for k in range(nLatents):
             tLatents[r,:,k] = simRes["latents"][r][k]
@@ -65,14 +65,15 @@ def main(argv):
     loadRes = scipy.io.loadmat(mModelSaveFilename)
     mTimes = torch.from_numpy(loadRes["testTimes"][:,0]).type(torch.DoubleTensor).squeeze()
     mMeanLatents_tmp = torch.from_numpy(loadRes["meanEstimatedLatents"]).type(torch.DoubleTensor)
+    eNSamples = mMeanLatents_tmp.shape[0]
     # mMeanLatents_tmp = torch.reshape(mMeanLatents_tmp, (-1, nTrials, nLatents))
-    mMeanLatents = torch.empty((nTrials, nSamples, nLatents), dtype=torch.double)
+    mMeanLatents = torch.empty((nTrials, eNSamples, nLatents), dtype=torch.double)
     for r in range(nTrials):
         for k in range(nLatents):
             mMeanLatents[r,:,k] = mMeanLatents_tmp[:,k,r]
     mVarLatents_tmp = torch.from_numpy(loadRes["varEstimatedLatents"]).type(torch.DoubleTensor)
     # mVarLatents_tmp = torch.reshape(mVarLatents_tmp, (-1, nTrials, nLatents))
-    mVarLatents = torch.empty((nTrials, nSamples, nLatents), dtype=torch.double)
+    mVarLatents = torch.empty((nTrials, eNSamples, nLatents), dtype=torch.double)
     for r in range(nTrials):
         for k in range(nLatents):
             mVarLatents[r,:,k] = mVarLatents_tmp[:,k,r]
@@ -95,13 +96,15 @@ def main(argv):
     mCIF = mCIFs[trialToPlot,:,neuronToPlot]
     pCIF = pCIFs[trialToPlot,:,neuronToPlot]
     meanTCIF = torch.mean(tCIF)
-    ssTot = torch.sum((tCIF-meanTCIF)**2)
-    pSSRes = torch.sum((pCIF-tCIF)**2)
-    mSSRes = torch.sum((mCIF-tCIF)**2)
-    pR2 = (1-(pSSRes/ssTot)).item()
-    mR2 = (1-(mSSRes/ssTot)).item()
-    pLabel = pLabelPattern.format(pR2)
-    mLabel = mLabelPattern.format(mR2)
+    # ssTot = torch.sum((tCIF-meanTCIF)**2)
+    # pSSRes = torch.sum((pCIF-tCIF)**2)
+    # mSSRes = torch.sum((mCIF-tCIF)**2)
+    # pR2 = (1-(pSSRes/ssTot)).item()
+    # mR2 = (1-(mSSRes/ssTot)).item()
+    # pLabel = pLabelPattern.format(pR2)
+    pLabel = "Python"
+    # mLabel = mLabelPattern.format(mR2)
+    mLabel = "Matlab"
     fig = plot.svGPFA.plotUtilsPlotly.\
         getPlotTruePythonAndMatlabCIFs(tTimes=tTimes,
                                              tCIF=tCIF,
