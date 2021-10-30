@@ -31,8 +31,8 @@ def main(argv):
     mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
     pModelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(pEstNumber)
 
-    lowerBoundVsIterNoFigFilenamePattern = "figures/{:08d}-{:08d}-lowerBoundVsIterNo.{{:s}}".format(mEstNumber, pEstNumber)
-    lowerBoundVsElapsedTimeFigFilenamePattern = "figures/{:08d}-{:08d}-lowerBoundVsRuntime.{{:s}}".format(mEstNumber, pEstNumber)
+    lowerBoundVsIterNoFigFilenamePattern = "figures/{:08d}_{:08d}_lowerBoundVsIterNo.{{:s}}".format(pEstNumber, mEstNumber)
+    lowerBoundVsElapsedTimeFigFilenamePattern = "figures/{:08d}_{:08d}_lowerBoundVsRuntime.{{:s}}".format(pEstNumber, mEstNumber)
 
     with open(pModelSaveFilename, "rb") as f: res = pickle.load(f)
     # pLowerBound = -torch.stack(res["lowerBoundHist"]).detach().numpy()
