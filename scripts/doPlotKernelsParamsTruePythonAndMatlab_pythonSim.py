@@ -24,9 +24,9 @@ def main(argv):
     mEstConfig.read(mEstParamsFilename)
     pEstNumber = int(mEstConfig["data"]["pEstNumber"])
 
-    pEstimParamsFilename = "results/{:08d}_estimation_metaData.ini".format(pEstNumber)
+    pEstimMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(pEstNumber)
     pEstConfig = configparser.ConfigParser()
-    pEstConfig.read(pEstimParamsFilename)
+    pEstConfig.read(pEstimMetaDataFilename)
     pSimNumber = int(pEstConfig["simulation_params"]["simResNumber"])
 
     pSimResMetaDataFilename = "results/{:08d}_simulation_metaData.ini".format(pSimNumber)
@@ -36,15 +36,14 @@ def main(argv):
 
     pSimInitConfig = configparser.ConfigParser()
     pSimInitConfig.read(pSimInitConfigFilename)
-    nIndPointsPerLatent = [int(str) for str in pSimInitConfig["control_variables"]["nIndPointsPerLatent"][1:-1].split(",")]
-    nLatents = len(nIndPointsPerLatent)
+    nLatents = int(pSimInitConfig["control_variables"]["nLatents"])
     tKernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=pSimInitConfig, forceUnitScale=True)
     kernelsTypes = [type(tKernels[k]).__name__ for k in range(nLatents)]
     tKernelsParams = utils.svGPFA.initUtils.getKernelsParams0(kernels=tKernels, noiseSTD=0.0)
 
     mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
     pModelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(pEstNumber)
-    figFilenamePattern = "figures/{:08d}-{:08d}-truePythonMatlabKernelsParamsPointProcess.{{:s}}".format(mEstNumber, pEstNumber)
+    figFilenamePattern = "figures/{:08d}_{:08d}_truePythonMatlabKernelsParamsPointProcess.{{:s}}".format(pEstNumber, mEstNumber)
 
     with open(pModelSaveFilename, "rb") as f: res = pickle.load(f)
     pModel = res["model"]
@@ -53,7 +52,7 @@ def main(argv):
     loadRes = loadmat(mModelSaveFilename)
     mKernelsParams = [[] for k in range(nLatents)]
     for k in range(nLatents):
-        mKernelsParams[k] = loadRes["m"][0,0]["kerns"][k,0]["hprs"][0,0].squeeze()
+        mKernelsParams[k] = loadRes["m"][0,0]["kerns"][0,k]["hprs"][0,0].squeeze()
 
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTruePythonAndMatlabKernelsParams(
         kernelsTypes=kernelsTypes,
