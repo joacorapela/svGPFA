@@ -15,10 +15,6 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
-    def sampleCIFs(self):
-        pass
-
-    @abstractmethod
     def buildKernelsMatrices(self):
         pass
 
@@ -45,6 +41,12 @@ class ExpectedLogLikelihood(ABC):
     @abstractmethod
     def setQuadParams(self, quadParams):
         pass
+
+    def sampleCIFs(self, times):
+        h = self._svEmbeddingAllTimes.sample(times=times)
+        nTrials = len(h)
+        answer = [self._linkFunction(h[r]) for r in range(nTrials)]
+        return answer
 
     def getSVPosteriorOnIndPointsParams(self):
         return self._svEmbeddingAllTimes.getSVPosteriorOnIndPointsParams()
@@ -100,12 +102,6 @@ class PointProcessELL(ExpectedLogLikelihood):
         sELLTerm1 = torch.sum(aux1)
         sELLTerm2 = torch.sum(eLogLinkValues)
         answer = -sELLTerm1+sELLTerm2
-        return answer
-
-    def sampleCIFs(self, times):
-        h = self._svEmbeddingAllTimes.sample(times=times)
-        nTrials = len(h)
-        answer = [self._linkFunction(h[r]) for r in range(nTrials)]
         return answer
 
     def computeCIFsMeans(self, times):
@@ -251,6 +247,13 @@ class PointProcessELLQuad(PointProcessELL):
 
 class PoissonELL(ExpectedLogLikelihood):
 
+    def setQuadParams(self, quadParams):
+        self._svEmbeddingAllTimes.setTimes(times=quadParams["legQuadPoints"])
+
+    def computeSVPosteriorOnLatentsStats(self):
+        answer = self._svEmbeddingAllTimes.computeSVPosteriorOnLatentsStats()
+        return answer
+
     def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
         eMean, eVar= self._svEmbeddingAllTimes.\
             computeMeansAndVars(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
@@ -292,20 +295,20 @@ class PoissonELL(ExpectedLogLikelihood):
 
 class PoissonELLExpLink(PoissonELL):
 
-    def __init__(self, svEmbeddingAllTime):
-        super().__init__(svEmbeddingAllTime=svEmbeddingAllTime,
+    def __init__(self, svEmbeddingAllTimes):
+        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
                          linkFunction=torch.exp)
 
     def _getELinkAndELogLinkValues(self, eMean, eVar):
         # intval \in nTrials x nQuadLeg x nNeurons
-        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
-        eLogLink = eMean
-        return eLink, eLogLink
+        eLink = self._linkFunction(input=eMean+0.5*eVar)
+        eLogLinkValues = eMean
+        return eLink, eLogLinkValues
 
 class PoissonELLQuad(PoissonELL):
 
-    def __init__(self, svEmbeddingAllTime, linkFunction):
-        super().__init__(svEmbeddingAllTime=svEmbeddingAllTime,
+    def __init__(self, svEmbeddingAllTimes, linkFunction):
+        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
                          linkFunction=linkFunction)
 
     def _getELinkAndELogLinkValues(self, eMean, eVar):
