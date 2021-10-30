@@ -308,6 +308,171 @@ def getPlotTrueAndEstimatedEmbedding(tTimes, tSamples, tMeans, tSTDs,
     fig.update_layout(title=title)
     return fig
 
+def getPlotTruePythonAndMatlabEmbeddingPropCovered(propCovered, percent,
+                                                   title="", xlabel="Neuron",
+                                                   ylabel="Coverage",
+                                                   tColor="blue", pColor="red",
+                                                   mColor="green"):
+    nIndices = np.arange(propCovered.shape[1])
+    traceT = go.Scatter(
+        x=nIndices,
+        y=propCovered[0,:],
+        mode="lines+markers",
+        marker=dict(color=tColor),
+        line=dict(color=tColor),
+        name="True",
+        showlegend=True)
+    traceP = go.Scatter(
+        x=nIndices,
+        y=propCovered[1,:],
+        mode="lines+markers",
+        marker=dict(color=pColor),
+        line=dict(color=pColor),
+        name="Python",
+        showlegend=True)
+    traceM = go.Scatter(
+        x=nIndices,
+        y=propCovered[2,:],
+        mode="lines+markers",
+        marker=dict(color=mColor),
+        line=dict(color=mColor),
+        name="Matlab",
+        showlegend=True)
+    fig = go.Figure()
+    fig.add_trace(traceT)
+    fig.add_trace(traceP)
+    fig.add_trace(traceM)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_layout(title=title)
+    return fig
+
+def getPlotTruePythonAndMatlabEmbedding(tTimes, tSamples, tMeans, tSTDs,
+                                        pTimes, pMeans, pSTDs,
+                                        mTimes, mMeans, mSTDs,
+                                        CBalpha = 0.2,
+                                        tCBFillColorPattern="rgba(0,0,255,{:f})",
+                                        tSamplesLineColor="black",
+                                        tMeanLineColor="blue",
+                                        pCBFillColorPattern="rgba(255,0,0,{:f})",
+                                        pMeanLineColor="red",
+                                        mCBFillColorPattern="rgba(0,255,0,{:f})",
+                                        mMeanLineColor="green",
+                                        xlabel="Time (sec)",
+                                        ylabel="Embedding",
+                                        title=""):
+    # tSamples[r], tMeans[r], tSTDs[r],
+    # eMean[r], eSTDs[r] \in nNeurons x nSamples
+    # pio.renderers.default = "browser"
+    #
+    pCI = 1.96*pSTDs
+    xP = pTimes
+    xP_rev = xP.flip(dims=[0])
+    yP = pMeans
+    yP_upper = yP + pCI
+    yP_lower = yP - pCI
+    yP_lower = yP_lower.flip(dims=[0])
+
+    xP = xP.detach().numpy()
+    yP = yP.detach().numpy()
+    yP_upper = yP_upper.detach().numpy()
+    yP_lower = yP_lower.detach().numpy()
+
+    mCI = 1.96*mSTDs
+    xM = mTimes
+    xM_rev = np.flip(xM, axis=0)
+    yM = mMeans
+    yM_upper = yM + mCI
+    yM_lower = yM - mCI
+    yM_lower = np.flip(yM_lower, axis=0)
+
+    tCI = 1.96*tSTDs
+    xT = tTimes
+    xT_rev = xT.flip(dims=[0])
+    yTMeans = tMeans
+    yTSamples = tSamples
+    yTMeans_upper = yTMeans + tCI
+    yTMeans_lower = yTMeans - tCI
+    yTMeans_lower = yTMeans_lower.flip(dims=[0])
+
+    xT = xT.detach().numpy()
+    yTMeans = yTMeans.detach().numpy()
+    yTSamples = yTSamples.detach().numpy()
+    yTMeans_upper = yTMeans_upper.detach().numpy()
+    yTMeans_lower = yTMeans_lower.detach().numpy()
+
+    tracePCB = go.Scatter(
+        x=np.concatenate((xP, xP_rev)),
+        y=np.concatenate((yP_upper, yP_lower)),
+        fill="tozerox",
+        fillcolor=pCBFillColorPattern.format(CBalpha),
+        line=dict(color="rgba(255,255,255,0)"),
+        showlegend=False,
+    )
+    tracePMean = go.Scatter(
+        x=xP,
+        y=yP,
+        # line=dict(color="rgb(0,100,80)"),
+        line=dict(color=pMeanLineColor),
+        mode="lines",
+        name="Python Mean",
+        showlegend=True,
+    )
+    traceMCB = go.Scatter(
+        x=np.concatenate((xM, xM_rev)),
+        y=np.concatenate((yM_upper, yM_lower)),
+        fill="tozerox",
+        fillcolor=mCBFillColorPattern.format(CBalpha),
+        line=dict(color="rgba(255,255,255,0)"),
+        showlegend=False,
+    )
+    traceMMean = go.Scatter(
+        x=xM,
+        y=yM,
+        # line=dict(color="rgb(0,100,80)"),
+        line=dict(color=mMeanLineColor),
+        mode="lines",
+        name="Matlab Mean",
+        showlegend=True,
+    )
+    traceTCB = go.Scatter(
+        x=np.concatenate((xT, xT_rev)),
+        y=np.concatenate((yTMeans_upper, yTMeans_lower)),
+        fill="tozerox",
+        fillcolor=tCBFillColorPattern.format(CBalpha),
+        line=dict(color="rgba(255,255,255,0)"),
+        showlegend=False,
+        name="True",
+    )
+    traceTMean = go.Scatter(
+        x=xT,
+        y=yTMeans,
+        line=dict(color=tMeanLineColor),
+        mode="lines",
+        name="True Mean",
+        showlegend=True,
+    )
+    traceTSamples = go.Scatter(
+        x=xT,
+        y=yTSamples,
+        line=dict(color=tSamplesLineColor),
+        mode="lines",
+        name="True Sample",
+        showlegend=True,
+    )
+    fig = go.Figure()
+    fig.add_trace(tracePCB)
+    fig.add_trace(tracePMean)
+    fig.add_trace(traceMCB)
+    fig.add_trace(traceMMean)
+    fig.add_trace(traceTCB)
+    fig.add_trace(traceTMean)
+    fig.add_trace(traceTSamples)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_layout(title=title)
+    return fig
+
 # inducing points
 def getPlotTrueAndEstimatedIndPointsLocs(trueIndPointsLocs,
                                          estimatedIndPointsLocs,
@@ -1293,6 +1458,8 @@ def getPlotTruePythonAndMatlabKernelsParams(kernelsTypes,
         trueParams = trueKernelsParams[k].tolist()
         pythonParams = pythonKernelsParams[k].tolist()
         matlabParams = matlabKernelsParams[k].tolist()
+        if type(matlabParams)==float:
+            matlabParams = [matlabParams]
         if k==0:
             showLegend = True
         else:
