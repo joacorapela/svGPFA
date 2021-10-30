@@ -129,6 +129,7 @@ def main(argv):
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
+        latentsTrialsTimes=simRes["latentsTrialsTimes"],
         emMaxIter=optimParams["em_max_iter"],
         eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
         mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
