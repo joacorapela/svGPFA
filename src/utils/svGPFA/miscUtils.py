@@ -8,6 +8,15 @@ import matplotlib.pyplot as plt
 import myMath.utils
 import stats.gaussianProcesses.eval
 
+def getPropSamplesCovered(sample, mean, std, percent=.95):
+    if percent==.95:
+        factor = 1.96
+    else:
+        raise ValueError("percent=0.95 is the only option implemented at the moment")
+    covered = torch.logical_and(mean-factor*std<=sample, sample<mean+factor*std)
+    coverage = torch.count_nonzero(covered)/float(len(covered))
+    return coverage
+
 def getCIFs(C, d, latents):
     nTrials = latents.shape[0]
     nLatents = latents.shape[2]
@@ -35,6 +44,7 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
                                  kernelsTypes, kernelsParams0,
                                  spikesTimes,
                                  indPointsLocsKMSRegEpsilon, trialsLengths,
+                                 latentsTrialsTimes,
                                  emMaxIter, eStepMaxIter, mStepEmbeddingMaxIter,
                                  mStepKernelsMaxIter, mStepIndPointsMaxIter,
                                  saveFilename):
@@ -62,6 +72,7 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
         mdict.update({"qMu0_{:d}".format(k): qMu0[k].numpy().astype(np.float64)})
         mdict.update({"qSVec0_{:d}".format(k): qSVec0[k].numpy().astype(np.float64)})
         mdict.update({"qSDiag0_{:d}".format(k): qSDiag0[k].numpy().astype(np.float64)})
+        mdict.update({"latentsTrialsTimes_{:d}".format(k): latentsTrialsTimes[k].numpy().astype(np.float64)})
     for r in range(nTrials):
         for n in range(nNeurons):
             mdict.update({"spikesTimes_{:d}_{:d}".format(r, n): spikesTimes[r][n].numpy().astype(np.float64)})
