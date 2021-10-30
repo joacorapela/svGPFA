@@ -60,6 +60,24 @@ class SVGPFAModelFactory:
             else:
                 raise ValueError("Invalid embeddingType=%s"%
                                  repr(embeddingType))
+        elif conditionalDist==Poisson:
+            if embeddingType==LinearEmbedding:
+                if linkFunction==ExponentialLink:
+                    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+                    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+                    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+                    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
+                        svPosteriorOnIndPoints=qU,
+                        indPointsLocsKMS=indPointsLocsKMS,
+                        indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
+                    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(
+                        svPosteriorOnLatents=qKAllTimes)
+                    eLL = stats.svGPFA.expectedLogLikelihood.PoissonELLExpLink(
+                        svEmbeddingAllTimes=qHAllTimes)
+                    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+                                         svPosteriorOnIndPoints=qU)
+                    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+                    svlb.setKernels(kernels=kernels)
         else:
             raise ValueError("Invalid conditionalDist=%s"%
                              repr(conditionalDist))
