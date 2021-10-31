@@ -9,10 +9,11 @@ class SVLowerBound:
         self._eLL = eLL
         self._klDiv = klDiv
 
-    def setInitialParamsAndData(self, measurements, initialParams, quadParams, indPointsLocsKMSRegEpsilon):
+    def setInitialParamsAndData(self, measurements, initialParams,
+                                eLLCalculationParams, indPointsLocsKMSRegEpsilon):
         self.setMeasurements(measurements=measurements)
         self.setInitialParams(initialParams=initialParams)
-        self.setQuadParams(quadParams=quadParams)
+        self.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
         self.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
         self.buildKernelsMatrices()
 
@@ -66,8 +67,8 @@ class SVLowerBound:
     def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
         self._eLL.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
-    def setQuadParams(self, quadParams):
-        self._eLL.setQuadParams(quadParams=quadParams)
+    def setELLCalculationParams(self, eLLCalculationParams):
+        self._eLL.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
 
     def getSVPosteriorOnIndPointsParams(self):
         return self._eLL.getSVPosteriorOnIndPointsParams()
