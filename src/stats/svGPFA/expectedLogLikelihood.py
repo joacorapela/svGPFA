@@ -39,13 +39,33 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
-    def setQuadParams(self, quadParams):
+    def setELLCalculationParams(self, eLLCalculationParams):
         pass
 
     def sampleCIFs(self, times):
         h = self._svEmbeddingAllTimes.sample(times=times)
         nTrials = len(h)
         answer = [self._linkFunction(h[r]) for r in range(nTrials)]
+        return answer
+
+    def computeCIFsMeans(self, times):
+        # h \in nTrials x times x nNeurons
+        h = self._svEmbeddingAllTimes.computeMeans(times=times)
+        nTrials = h.shape[0]
+        nNeurons = h.shape[2]
+        answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+        return answer
+
+    def computeExpectedCIFs(self, times):
+        # h \in nTrials x times x nNeurons
+        # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
+        # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
+        # return answer
+
+        eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times=times)
+        nTrials = eMean.shape[0]
+        nNeurons = eMean.shape[2]
+        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
         return answer
 
     def getSVPosteriorOnIndPointsParams(self):
@@ -104,14 +124,6 @@ class PointProcessELL(ExpectedLogLikelihood):
         answer = -sELLTerm1+sELLTerm2
         return answer
 
-    def computeCIFsMeans(self, times):
-        # h \in nTrials x times x nNeurons
-        h = self._svEmbeddingAllTimes.computeMeans(times=times)
-        nTrials = h.shape[0]
-        nNeurons = h.shape[2]
-        answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
-        return answer
-
     def buildKernelsMatrices(self):
         self._svEmbeddingAllTimes.buildKernelsMatrices()
         self._svEmbeddingAssocTimes.buildKernelsMatrices()
@@ -162,9 +174,9 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._svEmbeddingAllTimes.setInitialParams(initialParams=initialParams)
         self._svEmbeddingAssocTimes.setInitialParams(initialParams=initialParams)
 
-    def setQuadParams(self, quadParams):
-        self._svEmbeddingAllTimes.setTimes(times=quadParams["legQuadPoints"])
-        self._legQuadWeights = quadParams["legQuadWeights"]
+    def setELLCalculationParams(self, eLLCalculationParams):
+        self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["legQuadPoints"])
+        self._legQuadWeights = eLLCalculationParams["legQuadWeights"]
 
     @abstractmethod
     def _getELinkValues(self, eMean, eVar):
@@ -190,18 +202,6 @@ class PointProcessELLExpLink(PointProcessELL):
         eLogLink = torch.cat([eMean[trial] for trial in range(len(eMean))])
         return eLogLink
 
-    def computeExpectedCIFs(self, times):
-        # h \in nTrials x times x nNeurons
-        # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
-        # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
-        # return answer
-
-        eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times=times)
-        nTrials = eMean.shape[0]
-        nNeurons = eMean.shape[2]
-        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
-        return answer
-
 class PointProcessELLQuad(PointProcessELL):
 
     def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction):
@@ -209,10 +209,10 @@ class PointProcessELLQuad(PointProcessELL):
                          svEmbeddingAssocTimes=svEmbeddingAssocTimes,
                         linkFunction=linkFunction)
 
-    def setQuadParams(self, quadParams):
-        super().setQuadParams(quadParams=quadParams)
-        self._hermQuadWeights = quadParams["hermQuadWeights"]
-        self._hermQuadPoints = quadParams["hermQuadPoints"]
+    def setELLCalculationParams(self, eLLCalculationParams):
+        super().setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
+        self._hermQuadWeights = eLLCalculationParams["hermQuadWeights"]
+        self._hermQuadPoints = eLLCalculationParams["hermQuadPoints"]
 
     def _getELinkValues(self, eMean, eVar):
         # aux2 \in  nTrials x nQuadLeg x nNeurons
@@ -247,8 +247,10 @@ class PointProcessELLQuad(PointProcessELL):
 
 class PoissonELL(ExpectedLogLikelihood):
 
-    def setQuadParams(self, quadParams):
-        self._svEmbeddingAllTimes.setTimes(times=quadParams["legQuadPoints"])
+    def setELLCalculationParams(self, eLLCalculationParams):
+        times = eLLCalculationParams["binTimes"]
+        self._binWidth = times[0,1,0]-times[0,0,0]
+        self._svEmbeddingAllTimes.setTimes(times=times)
 
     def computeSVPosteriorOnLatentsStats(self):
         answer = self._svEmbeddingAllTimes.computeSVPosteriorOnLatentsStats()
@@ -257,10 +259,11 @@ class PoissonELL(ExpectedLogLikelihood):
     def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
         eMean, eVar= self._svEmbeddingAllTimes.\
             computeMeansAndVars(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
-        eLink, eLogLink = self._getELinkAndELogLinkValues(eMean=eMean,
-                                                           eVar=eVar)
+        eLinkValues, eLogLinkValues = \
+                self._getELinkAndELogLinkValues(eMean=eMean, eVar=eVar)
         sELLTerm1 = self._binWidth*eLinkValues.sum()
-        sELLTerm2 = (self._measurements*eLogLinkValues.permute(0, 2, 1)).sum()
+        # sELLTerm2 = (self._measurements*eLogLinkValues.permute(0, 2, 1)).sum()
+        sELLTerm2 = (self._measurements*eLogLinkValues).sum()
         return -sELLTerm1+sELLTerm2
 
     def buildKernelsMatrices(self):
@@ -286,9 +289,6 @@ class PoissonELL(ExpectedLogLikelihood):
         self._svEmbeddingAllTimes.\
             setInitialParams(initialParams=initialParams)
 
-    def setMiscParams(self, miscParams):
-        self._binWidth = miscParams["binWidth"]
-
     @abstractmethod
     def _getELinkAndELogLinkValues(self, eMean, eVar):
         pass
@@ -300,10 +300,10 @@ class PoissonELLExpLink(PoissonELL):
                          linkFunction=torch.exp)
 
     def _getELinkAndELogLinkValues(self, eMean, eVar):
-        # intval \in nTrials x nQuadLeg x nNeurons
-        eLink = self._linkFunction(input=eMean+0.5*eVar)
+        # intval \in nTrials x nBins x nNeurons
+        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
         eLogLinkValues = eMean
-        return eLink, eLogLinkValues
+        return eLinkValues, eLogLinkValues
 
 class PoissonELLQuad(PoissonELL):
 
