@@ -140,7 +140,7 @@ def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
             "type": "scatter",
             "name": "estimated d",
             "x": neuronIndices,
-            "y": estimatedD,
+            "y": estimatedD.squeeze(),
             "line": {"dash": linestyleEstimated},
             # "marker_symbol": marker,
         },
@@ -149,6 +149,7 @@ def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
         data=figDic["data"],
         layout=figDic["layout"],
     )
+    # import pdb; pdb.set_trace()
     return fig
 
 def getSimulatedEmbeddingPlot(times, samples, means, stds, title, 
@@ -303,6 +304,36 @@ def getPlotTrueAndEstimatedEmbedding(tTimes, tSamples, tMeans, tSTDs,
     fig.add_trace(traceTCB)
     fig.add_trace(traceTMean)
     fig.add_trace(traceTSamples)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_layout(title=title)
+    return fig
+
+def getPlotTrueAndEstimatedEmbeddingPropCovered(propCovered, percent,
+                                                   title="", xlabel="Neuron",
+                                                   ylabel="Coverage",
+                                                   tColor="blue", pColor="red",
+                                                   mColor="green"):
+    nIndices = np.arange(propCovered.shape[1])
+    traceT = go.Scatter(
+        x=nIndices,
+        y=propCovered[0,:],
+        mode="lines+markers",
+        marker=dict(color=tColor),
+        line=dict(color=tColor),
+        name="True",
+        showlegend=True)
+    traceP = go.Scatter(
+        x=nIndices,
+        y=propCovered[1,:],
+        mode="lines+markers",
+        marker=dict(color=pColor),
+        line=dict(color=pColor),
+        name="Python",
+        showlegend=True)
+    fig = go.Figure()
+    fig.add_trace(traceT)
+    fig.add_trace(traceP)
     fig.update_yaxes(title_text=ylabel)
     fig.update_xaxes(title_text=xlabel)
     fig.update_layout(title=title)
@@ -1391,29 +1422,35 @@ def getSimulatedLatentPlot(times, latentSamples, latentMeans,
     return fig
 
 # kernels
-def getPlotTrueAndEstimatedKernelsParams(trueKernels, estimatedKernelsParams,
+def getPlotTrueAndEstimatedKernelsParams(kernelsTypes, trueKernelsParams, estimatedKernelsParams,
                                          colorTrue="blue",
                                          colorEstimated="red",
                                          trueLegend="True",
                                          estimatedLegend="Estimated"):
-    nLatents = len(trueKernels)
-    titles = ["Kernel {:d}: {:s}".format(i, trueKernels[i].__class__.__name__) for i in range(nLatents)]
+    nLatents = len(trueKernelsParams)
+    titles = ["Kernel {:d}: {:s}".format(k, kernelsTypes[k]) for k in range(nLatents)]
     fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, subplot_titles=titles)
     for k in range(nLatents):
-        namedParams = trueKernels[k].getNamedParams()
-        labels = list(namedParams.keys())
-        trueParams = [z.item() for z in list(namedParams.values())]
+        trueParams = trueKernelsParams[k].tolist()
         estimatedParams = estimatedKernelsParams[k].tolist()
-        # we are fixing scale to 1.0. This is not great :(
-        estimatedParams = [1.0] + estimatedParams
         if k==0:
             showLegend = True
         else:
             showLegend = False
+
+
+        if kernelsTypes[k]=="PeriodicKernel":
+            labels = ["Length Scale", "Period"]
+        elif kernelsTypes[k]=="ExponentialQuadraticKernel":
+            labels = ["Length Scale"]
+        else:
+            raise RuntimeError("Invalid kernel type {:s}".format(kernelsTypes[k]))
+
         traceTrue = go.Bar(x=labels, y=trueParams, name=trueLegend, marker_color=colorTrue, showlegend=showLegend)
         traceEstimated = go.Bar(x=labels, y=estimatedParams, name=estimatedLegend, marker_color=colorEstimated, showlegend=showLegend)
         fig.append_trace(traceTrue, k+1, 1)
         fig.append_trace(traceEstimated, k+1, 1)
+        # import pdb; pdb.set_trace()
     fig.update_yaxes(title_text="Parameter Value", row=nLatents//2+1, col=1)
     return fig
 
