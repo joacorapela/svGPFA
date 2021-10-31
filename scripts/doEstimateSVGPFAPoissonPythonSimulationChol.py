@@ -19,17 +19,29 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("simResNumber", help="simuluation result number", type=int)
     parser.add_argument("estInitNumber", help="estimation init number", type=int)
+    parser.add_argument("binWidth", help="spikes bin width (sec)", type=float)
+    parser.add_argument("--estInitConfigFilenamePattern", 
+                        help="estimation init configuration filename pattern",
+                        default="data/{:08d}_estimation_metaData.ini")
+    parser.add_argument("--simResConfigFilenamePattern",
+                        help="simulation configuration filename pattern",
+                        default="results/{:08d}_simulation_metaData.ini")
+    parser.add_argument("--binnedSpikesFilenamePattern",
+                        help="binned spikes filename pattern",
+                        default="results/{:08d}_binned_spikes_binWidth{:.02f}.pickle")
     args = parser.parse_args()
 
     simResNumber = args.simResNumber
     estInitNumber = args.estInitNumber
+    binWidth = args.binWidth
+    estInitConfigFilenamePattern = args.estInitConfigFilenamePattern
+    simResConfigFilenamePattern = args.simResConfigFilenamePattern
+    binnedSpikesFilenamePattern = args.binnedSpikesFilenamePattern
 
-    estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
+    estInitConfigFilename = estInitConfigFilenamePattern.format(estInitNumber)
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
-    nQuad = int(estInitConfig["control_variables"]["nQuad"])
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
-
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimMethod = optimParamsConfig["em_method"]
     optimParams = {}
@@ -47,7 +59,7 @@ def main(argv):
     optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
 
     # load data and initial values
-    simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
+    simResConfigFilename = simResConfigFilenamePattern.format(simResNumber)
     simResConfig = configparser.ConfigParser()
     simResConfig.read(simResConfigFilename)
     simInitConfigFilename = simResConfig["simulation_params"]["simInitConfigFilename"]
@@ -60,8 +72,10 @@ def main(argv):
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
 
-    with open(simResFilename, "rb") as f: simRes = pickle.load(f)
-    spikesTimes = simRes["spikes"]
+    binnedSpikesFilename = binnedSpikesFilenamePattern.format(simResNumber, binWidth)
+    with open(binnedSpikesFilename, "rb") as f: binned_spikes = pickle.load(f)
+    bin_counts = binned_spikes["bin_counts"]
+    bin_times = binned_spikes["bin_times"]
 
     randomEmbedding = estInitConfig["control_variables"]["randomEmbedding"].lower()=="true"
     if randomEmbedding:
@@ -74,8 +88,6 @@ def main(argv):
         initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
         C0 = (C + torch.randn(C.shape)*initCondEmbeddingSTD).contiguous()
         d0 = (d + torch.randn(d.shape)*initCondEmbeddingSTD).contiguous()
-
-    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
 
     # kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
@@ -93,6 +105,7 @@ def main(argv):
 #             qMu0[k][r,:,:] = indPointsMeans[k][r]
 #     # end patch
 
+    bin_times_tensor = torch.unsqueeze(torch.outer(torch.ones(nTrials), bin_times), 2)
     qSigma0 = utils.svGPFA.configUtils.getVariationalCov0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
 
@@ -104,8 +117,7 @@ def main(argv):
     qHParams0 = {"C0": C0, "d0": d0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
-                  "legQuadWeights": legQuadWeights}
+    eLLCalculationParams = {"binTimes": bin_times_tensor}
 
     estPrefixUsed = True
     while estPrefixUsed:
@@ -115,28 +127,30 @@ def main(argv):
            estPrefixUsed = False
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
 
-    kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
-    qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
-    estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
-    utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
-        qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
-        C0=C0, d0=d0,
-        indPointsLocs0=Z0,
-        legQuadPoints=legQuadPoints,
-        legQuadWeights=legQuadWeights,
-        kernelsTypes=kernelsTypes,
-        kernelsParams0=kernelsScaledParams0,
-        spikesTimes=spikesTimes,
-        indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
-        trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
+    # saving Matlab data
+    # kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
+    # qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
+    # estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
+    # utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
+    #     qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
+    #     C0=C0, d0=d0,
+    #     indPointsLocs0=Z0,
+    #     legQuadPoints=legQuadPoints,
+    #     legQuadWeights=legQuadWeights,
+    #     kernelsTypes=kernelsTypes,
+    #     kernelsParams0=kernelsScaledParams0,
+    #     spikesTimes=spikesTimes,
+    #     indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
+    #     trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
         # latentsTrialsTimes=simRes["latentsTrialsTimes"],
-        latentsTrialsTimes=simRes["times"],
-        emMaxIter=optimParams["em_max_iter"],
-        eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
-        mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
-        mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
-        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
-        saveFilename=estimationDataForMatlabFilename)
+    #     latentsTrialsTimes=simRes["times"],
+    #     emMaxIter=optimParams["em_max_iter"],
+    #     eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
+    #     mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
+    #     mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
+    #     mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
+    #     saveFilename=estimationDataForMatlabFilename)
+    #
 
     def getKernelParams(model):
         kernelParams = model.getKernelsParams()[0]
@@ -149,9 +163,9 @@ def main(argv):
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels)
 
-    model.setInitialParamsAndData(measurements=spikesTimes,
+    model.setInitialParamsAndData(measurements=bin_counts,
                                   initialParams=initialParams,
-                                  quadParams=quadParams,
+                                  eLLCalculationParams=eLLCalculationParams,
                                   indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     # maximize lower bound
