@@ -47,7 +47,7 @@ def main(argv):
         kernelsTypes=kernelsTypes,
         trueKernelsParams=tKernelsParams,
         estimatedKernelsParams=pKernelsParams)
-    # fig.write_image(figFilenamePattern.format("png"))
+    fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     pio.renderers.default = "browser"
     fig.show()
