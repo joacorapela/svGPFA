@@ -23,7 +23,7 @@ def main(argv):
     percent = args.percent
 
     pModelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(pEstResNumber)
-    figFilenamePattern = "figures/{:08d}_truePythonAndMatlabEmbeddingPropCovered_trial{:d}.{{:s}}".format(pEstResNumber, trialToPlot)
+    figFilenamePattern = "figures/{:08d}_trueAndEstimatedEmbeddingPropCovered_trial{:d}.{{:s}}".format(pEstResNumber, trialToPlot)
 
     pEstimMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(pEstResNumber)
     pEstConfig = configparser.ConfigParser()
@@ -84,7 +84,7 @@ def main(argv):
     title = "Trial {:d}".format(trialToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingPropCovered(propCovered=propCovered, percent=percent, title=title)
 
-    # fig.write_image(figFilenamePattern.format("png"))
+    fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
     fig.show()
 
