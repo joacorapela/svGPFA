@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 sys.path.append("../src")
 import stats.pointProcess.tests
 import utils.svGPFA.configUtils
+import utils.svGPFA.initUtils
 import utils.svGPFA.miscUtils
 import plot.svGPFA.plotUtils
 import plot.svGPFA.plotUtilsPlotly
@@ -68,6 +69,9 @@ def main(argv):
     dtCIF = float(simInitConfig["control_variables"]["dtCIF"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
+    tKernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
+    kernelsTypes = [type(tKernels[k]).__name__ for k in range(nLatents)]
+    tKernelsParams = utils.svGPFA.initUtils.getKernelsParams0(kernels=tKernels, noiseSTD=0.0)
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
     CFilename = simInitConfig["embedding_params"]["C_filename"]
     dFilename = simInitConfig["embedding_params"]["d_filename"]
@@ -93,18 +97,18 @@ def main(argv):
 
     # plot lower bound history
     fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHist(lowerBoundHist=lowerBoundHist)
-    # fig.write_image(lowerBoundHistVsIterNoFigFilenamePattern.format("png"))
+    fig.write_image(lowerBoundHistVsIterNoFigFilenamePattern.format("png"))
     fig.write_html(lowerBoundHistVsIterNoFigFilenamePattern.format("html"))
 
     fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHist(elapsedTimeHist=elapsedTimeHist, lowerBoundHist=lowerBoundHist)
-    # fig.write_image(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("png"))
+    fig.write_image(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("png"))
     fig.write_html(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("html"))
 
     # plot true and estimated latents
     testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
     eIndPointsLocs = model.getIndPointsLocs()
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSamples=trueLatentsSamples, tLatentsMeans=trueLatentsMeans, tLatentsSTDs=trueLatentsSTDs, tIndPointsLocs=tIndPointsLocs, eTimes=trueLatentsTimes[0], eLatentsMeans=testMuK, eLatentsSTDs=torch.sqrt(testVarK), eIndPointsLocs=eIndPointsLocs, trialToPlot=trialToPlot)
-    # fig.write_image(latentsFigFilenamePattern.format("png"))
+    fig.write_image(latentsFigFilenamePattern.format("png"))
     fig.write_html(latentsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with numerical correction
@@ -126,7 +130,7 @@ def main(argv):
 
     # CIF
     fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs(tTimes=timesTrueValues, tCIF=simCIFsValues[trialToPlot][neuronToPlot], tLabel="True", eMeanTimes=oneTrialCIFTimes, eMeanCIF=emcifValues[trialToPlot][neuronToPlot], eMeanLabel="Mean", ePosteriorMeanTimes=oneTrialCIFTimes, ePosteriorMeanCIF=epmcifValues[trialToPlot][neuronToPlot], ePosteriorMeanLabel="Posterior Mean", title=title)
-    # fig.write_image(trueAndEstimatedCIFsFigFilenamePattern.format("png"))
+    fig.write_image(trueAndEstimatedCIFsFigFilenamePattern.format("png"))
     fig.write_html(trueAndEstimatedCIFsFigFilenamePattern.format("html"))
 
     # ROC predictive analysis
@@ -140,20 +144,28 @@ def main(argv):
     plt.close("all")
 
     # plot model params
-    tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
-    trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
-    tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=tLatentsMeansFuncs, trialsTimes=trialsTimes, dtype=C.dtype)
-    kernelsParams = model.getKernelsParams()
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
-    with torch.no_grad():
-        latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
+    mKernelsParams = model.getKernelsParams()
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(
+        kernelsTypes=kernelsTypes,
+        trueKernelsParams=tKernelsParams,
+        estimatedKernelsParams=mKernelsParams)
     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
     fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
 
+    # tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
+    # trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
+    # tLatentsMeans = utils.svGPFA.miscUtils.getLatentsMeanFuncsSamples(latentsMeansFuncs=tLatentsMeansFuncs, trialsTimes=trialsTimes, dtype=C.dtype)
+    # kernelsParams = model.getKernelsParams()
+    # kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
+    # with torch.no_grad():
+    #     latentsMeans, _ = model.predictLatents(newTimes=trialsTimes[0])
+    # fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(trueKernels=kernels, estimatedKernelsParams=kernelsParams)
+    # fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
+    # fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
+
     estimatedC, estimatedD = model.getSVEmbeddingParams()
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=C, trueD=d, estimatedC=estimatedC, estimatedD=estimatedD)
-    # fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
+    fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with analytical correction
