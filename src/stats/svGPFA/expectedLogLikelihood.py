@@ -42,31 +42,31 @@ class ExpectedLogLikelihood(ABC):
     def setELLCalculationParams(self, eLLCalculationParams):
         pass
 
-    def sampleCIFs(self, times):
-        h = self._svEmbeddingAllTimes.sample(times=times)
-        nTrials = len(h)
-        answer = [self._linkFunction(h[r]) for r in range(nTrials)]
-        return answer
-
-    def computeCIFsMeans(self, times):
-        # h \in nTrials x times x nNeurons
-        h = self._svEmbeddingAllTimes.computeMeans(times=times)
-        nTrials = h.shape[0]
-        nNeurons = h.shape[2]
-        answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
-        return answer
-
-    def computeExpectedCIFs(self, times):
-        # h \in nTrials x times x nNeurons
-        # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
-        # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
-        # return answer
-
-        eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times=times)
-        nTrials = eMean.shape[0]
-        nNeurons = eMean.shape[2]
-        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
-        return answer
+#     def sampleCIFs(self, times):
+#         h = self._svEmbeddingAllTimes.sample(times=times)
+#         nTrials = len(h)
+#         answer = [self._linkFunction(h[r]) for r in range(nTrials)]
+#         return answer
+# 
+#     def computeCIFsMeans(self, times):
+#         # h \in nTrials x times x nNeurons
+#         h = self._svEmbeddingAllTimes.computeMeans(times=times)
+#         nTrials = h.shape[0]
+#         nNeurons = h.shape[2]
+#         answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+#         return answer
+# 
+#     def computeExpectedCIFs(self, times):
+#         # h \in nTrials x times x nNeurons
+#         # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
+#         # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
+#         # return answer
+# 
+#         eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times=times)
+#         nTrials = eMean.shape[0]
+#         nNeurons = eMean.shape[2]
+#         answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+#         return answer
 
     def getSVPosteriorOnIndPointsParams(self):
         return self._svEmbeddingAllTimes.getSVPosteriorOnIndPointsParams()
@@ -74,8 +74,8 @@ class ExpectedLogLikelihood(ABC):
     def getSVEmbeddingParams(self):
         return self._svEmbeddingAllTimes.getParams()
 
-    def computeEmbeddingsMeansAndVarsAtTimes(self, times):
-        return self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times)
+#     def computeEmbeddingsMeansAndVarsAtTimes(self, times):
+#         return self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times)
 
     def getIndPointsLocs(self):
         return self._svEmbeddingAllTimes.getIndPointsLocs()
@@ -85,6 +85,9 @@ class ExpectedLogLikelihood(ABC):
 
     def predictLatents(self, newTimes):
         return self._svEmbeddingAllTimes.predictLatents(newTimes=newTimes)
+
+    def predictEmbedding(self, newTimes):
+        return self._svEmbeddingAllTimes.predict(newTimes=newTimes)
 
     def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
         self._svEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
@@ -264,7 +267,8 @@ class PoissonELL(ExpectedLogLikelihood):
         sELLTerm1 = self._binWidth*eLinkValues.sum()
         # sELLTerm2 = (self._measurements*eLogLinkValues.permute(0, 2, 1)).sum()
         sELLTerm2 = (self._measurements*eLogLinkValues).sum()
-        return -sELLTerm1+sELLTerm2
+        answer = -sELLTerm1+sELLTerm2
+        return answer
 
     def buildKernelsMatrices(self):
         self._svEmbeddingAllTimes.buildKernelsMatrices()
