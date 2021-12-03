@@ -70,6 +70,7 @@ def main(argv):
     CFilename = simInitConfig["embedding_params"]["C_filename"]
     dFilename = simInitConfig["embedding_params"]["d_filename"]
     trueC, trueD = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=CFilename, dFilename=dFilename)
+    tIndPointsLocs = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtSimulate)
 
     with open(modelSaveFilename, "rb") as f: savedResults = pickle.load(f)
@@ -77,7 +78,8 @@ def main(argv):
     kernelsParams = model.getKernelsParams()
     eTimes = tTimes
     with torch.no_grad():
-        eLatentsMeans, eLatentsSTDs = model.predictLatents(newTimes=eTimes[0])
+        eLatentsMeans, eLatentsVars = model.predictLatents(newTimes=eTimes[0])
+    eLatentsSTDs = torch.sqrt(eLatentsVars)
     estimatedC, estimatedD = model.getSVEmbeddingParams()
     eIndPointsLocs = model.getIndPointsLocs()
 
@@ -94,14 +96,16 @@ def main(argv):
         tLatentsSamples=tLatentsSamplesToPlot,
         tLatentsMeans=tLatentsMeansToPlot,
         tLatentsSTDs=tLatentsSTDsToPlot,
+        tIndPointsLocs=tIndPointsLocs[latentToPlot][trialToPlot,:,0],
         eTimes=eTimes[0],
         eLatentsMeans=eLatentsMeansToPlot,
         eLatentsSTDs=eLatentsSTDsToPlot,
+        eIndPointsLocs=eIndPointsLocs[latentToPlot][trialToPlot,:,0],
         title=title,
     )
     fig.write_image(latentsFigFilenamePattern.format("png"))
     fig.write_html(latentsFigFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     tKernelToPlot = kernels[latentToPlot]
     eKernelParamsToPlot = kernelsParams[latentToPlot]
@@ -109,7 +113,7 @@ def main(argv):
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParamsOneLatent(trueKernel=tKernelToPlot, estimatedKernelParams=eKernelParamsToPlot, title=title)
     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
     fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     svPosteriorOnIndPointsParams = model.getSVPosteriorOnIndPointsParams()
 
@@ -126,7 +130,7 @@ def main(argv):
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(trueIndPointsMeans=tIndPointsMeansToPlot, estimatedIndPointsMeans=eIndPointsMeansToPlot, trueIndPointsSTDs=tIndPointsSTDsToPlot, estimatedIndPointsSTDs=eIndPointsSTDsToPlot, title=title,)
     fig.write_image(indPointsMeanFigFilenamePattern.format("png"))
     fig.write_html(indPointsMeanFigFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     title = "Trial {:d}, Latent {:d}".format(trialToPlot, latentToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent(
@@ -136,12 +140,12 @@ def main(argv):
     )
     fig.write_image(indPointsCovFigFilenamePattern.format("png"))
     fig.write_html(indPointsCovFigFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     tIndPointsLocsToPlot = tIndPointsLocs[latentToPlot][trialToPlot,:,0]
     eIndPointsLocsToPlot = eIndPointsLocs[latentToPlot][trialToPlot,:,0]
@@ -149,7 +153,7 @@ def main(argv):
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsLocsOneTrialOneLatent(trueIndPointsLocs=tIndPointsLocsToPlot, estimatedIndPointsLocs=eIndPointsLocsToPlot, title=title)
     fig.write_image(indPointsLocsFigFilenamePattern.format("png"))
     fig.write_html(indPointsLocsFigFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     pdb.set_trace()
 
