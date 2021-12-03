@@ -41,10 +41,22 @@ class IndPointsLocsKMS(KernelsMatricesStore):
     def setEpsilon(self, epsilon):
         self._epsilon = epsilon
 
+    # @abstractmethod
+    def _invertKzz3D(self, Kzz):
+        pass
+
+    @abstractmethod
+    def solveForLatent(self, input, latentIndex):
+        pass
+
+    @abstractmethod
+    def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
+        pass
+
     def buildKernelsMatrices(self):
         nLatent = len(self._kernels)
         self._Kzz = [[None] for k in range(nLatent)]
-        self._KzzChol = [[None] for k in range(nLatent)]
+        self._KzzInv = [[None] for k in range(nLatent)]
 
         for k in range(nLatent):
             self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])+
@@ -52,16 +64,41 @@ class IndPointsLocsKMS(KernelsMatricesStore):
                                                     dtype=self._indPointsLocs[k].dtype,
                                                     device=self._indPointsLocs[k].device))
             # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])
-            self._KzzChol[k] = utils.svGPFA.miscUtils.chol3D(self._Kzz[k]) # O(n^3)
+            self._KzzInv[k] = self._invertKzz3D(self._Kzz[k]) # O(n^3)
 
     def getKzz(self):
         return self._Kzz
 
-    def getKzzChol(self):
-        return self._KzzChol
-
     def getEpsilon(self):
         return self._epsilon
+
+class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
+
+    def _invertKzz3D(self, Kzz):
+        KzzInv = utils.svGPFA.miscUtils.chol3D(Kzz) # O(n^3)
+        return KzzInv
+
+    def solveForLatent(self, input, latentIndex):
+        solve = torch.cholesky_solve(input, self._KzzInv[latentIndex])
+        return solve
+
+    def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
+        solve = torch.cholesky_solve(input, self._KzzInv[latentIndex][trialIndex,:,:])
+        return solve
+
+class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
+
+    def _invertKzz3D(self, Kzz):
+        KzzInv = utils.svGPFA.miscUtils.pinv3D(Kzz) # O(n^3)
+        return KzzInv
+
+    def solveForLatent(self, input, latentIndex):
+        solve = torch.matmul(self._KzzInv[latentIndex], input)
+        return solve
+
+    def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
+        solve = torch.matmul(self._KzzInv[latentIndex][trialIndex,:,:], input)
+        return solve
 
 class IndPointsLocsAndTimesKMS(KernelsMatricesStore):
 
