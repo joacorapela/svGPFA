@@ -53,10 +53,9 @@ def main(argv):
     tEmbeddingMeans = [torch.matmul(tC, tLatentsMeans[r])+td for r in range(nTrials)]
     tEmbeddingSTDs = [torch.matmul(tC, tLatentsSTDs[r]) for r in range(nTrials)]
 
-    eTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), tTimes[0]), dim=2)
     with open(modelSaveFilename, "rb") as f: estResults = pickle.load(f)
     model = estResults["model"]
-    eEmbeddingMeans, eEmbeddingVars = model.computeEmbeddingMeansAndVarsAtTimes(times=eTimes)
+    eEmbeddingMeans, eEmbeddingVars = model.predictEmbedding(newTimes=tTimes[trialToPlot])
 
     tSamplesToPlot = tEmbeddingSamples[trialToPlot][neuronToPlot,:]
     tMeansToPlot = tEmbeddingMeans[trialToPlot][neuronToPlot,:]
@@ -64,11 +63,11 @@ def main(argv):
     eMeansToPlot = eEmbeddingMeans[trialToPlot,:,neuronToPlot]
     eSTDsToPlot = eEmbeddingVars[trialToPlot,:,neuronToPlot].sqrt()
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbedding(tTimes=tTimes[trialToPlot], tSamples=tSamplesToPlot, tMeans=tMeansToPlot, tSTDs=tSTDsToPlot, eTimes=eTimes[trialToPlot,:,0], eMeans=eMeansToPlot, eSTDs=eSTDsToPlot, title=title)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbedding(tTimes=tTimes[trialToPlot], tSamples=tSamplesToPlot, tMeans=tMeansToPlot, tSTDs=tSTDsToPlot, eTimes=tTimes[trialToPlot], eMeans=eMeansToPlot, eSTDs=eSTDsToPlot, title=title)
 
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     pdb.set_trace()
 
