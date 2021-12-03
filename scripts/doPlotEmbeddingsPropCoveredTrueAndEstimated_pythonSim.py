@@ -66,7 +66,7 @@ def main(argv):
     pTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), tTimes[0]), dim=2)
     with open(pModelSaveFilename, "rb") as f: pEstResults = pickle.load(f)
     pModel = pEstResults["model"]
-    pEmbeddingMeans, pEmbeddingVars = pModel.computeEmbeddingMeansAndVarsAtTimes(times=pTimes)
+    pEmbeddingMeans, pEmbeddingVars = pModel.predictEmbedding(newTimes=pTimes[trialToPlot,:,0])
 
     nNeurons = tEmbeddingSamples[0].shape[0]
     propCovered = np.empty(shape=(3, nNeurons))
@@ -86,7 +86,7 @@ def main(argv):
 
     fig.write_image(figFilenamePattern.format("png"))
     fig.write_html(figFilenamePattern.format("html"))
-    fig.show()
+    # fig.show()
 
     pdb.set_trace()
 
