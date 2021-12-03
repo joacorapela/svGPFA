@@ -23,16 +23,27 @@ ExponentialLink = 1000
 #:
 NonExponentialLink = 1001
 
+#:
+Cholesky = 10000
+#:
+PInv = 10001
+
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModel(conditionalDist, linkFunction, embeddingType, kernels):
+    def buildModel(conditionalDist, linkFunction, embeddingType, kernels,
+                   kernelMatrixInvMethod):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
                 if linkFunction==ExponentialLink:
                     qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-                    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+                    if kernelMatrixInvMethod==Cholesky:
+                        indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
+                    elif kernelMatrixInvMethod==PInv:
+                        indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_PInv()
+                    else:
+                        raise ValueError("Invalid kernelMatrixInvMethod")
                     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
                     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
                     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -64,7 +75,12 @@ class SVGPFAModelFactory:
             if embeddingType==LinearEmbedding:
                 if linkFunction==ExponentialLink:
                     qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-                    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+                    if kernelMatrixInvMethod==Cholesky:
+                        indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
+                    elif kernelMatrixInvMethod==PInv:
+                        indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Pinv()
+                    else:
+                        raise ValueError("Invalid kernelMatrixInvMethod")
                     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
                     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
                         svPosteriorOnIndPoints=qU,
