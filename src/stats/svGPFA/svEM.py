@@ -156,8 +156,6 @@ class SVEM:
 
     def _mStepEmbedding(self, model, optimParams):
         x = model.getSVEmbeddingParams()
-        # pdb.set_trace()
-        # x = [i.contiguous() for i in x]
         svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
         evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
         # evalFunc = model.eval
