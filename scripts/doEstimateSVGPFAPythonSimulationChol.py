@@ -118,6 +118,12 @@ def main(argv):
     kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
     qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
     estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
+    if "latentsTrialsTimes" in simRes.keys():
+        latentsTrialsTimes = simRes["latentsTrialsTimes"]
+    elif "times" in simRes.keys():
+        latentsTrialsTimes = simRes["times"]
+    else:
+        raise ValueError("latentsTrialsTimes or times cannot be found in {:s}".format(simResFilename))
     utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
         qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
         C0=C0, d0=d0,
@@ -129,7 +135,7 @@ def main(argv):
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
-        latentsTrialsTimes=simRes["latentsTrialsTimes"],
+        latentsTrialsTimes=latentsTrialsTimes,
         emMaxIter=optimParams["em_max_iter"],
         eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
         mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
@@ -150,12 +156,12 @@ def main(argv):
 
     model.setInitialParamsAndData(measurements=spikesTimes,
                                   initialParams=initialParams,
-                                  quadParams=quadParams,
+                                  eLLCalculationParams=quadParams,
                                   indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     # maximize lower bound
     svEM = stats.svGPFA.svEM.SVEM()
-    lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams  = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod, getIterationModelParamsFn=getKernelParams)
+    lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod, getIterationModelParamsFn=getKernelParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
