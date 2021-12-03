@@ -1,6 +1,7 @@
 
 import pdb
 import torch
+import warnings
 
 class SVLowerBound:
 
@@ -22,24 +23,25 @@ class SVLowerBound:
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
         if torch.isinf(theEval):
-            raise RuntimeError("infinity lower bound detected")
+            # raise RuntimeError("infinity lower bound detected")
+            warnings.warn("infinity lower bound detected")
         return theEval
 
-    def sampleCIFs(self, times):
-        answer = self._eLL.sampleCIFs(times=times)
-        return answer
-
-    def computeCIFsMeans(self, times):
-        answer = self._eLL.computeCIFsMeans(times=times)
-        return answer
-
-    def computeExpectedCIFs(self, times):
-        answer = self._eLL.computeExpectedCIFs(times=times)
-        return answer
-
-    def computeEmbeddingMeansAndVarsAtTimes(self, times):
-        answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
-        return answer
+#     def sampleCIFs(self, times):
+#         answer = self._eLL.sampleCIFs(times=times)
+#         return answer
+# 
+#     def computeCIFsMeans(self, times):
+#         answer = self._eLL.computeCIFsMeans(times=times)
+#         return answer
+# 
+#     def computeExpectedCIFs(self, times):
+#         answer = self._eLL.computeExpectedCIFs(times=times)
+#         return answer
+# 
+#     def computeEmbeddingMeansAndVarsAtTimes(self, times):
+#         answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
+#         return answer
 
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
         answer = self._eLL.evalSumAcrossTrialsAndNeurons(
@@ -84,4 +86,7 @@ class SVLowerBound:
 
     def predictLatents(self, newTimes):
         return self._eLL.predictLatents(newTimes=newTimes)
+
+    def predictEmbedding(self, newTimes):
+        return self._eLL.predictEmbedding(newTimes=newTimes)
 
