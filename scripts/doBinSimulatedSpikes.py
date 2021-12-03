@@ -11,7 +11,7 @@ import utils.neuralDataAnalysis
 def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("sim_res_number", help="simuluation result number", type=int)
-    parser.add_argument("bin_width", help="bin width", type=float)
+    parser.add_argument("bin_width", help="bin width (sec)", type=float)
     parser.add_argument("--sim_config_filename_pattern", 
                         help="simulation configuration filename pattern",
                         default="results/{:08d}_simulation_metaData.ini")
