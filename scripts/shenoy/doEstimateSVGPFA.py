@@ -22,7 +22,7 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("estInitNumber", help="estimation init number", type=int)
     parser.add_argument("--data_filename", help="data filename",
-                        default="/nfs/ghome/live/rapela/dev/research/gatsby-swc/datasets/george20040123_hnlds.mat")
+                        default="~/dev/research/gatsby-swc/datasets/george20040123_hnlds.mat")
     parser.add_argument("--location", help="location to analyze", type=int,
                         default=0)
     parser.add_argument("--trials", help="trials to analyze",
@@ -44,7 +44,7 @@ def main(argv):
     from_time = args.from_time
     to_time = args.to_time
 
-    mat = scipy.io.loadmat(data_filename)
+    mat = scipy.io.loadmat(os.path.expanduser(data_filename))
     spikesTimes = shenoyUtils.getTrialsAndLocationSpikesTimes(mat=mat,
                                                                trials=trials,
                                                                location=location)
@@ -55,6 +55,13 @@ def main(argv):
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
+    kernelMatrixInvMethoStr = estInitConfig["control_variables"]["kernelMatrixInvMethod"]
+    if kernelMatrixInvMethoStr == "Chol":
+        kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.Cholesky
+    elif kernelMatrixInvMethoStr == "PInv":
+        kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.PInv
+    else:
+        raise RuntimeError("Invalid kernelMatrixInvMethod={:s}".format(kernelMatrixInvMethoStr))
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
@@ -182,7 +189,7 @@ def main(argv):
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels)
+        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod)
 
     model.setInitialParamsAndData(measurements=spikesTimes,
                                   initialParams=initialParams,
