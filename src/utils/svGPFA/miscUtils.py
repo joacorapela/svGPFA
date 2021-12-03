@@ -167,6 +167,23 @@ def chol3D(K):
         Kchol[i,:,:] = torch.cholesky(K[i,:,:])
     return Kchol
 
+def pinv3D(K):
+    # begin debug
+#     print("Waning: debug code on in miscUtils.py:chol3D")
+#     nTrial = K.shape[0]
+#     for r in range(nTrial):
+#         Kr = torch.matmul(K[r,:,:], torch.transpose(K[r,:,:], 0, 1))
+#         eigRes = torch.eig(Kr)
+#         cNum = eigRes.eigenvalues[0,0]/eigRes.eigenvalues[-1,0]
+#         print("Condition number for trial {:d}: {:f}".format(r, cNum))
+    # pdb.set_trace()
+    # end debug
+    Kpinv = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
+    nTrial = K.shape[0]
+    for i in range(nTrial):
+        Kpinv[i,:,:] = torch.linalg.pinv(K[i,:,:])
+    return Kpinv
+
 def getLegQuadPointsAndWeights(nQuad, trialsLengths, dtype=torch.double):
     nTrials = len(trialsLengths)
     legQuadPoints = torch.empty((nTrials, nQuad, 1), dtype=dtype)
