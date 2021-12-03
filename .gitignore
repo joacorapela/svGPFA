@@ -50,3 +50,7 @@ scripts/doSearchBug?.py
 slurmOutputs/*
 slurmScripts/*
 gui/doRunGUI.log
+scripts/shenoy/data/*
+scripts/shenoy/figures/*
+scripts/shenoy/results/*
+
