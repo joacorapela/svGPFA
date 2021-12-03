@@ -65,12 +65,18 @@ def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)", 
     )
     return fig
 
-def getSimulatedSpikesTimesPlotOneTrial(spikesTimes, title, xlabel="Time (sec)", ylabel="Neuron"):
+def getSpikesTimesPlotOneTrial(spikesTimes, title, xlabel="Time (sec)", ylabel="Neuron"):
     fig = go.Figure()
     for n in range(len(spikesTimes)):
+        # workaround because if a trial contains only one spike spikesTimes[n]
+        # does not respond to the len function
+        if len(spikesTimes[n].shape) == 0:
+            x = [spikesTimes[n]]
+        else:
+            x = spikesTimes[n]
         trace = go.Scatter(
-            x=spikesTimes[n].numpy(),
-            y=n*np.ones(len(spikesTimes[n])),
+            x=x,
+            y=n*np.ones(len(x)),
             mode="markers",
             marker=dict(size=3, color="black"),
             showlegend=False,
@@ -977,7 +983,8 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
                                    tIndPointsLocsColor="rgba(0,0,255,0.5)",
                                    eIndPointsLocsColor="rgba(255,0,0,0.5)",
                                    xlabel="Time (sec)",
-                                   ylabelPattern="Latent {:d}"):
+                                   ylabelPattern="Latent {:d}",
+                                   titlePattern="Trial {:d}"):
     eLatentsMeans = eLatentsMeans.detach()
     eLatentsSTDs = eLatentsSTDs.detach()
     eIndPointsLocs = [item.detach() for item in eIndPointsLocs]
@@ -985,7 +992,7 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
     # pio.renderers.default = "browser"
     nLatents = eLatentsMeans.shape[2]
     fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, shared_xaxes=True)
-    title = ylabelPattern.format(trialToPlot)
+    title = titlePattern.format(trialToPlot)
     nTrials = len(tLatentsSTDs)
     #
     # latentsMaxs = [1.96*torch.max(tLatentsSTDs[r]).item() for r in range(nTrials)]
@@ -1125,8 +1132,8 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
     return fig
 
 def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
-    tTimes, tLatentsSamples, tLatentsMeans, tLatentsSTDs,
-    eTimes, eLatentsMeans, eLatentsSTDs,
+    tTimes, tLatentsSamples, tLatentsMeans, tLatentsSTDs, tIndPointsLocs,
+    eTimes, eLatentsMeans, eLatentsSTDs, eIndPointsLocs,
     title,
     CBalpha = 0.2,
     tCBFillColorPattern="rgba(0,0,255,{:f})",
@@ -1134,10 +1141,12 @@ def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     tMeanLineColor="blue",
     eCBFillColorPattern="rgba(255,0,0,{:f})",
     eMeanLineColor="red",
+    tIndPointsLocsColor="rgba(0,0,255,0.5)",
+    eIndPointsLocsColor="rgba(255,0,0,0.5)",
     xlabel="Time (sec)",
     ylabel="Latent Value"):
 
-    # pio.renderers.default = "browser"
+    ault = "browser"
     fig = go.Figure()
 
     tCI = 1.96*tLatentsSTDs
@@ -1221,37 +1230,33 @@ def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     fig.add_trace(traceTMean)
     fig.add_trace(traceTSamples)
 
-#     for n in range(tIndPointsLocs[k].shape[1]):
-#         fig.add_shape(
-#             dict(
-#                 type="line",
-#                 x0=tIndPointsLocs[k][trialToPlot,n,0],
-#                 y0=ymin,
-#                 x1=tIndPointsLocs[k][trialToPlot,n,0],
-#                 y1=ymax,
-#                 line=dict(
-#                     color=tIndPointsLocsColor,
-#                     width=3
-#                 ),
-#             ),
-#             row=k+1,
-#             col=1,
-#         )
-#         fig.add_shape(
-#             dict(
-#                 type="line",
-#                 x0=eIndPointsLocs[k][trialToPlot,n,0],
-#                 y0=ymin,
-#                 x1=eIndPointsLocs[k][trialToPlot,n,0],
-#                 y1=ymax,
-#                 line=dict(
-#                     color=eIndPointsLocsColor,
-#                     width=3
-#                 ),
-#             ),
-#             row=k+1,
-#             col=1,
-#         )
+    for n in range(len(tIndPointsLocs)):
+        fig.add_shape(
+            dict(
+                type="line",
+                x0=tIndPointsLocs[n],
+                y0=ymin,
+                x1=tIndPointsLocs[n],
+                y1=ymax,
+                line=dict(
+                    color=tIndPointsLocsColor,
+                    width=3
+                ),
+            ),
+        )
+        fig.add_shape(
+            dict(
+                type="line",
+                x0=eIndPointsLocs[n],
+                y0=ymin,
+                x1=eIndPointsLocs[n],
+                y1=ymax,
+                line=dict(
+                    color=eIndPointsLocsColor,
+                    width=3
+                ),
+            ),
+        )
     fig.update_layout(title_text=title)
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
