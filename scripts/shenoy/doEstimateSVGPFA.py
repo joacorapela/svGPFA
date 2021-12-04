@@ -55,13 +55,20 @@ def main(argv):
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
-    kernelMatrixInvMethoStr = estInitConfig["control_variables"]["kernelMatrixInvMethod"]
-    if kernelMatrixInvMethoStr == "Chol":
-        kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.Cholesky
-    elif kernelMatrixInvMethoStr == "PInv":
-        kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.PInv
+    kernelMatrixInvMethodStr = estInitConfig["control_variables"]["kernelMatrixInvMethod"]
+    indPointsCovRepStr = estInitConfig["control_variables"]["indPointsCovRep"]
+    if kernelMatrixInvMethodStr == "Chol":
+        kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.kernelMatrixInvChol
+    elif kernelMatrixInvMethodStr == "PInv":
+        kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.kernelMatrixInvPInv
     else:
-        raise RuntimeError("Invalid kernelMatrixInvMethod={:s}".format(kernelMatrixInvMethoStr))
+        raise RuntimeError("Invalid kernelMatrixInvMethod={:s}".format(kernelMatrixInvMethodStr))
+    if indPointsCovRepStr == "Chol":
+        indPointsCovRep = stats.svGPFA.svGPFAModelFactory.indPointsCovChol
+    elif indPointsCovRepStr == "Rank1PlusDiag":
+        indPointsCovRep = stats.svGPFA.svGPFAModelFactory.indPointsCovRank1PlusDiag
+    else:
+        raise RuntimeError("Invalid indPointsCovRep={:s}".format(indPointsCovRepStr))
     indPointsLocsKMSRegEpsilon = float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
@@ -128,8 +135,15 @@ def main(argv):
 
     qSigma0 = utils.svGPFA.configUtils.getVariationalCov0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
     srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=qSigma0)
+    qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
 
-    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
+    if indPointsCovRep==stats.svGPFA.svGPFAModelFactory.indPointsCovChol:
+        qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
+    elif  indPointsCovRep==stats.svGPFA.svGPFAModelFactory.indPointsCovRank1PlusDiag:
+        qUParams0 = {"qMu0": qMu0, "qSVec0": qSVec0, "qSDiag0": qSDiag0}
+    else:
+        raise RuntimeError("Invalid indPointsCovRep")
+
     kmsParams0 = {"kernelsParams0": kernelsScaledParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -149,7 +163,6 @@ def main(argv):
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
 
     kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
-    qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
     estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
 
     dt_latents = 0.01
@@ -189,7 +202,8 @@ def main(argv):
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod)
+        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
+        indPointsCovRep=indPointsCovRep)
 
     model.setInitialParamsAndData(measurements=spikesTimes,
                                   initialParams=initialParams,
