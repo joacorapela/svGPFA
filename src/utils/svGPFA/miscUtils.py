@@ -164,7 +164,7 @@ def chol3D(K):
     Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
     nTrial = K.shape[0]
     for i in range(nTrial):
-        Kchol[i,:,:] = torch.cholesky(K[i,:,:])
+        Kchol[i,:,:] = torch.linalg.cholesky(K[i,:,:])
     return Kchol
 
 def pinv3D(K, rcond=1e-5):
@@ -296,7 +296,7 @@ def getSRQSigmaVec(qSVec, qSDiag):
         Pk = int((nIndPointsK+1)*nIndPointsK/2)
         srQSigmaVec[k] = torch.empty((nTrials, Pk, 1), dtype=torch.double)
         for r in range(nTrials):
-            cholKR = torch.cholesky(qSigma[k][r,:,:])
+            cholKR = torch.linalg.cholesky(qSigma[k][r,:,:])
             trilIndices = torch.tril_indices(nIndPointsK, nIndPointsK)
             cholKRVec = cholKR[trilIndices[0,:], trilIndices[1,:]]
             srQSigmaVec[k][r,:,0] = cholKRVec
