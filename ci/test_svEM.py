@@ -9,7 +9,7 @@ import torch
 import numpy as np
 import time
 sys.path.append("../src")
-import utils.svGPFA.initUtils
+import utils.svGPFA.miscUtils
 import stats.kernels
 import stats.svGPFA.kernelsMatricesStore
 import stats.svGPFA.svPosteriorOnIndPoints
@@ -31,7 +31,7 @@ def test_eStep_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor).contiguous()
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze().contiguous()
@@ -75,11 +75,11 @@ def test_eStep_pointProcess():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -112,7 +112,7 @@ def test_eStep_pointProcess():
     svlb.setKernels(kernels=kernels)
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
-    svlb.setQuadParams(quadParams=quadParams)
+    svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
@@ -187,7 +187,7 @@ def test_mStepModelParams_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor).contiguous()
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().contiguous()
@@ -223,8 +223,8 @@ def test_mStepModelParams_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -253,13 +253,13 @@ def test_mStepModelParams_pointProcess():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
-    svlb.setQuadParams(quadParams=quadParams)
+    svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
@@ -282,7 +282,7 @@ def test_mStepKernelParams_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor).contiguous()
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze().contiguous()
@@ -318,8 +318,8 @@ def test_mStepKernelParams_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -348,13 +348,13 @@ def test_mStepKernelParams_pointProcess():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
-    svlb.setQuadParams(quadParams=quadParams)
+    svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
@@ -427,7 +427,7 @@ def test_mStepIndPoints_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor).contiguous()
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze().contiguous()
@@ -463,8 +463,8 @@ def test_mStepIndPoints_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -493,13 +493,13 @@ def test_mStepIndPoints_pointProcess():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
-    svlb.setQuadParams(quadParams=quadParams)
+    svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
     logStream = io.StringIO()
@@ -521,7 +521,7 @@ def test_maximize_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag0'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z0'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1).contiguous() for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C0"]).type(torch.DoubleTensor).contiguous()
     b0 = torch.from_numpy(mat["b0"]).type(torch.DoubleTensor).squeeze().contiguous()
@@ -557,8 +557,8 @@ def test_maximize_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -588,7 +588,7 @@ def test_maximize_pointProcess():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     optimParams = {"em_max_iter":4,
@@ -621,7 +621,7 @@ def test_maximize_pointProcess():
     svlb.setInitialParamsAndData(
         measurements=YNonStacked,
         initialParams=initialParams,
-        quadParams=quadParams,
+        eLLCalculationParams=eLLCalculationParams,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     lowerBoundHist, _, _, _ = svEM.maximize(model=svlb, optimParams=optimParams)
     assert(lowerBoundHist[-1]>leasLowerBound)

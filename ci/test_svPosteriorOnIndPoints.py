@@ -5,7 +5,7 @@ from scipy.io import loadmat
 import torch
 sys.path.append("../src")
 import stats.svGPFA.svPosteriorOnIndPoints
-import utils.svGPFA.initUtils
+import utils.svGPFA.miscUtils
 
 def test_buildQSigma():
     tol = 1e-5
@@ -16,12 +16,12 @@ def test_buildQSigma():
     nTrials = mat['q_sqrt'][(0,0)].shape[2]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     q_sigma = [torch.from_numpy(mat['q_sigma'][(0,k)]).permute(2,0,1) for k in range(nLatents)]
     qMu0 = [[] for i in range(nLatents)]
 
     params0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
     qU.setInitialParams(initialParams=params0)
     qSigma = qU.buildQSigma();
 

@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import numpy as np
 import torch
 sys.path.append("../src")
-import utils.svGPFA.initUtils
+import utils.svGPFA.miscUtils
 import stats.kernels
 import stats.svGPFA.kernelsMatricesStore
 import stats.svGPFA.svPosteriorOnIndPoints
@@ -26,7 +26,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     t = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
@@ -72,11 +72,11 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -96,7 +96,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     eLL.setKernels(kernels=kernels)
     eLL.setInitialParams(initialParams=initialParams)
     eLL.setMeasurements(measurements=YNonStacked)
-    eLL.setQuadParams(quadParams=quadParams)
+    eLL.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     eLL.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     eLL.buildKernelsMatrices()
     sELL = eLL.evalSumAcrossTrialsAndNeurons()
@@ -116,7 +116,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     t = torch.from_numpy(mat['ttQuad']).type(torch.DoubleTensor).permute(2, 0, 1)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
@@ -162,14 +162,14 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"hermQuadPoints": hermQuadPoints,
+    eLLCalculationParams = {"hermQuadPoints": hermQuadPoints,
                   "hermQuadWeights": hermQuadWeights,
                   "legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -190,7 +190,7 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
     eLL.setKernels(kernels=kernels)
     eLL.setInitialParams(initialParams=initialParams)
     eLL.setMeasurements(measurements=YNonStacked)
-    eLL.setQuadParams(quadParams=quadParams)
+    eLL.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     eLL.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     eLL.buildKernelsMatrices()
     sELL = eLL.evalSumAcrossTrialsAndNeurons()

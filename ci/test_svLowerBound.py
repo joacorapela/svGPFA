@@ -7,7 +7,7 @@ from scipy.io import loadmat
 import numpy as np
 import torch
 sys.path.append("../src")
-import utils.svGPFA.initUtils
+import utils.svGPFA.miscUtils
 import stats.kernels
 import stats.svGPFA.kernelsMatricesStore
 import stats.svGPFA.svPosteriorOnIndPoints
@@ -28,7 +28,7 @@ def test_eval_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
@@ -63,8 +63,8 @@ def test_eval_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
@@ -92,13 +92,13 @@ def test_eval_pointProcess():
     qHParams0 = {"C0": C0, "d0": b0}
     initialParams = {"svPosteriorOnLatents": qKParams0,
                      "svEmbedding": qHParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
+    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
                   "legQuadWeights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
-    svlb.setQuadParams(quadParams=quadParams)
+    svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
 
