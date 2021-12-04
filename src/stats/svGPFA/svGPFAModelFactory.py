@@ -24,23 +24,33 @@ ExponentialLink = 1000
 NonExponentialLink = 1001
 
 #:
-Cholesky = 10000
+kernelMatrixInvChol = 10000
 #:
-PInv = 10001
+kernelMatrixInvPInv = 10001
+
+#:
+indPointsCovRank1PlusDiag = 100000
+#:
+indPointsCovChol = 100001
 
 class SVGPFAModelFactory:
 
     @staticmethod
     def buildModel(conditionalDist, linkFunction, embeddingType, kernels,
-                   kernelMatrixInvMethod):
+                   kernelMatrixInvMethod, indPointsCovRep):
 
         if conditionalDist==PointProcess:
             if embeddingType==LinearEmbedding:
                 if linkFunction==ExponentialLink:
-                    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
-                    if kernelMatrixInvMethod==Cholesky:
+                    if indPointsCovRep==indPointsCovChol:
+                        qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPoints()
+                    elif indPointsCovRep==indPointsCovRank1PlusDiag:
+                        qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag()
+                    else:
+                        raise ValueError("Invalid indPointsCovRep")
+                    if kernelMatrixInvMethod==kernelMatrixInvChol:
                         indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-                    elif kernelMatrixInvMethod==PInv:
+                    elif kernelMatrixInvMethod==kernelMatrixInvPInv:
                         indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_PInv()
                     else:
                         raise ValueError("Invalid kernelMatrixInvMethod")
