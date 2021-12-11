@@ -20,7 +20,7 @@ import stats.svGPFA.klDivergence
 import stats.svGPFA.svLowerBound
 import stats.svGPFA.svEM
 
-def test_eStep_pointProcess():
+def test_eStep_pointProcess_pyTorch():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Update_all_PointProcess_svGPFA.mat")
@@ -98,7 +98,7 @@ def test_eStep_pointProcess():
     klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_pyTorch()
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
@@ -177,7 +177,7 @@ def test_eStep_pointProcess():
 # 
 #     # pdb.set_trace()
 
-def test_mStepModelParams_pointProcess():
+def test_mStepModelParams_pointProcess_pyTorch():
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Mstep_Update_Iterative_PointProcess_svGPFA.mat")
 
@@ -243,7 +243,7 @@ def test_mStepModelParams_pointProcess():
     klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_pyTorch()
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
@@ -271,7 +271,7 @@ def test_mStepModelParams_pointProcess():
 
     # pdb.set_trace()
 
-def test_mStepKernelParams_pointProcess():
+def test_mStepKernelParams_pointProcess_pyTorch():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/hyperMstep_Update.mat")
@@ -338,7 +338,7 @@ def test_mStepKernelParams_pointProcess():
     klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_pyTorch()
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
@@ -416,7 +416,7 @@ def test_mStepKernelParams_pointProcess():
 # 
 #     # pdb.set_trace()
 
-def test_mStepIndPoints_pointProcess():
+def test_mStepIndPoints_pointProcess_pyTorch():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/inducingPointsMstep_all.mat")
@@ -483,7 +483,7 @@ def test_mStepIndPoints_pointProcess():
     klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_pyTorch()
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
@@ -510,7 +510,7 @@ def test_mStepIndPoints_pointProcess():
 
     # pdb.set_trace()
 
-def test_maximize_pointProcess():
+def test_maximize_pointProcess_pyTorch():
     tol = 1e-5
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
@@ -578,7 +578,7 @@ def test_maximize_pointProcess():
                          svPosteriorOnIndPoints=qU)
     svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
     svlb.setKernels(kernels=kernels)
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_pyTorch()
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
@@ -631,7 +631,7 @@ def test_maximize_pointProcess():
 if __name__=='__main__':
     # test_eStep_pointProcess() # passed
     # # test_eStep_poisson() # not tested
-    test_mStepModelParams_pointProcess() # passed
+    test_mStepModelParams_pointProcess_pyTorch()
     # test_mStepKernelParams_pointProcess() # passed
     # test_mStepIndPoints_pointProcess() # passed
 
