@@ -1,12 +1,12 @@
 
 import pdb
 import torch
-from abc import ABC, abstractmethod
+import abc
 import utils.svGPFA.miscUtils
 
-class KernelsMatricesStore(ABC):
+class KernelsMatricesStore(abc.ABC):
 
-    @abstractmethod
+    @abc.abstractmethod
     def buildKernelsMatrices(self):
         pass
 
@@ -36,20 +36,66 @@ class KernelsMatricesStore(ABC):
             answer.append(self._kernels[i].getParams())
         return answer
 
+class KernelMatricesStoreGettersAndSetters(abc.ABC):
+    def get_flattened_kernels_params(self):
+        flattened_params = []
+        for k in range(len(self._kernels)):
+            flattened_params.extend(self._kernels[k].getParams().flatten().tolist())
+        return flattened_params
+
+    def get_flattened_kernels_params_grad(self):
+        flattened_params_grad = []
+        for k in range(len(self._kernels)):
+            flattened_params_grad.extend(self._kernels[k].getParams().grad.flatten().tolist())
+        return flattened_params_grad
+
+    def set_kernels_params_from_flattened(self, flattened_params):
+        for k in range(len(self._kernels)):
+            kernel_nParams = self._kernels[k].getParams().numel()
+            flattened_param = flattened_params[:kernel_nParams]
+            self._kernels[k].setParams(torch.tensor(flattened_param, dtype=torch.double))
+            flattened_params = flattened_params[kernel_nParams:]
+
+    def set_kernels_params_requires_grad(self, requires_grad):
+        for k in range(len(self._kernels)):
+            self._kernels[k].getParams().requires_grad = requires_grad
+
+    def get_flattened_indPointsLocs(self):
+        flattened_params = []
+        for k in range(len(self._indPointsLocs)):
+            flattened_params.extend(self._indPointsLocs[k].flatten().tolist())
+        return flattened_params
+
+    def get_flattened_indPointsLocs_grad(self):
+        flattened_params_grad = []
+        for k in range(len(self._indPointsLocs)):
+            flattened_params_grad.extend(self._indPointsLocs[k].grad.flatten().tolist())
+        return flattened_params_grad
+
+    def set_indPointsLocs_from_flattened(self, flattened_params):
+        for k in range(len(self._indPointsLocs)):
+            numel = self._indPointsLocs[k].numel()
+            self._indPointsLocs[k] = torch.tensor(flattened_params[:numel], dtype=torch.double).reshape(self._indPointsLocs[k].shape)
+            flattened_params = flattened_params[numel:]
+
+    def set_indPointsLocs_requires_grad(self, requires_grad):
+        for k in range(len(self._indPointsLocs)):
+            self._indPointsLocs[k].requires_grad = requires_grad
+
 class IndPointsLocsKMS(KernelsMatricesStore):
 
     def setEpsilon(self, epsilon):
         self._epsilon = epsilon
 
-    # @abstractmethod
+    # @abc.abstractmethod
     def _invertKzz3D(self, Kzz):
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def solveForLatent(self, input, latentIndex):
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
         pass
 
@@ -86,6 +132,10 @@ class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
         solve = torch.cholesky_solve(input, self._KzzInv[latentIndex][trialIndex,:,:])
         return solve
 
+class IndPointsLocsKMS_CholWithGettersAndSetters(IndPointsLocsKMS_Chol, KernelMatricesStoreGettersAndSetters):
+    def __init__(self):
+        pass
+
 class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
 
     def _invertKzz3D(self, Kzz):
@@ -99,6 +149,10 @@ class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
     def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
         solve = torch.matmul(self._KzzInv[latentIndex][trialIndex,:,:], input)
         return solve
+
+class IndPointsLocsKMS_PInvWithGettersAndSetters(IndPointsLocsKMS_PInv, KernelMatricesStoreGettersAndSetters):
+    def __init__(self):
+        pass
 
 class IndPointsLocsAndTimesKMS(KernelsMatricesStore):
 
