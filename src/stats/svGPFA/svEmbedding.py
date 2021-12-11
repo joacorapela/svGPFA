@@ -1,9 +1,9 @@
 
 import pdb
-from abc import ABC, abstractmethod
+import abc
 import torch
 
-class SVEmbedding(ABC):
+class SVEmbedding(abc.ABC):
 
     def __init__(self, svPosteriorOnLatents):
         self._svPosteriorOnLatents = svPosteriorOnLatents
@@ -23,7 +23,7 @@ class SVEmbedding(ABC):
     def buildKernelsMatrices(self):
         self._svPosteriorOnLatents.buildKernelsMatrices()
 
-    @abstractmethod
+    @abc.abstractmethod
     def setInitialParams(self, initialParams):
         pass
 
@@ -36,7 +36,7 @@ class SVEmbedding(ABC):
     def setTimes(self, times):
         self._svPosteriorOnLatents.setTimes(times=times)
 
-    @abstractmethod
+    @abc.abstractmethod
     def getParams(self):
         pass
 
@@ -49,7 +49,7 @@ class SVEmbedding(ABC):
     def getKernelsParams(self):
         return self._svPosteriorOnLatents.getKernelsParams()
 
-    @abstractmethod
+    @abc.abstractmethod
     def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
         pass
 
@@ -98,6 +98,31 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
     def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
         self._svPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+
+class LinearSVEmbeddingAllTimesWithParamsGettersAndSetters(LinearSVEmbeddingAllTimes):
+    def get_flattened_params(self):
+        flattened_params = []
+        flattened_params.extend(self._C.flatten().tolist())
+        flattened_params.extend(self._d.flatten().tolist())
+        return flattened_params
+
+    def get_flattened_params_grad(self):
+        flattened_params_grad = []
+        flattened_params_grad.extend(self._C.grad.flatten().tolist())
+        flattened_params_grad.extend(self._d.grad.flatten().tolist())
+        return flattened_params_grad
+
+    def set_params_from_flattened(self, flattened_params):
+        flattened_param = flattened_params[:self._C.numel()]
+        self._C = torch.tensor(flattened_param, dtype=torch.double).reshape(self._C.shape)
+        flattened_params = flattened_params[self._C.numel():]
+        flattened_param = flattened_params[:self._d.numel()]
+        self._d = torch.tensor(flattened_param, dtype=torch.double).reshape(self._d.shape)
+        flattened_param = flattened_params[self._d.numel():]
+
+    def set_params_requires_grad(self, requires_grad):
+        self._C.requires_grad = requires_grad
+        self._d.requires_grad = requires_grad
 
 class LinearSVEmbeddingAssocTimes(LinearSVEmbedding):
 
