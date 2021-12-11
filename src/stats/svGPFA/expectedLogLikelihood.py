@@ -10,6 +10,9 @@ class ExpectedLogLikelihood(ABC):
         self._svEmbeddingAllTimes = svEmbeddingAllTimes
         self._linkFunction = linkFunction
 
+    def get_svEmbeddingAllTimes(self):
+        return self._svEmbeddingAllTimes
+
     @abstractmethod
     def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
         pass
@@ -125,6 +128,7 @@ class PointProcessELL(ExpectedLogLikelihood):
         sELLTerm1 = torch.sum(aux1)
         sELLTerm2 = torch.sum(eLogLinkValues)
         answer = -sELLTerm1+sELLTerm2
+        # import pdb; pdb.set_trace()
         return answer
 
     def buildKernelsMatrices(self):
