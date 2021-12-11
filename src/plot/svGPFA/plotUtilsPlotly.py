@@ -1131,6 +1131,160 @@ def getPlotTrueAndEstimatedLatents(tTimes, tLatentsSamples, tLatentsMeans, tLate
     fig.update_layout(title_text=title)
     return fig
 
+def getPlotEstimatedLatentsForTrial(times, latentsMeans, latentsSTDs, indPointsLocs, trialToPlot,
+                            cbAlpha = 0.2,
+                            cbFillColorPattern="rgba(255,0,0,{:f})",
+                            meanLineColor="red",
+                            indPointsLocsColor="rgba(255,0,0,0.5)",
+                            xlabel="Time (sec)",
+                            ylabel="Latent",
+                            titlePattern="Trial {:d}"):
+    latentsMeans = latentsMeans.detach()
+    latentsSTDs = latentsSTDs.detach()
+    indPointsLocs = [item.detach() for item in indPointsLocs]
+
+    # pio.renderers.default = "browser"
+    nLatents = latentsMeans.shape[2]
+    fig = go.Figure()
+    title = titlePattern.format(trialToPlot)
+    nTrials = latentsMeans.shape[0]
+    for k in range(nLatents):
+        meanToPlot = latentsMeans[trialToPlot,:,k]
+        stdToPlot = latentsSTDs[trialToPlot,:,k]
+        ciToPlot = 1.96*stdToPlot
+
+        ymax = max(torch.max(meanToPlot+ciToPlot), torch.max(meanToPlot+ciToPlot))
+        ymin = min(torch.min(meanToPlot-ciToPlot), torch.min(meanToPlot-ciToPlot))
+
+        x = times
+        x_rev = x.flip(dims=[0])
+        y = meanToPlot
+        y_upper = y + ciToPlot
+        y_lower = y - ciToPlot
+        y_lower = y_lower.flip(dims=[0])
+
+        x = x.detach().numpy()
+        y = y.detach().numpy()
+        y_upper = y_upper.detach().numpy()
+        y_lower = y_lower.detach().numpy()
+
+        traceCB = go.Scatter(
+            x=np.concatenate((x, x_rev)),
+            y=np.concatenate((y_upper, y_lower)),
+            fill="tozerox",
+            fillcolor=cbFillColorPattern.format(cbAlpha),
+            line=dict(color="rgba(255,255,255,0)"),
+            showlegend=False,
+            name="Estimated",
+        )
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            # line=dict(color="rgb(0,100,80)"),
+            line=dict(color=meanLineColor),
+            mode="lines",
+            name="Estimated",
+            showlegend=(k==0),
+        )
+        fig.add_trace(traceCB)
+        fig.add_trace(traceMean)
+
+        for n in range(indPointsLocs[k].shape[1]):
+            fig.add_shape(
+                dict(
+                    type="line",
+                    x0=indPointsLocs[k][trialToPlot,n,0],
+                    y0=ymin,
+                    x1=indPointsLocs[k][trialToPlot,n,0],
+                    y1=ymax,
+                    line=dict(
+                        color=indPointsLocsColor,
+                        width=3
+                    ),
+                ),
+            )
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
+def getPlotEstimatedLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, latentToPlot,
+                            cbAlpha = 0.2,
+                            cbFillColorPattern="rgba(255,0,0,{:f})",
+                            meanLineColor="red",
+                            indPointsLocsColor="rgba(255,0,0,0.5)",
+                            xlabel="Time (sec)",
+                            ylabel="Latent",
+                            titlePattern="Latent {:d}"):
+    latentsMeans = latentsMeans.detach()
+    latentsSTDs = latentsSTDs.detach()
+    indPointsLocs = [item.detach() for item in indPointsLocs]
+
+    # pio.renderers.default = "browser"
+    nLatents = latentsMeans.shape[2]
+    fig = go.Figure()
+    title = titlePattern.format(latentToPlot)
+    nTrials = latentsMeans.shape[0]
+    for r in range(nTrials):
+        meanToPlot = latentsMeans[r,:,latentToPlot]
+        stdToPlot = latentsSTDs[r,:,latentToPlot]
+        ciToPlot = 1.96*stdToPlot
+        pdb.set_trace()
+
+        ymax = max(torch.max(meanToPlot+ciToPlot), torch.max(meanToPlot+ciToPlot))
+        ymin = min(torch.min(meanToPlot-ciToPlot), torch.min(meanToPlot-ciToPlot))
+
+        x = times
+        x_rev = x.flip(dims=[0])
+        y = meanToPlot
+        y_upper = y + ciToPlot
+        y_lower = y - ciToPlot
+        y_lower = y_lower.flip(dims=[0])
+
+        x = x.detach().numpy()
+        y = y.detach().numpy()
+        y_upper = y_upper.detach().numpy()
+        y_lower = y_lower.detach().numpy()
+
+        traceCB = go.Scatter(
+            x=np.concatenate((x, x_rev)),
+            y=np.concatenate((y_upper, y_lower)),
+            fill="tozerox",
+            fillcolor=cbFillColorPattern.format(cbAlpha),
+            # line=dict(color="rgba(255,255,255,0)"),
+            showlegend=False,
+            name="Estimated",
+        )
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            # line=dict(color="rgb(0,100,80)"),
+            # line=dict(color=meanLineColor),
+            mode="lines",
+            name="trial {:d}".format(r),
+        )
+        fig.add_trace(traceCB)
+        fig.add_trace(traceMean)
+
+        for n in range(indPointsLocs[latentToPlot].shape[1]):
+            fig.add_shape(
+                dict(
+                    type="line",
+                    x0=indPointsLocs[latentToPlot][r,n,0],
+                    y0=ymin,
+                    x1=indPointsLocs[latentToPlot][r,n,0],
+                    y1=ymax,
+                    line=dict(
+                        color=indPointsLocsColor,
+                        width=3
+                    ),
+                ),
+            )
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
 def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     tTimes, tLatentsSamples, tLatentsMeans, tLatentsSTDs, tIndPointsLocs,
     eTimes, eLatentsMeans, eLatentsSTDs, eIndPointsLocs,
