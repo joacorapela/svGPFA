@@ -38,10 +38,10 @@ def computeSpikeRates(trialsTimes, spikesTimes):
             spikesRates[r,n] = len(spikesTimes[r][n])/trialDuration
     return spikesRates
 
-def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
-                                 indPointsLocs0,
+def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
+                                 indPointsLocs,
                                  legQuadPoints, legQuadWeights,
-                                 kernelsTypes, kernelsParams0,
+                                 kernelsTypes, kernelsParams,
                                  spikesTimes,
                                  indPointsLocsKMSRegEpsilon, trialsLengths,
                                  latentsTrialsTimes,
@@ -50,10 +50,10 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
                                  saveFilename):
     nTrials = len(spikesTimes)
     nNeurons = len(spikesTimes[0])
-    nLatents = len(qMu0)
+    nLatents = len(qMu)
     # indPointsLocsKMSEpsilon = np.array(indPointsLocsKMSEpsilon)
     mdict = dict(nTrials=nTrials, nNeurons=nNeurons, nLatents=nLatents,
-                 C0=C0.numpy(), d0=torch.reshape(input=d0, shape=(-1,1)).numpy(),
+                 C=C.numpy(), d=torch.reshape(input=d, shape=(-1,1)).numpy(),
                  legQuadPoints=legQuadPoints.numpy(),
                  legQuadWeights=legQuadWeights.numpy(),
                  indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
@@ -64,14 +64,14 @@ def saveDataForMatlabEstimations(qMu0, qSVec0, qSDiag0, C0, d0,
                  mStepIndPointsMaxIter=mStepIndPointsMaxIter)
     for k in range(nLatents):
         mdict.update({"kernelType_{:d}".format(k): kernelsTypes[k]})
-        mdict.update({"qMu0_{:d}".format(k): qMu0[k].numpy().astype(np.float64)})
-        mdict.update({"qSVec0_{:d}".format(k): qSVec0[k].numpy().astype(np.float64)})
-        mdict.update({"qSDiag0_{:d}".format(k): qSDiag0[k].numpy().astype(np.float64)})
-        mdict.update({"kernelsParams0_{:d}".format(k): kernelsParams0[k].numpy().astype(np.float64)})
-        mdict.update({"indPointsLocs0_{:d}".format(k): indPointsLocs0[k].numpy().astype(np.float64)})
-        mdict.update({"qMu0_{:d}".format(k): qMu0[k].numpy().astype(np.float64)})
-        mdict.update({"qSVec0_{:d}".format(k): qSVec0[k].numpy().astype(np.float64)})
-        mdict.update({"qSDiag0_{:d}".format(k): qSDiag0[k].numpy().astype(np.float64)})
+        mdict.update({"qMu_{:d}".format(k): qMu[k].numpy().astype(np.float64)})
+        mdict.update({"qSVec_{:d}".format(k): qSVec[k].numpy().astype(np.float64)})
+        mdict.update({"qSDiag_{:d}".format(k): qSDiag[k].numpy().astype(np.float64)})
+        mdict.update({"kernelsParams_{:d}".format(k): kernelsParams[k].numpy().astype(np.float64)})
+        mdict.update({"indPointsLocs_{:d}".format(k): indPointsLocs[k].numpy().astype(np.float64)})
+        mdict.update({"qMu_{:d}".format(k): qMu[k].numpy().astype(np.float64)})
+        mdict.update({"qSVec_{:d}".format(k): qSVec[k].numpy().astype(np.float64)})
+        mdict.update({"qSDiag_{:d}".format(k): qSDiag[k].numpy().astype(np.float64)})
         mdict.update({"latentsTrialsTimes_{:d}".format(k): latentsTrialsTimes[k].numpy().astype(np.float64)})
     for r in range(nTrials):
         for n in range(nNeurons):
