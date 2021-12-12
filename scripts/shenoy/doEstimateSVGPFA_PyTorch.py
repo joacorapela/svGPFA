@@ -84,19 +84,7 @@ def main(argv):
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimMethod = optimParamsConfig["em_method"]
-    optimParams = {}
-    optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
-    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-    for step in steps:
-        optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
-        optimParams["{:s}_optim_params".format(step)] = {
-            "max_iter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
-            "lr": float(optimParamsConfig["{:s}_lr".format(step)]),
-            "tolerance_grad": float(optimParamsConfig["{:s}_tolerance_grad".format(step)]),
-            "tolerance_change": float(optimParamsConfig["{:s}_tolerance_change".format(step)]),
-            "line_search_fn": optimParamsConfig["{:s}_line_search_fn".format(step)],
-        }
-    optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
+    optimParams = utils.svGPFA.miscUtils.getOptimParams(optimParamsDict=optimParamsDict)
 
     # load data and initial values
     # simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
@@ -210,7 +198,7 @@ def main(argv):
         return kernelParams
 
     # create model
-    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
+    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
@@ -236,7 +224,7 @@ def main(argv):
     with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
 
     # maximize lower bound
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_PyTorch()
     lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
             svEM.maximize(model=model, optimParams=optimParams,
                           method=optimMethod,

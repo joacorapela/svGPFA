@@ -8,6 +8,23 @@ import matplotlib.pyplot as plt
 import myMath.utils
 import stats.gaussianProcesses.eval
 
+def getOptimParams(optimParamsDict):
+    optimMethod = optimParamsDict["em_method"]
+    optimParams = {}
+    optimParams["em_max_iter"] = int(optimParamsDict["em_max_iter"])
+    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
+    for step in steps:
+        optimParams["{:s}_estimate".format(step)] = optimParamsDict["{:s}_estimate".format(step)]=="True"
+        optimParams["{:s}_optim_params".format(step)] = {
+            "max_iter": int(optimParamsDict["{:s}_max_iter".format(step)]),
+            "lr": float(optimParamsDict["{:s}_lr".format(step)]),
+            "tolerance_grad": float(optimParamsDict["{:s}_tolerance_grad".format(step)]),
+            "tolerance_change": float(optimParamsDict["{:s}_tolerance_change".format(step)]),
+            "line_search_fn": optimParamsDict["{:s}_line_search_fn".format(step)],
+        }
+    optimParams["verbose"] = optimParamsDict["verbose"]=="True"
+    return optimParams
+
 def getPropSamplesCovered(sample, mean, std, percent=.95):
     if percent==.95:
         factor = 1.96
@@ -26,7 +43,7 @@ def getCIFs(C, d, latents):
     for r in range(nTrials):
         embeddings[r,:,:] = torch.matmul(latents[r,:,:], torch.transpose(C, 0, 1))+d[:,0]
     CIFs = torch.exp(embeddings)
-    return(CIFs)
+    return CIFs
 
 def computeSpikeRates(trialsTimes, spikesTimes):
     nTrials = len(spikesTimes)
@@ -98,7 +115,7 @@ def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
         for r in range(R):
             qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:,0], nIndPoints=nIndPointsK)
             qSigmas[k][r,:,:] = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
-    return(qSigmas)
+    return qSigmas
 
 def getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs):
     # srQSigmaVecs[k] \in nTrial x Pk
@@ -284,7 +301,7 @@ def buildQSigmaFromQSVecAndQSDiag(qSVec, qSDiag):
         dd = build3DdiagFromDiagVector(v=(qSDiag[k].flatten())**2, M=nTrials, N=nIndKVarRnkK)
         # qSigma[k] \in nTrials x nInd[k] x nInd[k]
         qSigma[k] = torch.matmul(qq, torch.transpose(a=qq, dim0=1, dim1=2)) + dd
-    return(qSigma)
+    return qSigma
 
 def getSRQSigmaVec(qSVec, qSDiag):
     nLatents = len(qSVec)

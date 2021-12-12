@@ -79,6 +79,7 @@ def main(argv):
     fig.write_image(latentsFigFilenamePattern.format("png"))
     fig.write_html(latentsFigFilenamePattern.format("html"))
 
+<<<<<<< HEAD
     embeddingMeans, embeddingVars = model.predictEmbedding(newTimes=trial_times)
     title = "Neuron {:d}".format(neuronToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotEmbeddingAcrossTrials(times=trial_times, embeddingsMeans=embeddingMeans[:,:,neuronToPlot], embeddingsSTDs=torch.sqrt(embeddingVars[:,:,neuronToPlot]), title=title)
@@ -97,7 +98,7 @@ def main(argv):
     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
     fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
 
-    pdb.set_trace()
+#     pdb.set_trace()
 
 if __name__=="__main__":
     main(sys.argv)
