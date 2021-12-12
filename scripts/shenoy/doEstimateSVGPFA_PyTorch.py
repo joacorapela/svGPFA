@@ -25,7 +25,7 @@ def main(argv):
     parser.add_argument("--location", help="location to analyze", type=int,
                         default=0)
     parser.add_argument("--trials", help="trials to analyze",
-                        default="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]")
+                        default="[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]")
     parser.add_argument("--nLatents", help="number of latent variables",
                         type=int, default=2)
     parser.add_argument("--from_time", help="starting spike analysis time",
