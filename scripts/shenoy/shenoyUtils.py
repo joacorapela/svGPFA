@@ -4,9 +4,10 @@ import torch
 def  getTrialAndLocationSpikesTimes(mat, trial, location, sRate=1000):
     mat_spike_times = mat["Rb"][trial, location]['unit']['spikeTimes']
     spikes_times = []
-    for j in range(mat_spike_times.shape[1]):
+    nNeurons = mat_spike_times.shape[1]
+    for j in range(nNeurons):
         spikes_times_set = (mat_spike_times[0,j].astype(np.float64)/sRate).squeeze()
-        spikes_times.append(torch.from_numpy(spikes_times_set))
+        spikes_times.append(torch.from_numpy(spikes_times_set, dtype=torch.double))
     return spikes_times
 
 def getTrialsAndLocationSpikesTimes(mat, trials, location, sRate=1000):
