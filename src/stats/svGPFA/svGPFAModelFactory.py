@@ -36,7 +36,7 @@ indPointsCovChol = 100001
 class SVGPFAModelFactory:
 
     @staticmethod
-    def buildModelPytorch(conditionalDist, linkFunction, embeddingType, kernels,
+    def buildModelPyTorch(conditionalDist, linkFunction, embeddingType, kernels,
                    kernelMatrixInvMethod, indPointsCovRep):
 
         if conditionalDist==PointProcess:
