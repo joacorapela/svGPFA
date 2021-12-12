@@ -84,17 +84,7 @@ def main(argv):
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimMethod = optimParamsConfig["em_method"]
-    optimParams = {}
-    optimParams["em_max_iter"] = int(optimParamsConfig["em_max_iter"])
-    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-    for step in steps:
-        optimParams["{:s}_estimate".format(step)] = optimParamsConfig["{:s}_estimate".format(step)]=="True"
-        optimParams["{:s}_optim_params".format(step)] = {
-            "maxiter": int(optimParamsConfig["{:s}_max_iter".format(step)]),
-            "ftol": float(optimParamsConfig["{:s}_tolerance_grad".format(step)]),
-            "gtol": float(optimParamsConfig["{:s}_tolerance_change".format(step)]),
-        }
-    optimParams["verbose"] = optimParamsConfig["verbose"]=="True"
+    optimParams = utils.svGPFA.miscUtils.getOptimParams(optimParamsDict=optimParamsDict)
 
     # load data and initial values
     # simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
