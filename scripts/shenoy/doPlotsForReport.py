@@ -120,13 +120,13 @@ def main(argv):
 #     plt.close("all")
 
     # plot model params
-    mKernelsParams = model.getKernelsParams()
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(
-        kernelsTypes=kernelsTypes,
-        trueKernelsParams=tKernelsParams,
-        estimatedKernelsParams=mKernelsParams)
-    fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
-    fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
+#     mKernelsParams = model.getKernelsParams()
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams(
+#         kernelsTypes=kernelsTypes,
+#         trueKernelsParams=tKernelsParams,
+#         estimatedKernelsParams=mKernelsParams)
+#     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
+#     fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
 
     # tLatentsMeansFuncs = utils.svGPFA.configUtils.getLatentsMeansFuncs(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     # trialsTimes = utils.svGPFA.miscUtils.getTrialsTimes(trialsLengths=trialsLengths, dt=dtCIF)
@@ -139,10 +139,10 @@ def main(argv):
     # fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
     # fig.write_html(kernelsParamsFigFilenamePattern.format("html"))
 
-    estimatedC, estimatedD = model.getSVEmbeddingParams()
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=C.numpy(), trueD=d.numpy(), estimatedC=estimatedC.numpy(), estimatedD=estimatedD.numpy())
-    fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
-    fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
+#     estimatedC, estimatedD = model.getSVEmbeddingParams()
+#     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=C.numpy(), trueD=d.numpy(), estimatedC=estimatedC.numpy(), estimatedD=estimatedD.numpy())
+#     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
+#     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with analytical correction
 #     t0 = math.floor(cifTimesKS.min())
@@ -161,7 +161,7 @@ def main(argv):
 # #     plot.svGPFA.plotUtils.plotACF(acf=acfRes, Fs=1/dt, confint=confint, title=title, figFilename=timeRescalingACFFigFilename),
 # #     plt.close("all")
 
-    pdb.set_trace()
+#     pdb.set_trace()
 
 if __name__=="__main__":
     main(sys.argv)
