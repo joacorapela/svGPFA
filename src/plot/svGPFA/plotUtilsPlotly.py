@@ -158,6 +158,103 @@ def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
     # import pdb; pdb.set_trace()
     return fig
 
+def getPlotEmbeddingParams(C, d, linestyle="solid", marker="asterisk", xlabel="Neuron Index", ylabel="Value"):
+    figDic = {
+        "data": [],
+        "layout": {
+            "xaxis": {"title": xlabel},
+            "yaxis": {"title": ylabel},
+        },
+    }
+    neuronIndices = np.arange(C.shape[0])
+    for i in range(C.shape[1]):
+        figDic["data"].append(
+            {
+                "type": "scatter",
+                "name": "C[:,{:d}]".format(i),
+                "x": neuronIndices,
+                "y": C[:,i],
+                "line": {"dash": linestyle},
+                # "marker_symbol": marker,
+            },
+        )
+    figDic["data"].append(
+        {
+            "type": "scatter",
+            "name": "d",
+            "x": neuronIndices,
+            "y": d[:,0],
+            "line": {"dash": linestyle},
+            # "marker_symbol": marker,
+        },
+    )
+    fig = go.Figure(
+        data=figDic["data"],
+        layout=figDic["layout"],
+    )
+    # import pdb; pdb.set_trace()
+    return fig
+
+def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
+                            cbAlpha = 0.2,
+                            indPointsLocsColor="rgba(255,0,0,0.5)",
+                            colorsList=plotly.colors.qualitative.Plotly,
+                            xlabel="Time (sec)",
+                            ylabel="Value",
+                            title=""):
+    times = times.detach().numpy()
+    embeddingsMeans = embeddingsMeans.detach().numpy()
+    embeddingsSTDs = embeddingsSTDs.detach().numpy()
+
+    # pio.renderers.default = "browser"
+    fig = go.Figure()
+    nTrials = embeddingsMeans.shape[0]
+    for r in range(nTrials):
+        meanToPlot = embeddingsMeans[r,:]
+        stdToPlot = embeddingsSTDs[r,:]
+        ciToPlot = 1.96*stdToPlot
+        color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
+        color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
+
+        # pdb.set_trace()
+#         import matplotlib
+#         matplotlib.use('TkAgg')
+#         import matplotlib.pyplot as plt
+#         plt.plot(times, meanToPlot)
+#         plt.show()
+#         pdb.set_trace()
+
+        x = times
+        y = meanToPlot
+        y_upper = y + ciToPlot
+        y_lower = y - ciToPlot
+        ymax = max(np.max(meanToPlot+ciToPlot), np.max(meanToPlot+ciToPlot))
+        ymin = min(np.min(meanToPlot-ciToPlot), np.min(meanToPlot-ciToPlot))
+
+        traceCB = go.Scatter(
+            x=np.concatenate((x, x[::-1])),
+            y=np.concatenate((y_upper, y_lower[::-1])),
+            fill="toself",
+            fillcolor=color_rgba_pattern.format(0.5),
+            line=dict(color=color_rgba_pattern.format(0.0)),
+            showlegend=False,
+            name="Estimated",
+        )
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            line=dict(color=color_rgba_pattern.format(1.0)),
+            mode="lines",
+            name="trial {:d}".format(r),
+        )
+        fig.add_trace(traceCB)
+        fig.add_trace(traceMean)
+
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
 def getSimulatedEmbeddingPlot(times, samples, means, stds, title, 
                               cbAlpha = 0.2, 
                               cbFillColorPattern="rgba(0,0,255,{:f})", 
@@ -1208,20 +1305,19 @@ def getPlotEstimatedLatentsForTrial(times, latentsMeans, latentsSTDs, indPointsL
     fig.update_layout(title_text=title)
     return fig
 
-def getPlotEstimatedLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, latentToPlot,
+def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, latentToPlot,
                             cbAlpha = 0.2,
-                            cbFillColorPattern="rgba(255,0,0,{:f})",
-                            meanLineColor="red",
                             indPointsLocsColor="rgba(255,0,0,0.5)",
+                            colorsList=plotly.colors.qualitative.Plotly,
                             xlabel="Time (sec)",
-                            ylabel="Latent",
+                            ylabel="Value",
                             titlePattern="Latent {:d}"):
-    latentsMeans = latentsMeans.detach()
-    latentsSTDs = latentsSTDs.detach()
-    indPointsLocs = [item.detach() for item in indPointsLocs]
+    times = times.detach().numpy()
+    latentsMeans = latentsMeans.detach().numpy()
+    latentsSTDs = latentsSTDs.detach().numpy()
+    indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
 
     # pio.renderers.default = "browser"
-    nLatents = latentsMeans.shape[2]
     fig = go.Figure()
     title = titlePattern.format(latentToPlot)
     nTrials = latentsMeans.shape[0]
@@ -1229,37 +1325,37 @@ def getPlotEstimatedLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPoin
         meanToPlot = latentsMeans[r,:,latentToPlot]
         stdToPlot = latentsSTDs[r,:,latentToPlot]
         ciToPlot = 1.96*stdToPlot
-        pdb.set_trace()
+        color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
+        color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
 
-        ymax = max(torch.max(meanToPlot+ciToPlot), torch.max(meanToPlot+ciToPlot))
-        ymin = min(torch.min(meanToPlot-ciToPlot), torch.min(meanToPlot-ciToPlot))
+        # pdb.set_trace()
+#         import matplotlib
+#         matplotlib.use('TkAgg')
+#         import matplotlib.pyplot as plt
+#         plt.plot(times, meanToPlot)
+#         plt.show()
+#         pdb.set_trace()
 
         x = times
-        x_rev = x.flip(dims=[0])
         y = meanToPlot
         y_upper = y + ciToPlot
         y_lower = y - ciToPlot
-        y_lower = y_lower.flip(dims=[0])
-
-        x = x.detach().numpy()
-        y = y.detach().numpy()
-        y_upper = y_upper.detach().numpy()
-        y_lower = y_lower.detach().numpy()
+        ymax = max(np.max(meanToPlot+ciToPlot), np.max(meanToPlot+ciToPlot))
+        ymin = min(np.min(meanToPlot-ciToPlot), np.min(meanToPlot-ciToPlot))
 
         traceCB = go.Scatter(
-            x=np.concatenate((x, x_rev)),
-            y=np.concatenate((y_upper, y_lower)),
-            fill="tozerox",
-            fillcolor=cbFillColorPattern.format(cbAlpha),
-            # line=dict(color="rgba(255,255,255,0)"),
+            x=np.concatenate((x, x[::-1])),
+            y=np.concatenate((y_upper, y_lower[::-1])),
+            fill="toself",
+            fillcolor=color_rgba_pattern.format(cbAlpha),
+            line=dict(color=color_rgba_pattern.format(0.0)),
             showlegend=False,
             name="Estimated",
         )
         traceMean = go.Scatter(
             x=x,
             y=y,
-            # line=dict(color="rgb(0,100,80)"),
-            # line=dict(color=meanLineColor),
+            line=dict(color=color_rgba_pattern.format(1.0)),
             mode="lines",
             name="trial {:d}".format(r),
         )
@@ -1613,6 +1709,30 @@ def getPlotTrueAndEstimatedKernelsParams(kernelsTypes, trueKernelsParams, estima
     fig.update_yaxes(title_text="Parameter Value", row=nLatents//2+1, col=1)
     return fig
 
+def getPlotKernelsParams(kernelsTypes, kernelsParams, color="red", ylabel="Value"):
+    nLatents = len(kernelsParams)
+    titles = ["Latent {:d}: {:s}".format(k, kernelsTypes[k]) for k in range(nLatents)]
+    fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, subplot_titles=titles)
+    for k in range(nLatents):
+        params = kernelsParams[k].tolist()
+        if k==0:
+            showLegend = True
+        else:
+            showLegend = False
+
+        if kernelsTypes[k]=="PeriodicKernel":
+            labels = ["Length Scale", "Period"]
+        elif kernelsTypes[k]=="ExponentialQuadraticKernel":
+            labels = ["Length Scale"]
+        else:
+            raise RuntimeError("Invalid kernel type {:s}".format(kernelsTypes[k]))
+
+        trace = go.Bar(x=labels, y=params, marker_color=color, showlegend=False)
+        fig.append_trace(trace, k+1, 1)
+        # import pdb; pdb.set_trace()
+    fig.update_yaxes(title_text=ylabel, row=nLatents//2+1, col=1)
+    return fig
+
 def getPlotTrueAndEstimatedKernelsParamsOneLatent(
     trueKernel,
     estimatedKernelParams,
@@ -1633,6 +1753,16 @@ def getPlotTrueAndEstimatedKernelsParamsOneLatent(
     traceEstimated = go.Bar(x=labels, y=estimatedParams, name=estimatedLegend, marker_color=colorEstimated, showlegend=True)
     fig.add_trace(traceTrue)
     fig.add_trace(traceEstimated)
+    fig.update_yaxes(title_text="Parameter Value")
+    fig.update_layout(title=title)
+    return fig
+
+def getPlotKernelsParamsOneLatent(kernelParams, labels, title, color="red"):
+    kernelParams = kernelParams.tolist()
+
+    fig = go.Figure()
+    trace = go.Bar(x=labels, y=kernelParams, marker_color=color, showlegend=True)
+    fig.add_trace(trace)
     fig.update_yaxes(title_text="Parameter Value")
     fig.update_layout(title=title)
     return fig
@@ -1675,58 +1805,6 @@ def getPlotTruePythonAndMatlabKernelsParams(kernelsTypes,
         fig.append_trace(tracePython, k+1, 1)
         fig.append_trace(traceMatlab, k+1, 1)
     fig.update_yaxes(title_text="Parameter Value", row=nLatents//2+1, col=1)
-    return fig
-
-def getPlotLowerBoundVsTwoParamsParam(param1Values,
-                                      param2Values,
-                                      lowerBoundValues,
-                                      refParam1,
-                                      refParam2,
-                                      refParamsLowerBound,
-                                      refParamText,
-                                      title,
-                                      lowerBoundQuantile = 0.5,
-                                      param1Label="Parameter 1",
-                                      param2Label="Parameter 2",
-                                      lowerBoundLabel="Lower Bound",
-                                      markerSize=3.0,
-                                      markerOpacity=0.8,
-                                      markerColorscale="Viridis",
-                                      zMin=None, zMax=None,
-                                     ):
-    data = {"x": param1Values, "y": param2Values, "z": lowerBoundValues}
-    df = pd.DataFrame(data)
-    if zMin is None:
-        zMin = df.z.quantile(lowerBoundQuantile)
-    if zMax is None:
-        zMax = df.z.max()
-    dfTrimmed = df[df.z>zMin]
-    # fig = go.Figure(data=[go.Scatter3d(x=param1Values, y=param2Values, z=lowerBoundValues, mode="markers")])
-#     fig = go.Figure(data=[go.Scatter3d(x=dfTrimmed.x, y=dfTrimmed.y, z=dfTrimmed.z, mode="markers")])
-    # fig.update_layout(scene=dict(zaxis=dict(range=[df.z.max()-1000,df.z.max()+500],)),width=700,)
-    # fig = px.scatter_3d(dfTrimmed, x='x', y='y', z='z')
-    fig = go.Figure(data=[go.Scatter3d(x=dfTrimmed.x, y=dfTrimmed.y,
-                                       z=dfTrimmed.z, mode="markers",
-                                       marker=dict(size=markerSize,
-                                                   color=dfTrimmed.z,
-                                                   colorscale=markerColorscale,
-                                                   opacity=markerOpacity)) ])
-
-#     fig = go.Figure(go.Mesh3d(x=dfTrimmed.x, y=dfTrimmed.y, z=dfTrimmed.z))
-#     fig.add_trace(
-#         go.Scatter3d(
-#             x=[refParam1],
-#             y=[refParam2],
-#             z=[refParamsLowerBound],
-#             type="scatter3d", text=[refParamText], mode="text",
-#         )
-#     )
-    fig.update_layout(title=title, scene = dict(xaxis_title = param1Label, yaxis_title = param2Label, zaxis_title = lowerBoundLabel,))
-#     fig.update_layout(scene = dict(zaxis = dict(range=[zMin,zMax]),))
-#     fig.update_layout(scene = dict(zaxis=dict(range=[df.z.max()-1000,df.z.max()+500],),),)
-#     pio.renderers.default = "browser"
-#     fig.show()
-#     pdb.set_trace()
     return fig
 
 # CIF
@@ -1920,3 +1998,57 @@ def getPlotLowerBoundVsOneParam(paramValues, lowerBoundValues, refParams, title,
                 )
         ))
     return fig
+
+def getPlotLowerBoundVsTwoParamsParam(param1Values,
+                                      param2Values,
+                                      lowerBoundValues,
+                                      refParam1,
+                                      refParam2,
+                                      refParamsLowerBound,
+                                      refParamText,
+                                      title,
+                                      lowerBoundQuantile = 0.5,
+                                      param1Label="Parameter 1",
+                                      param2Label="Parameter 2",
+                                      lowerBoundLabel="Lower Bound",
+                                      markerSize=3.0,
+                                      markerOpacity=0.8,
+                                      markerColorscale="Viridis",
+                                      zMin=None, zMax=None,
+                                     ):
+    data = {"x": param1Values, "y": param2Values, "z": lowerBoundValues}
+    df = pd.DataFrame(data)
+    if zMin is None:
+        zMin = df.z.quantile(lowerBoundQuantile)
+    if zMax is None:
+        zMax = df.z.max()
+    dfTrimmed = df[df.z>zMin]
+    # fig = go.Figure(data=[go.Scatter3d(x=param1Values, y=param2Values, z=lowerBoundValues, mode="markers")])
+#     fig = go.Figure(data=[go.Scatter3d(x=dfTrimmed.x, y=dfTrimmed.y, z=dfTrimmed.z, mode="markers")])
+    # fig.update_layout(scene=dict(zaxis=dict(range=[df.z.max()-1000,df.z.max()+500],)),width=700,)
+    # fig = px.scatter_3d(dfTrimmed, x='x', y='y', z='z')
+    fig = go.Figure(data=[go.Scatter3d(x=dfTrimmed.x, y=dfTrimmed.y,
+                                       z=dfTrimmed.z, mode="markers",
+                                       marker=dict(size=markerSize,
+                                                   color=dfTrimmed.z,
+                                                   colorscale=markerColorscale,
+                                                   opacity=markerOpacity)) ])
+
+#     fig = go.Figure(go.Mesh3d(x=dfTrimmed.x, y=dfTrimmed.y, z=dfTrimmed.z))
+#     fig.add_trace(
+#         go.Scatter3d(
+#             x=[refParam1],
+#             y=[refParam2],
+#             z=[refParamsLowerBound],
+#             type="scatter3d", text=[refParamText], mode="text",
+#         )
+#     )
+    fig.update_layout(title=title, scene = dict(xaxis_title = param1Label, yaxis_title = param2Label, zaxis_title = lowerBoundLabel,))
+#     fig.update_layout(scene = dict(zaxis = dict(range=[zMin,zMax]),))
+#     fig.update_layout(scene = dict(zaxis=dict(range=[df.z.max()-1000,df.z.max()+500],),),)
+#     pio.renderers.default = "browser"
+#     fig.show()
+#     pdb.set_trace()
+    return fig
+
+
