@@ -1229,7 +1229,6 @@ def getPlotEstimatedLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPoin
         meanToPlot = latentsMeans[r,:,latentToPlot]
         stdToPlot = latentsSTDs[r,:,latentToPlot]
         ciToPlot = 1.96*stdToPlot
-        pdb.set_trace()
 
         ymax = max(torch.max(meanToPlot+ciToPlot), torch.max(meanToPlot+ciToPlot))
         ymin = min(torch.min(meanToPlot-ciToPlot), torch.min(meanToPlot-ciToPlot))
