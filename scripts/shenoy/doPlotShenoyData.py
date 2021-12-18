@@ -20,7 +20,7 @@ def main(argv):
     parser.add_argument("--vline_width", help="vertical line width", type=int, default=3)
     parser.add_argument("--vline_style", help="vertical line style", default="solid")
     parser.add_argument("--xlabel", help="x-axis label", default="Time (msec)")
-    parser.add_argument("--fig_filename_pattern", help="figure filename pattern", default="figures/shenoy_delayRch_george_trial{:d}_location{:d}.{:s}")
+    parser.add_argument("--fig_filename_pattern", help="figure filename pattern", default="figures/spikesTimes_trial{:d}_location{:d}.{:s}")
     args = parser.parse_args()
 
     data_filename = args.data_filename
@@ -60,9 +60,9 @@ def main(argv):
     html_fig_filename = fig_filename_pattern.format(trial, location, "html")
     fig.write_html(html_fig_filename)
 
-    fig.show()
+    # fig.show()
 
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
 if __name__=="__main__":
     main(sys.argv)
