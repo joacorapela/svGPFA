@@ -238,7 +238,8 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
             fillcolor=color_rgba_pattern.format(0.5),
             line=dict(color=color_rgba_pattern.format(0.0)),
             showlegend=False,
-            name="Estimated",
+            # name="trial CB {:d}".format(r),
+            legendgroup="trial{:02d}".format(r)
         )
         traceMean = go.Scatter(
             x=x,
@@ -246,6 +247,7 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
             line=dict(color=color_rgba_pattern.format(1.0)),
             mode="lines",
             name="trial {:d}".format(r),
+            legendgroup="trial{:02d}".format(r)
         )
         fig.add_trace(traceCB)
         fig.add_trace(traceMean)
@@ -1371,7 +1373,7 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, l
                     x1=indPointsLocs[latentToPlot][r,n,0],
                     y1=ymax,
                     line=dict(
-                        color=indPointsLocsColor,
+                        color=color_rgba_pattern.format(0.7),
                         width=3
                     ),
                 ),
