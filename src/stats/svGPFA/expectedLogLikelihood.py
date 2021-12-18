@@ -128,7 +128,6 @@ class PointProcessELL(ExpectedLogLikelihood):
         sELLTerm1 = torch.sum(aux1)
         sELLTerm2 = torch.sum(eLogLinkValues)
         answer = -sELLTerm1+sELLTerm2
-        # import pdb; pdb.set_trace()
         return answer
 
     def buildKernelsMatrices(self):
