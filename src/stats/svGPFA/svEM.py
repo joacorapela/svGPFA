@@ -61,7 +61,7 @@ class SVEM_PyTorch(SVEM):
                  savePartialFilenamePattern="results/00000000_{:s}_estimatedModel.pickle",
                 ):
         # begin debug
-        self._model = model
+        # self._model = model
         # end debug
 
         if latentsStreamFN is not None and latentsTimes is None:
