@@ -7,6 +7,8 @@ import pickle
 import argparse
 import configparser
 import scipy.io
+import numpy as np
+import pandas as pd
 
 import shenoyUtils
 sys.path.append("../../src")
@@ -24,16 +26,17 @@ def main(argv):
                         action="store_true")
     parser.add_argument("--location", help="location to analyze", type=int,
                         default=0)
-    parser.add_argument("--trials", help="trials to analyze",
+    parser.add_argument("--trials_indices", help="trials indices to analyze",
                         default="[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]")
     parser.add_argument("--nLatents", help="number of latent variables",
                         type=int, default=2)
     parser.add_argument("--from_time", help="starting spike analysis time",
-                        type=float, default=0.750)
+                        type=float, default=0.0)
     parser.add_argument("--to_time", help="ending spike analysis time",
-                        type=float, default=2.250)
-    parser.add_argument("--unitsToRemove", help="units to remove",
-                        default="[39,57,73]")
+                        type=float, default=3000.0)
+    parser.add_argument("--min_nSpikes_perNeuron_perTrial",
+                        help="min number of spikes per neuron per trial",
+                        type=int, default=1)
     parser.add_argument("--save_partial_filename_pattern_pattern",
                         help="pattern for save partial model filename pattern",
                         default="results/{:08d}_{{:s}}_estimatedModel.pickle")
@@ -44,21 +47,29 @@ def main(argv):
     estInitNumber = args.estInitNumber
     save_partial = args.savePartial
     location = args.location
-    trials = [int(str) for str in args.trials[1:-1].split(",")]
+    trials_indices = [int(str) for str in args.trials_indices[1:-1].split(",")]
     nLatents = args.nLatents
     from_time = args.from_time
     to_time = args.to_time
-    units_to_remove = [int(str) for str in args.unitsToRemove[1:-1].split(",")]
+    min_nSpikes_perNeuron_perTrial = args.min_nSpikes_perNeuron_perTrial
     save_partial_filename_pattern_pattern = args.save_partial_filename_pattern_pattern
     data_filename = args.data_filename
 
     mat = scipy.io.loadmat(os.path.expanduser(data_filename))
     spikesTimes = shenoyUtils.getTrialsAndLocationSpikesTimes(mat=mat,
-                                                               trials=trials,
+                                                               trials_indices=
+                                                                trials_indices,
                                                                location=location)
     spikesTimes = shenoyUtils.clipSpikesTimes(spikes_times=spikesTimes,
                                               from_time=from_time,
                                               to_time=to_time)
+    # spikesTimes = shenoyUtils.offsetSpikeTimes(spikes_times=spikesTimes, offset=-from_time)
+
+    # units_to_remove = shenoyUtils.selectUnitsWithLessSpikesThanThrInAnyTrial(
+    #     spikes_times=spikesTimes, thr=min_nSpikes_perNeuron_perTrial)
+    units_to_remove = \
+            shenoyUtils.selectUnitsWithLessSpikesThanThrInAllTrials(
+                spikes_times=spikesTimes, thr=min_nSpikes_perNeuron_perTrial)
     spikesTimes = shenoyUtils.removeUnits(spikes_times=spikesTimes,
                                           units_to_remove=units_to_remove)
 
@@ -84,7 +95,7 @@ def main(argv):
 
     optimParamsConfig = estInitConfig._sections["optim_params"]
     optimMethod = optimParamsConfig["em_method"]
-    optimParams = utils.svGPFA.miscUtils.getOptimParams(optimParamsDict=optimParamsDict)
+    optimParams = utils.svGPFA.miscUtils.getOptimParams(optimParamsDict=optimParamsConfig)
 
     # load data and initial values
     # simResConfigFilename = "results/{:08d}_simulation_metaData.ini".format(simResNumber)
@@ -96,8 +107,10 @@ def main(argv):
     # simInitConfig = configparser.ConfigParser()
     # simInitConfig.read(simInitConfigFilename)
     nNeurons = len(spikesTimes[0])
-    nTrials = len(trials)
-    trialsLengths = [to_time-from_time for i in range(nTrials)]
+    nTrials = len(trials_indices)
+    trials_start_times = [from_time for i in range(nTrials)]
+    trials_end_times = [to_time for i in range(nTrials)]
+    trials_lengths = [trials_end_times[i]-trials_start_times[i] for i in range(nTrials)]
 
     # with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     # spikesTimes = simRes["spikes"]
@@ -109,12 +122,22 @@ def main(argv):
     else:
         CFilename = estInitConfig["embedding_params"]["C_filename"]
         dFilename = estInitConfig["embedding_params"]["d_filename"]
-        C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=CFilename, dFilename=dFilename)
+        df = pd.read_csv(CFilename, header=None)
+        C = df.values
+        C = np.delete(C, units_to_remove, axis=0)
+        C = torch.from_numpy(C)
+        df = pd.read_csv(dFilename, header=None)
+        d = df.values
+        d = np.delete(d, units_to_remove, axis=0)
+        d = torch.from_numpy(d)
         initCondEmbeddingSTD = float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
         C0 = (C + torch.randn(C.shape)*initCondEmbeddingSTD).contiguous()
         d0 = (d + torch.randn(d.shape)*initCondEmbeddingSTD).contiguous()
 
-    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
+    legQuadPoints, legQuadWeights = \
+            utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(
+                nQuad=nQuad, trials_start_times=trials_start_times,
+                trials_end_times=trials_end_times)
 
     # kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
@@ -165,7 +188,7 @@ def main(argv):
     kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
     estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
 
-    dt_latents = 0.01
+    dt_latents = 1.00
     oneSetLatentsTrialTimes = torch.arange(from_time, to_time, dt_latents)
     latentsTrialsTimes = [oneSetLatentsTrialTimes for k in range(nLatents)]
 #     if "latentsTrialsTimes" in simRes.keys():
@@ -184,7 +207,7 @@ def main(argv):
         kernelsParams=kernelsScaledParams0,
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
-        trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
+        trialsLengths=torch.tensor(trials_lengths).reshape(-1,1),
         latentsTrialsTimes=latentsTrialsTimes,
         emMaxIter=optimParams["em_max_iter"],
         eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
@@ -215,7 +238,7 @@ def main(argv):
     # estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
     estimResConfig["data_params"] = {"data_filename": data_filename,
                                      "location": location,
-                                     "trials": trials,
+                                     "trials_indices": trials_indices,
                                      "nLatents": nLatents,
                                      "from_time": from_time,
                                      "to_time": to_time}
