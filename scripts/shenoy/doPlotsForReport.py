@@ -63,6 +63,11 @@ def main(argv):
     lowerBoundHist = estResults["lowerBoundHist"]
     elapsedTimeHist = estResults["elapsedTimeHist"]
     model = estResults["model"]
+    neurons_indices = estResults["neurons_indices"]
+    neuronToPlot_index = torch.nonzero(torch.tensor(neurons_indices)==neuronToPlot)
+    neurons_indices_str = "".join(str(i)+" " for i in neurons_indices)
+    if len(neuronToPlot_index)==0:
+        raise ValueError("Neuron {:d} is not valid. Valid neurons are ".format(neuronToPlot) + neurons_indices_str)
 
     # plot lower bound history
     fig = plot.svGPFA.plotUtilsPlotly.getPlotLowerBoundHist(lowerBoundHist=lowerBoundHist)
