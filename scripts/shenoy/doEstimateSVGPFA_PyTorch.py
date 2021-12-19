@@ -28,12 +28,10 @@ def main(argv):
                         default=0)
     parser.add_argument("--trials_indices", help="trials indices to analyze",
                         default="[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]")
-    parser.add_argument("--nLatents", help="number of latent variables",
-                        type=int, default=2)
     parser.add_argument("--from_time", help="starting spike analysis time",
-                        type=float, default=0.0)
+                        type=float, default=750.0)
     parser.add_argument("--to_time", help="ending spike analysis time",
-                        type=float, default=3000.0)
+                        type=float, default=2500.0)
     parser.add_argument("--min_nSpikes_perNeuron_perTrial",
                         help="min number of spikes per neuron per trial",
                         type=int, default=1)
@@ -48,7 +46,6 @@ def main(argv):
     save_partial = args.savePartial
     location = args.location
     trials_indices = [int(str) for str in args.trials_indices[1:-1].split(",")]
-    nLatents = args.nLatents
     from_time = args.from_time
     to_time = args.to_time
     min_nSpikes_perNeuron_perTrial = args.min_nSpikes_perNeuron_perTrial
@@ -67,15 +64,22 @@ def main(argv):
 
     # units_to_remove = shenoyUtils.selectUnitsWithLessSpikesThanThrInAnyTrial(
     #     spikes_times=spikesTimes, thr=min_nSpikes_perNeuron_perTrial)
+    nNeurons = len(spikesTimes[0])
+    neurons_indices = [n for n in range(nNeurons)]
     units_to_remove = \
             shenoyUtils.selectUnitsWithLessSpikesThanThrInAllTrials(
                 spikes_times=spikesTimes, thr=min_nSpikes_perNeuron_perTrial)
+    units_to_remove_str = "".join(str(i)+" " for i in units_to_remove)
+    print("Removing units " + units_to_remove_str)
     spikesTimes = shenoyUtils.removeUnits(spikes_times=spikesTimes,
                                           units_to_remove=units_to_remove)
+    neurons_indices = [n for n in neurons_indices if n not in units_to_remove]
+    nNeurons = len(spikesTimes[0])
 
     estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
+    nLatents = int(estInitConfig["control_variables"]["nLatents"])
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
     kernelMatrixInvMethodStr = estInitConfig["control_variables"]["kernelMatrixInvMethod"]
     indPointsCovRepStr = estInitConfig["control_variables"]["indPointsCovRep"]
@@ -106,7 +110,6 @@ def main(argv):
 
     # simInitConfig = configparser.ConfigParser()
     # simInitConfig.read(simInitConfigFilename)
-    nNeurons = len(spikesTimes[0])
     nTrials = len(trials_indices)
     trials_start_times = [from_time for i in range(nTrials)]
     trials_end_times = [to_time for i in range(nTrials)]
@@ -255,7 +258,7 @@ def main(argv):
                           savePartial=save_partial, 
                           savePartialFilenamePattern=save_partial_filename_pattern)
 
-    resultsToSave = {"lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "iterationModelParams": iterationsModelParams, "model": model}
+    resultsToSave = {"neurons_indices": neurons_indices, "lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "iterationModelParams": iterationsModelParams, "model": model}
     with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
     print("Saved results to {:s}".format(modelSaveFilename))
 
