@@ -199,7 +199,7 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
                             cbAlpha = 0.2,
                             indPointsLocsColor="rgba(255,0,0,0.5)",
                             colorsList=plotly.colors.qualitative.Plotly,
-                            xlabel="Time (sec)",
+                            xlabel="Time (msec)",
                             ylabel="Value",
                             title=""):
     times = times.detach().numpy()
