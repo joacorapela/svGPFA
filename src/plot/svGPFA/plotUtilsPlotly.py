@@ -202,9 +202,9 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
                             xlabel="Time (msec)",
                             ylabel="Value",
                             title=""):
-    times = times.detach().numpy()
-    embeddingsMeans = embeddingsMeans.detach().numpy()
-    embeddingsSTDs = embeddingsSTDs.detach().numpy()
+    # times = times.detach().numpy()
+    # embeddingsMeans = embeddingsMeans.detach().numpy()
+    # embeddingsSTDs = embeddingsSTDs.detach().numpy()
 
     # pio.renderers.default = "browser"
     fig = go.Figure()
@@ -1716,7 +1716,8 @@ def getPlotKernelsParams(kernelsTypes, kernelsParams, color="red", ylabel="Value
     titles = ["Latent {:d}: {:s}".format(k, kernelsTypes[k]) for k in range(nLatents)]
     fig = plotly.subplots.make_subplots(rows=nLatents, cols=1, subplot_titles=titles)
     for k in range(nLatents):
-        params = kernelsParams[k].tolist()
+        # params = kernelsParams[k].tolist()
+        params = kernelsParams[k]
         if k==0:
             showLegend = True
         else:
