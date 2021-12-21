@@ -97,7 +97,7 @@ def main(argv):
     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
 
     kernelsParams = model.getKernelsParams()
-    kernelsTypes = ["ExponentialQuadraticKernel", "ExponentialQuadraticKernel"]
+    kernelsTypes = [type(kernel).__name__ for kernel in model.getKernels()]
     fig = plot.svGPFA.plotUtilsPlotly.getPlotKernelsParams(
         kernelsTypes=kernelsTypes, kernelsParams=kernelsParams)
     fig.write_image(kernelsParamsFigFilenamePattern.format("png"))
