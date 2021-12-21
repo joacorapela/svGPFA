@@ -212,6 +212,7 @@ def main(argv):
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=torch.tensor(trials_lengths).reshape(-1,1),
         latentsTrialsTimes=latentsTrialsTimes,
+        neurons_indices=neurons_indices,
         emMaxIter=optimParams["em_max_iter"],
         eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
         mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
