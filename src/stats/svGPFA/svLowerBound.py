@@ -82,6 +82,9 @@ class SVLowerBound:
     def getSVEmbeddingParams(self):
         return self._eLL.getSVEmbeddingParams()
 
+    def getKernels(self):
+        return self._eLL.getKernels()
+
     def getKernelsParams(self):
         return self._eLL.getKernelsParams()
 

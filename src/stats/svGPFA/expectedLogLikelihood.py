@@ -83,6 +83,9 @@ class ExpectedLogLikelihood(ABC):
     def getIndPointsLocs(self):
         return self._svEmbeddingAllTimes.getIndPointsLocs()
 
+    def getKernels(self):
+        return self._svEmbeddingAllTimes.getKernels()
+
     def getKernelsParams(self):
         return self._svEmbeddingAllTimes.getKernelsParams()
 

@@ -39,6 +39,9 @@ class SVPosteriorOnLatents(ABC):
     def getSVPosteriorOnIndPointsParams(self):
         return self._svPosteriorOnIndPoints.getParams()
 
+    def getKernels(self):
+        return self._indPointsLocsKMS.getKernels()
+
     def getKernelsParams(self):
         return self._indPointsLocsKMS.getKernelsParams()
 

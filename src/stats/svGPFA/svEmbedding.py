@@ -46,6 +46,9 @@ class SVEmbedding(abc.ABC):
     def getIndPointsLocs(self):
         return self._svPosteriorOnLatents.getIndPointsLocs()
 
+    def getKernels(self):
+        return self._svPosteriorOnLatents.getKernels()
+
     def getKernelsParams(self):
         return self._svPosteriorOnLatents.getKernelsParams()
 
