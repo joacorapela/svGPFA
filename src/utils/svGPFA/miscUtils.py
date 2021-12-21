@@ -184,7 +184,7 @@ def chol3D(K):
         Kchol[i,:,:] = torch.linalg.cholesky(K[i,:,:])
     return Kchol
 
-def pinv3D(K, rcond=1e-5):
+def pinv3D(K, rcond=1e-15):
     Kpinv = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
     nTrial = K.shape[0]
     for i in range(nTrial):
