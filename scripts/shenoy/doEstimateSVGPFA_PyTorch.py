@@ -52,28 +52,14 @@ def main(argv):
     save_partial_filename_pattern_pattern = args.save_partial_filename_pattern_pattern
     data_filename = args.data_filename
 
-    mat = scipy.io.loadmat(os.path.expanduser(data_filename))
-    spikesTimes = shenoyUtils.getTrialsAndLocationSpikesTimes(mat=mat,
-                                                               trials_indices=
-                                                                trials_indices,
-                                                               location=location)
-    spikesTimes = shenoyUtils.clipSpikesTimes(spikes_times=spikesTimes,
-                                              from_time=from_time,
-                                              to_time=to_time)
-    # spikesTimes = shenoyUtils.offsetSpikeTimes(spikes_times=spikesTimes, offset=-from_time)
-
-    # units_to_remove = shenoyUtils.selectUnitsWithLessSpikesThanThrInAnyTrial(
-    #     spikes_times=spikesTimes, thr=min_nSpikes_perNeuron_perTrial)
-    nNeurons = len(spikesTimes[0])
-    neurons_indices = [n for n in range(nNeurons)]
-    units_to_remove = \
-            shenoyUtils.selectUnitsWithLessSpikesThanThrInAllTrials(
-                spikes_times=spikesTimes, thr=min_nSpikes_perNeuron_perTrial)
-    units_to_remove_str = "".join(str(i)+" " for i in units_to_remove)
-    print("Removing units " + units_to_remove_str)
-    spikesTimes = shenoyUtils.removeUnits(spikes_times=spikesTimes,
-                                          units_to_remove=units_to_remove)
-    neurons_indices = [n for n in neurons_indices if n not in units_to_remove]
+    spikes_times, neurons_indices = \
+            shenoyUtils.getSpikesTimes(data_filename=data_filename,
+                                       trials_indices=trials_indices,
+                                       location=location,
+                                       from_time=from_time,
+                                       to_time=to_time,
+                                       min_nSpikes_perNeuron_perTrial=
+                                        min_nSpikes_perNeuron_perTrial)
     nNeurons = len(spikesTimes[0])
 
     estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
