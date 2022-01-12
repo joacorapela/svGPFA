@@ -18,7 +18,7 @@ jobs:
         pip install -r requirements.txt
     - name: Update PYTHONPATH
       run: |
-        echo "PYTHONPATH=src/" >> $GITHUB_ENV
+        echo "PYTHONPATH=PYTHONPATH:src/" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
         pip install pytest
