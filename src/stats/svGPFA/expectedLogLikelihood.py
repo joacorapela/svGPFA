@@ -59,17 +59,17 @@ class ExpectedLogLikelihood(ABC):
 #         answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
 #         return answer
 # 
-#     def computeExpectedCIFs(self, times):
-#         # h \in nTrials x times x nNeurons
-#         # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
-#         # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
-#         # return answer
-# 
-#         eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times=times)
-#         nTrials = eMean.shape[0]
-#         nNeurons = eMean.shape[2]
-#         answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
-#         return answer
+    def computeExpectedPosteriorCIFs(self, times):
+        # h \in nTrials x times x nNeurons
+        # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
+        # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
+        # return answer
+
+        eMean, eVar = self._svEmbeddingAllTimes.predict(times=times)
+        nTrials = eMean.shape[0]
+        nNeurons = eMean.shape[2]
+        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+        return answer
 
     def getSVPosteriorOnIndPointsParams(self):
         return self._svEmbeddingAllTimes.getSVPosteriorOnIndPointsParams()
@@ -89,11 +89,11 @@ class ExpectedLogLikelihood(ABC):
     def getKernelsParams(self):
         return self._svEmbeddingAllTimes.getKernelsParams()
 
-    def predictLatents(self, newTimes):
-        return self._svEmbeddingAllTimes.predictLatents(newTimes=newTimes)
+    def predictLatents(self, times):
+        return self._svEmbeddingAllTimes.predictLatents(times=times)
 
-    def predictEmbedding(self, newTimes):
-        return self._svEmbeddingAllTimes.predict(newTimes=newTimes)
+    def predictEmbedding(self, times):
+        return self._svEmbeddingAllTimes.predict(times=times)
 
     def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
         self._svEmbeddingAllTimes.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
