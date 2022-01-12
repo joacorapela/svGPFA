@@ -4,8 +4,10 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    env:
+        PYTHONPATH: "/home/travis/build/joacorapela/svGPFA/src"
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
