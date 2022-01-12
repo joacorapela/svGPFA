@@ -81,11 +81,11 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
         qHVar = torch.matmul(vars, (torch.t(self._C))**2)
         return qHMu, qHVar
 
-    def predictLatents(self, newTimes):
-        return self._svPosteriorOnLatents.predict(newTimes=newTimes)
+    def predictLatents(self, times):
+        return self._svPosteriorOnLatents.predict(times=times)
 
-    def predict(self, newTimes):
-        qKMu, qKVar = self._svPosteriorOnLatents.predict(newTimes=newTimes)
+    def predict(self, times):
+        qKMu, qKVar = self._svPosteriorOnLatents.predict(times=times)
         answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
         return answer
 
