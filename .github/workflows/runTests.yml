@@ -5,8 +5,6 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-        PYTHONPATH: "/home/travis/build/joacorapela/svGPFA/src"
 
     steps:
     - uses: actions/checkout@v2
@@ -20,7 +18,7 @@ jobs:
         pip install -r requirements.txt
     - name: Update PYTHONPATH
       run: |
-        echo "::set-env name=PYTHONPATH::home/runner/work/joacorapela/src"
+        echo "PYTHONPATH=src/" >> $GITHUB_ENV
     - name: Test with pytest
       run: |
         pip install pytest
