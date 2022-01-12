@@ -4,7 +4,7 @@ import math
 import numpy as np
 import torch
 import scipy.stats
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import myMath.utils
 import stats.gaussianProcesses.eval
 
@@ -267,13 +267,13 @@ def getLatentsSamplesMeansAndSTDsFromSampledMeans(nTrials, sampledMeans, kernels
             latentsSamples[r][k,:] = sample
             latentsMeans[r][k,:] = mean
             latentsSTDs[r][k,:] = std
-            plt.plot(trialsTimes[r], mean, label="mean")
-            plt.plot(trialsTimes[r], sample, label="sample")
-            plt.xlabel("Time (sec)")
-            plt.ylabel("Value")
-            plt.title("Latent {:d}".format(k))
-            plt.legend()
-            plt.show()
+            # plt.plot(trialsTimes[r], mean, label="mean")
+            # plt.plot(trialsTimes[r], sample, label="sample")
+            # plt.xlabel("Time (sec)")
+            # plt.ylabel("Value")
+            # plt.title("Latent {:d}".format(k))
+            # plt.legend()
+            # plt.show()
     return latentsSamples, latentsMeans, latentsSTDs
 
 def getDiagIndicesIn3DArray(N, M, device=torch.device("cpu")):
