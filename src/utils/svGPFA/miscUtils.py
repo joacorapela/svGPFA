@@ -4,7 +4,7 @@ import math
 import numpy as np
 import torch
 import scipy.stats
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import myMath.utils
 import stats.gaussianProcesses.eval
 
@@ -184,7 +184,7 @@ def chol3D(K):
         Kchol[i,:,:] = torch.linalg.cholesky(K[i,:,:])
     return Kchol
 
-def pinv3D(K, rcond=1e-5):
+def pinv3D(K, rcond=1e-15):
     Kpinv = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
     nTrial = K.shape[0]
     for i in range(nTrial):
@@ -267,13 +267,13 @@ def getLatentsSamplesMeansAndSTDsFromSampledMeans(nTrials, sampledMeans, kernels
             latentsSamples[r][k,:] = sample
             latentsMeans[r][k,:] = mean
             latentsSTDs[r][k,:] = std
-            plt.plot(trialsTimes[r], mean, label="mean")
-            plt.plot(trialsTimes[r], sample, label="sample")
-            plt.xlabel("Time (sec)")
-            plt.ylabel("Value")
-            plt.title("Latent {:d}".format(k))
-            plt.legend()
-            plt.show()
+            # plt.plot(trialsTimes[r], mean, label="mean")
+            # plt.plot(trialsTimes[r], sample, label="sample")
+            # plt.xlabel("Time (sec)")
+            # plt.ylabel("Value")
+            # plt.title("Latent {:d}".format(k))
+            # plt.legend()
+            # plt.show()
     return latentsSamples, latentsMeans, latentsSTDs
 
 def getDiagIndicesIn3DArray(N, M, device=torch.device("cpu")):

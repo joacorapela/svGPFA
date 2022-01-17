@@ -39,10 +39,10 @@ class SVLowerBound:
 #         answer = self._eLL.computeCIFsMeans(times=times)
 #         return answer
 # 
-#     def computeExpectedCIFs(self, times):
-#         answer = self._eLL.computeExpectedCIFs(times=times)
-#         return answer
-# 
+    def computeExpectedPosteriorCIFs(self, times):
+        answer = self._eLL.computeExpectedPosteriorCIFs(times=times)
+        return answer
+
 #     def computeEmbeddingMeansAndVarsAtTimes(self, times):
 #         answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
 #         return answer
@@ -82,17 +82,20 @@ class SVLowerBound:
     def getSVEmbeddingParams(self):
         return self._eLL.getSVEmbeddingParams()
 
+    def getKernels(self):
+        return self._eLL.getKernels()
+
     def getKernelsParams(self):
         return self._eLL.getKernelsParams()
 
     def getIndPointsLocs(self):
         return self._eLL.getIndPointsLocs()
 
-    def predictLatents(self, newTimes):
-        return self._eLL.predictLatents(newTimes=newTimes)
+    def predictLatents(self, times):
+        return self._eLL.predictLatents(times=times)
 
-    def predictEmbedding(self, newTimes):
-        return self._eLL.predictEmbedding(newTimes=newTimes)
+    def predictEmbedding(self, times):
+        return self._eLL.predictEmbedding(times=times)
 
 
 class SVLowerBoundWithParamsGettersAndSetters(SVLowerBound):

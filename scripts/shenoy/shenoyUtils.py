@@ -1,5 +1,7 @@
 import pdb
+import os
 import numpy as np
+import scipy.io
 import torch
 
 def  getTrialAndLocationSpikesTimes(mat, trial_index, location):
@@ -104,4 +106,26 @@ def selectUnitsWithLessSpikesThanThrInTrial(spikes_times, thr):
         if len(spikes_times[n])<thr:
             selected_units.add(n)
     return selected_units
+
+def getSpikesTimes(data_filename, trials_indices, location, from_time, to_time, min_nSpikes_perNeuron_perTrial):
+    mat = scipy.io.loadmat(os.path.expanduser(data_filename))
+    spikes_times = getTrialsAndLocationSpikesTimes(mat=mat,
+                                                   trials_indices=trials_indices,
+                                                   location=location)
+    spikes_times = clipSpikesTimes(spikes_times=spikes_times,
+                                               from_time=from_time,
+                                               to_time=to_time)
+    # spikes_times = offsetSpikeTimes(spikes_times=spikes_times, offset=-from_time)
+
+    # units_to_remove = selectUnitsWithLessSpikesThanThrInAnyTrial(
+    #     spikes_times=spikes_times, thr=min_nSpikes_perNeuron_perTrial)
+    nNeurons = len(spikes_times[0])
+    neurons_indices = [n for n in range(nNeurons)]
+    units_to_remove = \
+            selectUnitsWithLessSpikesThanThrInAllTrials(
+                spikes_times=spikes_times, thr=min_nSpikes_perNeuron_perTrial)
+    spikes_times = removeUnits(spikes_times=spikes_times,
+                                          units_to_remove=units_to_remove)
+    neurons_indices = [n for n in neurons_indices if n not in units_to_remove]
+    return spikes_times, neurons_indices
 

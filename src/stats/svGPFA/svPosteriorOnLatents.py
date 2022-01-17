@@ -39,6 +39,9 @@ class SVPosteriorOnLatents(ABC):
     def getSVPosteriorOnIndPointsParams(self):
         return self._svPosteriorOnIndPoints.getParams()
 
+    def getKernels(self):
+        return self._indPointsLocsKMS.getKernels()
+
     def getKernelsParams(self):
         return self._indPointsLocsKMS.getKernelsParams()
 
@@ -50,22 +53,22 @@ class SVPosteriorOnLatents(ABC):
 
 class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
-    def predict(self, newTimes):
+    def predict(self, times):
         Z = self.getIndPointsLocs()
         kernels = self._indPointsLocsKMS.getKernels()
         nTrials = Z[0].shape[0]
 
         # test times \in nTestTimes but should be in nTrials x nTestTimes
-        newTimesReformatted = torch.matmul(
+        timesReformatted = torch.matmul(
             torch.ones(nTrials,
-                dtype=newTimes.dtype,
-                device=newTimes.device).reshape(-1, 1),
-            newTimes.reshape(1,-1))
-        newTimesReformatted = newTimesReformatted.unsqueeze(2)
+                dtype=times.dtype,
+                device=times.device).reshape(-1, 1),
+            times.reshape(1,-1))
+        timesReformatted = timesReformatted.unsqueeze(2)
 
         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
         indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
-        indPointsLocsAndAllTimesKMS.setTimes(times=newTimesReformatted)
+        indPointsLocsAndAllTimesKMS.setTimes(times=timesReformatted)
         indPointsLocsAndAllTimesKMS.setIndPointsLocs(
             indPointsLocs=self.getIndPointsLocs())
         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
