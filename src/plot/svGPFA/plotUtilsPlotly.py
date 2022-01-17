@@ -65,18 +65,52 @@ def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)", 
     )
     return fig
 
-def getSpikesTimesPlotOneTrial(spikesTimes, title, xlabel="Time (sec)", ylabel="Neuron"):
+def getSpikesTimesPlotOneTrial(spikes_times, title, xlabel="Time (sec)", ylabel="Neuron"):
+    nNeurons = len(spikes_times)
     fig = go.Figure()
-    for n in range(len(spikesTimes)):
-        # workaround because if a trial contains only one spike spikesTimes[n]
+    for n in range(nNeurons):
+        # workaround because if a trial contains only one spike spikes_times[n]
         # does not respond to the len function
-        if len(spikesTimes[n].shape) == 0:
-            x = [spikesTimes[n]]
+        if len(spikes_times[n].shape) == 0:
+            x = [spikes_times[n]]
         else:
-            x = spikesTimes[n]
+            x = spikes_times[n]
         trace = go.Scatter(
             x=x,
             y=n*np.ones(len(x)),
+            mode="markers",
+            marker=dict(size=3, color="black"),
+            showlegend=False,
+            # hoverinfo="skip",
+        )
+        fig.add_trace(trace)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title=title)
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgba(0, 0, 0, 0)",
+            "paper_bgcolor": "rgba(0, 0, 0, 0)",
+        }
+    )
+    return fig
+
+
+def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, title,
+                                xlabel="Time (sec)", ylabel="Trial"):
+    nTrials = len(spikes_times)
+    fig = go.Figure()
+    for r in range(nTrials):
+        spikes_times_trial_neuron = spikes_times[r][neuron_index]
+        # workaround because if a trial contains only one spike spikes_times[n]
+        # does not respond to the len function
+        if spikes_times_trial_neuron.numel() == 1:
+            x = [spikes_times_trial_neuron.detach().numpy()]
+        else:
+            x = spikes_times_trial_neuron.detach().numpy()
+        trace = go.Scatter(
+            x=x,
+            y=r*np.ones(len(x)),
             mode="markers",
             marker=dict(size=3, color="black"),
             showlegend=False,
