@@ -96,12 +96,13 @@ def getSpikesTimesPlotOneTrial(spikes_times, title, xlabel="Time (sec)", ylabel=
     return fig
 
 
-def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, title,
+def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
+                                epoch_times, title,
                                 xlabel="Time (sec)", ylabel="Trial"):
     nTrials = len(spikes_times)
     fig = go.Figure()
-    for r in range(nTrials):
-        spikes_times_trial_neuron = spikes_times[r][neuron_index]
+    for r in trials_indices:
+        spikes_times_trial_neuron = spikes_times[r][neuron_index]-epoch_times[r]
         # workaround because if a trial contains only one spike spikes_times[n]
         # does not respond to the len function
         if spikes_times_trial_neuron.numel() == 1:
@@ -446,6 +447,60 @@ def getPlotTrueAndEstimatedEmbedding(tTimes, tSamples, tMeans, tSTDs,
     fig.update_yaxes(title_text=ylabel)
     fig.update_xaxes(title_text=xlabel)
     fig.update_layout(title=title)
+    return fig
+
+def getPlotMean(x, mean, xlabel="x", ylabel="y", title="",
+                      mean_line_color="red", mean_width=5):
+    # inputs are numpy arrays
+    y = mean
+
+    traceMean = go.Scatter(
+        x=x,
+        y=y,
+        # line=dict(color="rgb(0,100,80)"),
+        line=dict(color=mean_line_color, width=mean_width),
+        mode="lines+markers",
+        showlegend=False,
+    )
+    fig = go.Figure()
+    fig.add_trace(traceMean)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_layout(title=title)
+    # import pdb; pdb.set_trace()
+    return fig
+
+def getPlotMeanWithCI(x, mean, ci, xlabel="x", ylabel="y", title="", CBalpha=0.3,
+                      cbFillColorPattern="rgba(255,0,0,{:f})",
+                      meanLineColor="red"):
+    # inputs are numpy arrays
+    y = mean
+    y_lower = ci[:, 0]
+    y_upper = ci[:, 1]
+
+    traceCB = go.Scatter(
+        x=np.concatenate([x, x[::-1]]),
+        y=np.concatenate([y_upper, y_lower[::-1]]),
+        fill="toself",
+        fillcolor=cbFillColorPattern.format(CBalpha),
+        line=dict(color="rgba(255,255,255,0)"),
+        showlegend=False,
+    )
+    traceMean = go.Scatter(
+        x=x,
+        y=y,
+        # line=dict(color="rgb(0,100,80)"),
+        line=dict(color=meanLineColor),
+        mode="lines+markers",
+        showlegend=False,
+    )
+    fig = go.Figure()
+    fig.add_trace(traceCB)
+    fig.add_trace(traceMean)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_layout(title=title)
+    # import pdb; pdb.set_trace()
     return fig
 
 def getPlotTrueAndEstimatedEmbeddingPropCovered(propCovered, percent,
