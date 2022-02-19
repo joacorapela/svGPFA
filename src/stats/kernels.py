@@ -32,7 +32,7 @@ class ExponentialQuadraticKernel(Kernel):
 
     def buildKernelMatrix(self, X1, X2=None):
         scale, lengthscale = self._getAllParams()
-        if not hasattr(self, "_lengtscaleScale"):
+        if not hasattr(self, "_lengthscaleScale"):
             self._lengthscaleScale = 1.0
         lengthscale = lengthscale/self._lengthscaleScale
 
