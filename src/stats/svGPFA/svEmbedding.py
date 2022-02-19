@@ -63,12 +63,14 @@ class LinearSVEmbedding(SVEmbedding):
         self._C = svEmbeddingInitialParams["C0"]
         self._d = svEmbeddingInitialParams["d0"]
         svPosteriorOnLatentsInitialParams = initialParams["svPosteriorOnLatents"]
-        self._svPosteriorOnLatents.setInitialParams(initialParams=svPosteriorOnLatentsInitialParams)
+        self._svPosteriorOnLatents.setInitialParams(
+            initialParams=svPosteriorOnLatentsInitialParams)
 
-#     def sample(self, times):
-#         latentsSamples = self._svPosteriorOnLatents.sample(times=times)
-#         answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
-#         return answer
+    def sample(self, times, nudget=1e-3):
+        latentsSamples, _, _ = self._svPosteriorOnLatents.sample(times=times,
+                                                                 nudget=nudget)
+        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
+        return answer
 
     def getParams(self):
         return [self._C, self._d]
