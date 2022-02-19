@@ -31,10 +31,10 @@ class SVLowerBound:
             pdb.set_trace()
         return theEval
 
-#     def sampleCIFs(self, times):
-#         answer = self._eLL.sampleCIFs(times=times)
-#         return answer
-# 
+    def sampleCIFs(self, times, nudget=1e-3):
+        answer = self._eLL.sampleCIFs(times=times, nudget=nudget)
+        return answer
+
 #     def computeCIFsMeans(self, times):
 #         answer = self._eLL.computeCIFsMeans(times=times)
 #         return answer
