@@ -45,12 +45,12 @@ class ExpectedLogLikelihood(ABC):
     def setELLCalculationParams(self, eLLCalculationParams):
         pass
 
-#     def sampleCIFs(self, times):
-#         h = self._svEmbeddingAllTimes.sample(times=times)
-#         nTrials = len(h)
-#         answer = [self._linkFunction(h[r]) for r in range(nTrials)]
-#         return answer
-# 
+    def sampleCIFs(self, times, nudget=1e-3):
+        h = self._svEmbeddingAllTimes.sample(times=times, nudget=nudget)
+        nTrials = len(h)
+        answer = [self._linkFunction(h[r]) for r in range(nTrials)]
+        return answer
+
 #     def computeCIFsMeans(self, times):
 #         # h \in nTrials x times x nNeurons
 #         h = self._svEmbeddingAllTimes.computeMeans(times=times)
