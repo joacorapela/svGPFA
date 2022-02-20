@@ -2,52 +2,66 @@
 import numpy as np
 import stats.bootstrapTests
 
-def computePSTH(spikes_times, bin_edges):
+
+def binSpikes(spikes_times, bin_edges, time_unit):
     # spike_times in msec
     bin_width = bin_edges[1]-bin_edges[0]
-    psth, _ = np.histogram(a=spikes_times, bins=bin_edges)
-    psth = psth.astype(float)
-    psth *= 1000.0/bin_width
-    return psth
+    binned_spikes, _ = np.histogram(a=spikes_times, bins=bin_edges)
+    binned_spikes = binned_spikes.astype(float)
+    if time_unit == "sec":
+        binned_spikes *= 1.0/bin_width
+    elif time_unit == "msec":
+        binned_spikes *= 1000.0/bin_width
+    else:
+        raise ValueError("time_unit should be sec or msec, but not {}".format(time_unit))
+    return binned_spikes
 
-def computePSTHs(spikes_times, neuron_index, trials_indices, epoch_times,
-                 bin_edges):
-    psths = np.empty((len(trials_indices), len(bin_edges)-1), dtype=np.double)
+
+def binMultiTrialSpikes(spikes_times, neuron_index, trials_indices,
+                        epoch_times, bin_edges, time_unit):
+    mt_binned_spikes = np.empty((len(trials_indices), len(bin_edges)-1),
+                                dtype=np.double)
     for i, trial_index in enumerate(trials_indices):
-        psth = computePSTH(
-            spikes_times=spikes_times[trial_index][neuron_index]-epoch_times[i],
-            bin_edges=bin_edges
-        )
-        psths[i,:] = psth
-    return psths
+        aligned_spikes_times = spikes_times[trial_index][neuron_index] - \
+                                epoch_times[i]
+        binned_spikes = binSpikes(
+            spikes_times=aligned_spikes_times,
+            bin_edges=bin_edges, time_unit=time_unit)
+        mt_binned_spikes[i, :] = binned_spikes
+    return mt_binned_spikes
 
-def computePSTHsAndMeans(spikes_times, neuron_index, trials_indices, epoch_times,
-                         bin_edges):
-    psths = computePSTHs(spikes_times=spikes_times, neuron_index=neuron_index,
-                         trials_indices=trials_indices, epoch_times=epoch_times,
-                         bin_edges=bin_edges)
-    psth_mean = np.empty(len(bin_edges)-1, dtype=np.double)
+
+def computeBinnedSpikesAndPSTH(spikes_times, neuron_index, trials_indices,
+                               epoch_times, bin_edges, time_unit):
+    binned_spikes = binMultiTrialSpikes(spikes_times=spikes_times,
+                                        neuron_index=neuron_index,
+                                        trials_indices=trials_indices,
+                                        epoch_times=epoch_times,
+                                        bin_edges=bin_edges,
+                                        time_unit=time_unit)
+    psth = np.empty(len(bin_edges)-1, dtype=np.double)
     for j in range(len(bin_edges)-1):
-        psth_mean[j] = psths[:,j].mean()
-#         if psth_mean[j]>0 or psth_ci[j, 0]>0 or psth_ci[j, 1]>0:
-#             import pdb; pdb.set_trace()
-    return psths, psth_mean
+        psth[j] = binned_spikes[:, j].mean()
+    return binned_spikes, psth
 
-def computePSTHsAndMeansCIs(spikes_times, neuron_index, trials_indices,
-                            epoch_times, bin_edges, nResamples, alpha):
-    psths = computePSTHs(spikes_times=spikes_times, neuron_index=neuron_index,
-                         trials_indices=trials_indices, epoch_times=epoch_times,
-                         bin_edges=bin_edges)
-    psth_mean = np.empty(len(bin_edges)-1, dtype=np.double)
+
+def computeBinnedSpikesAndPSTHwithCI(spikes_times, neuron_index,
+                                     trials_indices, epoch_times,
+                                     bin_edges, time_unit,
+                                     nResamples, alpha):
+    binned_spikes = binMultiTrialSpikes(spikes_times=spikes_times,
+                                        neuron_index=neuron_index,
+                                        trials_indices=trials_indices,
+                                        epoch_times=epoch_times,
+                                        bin_edges=bin_edges,
+                                        time_unit=time_unit)
+    psth = np.empty(len(bin_edges)-1, dtype=np.double)
     psth_ci = np.empty((len(bin_edges)-1, 2), dtype=np.double)
     for j in range(len(bin_edges)-1):
-        psth_mean[j] = psths[:,j].mean()
-        bootstrapMeans = stats.bootstrapTests.bootstrapMean(
-            observations=psths[:,j], nResamples=nResamples)
-        psth_ci[j,:] = stats.bootstrapTests.estimatePercentileCI(
-            alpha=alpha, bootstrapped_stats=bootstrapMeans
+        psth[j] = binned_spikes[:, j].mean()
+        bootstrapped_mean = stats.bootstrapTests.bootstrapMean(
+            observations=binned_spikes[:, j], nResamples=nResamples)
+        psth_ci[j, :] = stats.bootstrapTests.estimatePercentileCI(
+            alpha=alpha, bootstrapped_stats=bootstrapped_mean
         )
-#         if psth_mean[j]>0 or psth_ci[j, 0]>0 or psth_ci[j, 1]>0:
-#             import pdb; pdb.set_trace()
-    return psths, psth_mean, psth_ci
-
+    return binned_spikes, psth, psth_ci
