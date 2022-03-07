@@ -7,4 +7,4 @@ Tested with [Python 3](https://www.python.org/downloads/release/python-352/) and
 * A Dash/Plotly GUI can be found [here](gui/doRunGUI.py)
 * A script running svGPFA on simulated data can be found here [here](scripts/demoPointProcessLeasSimulation-noGPU.py)
 * The source code can be found under [src](src)
-* Test cases can be found under [ci](ci) and the history of running these test can be accessed by clicking on the badge in the title
+* Test cases can be found under [ci](ci) and the history of running these test can be found [here](https://github.com/joacorapela/svGPFA/actions).
