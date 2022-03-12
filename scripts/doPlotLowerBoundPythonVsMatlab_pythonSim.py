@@ -18,7 +18,7 @@ def main(argv):
     args = parser.parse_args()
     mEstNumber = args.mEstNumber
 
-    mEstParamsFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
+    mEstParamsFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
     mEstConfig = configparser.ConfigParser()
     mEstConfig.read(mEstParamsFilename)
     pEstNumber = int(mEstConfig["data"]["pEstNumber"])
@@ -28,7 +28,7 @@ def main(argv):
     pEstConfig.read(pEstimMetaDataFilename)
     pSimNumber = int(pEstConfig["simulation_params"]["simResNumber"])
 
-    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
+    mModelSaveFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
     pModelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(pEstNumber)
 
     lowerBoundVsIterNoFigFilenamePattern = "figures/{:08d}_{:08d}_lowerBoundVsIterNo.{{:s}}".format(pEstNumber, mEstNumber)
@@ -41,7 +41,7 @@ def main(argv):
 
     loadRes = loadmat(mModelSaveFilename)
     mLowerBound = torch.cat(tuple(torch.from_numpy(loadRes["lowerBound"])))
-    mElapsedTime = torch.cat(tuple(torch.from_numpy(loadRes["elapsedTime"])))
+    mElapsedTime = loadRes["m"]["elapsedTime"][0][0][:, 0]
 
     trace1 = go.Scatter(
         y=pLowerBound,
