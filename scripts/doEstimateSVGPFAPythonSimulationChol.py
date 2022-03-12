@@ -59,6 +59,8 @@ def main(argv):
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
+    trials_start_times = [0.0 for i in range(nTrials)]
+    trials_end_times = trialsLengths
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
@@ -75,7 +77,10 @@ def main(argv):
         C0 = (C + torch.randn(C.shape)*initCondEmbeddingSTD).contiguous()
         d0 = (d + torch.randn(d.shape)*initCondEmbeddingSTD).contiguous()
 
-    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
+    legQuadPoints, legQuadWeights = \
+            utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(
+                nQuad=nQuad, trials_start_times=trials_start_times,
+                trials_end_times=trials_end_times)
 
     # kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)
@@ -125,13 +130,13 @@ def main(argv):
     else:
         raise ValueError("latentsTrialsTimes or times cannot be found in {:s}".format(simResFilename))
     utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
-        qMu0=qMu0, qSVec0=qSVec0, qSDiag0=qSDiag0,
-        C0=C0, d0=d0,
-        indPointsLocs0=Z0,
+        qMu=qMu0, qSVec=qSVec0, qSDiag=qSDiag0,
+        C=C0, d=d0,
+        indPointsLocs=Z0,
         legQuadPoints=legQuadPoints,
         legQuadWeights=legQuadWeights,
         kernelsTypes=kernelsTypes,
-        kernelsParams0=kernelsScaledParams0,
+        kernelsParams=kernelsScaledParams0,
         spikesTimes=spikesTimes,
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
         trialsLengths=torch.tensor(trialsLengths).reshape(-1,1),
@@ -148,11 +153,14 @@ def main(argv):
         return kernelParams
 
     # create model
-    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
+    kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.kernelMatrixInvChol
+    indPointsCovRep = stats.svGPFA.svGPFAModelFactory.indPointsCovChol
+    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels)
+        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
+        indPointsCovRep=indPointsCovRep)
 
     model.setInitialParamsAndData(measurements=spikesTimes,
                                   initialParams=initialParams,
@@ -160,7 +168,7 @@ def main(argv):
                                   indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     # maximize lower bound
-    svEM = stats.svGPFA.svEM.SVEM()
+    svEM = stats.svGPFA.svEM.SVEM_PyTorch()
     lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = svEM.maximize(model=model, optimParams=optimParams, method=optimMethod, getIterationModelParamsFn=getKernelParams)
 
     # save estimated values
