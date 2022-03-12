@@ -62,7 +62,7 @@ def test_timeRescaling(plot=False):
     end_time = 1.0
     CIF_time_step = 1e-3
     psth_bin_size = 1e-2
-    epoch_times = [0.0 for r in range(nTrials)]                                  
+    epoch_times = [0.0 for r in range(nTrials)]
 
     CIF_times = torch.arange(start_time, end_time, CIF_time_step)
     psth_bin_edges = np.arange(start_time,
