@@ -27,9 +27,9 @@ def main(argv):
                         type=float, default=0.0)
     parser.add_argument("--psth_bins_end_time",
                         help="PSTH bins end time (sec)",
-                        type=int, default=0.99)
+                        type=float, default=0.99)
     parser.add_argument("--psth_bin_size", help="PSTH bin size (sec)",
-                        type=int, default=0.01)
+                        type=float, default=0.01)
     parser.add_argument("--title_pattern",
                         help="title pattern",
                         default="Neuron {:d}")
