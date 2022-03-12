@@ -50,9 +50,9 @@ def main(argv):
     nTrials = len(trialsLengths)
 
     with open(pSimResFilename, "rb") as f: simRes = pickle.load(f)
-    tTimes = simRes["times"]
+    tTimes = simRes["latentsTrialsTimes"]
     # tLatentsSamples[r], tLatentsMeans[r], tLatentsVars[r] \in nLatents x nSamples
-    tLatentsSamples = simRes["latents"]
+    tLatentsSamples = simRes["latentsSamples"]
     tLatentsMeans = simRes["latentsMeans"]
     tLatentsSTDs = simRes["latentsSTDs"]
 
@@ -66,7 +66,7 @@ def main(argv):
     pTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), tTimes[0]), dim=2)
     with open(pModelSaveFilename, "rb") as f: pEstResults = pickle.load(f)
     pModel = pEstResults["model"]
-    pEmbeddingMeans, pEmbeddingVars = pModel.predictEmbedding(newTimes=pTimes[trialToPlot,:,0])
+    pEmbeddingMeans, pEmbeddingVars = pModel.predictEmbedding(times=pTimes[trialToPlot,:,0])
 
     nNeurons = tEmbeddingSamples[0].shape[0]
     propCovered = np.empty(shape=(3, nNeurons))
