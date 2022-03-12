@@ -42,9 +42,9 @@ def main(argv):
     simResFilename = simResConfig["simulation_results"]["simResFilename"]
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
-    tTimes = simRes["times"]
+    tTimes = simRes["latentsTrialsTimes"]
     # tLatentsSamples[r], tLatentsMeans[r], tLatentsVars[r] \in nLatents x nSamples
-    tLatentsSamples = simRes["latents"]
+    tLatentsSamples = simRes["latentsSamples"]
     tLatentsMeans = simRes["latentsMeans"]
     tLatentsSTDs = simRes["latentsSTDs"]
 
@@ -55,7 +55,7 @@ def main(argv):
 
     with open(modelSaveFilename, "rb") as f: estResults = pickle.load(f)
     model = estResults["model"]
-    eEmbeddingMeans, eEmbeddingVars = model.predictEmbedding(newTimes=tTimes[trialToPlot])
+    eEmbeddingMeans, eEmbeddingVars = model.predictEmbedding(times=tTimes[trialToPlot])
 
     tSamplesToPlot = tEmbeddingSamples[trialToPlot][neuronToPlot,:]
     tMeansToPlot = tEmbeddingMeans[trialToPlot][neuronToPlot,:]
