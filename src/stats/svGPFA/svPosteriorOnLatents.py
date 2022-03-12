@@ -102,22 +102,21 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 #         answer = self.__computeMeansGivenKernelMatrices(Kzz=Kzz, KzzInv=KzzInv, Ktz=Ktz)
 #         return answer
 # 
-#     def computeMeansAndVarsAtTimes(self, times):
-#         Kzz = self._indPointsLocsKMS.getKzz()
-#         KzzInv = self._indPointsLocsKMS.getKzzInv()
-# 
-#         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-#         indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
-#         indPointsLocsAndAllTimesKMS.setTimes(times=times)
-#         indPointsLocsAndAllTimesKMS.setIndPointsLocs(
-#             indPointsLocs=self.getIndPointsLocs())
-#         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
-# 
-#         Ktz = indPointsLocsAndAllTimesKMS.getKtz()
-#         KttDiag = indPointsLocsAndAllTimesKMS.getKttDiag()
-#         answer = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, KzzInv=KzzInv, Ktz=Ktz, KttDiag=KttDiag)
-# 
-#         return answer
+    def computeMeansAndVarsAtTimes(self, times):
+        Kzz = self._indPointsLocsKMS.getKzz()
+
+        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
+        indPointsLocsAndAllTimesKMS.setTimes(times=times)
+        indPointsLocsAndAllTimesKMS.setIndPointsLocs(
+            indPointsLocs=self.getIndPointsLocs())
+        indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
+
+        Ktz = indPointsLocsAndAllTimesKMS.getKtz()
+        KttDiag = indPointsLocsAndAllTimesKMS.getKttDiag()
+        answer = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, Ktz=Ktz, KttDiag=KttDiag)
+
+        return answer
 
     def sample(self, times, nudget=1e-3):
         Kzz = self._indPointsLocsKMS.getKzz()
