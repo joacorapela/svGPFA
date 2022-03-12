@@ -334,3 +334,18 @@ def getSRQSigmaVec(qSVec, qSDiag):
 #             Z0[k][r,:,0] = torch.linspace(firstIndPointLoc, trialsLengths[r], nIndPointsPerLatent[k])
 #     return Z0
 
+def getEmbeddingSamples(C, d, latentsSamples):
+    nTrials = len(latentsSamples)
+    answer = [torch.matmul(C, latentsSamples[r])+d for r in range(nTrials)]
+    return answer
+
+def getEmbeddingMeans(C, d, latentsMeans):
+    nTrials = len(latentsMeans)
+    answer = [torch.matmul(C, latentsMeans[r])+d for r in range(nTrials)]
+    return answer
+
+def getEmbeddingSTDs(C, latentsSTDs):
+    nTrials = len(latentsSTDs)
+    answer = [torch.matmul(C**2, latentsSTDs[r]**2).sqrt() for r in range(nTrials)]
+    return answer
+
