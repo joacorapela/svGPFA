@@ -65,7 +65,7 @@ def main(argv):
     indPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
     simulator = simulations.svGPFA.simulations.GPFAwithIndPointsSimulator()
     print("Computing latents samples")
-    latentsSamples, latentsMeans, latentsSTDs, KzzChol = simulator.getLatentsSamplesMeansAndSTDs(
+    latentsSamples, latentsMeans, latentsSTDs, Kzz = simulator.getLatentsSamplesMeansAndSTDs(
         indPointsMeans=indPointsMeans,
         kernels=kernels,
         indPointsLocs=indPointsLocs,
@@ -107,19 +107,32 @@ def main(argv):
     plt.figure()
     plt.show(block=False)
 
-    plt.plot(latentsTrialsTimes[cifTrialToPlot], cifValues[cifTrialToPlot][cifNeuronToPlot])
+    for n in range(nNeurons):
+        plt.plot(latentsTrialsTimes[cifTrialToPlot], cifValues[cifTrialToPlot][n])
     plt.xlabel("Time (sec)")
     plt.ylabel("CIF")
-    plt.title("Trial: {:d}, Neuron: {:d}".format(cifTrialToPlot, cifNeuronToPlot))
+    plt.title("Trial: {:d}".format(cifTrialToPlot))
 
     plt.show()
     pdb.set_trace()
 
     print("Getting spikes times")
-    spikesTimes = simulator.simulate(cifTrialsTimes=latentsTrialsTimes, cifValues=cifValues)
+    sampling_func = stats.pointProcess.sampling.sampleInhomogeneousPP_thinning
+    spikesTimes = simulator.simulate(cifTrialsTimes=latentsTrialsTimes,
+                                     cifValues=cifValues,
+                                     sampling_func=sampling_func)
 
     spikesRates = utils.svGPFA.miscUtils.computeSpikeRates(trialsTimes=latentsTrialsTimes, spikesTimes=spikesTimes)
-    simRes = {"latentsTrialsTimes": latentsTrialsTimes, "latentsSamples": latentsSamples, "latentsMeans": latentsMeans, "latentsSTDs": latentsSTDs, "indPointsMeans": indPointsMeans, "indPointsLocs": indPointsLocs, "KzzChol": KzzChol, "C": C, "d": d, "cifValues": cifValues, "spikes": spikesTimes}
+    simRes = {"latentsTrialsTimes": latentsTrialsTimes,
+              "latentsSamples": latentsSamples,
+              "latentsMeans": latentsMeans,
+              "latentsSTDs": latentsSTDs,
+              "indPointsMeans": indPointsMeans,
+              "indPointsLocs": indPointsLocs,
+              "C": C, "d": d,
+              "cifValues": cifValues,
+              "spikes": spikesTimes,
+              "Kzz": Kzz}
     with open(simResFilename, "wb") as f: pickle.dump(simRes, f)
 
     simResConfig = configparser.ConfigParser()
