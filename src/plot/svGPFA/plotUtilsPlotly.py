@@ -1948,7 +1948,7 @@ def getPlotTruePythonAndMatlabCIFs(tTimes, tCIF, tLabel,
 
 def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel, 
                                      eMeanTimes=None, eMeanCIF=None, eMeanLabel=None,
-                                     ePosteriorMeanTimes=None, ePosteriorMeanCIF=None, ePosteriorMeanLabel=None,
+#                                      ePosteriorMeanTimes=None, ePosteriorMeanCIF=None, ePosteriorMeanLabel=None,
                                      xlabel="Time (sec)", ylabel="CIF", title=""):
     # pio.renderers.default = "browser"
     figDic = {
@@ -1976,15 +1976,15 @@ def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel,
                 "y": eMeanCIF,
             },
         )
-    if ePosteriorMeanCIF is not None:
-        figDic["data"].append(
-            {
-                "type": "scatter",
-                "name": ePosteriorMeanLabel,
-                "x": ePosteriorMeanTimes,
-                "y": ePosteriorMeanCIF,
-            },
-        )
+#     if ePosteriorMeanCIF is not None:
+#         figDic["data"].append(
+#             {
+#                 "type": "scatter",
+#                 "name": ePosteriorMeanLabel,
+#                 "x": ePosteriorMeanTimes,
+#                 "y": ePosteriorMeanCIF,
+#             },
+#         )
     fig = go.Figure(
         data=figDic["data"],
         layout=figDic["layout"],
