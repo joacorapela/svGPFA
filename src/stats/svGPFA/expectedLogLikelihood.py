@@ -77,8 +77,8 @@ class ExpectedLogLikelihood(ABC):
     def getSVEmbeddingParams(self):
         return self._svEmbeddingAllTimes.getParams()
 
-#     def computeEmbeddingsMeansAndVarsAtTimes(self, times):
-#         return self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times)
+    def computeEmbeddingsMeansAndVarsAtTimes(self, times):
+        return self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times)
 
     def getIndPointsLocs(self):
         return self._svEmbeddingAllTimes.getIndPointsLocs()
