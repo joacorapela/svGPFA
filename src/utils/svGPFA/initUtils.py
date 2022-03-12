@@ -5,6 +5,7 @@ import os
 import torch
 import myMath.utils
 import stats.svGPFA.kernelsMatricesStore
+import utils.svGPFA.miscUtils
 
 def getUniformIndPointsMeans(nTrials, nLatents, nIndPointsPerLatent, min=-1, max=1):
     indPointsMeans = [[] for r in range(nTrials)]
@@ -68,6 +69,13 @@ def getKernelsScaledParams0(kernels, noiseSTD):
         trueParams = kernels[k].getScaledParams()
         kernelsParams0[k] = noiseSTD*torch.randn(len(trueParams))+trueParams
     return kernelsParams0
+
+def getSRQSigmaVecsFromKzz(Kzz):
+    Kzz_chol = []
+    for aKzz in Kzz:
+        Kzz_chol.append(utils.svGPFA.miscUtils.chol3D(aKzz))
+    answer = getSRQSigmaVecsFromSRMatrices(srMatrices=Kzz_chol)
+    return answer
 
 def getSRQSigmaVecsFromSRMatrices(srMatrices):
     nLatents = len(srMatrices)
