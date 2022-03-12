@@ -43,9 +43,9 @@ class SVLowerBound:
         answer = self._eLL.computeExpectedPosteriorCIFs(times=times)
         return answer
 
-#     def computeEmbeddingMeansAndVarsAtTimes(self, times):
-#         answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
-#         return answer
+    def computeEmbeddingMeansAndVarsAtTimes(self, times):
+        answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
+        return answer
 
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
         answer = self._eLL.evalSumAcrossTrialsAndNeurons(
