@@ -3,7 +3,7 @@ import pdb
 import warnings
 import torch
 import scipy.stats
-import stats.pointProcess.sampler
+import stats.pointProcess.sampling
 import stats.svGPFA.kernelsMatricesStore
 
 class BaseSimulator:
@@ -19,16 +19,19 @@ class BaseSimulator:
                 cifValues[r][n] = linkFunction(embeddings[n,:])
         return(cifValues)
 
-    def simulate(self, cifTrialsTimes, cifValues):
+    def simulate(self, cifTrialsTimes, cifValues,
+                 sampling_func=
+                  stats.pointProcess.sampling.sampleInhomogeneousPP_thinning):
         nTrials = len(cifValues)
         nNeurons = len(cifValues[0])
         spikesTimes = [[] for n in range(nTrials)]
-        sampler = stats.pointProcess.sampler.Sampler()
         for r in range(nTrials):
             spikesTimes[r] = [[] for r in range(nNeurons)]
             for n in range(nNeurons):
                 print("Processing trial {:d} and neuron {:d}".format(r, n))
-                spikesTimes[r][n] = torch.tensor(sampler.sampleInhomogeneousPP_timeRescaling(cifTimes=cifTrialsTimes[r], cifValues=cifValues[r][n], T=cifTrialsTimes[r].max()), device=cifTrialsTimes[r].device)
+                spikesTimes[r][n] = torch.tensor(
+                    sampling_func(CIF_times=cifTrialsTimes[r],
+                                  CIF_values=cifValues[r][n])["inhomogeneous"])
         return(spikesTimes)
 
 class GPFASimulator(BaseSimulator):
@@ -83,7 +86,7 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
         nLatents = len(kernels)
         nTrials = indPointsLocs[0].shape[0]
 
-        indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+        indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
         indPointsLocsKMS.setKernels(kernels=kernels)
         indPointsLocsKMS.setIndPointsLocs(indPointsLocs=indPointsLocs)
         indPointsLocsKMS.setEpsilon(epsilon=indPointsLocsKMSRegEpsilon)
@@ -100,7 +103,6 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
         if condNumber>condNumberThr:
             warnings.warn("Poorly conditioned Kzz (condition number={:.02f})".format(condNumber))
         # end debug
-        KzzChol = indPointsLocsKMS.getKzzChol()
 
         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
         indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
@@ -117,7 +119,10 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
             latentsMeans[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
             latentsSTDs[r] = torch.empty((nLatents, trialsTimes.shape[1]), dtype=torch.double)
             for k in range(nLatents):
-                mean = torch.matmul(Ktz[k][r,:,:], torch.cholesky_solve(indPointsMeans[r][k], KzzChol[k][r,:,:])).squeeze()
+                # mean = torch.matmul(Ktz[k][r,:,:], torch.cholesky_solve(indPointsMeans[r][k], KzzChol[k][r,:,:])).squeeze()
+                tmp = indPointsLocsKMS.solveForLatentAndTrial(
+                    input=indPointsMeans[r][k], latentIndex=k, trialIndex=r)
+                mean = torch.matmul(Ktz[k][r,:,:], tmp).squeeze()
                 cov = kernels[k].buildKernelMatrix(trialsTimes[r,:,0])
                 cov += torch.eye(cov.shape[0])*latentsCovRegEpsilon
                 std = torch.diag(cov).sqrt()
@@ -126,5 +131,5 @@ class GPFAwithIndPointsSimulator(BaseSimulator):
                 latentsSamples[r][k,:] = sample
                 latentsMeans[r][k,:] = mean
                 latentsSTDs[r][k,:] = std
-        return latentsSamples, latentsMeans, latentsSTDs, KzzChol
+        return latentsSamples, latentsMeans, latentsSTDs, Kzz
 
