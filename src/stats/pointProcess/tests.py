@@ -7,7 +7,8 @@ import pandas as pd
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from .sampler import Sampler
+
+import stats.pointProcess.sampling
 
 def timeRescaling(Y, pk):
     n = int(torch.sum(Y).item())
@@ -57,11 +58,14 @@ def KSTestTimeRescalingNumericalCorrection(spikesTimes, cifTimes, cifValues, gam
     print("Processing given ISIs")
     zExp = timeRescalingForUnbinnedSpikes(spikesTimes=spikesTimes, cifValues=cifValues, t0=t0, tf=tf, dt=dt)
     zSim = None
-    sampler = Sampler()
     for i in range(gamma):
         print("Processing iter {:d}/{:d}".format(i, gamma-1))
-        simSpikesTimes = sampler.sampleInhomogeneousPP_timeRescaling(cifTimes=cifTimes, cifValues=cifValues, T=T)
-        zSimIter = timeRescalingForUnbinnedSpikes(spikesTimes=simSpikesTimes, cifValues=cifValues, t0=t0, tf=tf, dt=dt)
+        simSpikesTimes = \
+            stats.pointProcess.sampling.sampleInhomogeneousPP_timeRescaling(
+                CIF_times=cifTimes, CIF_values=cifValues)
+        zSimIter = timeRescalingForUnbinnedSpikes(spikesTimes=simSpikesTimes,
+                                                  cifValues=cifValues,
+                                                  t0=t0, tf=tf, dt=dt)
         if zSim is None:
             zSim = zSimIter
         else:
