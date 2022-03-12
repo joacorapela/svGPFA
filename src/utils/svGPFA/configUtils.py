@@ -35,7 +35,7 @@ def getKernels(nLatents, config, forceUnitScale):
         kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
         if kernelType=="periodic":
             if not forceUnitScale:
-                scale = float(config["kernel_params"]["kPeriodicScaleValueLatent{:d}".format(k)])
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
             else:
                 scale = 1.0
             lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
