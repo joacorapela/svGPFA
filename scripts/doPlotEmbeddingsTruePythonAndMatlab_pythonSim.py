@@ -11,6 +11,7 @@ from scipy.io import loadmat
 sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import utils.svGPFA.configUtils
+import utils.svGPFA.miscUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -22,8 +23,8 @@ def main(argv):
     trialToPlot = args.trialToPlot
     neuronToPlot = args.neuronToPlot
 
-    mEstParamsFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
-    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
+    mEstParamsFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
+    mModelSaveFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
 
     mEstConfig = configparser.ConfigParser()
     mEstConfig.read(mEstParamsFilename)
@@ -57,16 +58,19 @@ def main(argv):
     nTrials = len(trialsLengths)
 
     with open(pSimResFilename, "rb") as f: simRes = pickle.load(f)
-    tTimes = simRes["times"]
+    tTimes = simRes["latentsTrialsTimes"]
     # tLatentsSamples[r], tLatentsMeans[r], tLatentsVars[r] \in nLatents x nSamples
-    tLatentsSamples = simRes["latents"]
+    tLatentsSamples = simRes["latentsSamples"]
     tLatentsMeans = simRes["latentsMeans"]
     tLatentsSTDs = simRes["latentsSTDs"]
 
     # tEmbeddingSamples[r], tEmbeddingMeans[r], tEmbeddingSTDs \in nNeurons x nSamples
-    tEmbeddingSamples = [torch.matmul(tC, tLatentsSamples[r])+td for r in range(nTrials)]
-    tEmbeddingMeans = [torch.matmul(tC, tLatentsMeans[r])+td for r in range(nTrials)]
-    tEmbeddingSTDs = [torch.matmul(tC, tLatentsSTDs[r]) for r in range(nTrials)]
+    tEmbeddingSamples = utils.svGPFA.miscUtils.getEmbeddingSamples(C=tC, d=td,
+                                                                   latentsSamples=tLatentsSamples)
+    tEmbeddingMeans = utils.svGPFA.miscUtils.getEmbeddingMeans(C=tC, d=td,
+                                                               latentsMeans=tLatentsMeans)
+    tEmbeddingSTDs = utils.svGPFA.miscUtils.getEmbeddingSTDs(C=tC,
+                                                             latentsSTDs=tLatentsSTDs)
 
     pEstimResConfig = configparser.ConfigParser()
     pEstimResConfig.read(pEstimMetaDataFilename)
@@ -76,8 +80,14 @@ def main(argv):
     pEmbeddingMeans, pEmbeddingVars = pModel.computeEmbeddingMeansAndVarsAtTimes(times=pTimes)
 
     loadRes = loadmat(mModelSaveFilename)
-    mLatentsMeans = loadRes["meanEstimatedLatents"].transpose((2, 0, 1))
-    mLatentsVars = loadRes["varEstimatedLatents"].transpose((2, 0, 1))
+    mLatentsMeans = loadRes["meanEstimatedLatents"]
+    mLatentsVars = loadRes["varEstimatedLatents"]
+    if mLatentsMeans.ndim == 3:
+        mLatentsMeans = mLatentsMeans.transpose((2, 0, 1))
+        mLatentsVars = mLatentsVars.transpose((2, 0, 1))
+    elif mLatentsMeans.ndim == 2:
+        mLatentsMeans = np.expand_dims(mLatentsMeans, 0)
+        mLatentsVars = np.expand_dims(mLatentsVars, 0)
     mTimes = loadRes["latentsTimes"]
     mC = loadRes["m"][0,0]["prs"][0,0]["C"]
     md = loadRes["m"][0,0]["prs"][0,0]["b"]
