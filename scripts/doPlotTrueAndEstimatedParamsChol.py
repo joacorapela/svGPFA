@@ -56,11 +56,10 @@ def main(argv):
     tIndPointsMeans = utils.svGPFA.configUtils.getIndPointsMeans(nTrials=nTrials, nLatents=nLatents, config=simInitConfig)
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
-    tKzzChol = simRes["KzzChol"]
-    tIndPointsCovs = [torch.matmul(tKzzChol[k], torch.transpose(tKzzChol[k], 1, 2)) for k in range(nLatents)]
+    tIndPointsCovs = simRes["Kzz"]
     tIndPointsLocs = simRes["indPointsLocs"]
-    tTimes = simRes["times"]
-    tLatentsSamples = simRes["latents"]
+    tTimes = simRes["latentsTrialsTimes"]
+    tLatentsSamples = simRes["latentsSamples"]
     tLatentsMeans = simRes["latentsMeans"]
     tLatentsSTDs = simRes["latentsSTDs"]
 
@@ -78,7 +77,7 @@ def main(argv):
     kernelsParams = model.getKernelsParams()
     eTimes = tTimes
     with torch.no_grad():
-        eLatentsMeans, eLatentsVars = model.predictLatents(newTimes=eTimes[0])
+        eLatentsMeans, eLatentsVars = model.predictLatents(times=eTimes[0])
     eLatentsSTDs = torch.sqrt(eLatentsVars)
     estimatedC, estimatedD = model.getSVEmbeddingParams()
     eIndPointsLocs = model.getIndPointsLocs()
@@ -130,7 +129,7 @@ def main(argv):
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent(trueIndPointsMeans=tIndPointsMeansToPlot, estimatedIndPointsMeans=eIndPointsMeansToPlot, trueIndPointsSTDs=tIndPointsSTDsToPlot, estimatedIndPointsSTDs=eIndPointsSTDsToPlot, title=title,)
     fig.write_image(indPointsMeanFigFilenamePattern.format("png"))
     fig.write_html(indPointsMeanFigFilenamePattern.format("html"))
-    # fig.show()
+    fig.show()
 
     title = "Trial {:d}, Latent {:d}".format(trialToPlot, latentToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent(
@@ -140,9 +139,9 @@ def main(argv):
     )
     fig.write_image(indPointsCovFigFilenamePattern.format("png"))
     fig.write_html(indPointsCovFigFilenamePattern.format("html"))
-    # fig.show()
+    fig.show()
 
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC, trueD=trueD, estimatedC=estimatedC, estimatedD=estimatedD)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams(trueC=trueC.numpy(), trueD=trueD.numpy(), estimatedC=estimatedC.numpy(), estimatedD=estimatedD.numpy())
     fig.write_image(embeddingParamsFigFilenamePattern.format("png"))
     fig.write_html(embeddingParamsFigFilenamePattern.format("html"))
     # fig.show()
