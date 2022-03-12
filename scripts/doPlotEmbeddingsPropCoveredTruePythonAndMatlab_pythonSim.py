@@ -11,6 +11,7 @@ from scipy.io import loadmat
 sys.path.append("../src")
 import plot.svGPFA.plotUtilsPlotly
 import utils.svGPFA.configUtils
+import utils.svGPFA.miscUtils
 
 def main(argv):
     parser = argparse.ArgumentParser()
@@ -22,8 +23,8 @@ def main(argv):
     trialToPlot = args.trialToPlot
     percent = args.percent
 
-    mEstParamsFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
-    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
+    mEstParamsFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
+    mModelSaveFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
 
     mEstConfig = configparser.ConfigParser()
     mEstConfig.read(mEstParamsFilename)
@@ -57,16 +58,19 @@ def main(argv):
     nTrials = len(trialsLengths)
 
     with open(pSimResFilename, "rb") as f: simRes = pickle.load(f)
-    tTimes = simRes["times"]
+    tTimes = simRes["latentsTrialsTimes"]
     # tLatentsSamples[r], tLatentsMeans[r], tLatentsVars[r] \in nLatents x nSamples
-    tLatentsSamples = simRes["latents"]
+    tLatentsSamples = simRes["latentsSamples"]
     tLatentsMeans = simRes["latentsMeans"]
     tLatentsSTDs = simRes["latentsSTDs"]
 
-    # tEmbeddingSamples[r], tEmbeddingMeans[r], tEmbeddingSTDs \in nNeurons x nSamples
-    tEmbeddingSamples = [torch.matmul(tC, tLatentsSamples[r])+td for r in range(nTrials)]
-    tEmbeddingMeans = [torch.matmul(tC, tLatentsMeans[r])+td for r in range(nTrials)]
-    tEmbeddingSTDs = [torch.matmul(tC, tLatentsSTDs[r]) for r in range(nTrials)]
+    # tEmbeddingSamples[r], tEmbeddingMeans[r], tEmbeddingSTDs[r] \in nNeurons x nSamples
+    tEmbeddingSamples = utils.svGPFA.miscUtils.getEmbeddingSamples(C=tC, d=td,
+                                                                   latentsSamples=tLatentsSamples)
+    tEmbeddingMeans = utils.svGPFA.miscUtils.getEmbeddingMeans(C=tC, d=td,
+                                                               latentsMeans=tLatentsMeans)
+    tEmbeddingSTDs = utils.svGPFA.miscUtils.getEmbeddingSTDs(C=tC,
+                                                             latentsSTDs=tLatentsSTDs)
 
     pEstimResConfig = configparser.ConfigParser()
     pEstimResConfig.read(pEstimMetaDataFilename)
@@ -76,15 +80,19 @@ def main(argv):
     pEmbeddingMeans, pEmbeddingVars = pModel.computeEmbeddingMeansAndVarsAtTimes(times=pTimes)
 
     loadRes = loadmat(mModelSaveFilename)
-    mLatentsMeans = loadRes["meanEstimatedLatents"].transpose((2, 0, 1))
-    mLatentsVars = loadRes["varEstimatedLatents"].transpose((2, 0, 1))
+    mLatentsMeans = loadRes["meanEstimatedLatents"]
+    mLatentsVars = loadRes["varEstimatedLatents"]
+    if mLatentsMeans.ndim == 3:
+        mLatentsMeans = mLatentsMeans.transpose((2, 0, 1))
+        mLatentsVars = mLatentsVars.transpose((2, 0, 1))
+    elif mLatentsMeans.ndim == 2:
+        mLatentsMeans = np.expand_dims(mLatentsMeans, 0)
+        mLatentsVars = np.expand_dims(mLatentsVars, 0)
     mTimes = loadRes["latentsTimes"]
     mC = loadRes["m"][0,0]["prs"][0,0]["C"]
     md = loadRes["m"][0,0]["prs"][0,0]["b"]
-    # mEmbeddingMeans = [np.matmul(meC, mELatentsMeans[:,:,r].T)+med for r in range(nTrials)]
-    # mEmbeddingSTDs = [np.matmul(meC, mELatentsSTDs[:,:,r].T) for r in range(nTrials)]
     mEmbeddingMeans = np.matmul(mLatentsMeans, mC.T) + np.reshape(md, (1, 1, len(md))) # using broadcasting
-    mEmbeddingVars = np.matmul(mLatentsVars, (mC.T)**2)
+    mEmbeddingSTDs = np.sqrt(np.matmul(mLatentsVars, (mC.T)**2))
 
     nNeurons = tEmbeddingSamples[0].shape[0]
     propCovered = np.empty(shape=(3, nNeurons))
@@ -100,7 +108,7 @@ def main(argv):
         propCovered[1, neuronToPlot] = utils.svGPFA.miscUtils.getPropSamplesCovered(sample=sample, mean=pMean, std=pSTD, percent=percent)
 
         mMean = torch.from_numpy(mEmbeddingMeans[trialToPlot,:,neuronToPlot])
-        mSTD = torch.from_numpy(np.sqrt(mEmbeddingVars[trialToPlot,:,neuronToPlot]))
+        mSTD = torch.from_numpy(mEmbeddingSTDs[trialToPlot,:,neuronToPlot])
         propCovered[2, neuronToPlot] = utils.svGPFA.miscUtils.getPropSamplesCovered(sample=sample, mean=mMean, std=mSTD, percent=percent)
     title = "Trial {:d}".format(trialToPlot)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTruePythonAndMatlabEmbeddingPropCovered(propCovered=propCovered, percent=percent, title=title)
