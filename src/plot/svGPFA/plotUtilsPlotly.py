@@ -263,8 +263,6 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
         y = meanToPlot
         y_upper = y + ciToPlot
         y_lower = y - ciToPlot
-        ymax = max(np.max(meanToPlot+ciToPlot), np.max(meanToPlot+ciToPlot))
-        ymin = min(np.min(meanToPlot-ciToPlot), np.min(meanToPlot-ciToPlot))
 
         traceCB = go.Scatter(
             x=np.concatenate((x, x[::-1])),
@@ -1396,17 +1394,19 @@ def getPlotEstimatedLatentsForTrial(times, latentsMeans, latentsSTDs, indPointsL
     fig.update_layout(title_text=title)
     return fig
 
-def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, latentToPlot,
-                            cbAlpha = 0.2,
-                            indPointsLocsColor="rgba(255,0,0,0.5)",
-                            colorsList=plotly.colors.qualitative.Plotly,
-                            xlabel="Time (sec)",
-                            ylabel="Value",
-                            titlePattern="Latent {:d}"):
+def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
+                              indPointsLocs=None,
+                              cbAlpha = 0.2,
+                              indPointsLocsColor="rgba(255,0,0,0.5)",
+                              colorsList=plotly.colors.qualitative.Plotly,
+                              xlabel="Time (sec)",
+                              ylabel="Value",
+                              titlePattern="Latent {:d}"):
     times = times.detach().numpy()
     latentsMeans = latentsMeans.detach().numpy()
     latentsSTDs = latentsSTDs.detach().numpy()
-    indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
+    if not indPointsLocs is None:
+        indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
 
     # pio.renderers.default = "browser"
     fig = go.Figure()
@@ -1441,7 +1441,7 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, l
             fillcolor=color_rgba_pattern.format(cbAlpha),
             line=dict(color=color_rgba_pattern.format(0.0)),
             showlegend=False,
-            name="Estimated",
+            legendgroup="trial{:02d}".format(r)
         )
         traceMean = go.Scatter(
             x=x,
@@ -1449,24 +1449,26 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, indPointsLocs, l
             line=dict(color=color_rgba_pattern.format(1.0)),
             mode="lines",
             name="trial {:d}".format(r),
+            legendgroup="trial{:02d}".format(r)
         )
         fig.add_trace(traceCB)
         fig.add_trace(traceMean)
 
-        for n in range(indPointsLocs[latentToPlot].shape[1]):
-            fig.add_shape(
-                dict(
-                    type="line",
-                    x0=indPointsLocs[latentToPlot][r,n,0],
-                    y0=ymin,
-                    x1=indPointsLocs[latentToPlot][r,n,0],
-                    y1=ymax,
-                    line=dict(
-                        color=color_rgba_pattern.format(0.7),
-                        width=3
+        if not indPointsLocs is None:
+            for n in range(indPointsLocs[latentToPlot].shape[1]):
+                fig.add_shape(
+                    dict(
+                        type="line",
+                        x0=indPointsLocs[latentToPlot][r,n,0],
+                        y0=ymin,
+                        x1=indPointsLocs[latentToPlot][r,n,0],
+                        y1=ymax,
+                        line=dict(
+                            color=color_rgba_pattern.format(0.7),
+                            width=3
+                        ),
                     ),
-                ),
-            )
+                )
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
     fig.update_layout(title_text=title)
