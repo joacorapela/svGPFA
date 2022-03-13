@@ -1,17 +1,17 @@
 
-import pdb
 import math
 import numpy as np
 import pandas as pd
 import torch
 import stats.kernels
 
+
 def getScaledKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     kernelsParamsScales = [[] for r in range(nLatents)]
     for k in range(nLatents):
         kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
-        if kernelType=="periodic":
+        if kernelType == "periodic":
             if not forceUnitScale:
                 scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
             else:
@@ -28,6 +28,7 @@ def getScaledKernels(nLatents, config, forceUnitScale):
         kernels[k] = kernel
     answer = {"kernels": kernels, "kernelsParamsScales": kernelsParamsScales}
     return answer
+
 
 def getKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
@@ -55,6 +56,7 @@ def getKernels(nLatents, config, forceUnitScale):
         kernels[k] = kernel
     return kernels
 
+
 def getVariationalMean0FromList(nLatents, nTrials, config):
     qMu0 = [[] for r in range(nLatents)]
     for k in range(nLatents):
@@ -66,6 +68,7 @@ def getVariationalMean0FromList(nLatents, nTrials, config):
             qMu0kr = torch.tensor([float(str) for str in config["variational_params"]["qMu0Latent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")])
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
+
 
 def getVariationalMean0(nLatents, nTrials, config, keyNamePattern="qMu0Latent{:d}Trial{:d}_filename"):
     qMu0 = [[] for r in range(nLatents)]
@@ -81,6 +84,19 @@ def getVariationalMean0(nLatents, nTrials, config, keyNamePattern="qMu0Latent{:d
             qMu0[k][r,:,0] = qMu0kr
     return qMu0
 
+
+def getIdenticalVariationalMean0(nLatents, nTrials, config,
+                                 keyName="qMu0_filename"):
+    qMu0 = [[] for r in range(nLatents)]
+    qMu0Filename = config["variational_params"][keyName]
+    the_qMu0 = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+    nIndPoints = len(the_qMu0)
+    for k in range(nLatents):
+        qMu0[k] = torch.empty((nTrials, nIndPoints, 1), dtype=torch.double)
+        qMu0[k][:, :, 0] = the_qMu0
+    return qMu0
+
+
 def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{:d}Trial{:d}_filename"):
     qSigma0 = [[] for r in range(nLatents)]
     for k in range(nLatents):
@@ -95,6 +111,21 @@ def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{
             qSigma0[k][r,:,:] = qSigma0kr
     return qSigma0
 
+
+def getIdenticalVariationalCov0(nLatents, nTrials, config,
+                                keyName="qSigma0_filename"):
+    qSigma0 = [[] for r in range(nLatents)]
+    qSigma0Filename = config["variational_params"][keyName]
+    the_qSigma0 = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).to_numpy())
+    nIndPoints = the_qSigma0.shape[0]
+    for k in range(nLatents):
+        qSigma0[k] = torch.empty((nTrials, nIndPoints, nIndPoints),
+                                 dtype=torch.double)
+        # qSigma0[k][r,:,:] = qSigma0kr
+        qSigma0[k][:, :, :] = the_qSigma0
+    return qSigma0
+
+
 def getIndPointsMeans(nTrials, nLatents, config):
     indPointsMeans = [[] for r in range(nTrials)]
     for r in range(nTrials):
@@ -103,6 +134,7 @@ def getIndPointsMeans(nTrials, nLatents, config):
             indPointsMeansFN = config["indPoints_params"]["indPointsMeanFNLatent{:d}Trial{:d}".format(k,r)]
             indPointsMeans[r][k] = torch.reshape(torch.from_numpy(np.loadtxt(indPointsMeansFN)), (-1,1))
     return indPointsMeans
+
 
 def getIndPointsLocs0(nLatents, nTrials, config):
     Z0 = [[] for k in range(nLatents)]
@@ -129,6 +161,19 @@ def getIndPointsLocs0(nLatents, nTrials, config):
                 raise ValueError("option={:s} not found in config.options('indPoints_params')")
     return Z0
 
+
+def getIdenticalIndPointsLocs0(nLatents, nTrials, config):
+    Z0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        the_Z0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocs"][1:-1].split(", ")],
+                              dtype=torch.double)
+        nIndPointsForLatent = len(the_Z0)
+        Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1),
+                            dtype=torch.double)
+        Z0[k][:, :, 0] = the_Z0
+    return Z0
+
+
 def getLatentsMeansFuncs(nLatents, nTrials, config):
     def getLatentMeanFunc(ampl, tau, freq, phase):
         mean = lambda t: ampl*torch.exp(-t/tau)*torch.sin(2*math.pi*freq*t + phase)
@@ -143,6 +188,7 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
         meanFunc = getLatentMeanFunc(ampl=ampl, tau=tau, freq=freq, phase=phase)
         meansFuncs[k] = meanFunc
     return meansFuncs
+
 
 def getLinearEmbeddingParams(CFilename, dFilename):
     df = pd.read_csv(CFilename, header=None)
