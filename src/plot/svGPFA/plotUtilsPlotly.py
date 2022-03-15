@@ -1474,6 +1474,113 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
     fig.update_layout(title_text=title)
     return fig
 
+def getPlotOrthonormalizedLatentAcrossTrials(
+        times, latentsMeans, latentToPlot, C, indPointsLocs=None,
+        indPointsLocsColor="rgba(255,0,0,0.5)",
+        colorsList=plotly.colors.qualitative.Plotly,
+        xlabel="Time (sec)", ylabel="Value", titlePattern="Latent {:d}"):
+    times = times.detach().numpy()
+    latentsMeans = latentsMeans.detach().numpy()
+    C = C.detach().numpy()
+    U, S, Vh = np.linalg.svd(C)
+    orthoMatrix = Vh.T*S
+    if not indPointsLocs is None:
+        indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
+
+    # pio.renderers.default = "browser"
+    fig = go.Figure()
+    title = titlePattern.format(latentToPlot)
+    nTrials = latentsMeans.shape[0]
+    for r in range(nTrials):
+        # meanToPlot = latentsMeans[r,:,latentToPlot]
+        oTrialLatentsMeans = np.matmul(latentsMeans[r,:,:], orthoMatrix)
+        meanToPlot = oTrialLatentsMeans[:, latentToPlot]
+        color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
+        color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
+
+        # pdb.set_trace()
+#         import matplotlib
+#         matplotlib.use('TkAgg')
+#         import matplotlib.pyplot as plt
+#         plt.plot(times, meanToPlot)
+#         plt.show()
+#         pdb.set_trace()
+
+        x = times
+        y = meanToPlot
+        ymax = np.max(meanToPlot)
+        ymin = np.min(meanToPlot)
+
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            line=dict(color=color_rgba_pattern.format(1.0)),
+            mode="lines",
+            name="trial {:d}".format(r),
+            legendgroup="trial{:02d}".format(r)
+        )
+        fig.add_trace(traceMean)
+
+        if not indPointsLocs is None:
+            for n in range(indPointsLocs[latentToPlot].shape[1]):
+                fig.add_shape(
+                    dict(
+                        type="line",
+                        x0=indPointsLocs[latentToPlot][r,n,0],
+                        y0=ymin,
+                        x1=indPointsLocs[latentToPlot][r,n,0],
+                        y1=ymax,
+                        line=dict(
+                            color=color_rgba_pattern.format(0.7),
+                            width=3
+                        ),
+                    ),
+                )
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
+def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
+        times, latentsMeans, latentToPlot, C,
+        sort_event=None, title="", xlabel="Time (sec)",
+        ylabel="Sorted Trial Index", event_line_color="white",
+        event_line_width=5):
+    times = times.detach().numpy()
+    latentsMeans = latentsMeans.detach().numpy()
+    C = C.detach().numpy()
+    U, S, Vh = np.linalg.svd(C)
+    orthoMatrix = Vh.T*S
+
+    # pio.renderers.default = "browser"
+    nTrials = len(latentsMeans)
+    latents_image = np.empty(shape=(nTrials, len(times)))
+    for r in range(nTrials):
+        # meanToPlot = latentsMeans[r][latentToPlot,:]
+        oTrialLatentsMean = np.matmul(latentsMeans[r], orthoMatrix)
+        latents_image[r, :] = oTrialLatentsMean[:, latentToPlot]
+    if sort_event is not None:
+        sort_indices = np.argsort(sort_event)
+        latents_image = latents_image[sort_indices, :]
+    nTrials = len(latentsMeans)
+    trials_indices = np.arange(0, nTrials)
+    trace_hm = go.Heatmap(x=times, y=trials_indices, z=latents_image)
+
+    fig = go.Figure()
+    fig.add_trace(trace_hm)
+    fig.add_vline(x=0.0, line=dict(color=event_line_color,
+                                   width=event_line_width))
+    if sort_event is not None:
+        trace_event = go.Scatter(x=sort_event[sort_indices], y=trials_indices,
+                                 line=dict(color=event_line_color,
+                                           width=event_line_width))
+        fig.add_trace(trace_event)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title=title)
+    return fig
+
+
 def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     tTimes, tLatentsSamples, tLatentsMeans, tLatentsSTDs, tIndPointsLocs,
     eTimes, eLatentsMeans, eLatentsSTDs, eIndPointsLocs,
@@ -1901,6 +2008,7 @@ def getPlotTruePythonAndMatlabKernelsParams(kernelsTypes,
     fig.update_yaxes(title_text="Parameter Value", row=nLatents//2+1, col=1)
     return fig
 
+
 # CIF
 def getPlotTruePythonAndMatlabCIFs(tTimes, tCIF, tLabel,
                                    pTimes, pCIF, pLabel,
@@ -1948,7 +2056,8 @@ def getPlotTruePythonAndMatlabCIFs(tTimes, tCIF, tLabel,
     )
     return fig
 
-def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel, 
+
+def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel,
                                      eMeanTimes=None, eMeanCIF=None, eMeanLabel=None,
 #                                      ePosteriorMeanTimes=None, ePosteriorMeanCIF=None, ePosteriorMeanLabel=None,
                                      xlabel="Time (sec)", ylabel="CIF", title=""):
@@ -1993,6 +2102,7 @@ def getPlotSimulatedAndEstimatedCIFs(tTimes, tCIF, tLabel,
     )
     return fig
 
+
 def getPlotCIF(times, values, title="", xlabel="Time (sec)", ylabel="Conditional Intensity Function"):
     figDic = {
         "data": [],
@@ -2015,11 +2125,45 @@ def getPlotCIF(times, values, title="", xlabel="Time (sec)", ylabel="Conditional
     )
     return fig
 
+
+def getPlotCIFsOneNeuronAllTrials(times, cif_values, neuron_index,
+                                  sort_event=None,
+                                  title="", xlabel="Time (sec)",
+                                  ylabel="Sorted Trial Index",
+                                  event_line_color="white",
+                                  event_line_width=5):
+    # civ_values[trialIndex][neuron_index]
+    nTrials = len(cif_values)
+    trials_indices = np.arange(0, nTrials)
+    cifs_image = np.empty(shape=(nTrials, len(times)))
+    for r in range(nTrials):
+        cifs_image[r, :] = cif_values[r][neuron_index]
+    if sort_event is not None:
+        sort_indices = np.argsort(sort_event)
+        cifs_image = cifs_image[sort_indices, :]
+    trace_hm = go.Heatmap(x=times, y=trials_indices, z=cifs_image)
+
+    fig = go.Figure()
+    fig.add_trace(trace_hm)
+    fig.add_vline(x=0.0, line=dict(color=event_line_color,
+                                   width=event_line_width))
+    if sort_event is not None:
+        trace_event = go.Scatter(x=sort_event[sort_indices], y=trials_indices,
+                                 line=dict(color=event_line_color,
+                                           width=event_line_width))
+        fig.add_trace(trace_event)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title=title)
+    return fig
+
+
 # Lower bound
 def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None,
                           xlabelIterNumber="Iteration Number",
-                          xlabelElapsedTime="Elapsed Time (sec)", 
-                          ylabel="Lower Bound", marker="cross", linestyle="solid"):
+                          xlabelElapsedTime="Elapsed Time (sec)",
+                          ylabel="Lower Bound", marker="cross",
+                          linestyle="solid"):
     if elapsedTimeHist is None:
         trace = go.Scatter(
             y=lowerBoundHist,
