@@ -65,8 +65,13 @@ def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)", 
     )
     return fig
 
-def getSpikesTimesPlotOneTrial(spikes_times, title, xlabel="Time (sec)", ylabel="Neuron"):
+def getSpikesTimesPlotOneTrial(spikes_times, title,
+                               align_event, marked_events,
+                               xlabel="Time (sec)", ylabel="Neuron",
+                               event_line_color="rgba(0, 0, 255, 0.2)", event_line_width=5):
     nNeurons = len(spikes_times)
+    min_time = np.Inf
+    max_time = -np.Inf
     fig = go.Figure()
     for n in range(nNeurons):
         # workaround because if a trial contains only one spike spikes_times[n]
@@ -75,6 +80,9 @@ def getSpikesTimesPlotOneTrial(spikes_times, title, xlabel="Time (sec)", ylabel=
             x = [spikes_times[n]]
         else:
             x = spikes_times[n]
+        if len(x)>0:
+            min_time = min(min_time, x.min())
+            max_time = max(max_time, x.max())
         trace = go.Scatter(
             x=x,
             y=n*np.ones(len(x)),
@@ -84,6 +92,15 @@ def getSpikesTimesPlotOneTrial(spikes_times, title, xlabel="Time (sec)", ylabel=
             # hoverinfo="skip",
         )
         fig.add_trace(trace)
+    neurons_indices = np.arange(0, nNeurons)
+    n_marked_events = len(marked_events)
+    for i in range(n_marked_events):
+        marked_time = marked_events[i]-align_event
+        if marked_time>max_time:
+            marked_time = max_time
+        if marked_time<min_time:
+            marked_time = min_time
+        fig.add_vline(x=marked_time, line=dict(color=event_line_color, width=event_line_width))
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
     fig.update_layout(title=title)
@@ -97,18 +114,24 @@ def getSpikesTimesPlotOneTrial(spikes_times, title, xlabel="Time (sec)", ylabel=
 
 
 def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
-                                epoch_times, title,
-                                xlabel="Time (sec)", ylabel="Trial"):
-    nTrials = len(spikes_times)
+                                title, align_event, marked_events,
+                                xlabel="Time (sec)", ylabel="Trial",
+                                event_line_color="rgba(0, 0, 255, 0.2)", event_line_width=5):
+    nTrials = len(trials_indices)
+    min_time = np.Inf
+    max_time = -np.Inf
     fig = go.Figure()
-    for r in trials_indices:
-        spikes_times_trial_neuron = spikes_times[r][neuron_index]-epoch_times[r]
+    for r in range(nTrials):
+        spikes_times_trial_neuron = spikes_times[trials_indices[r]][neuron_index]
         # workaround because if a trial contains only one spike spikes_times[n]
         # does not respond to the len function
-        if spikes_times_trial_neuron.numel() == 1:
-            x = [spikes_times_trial_neuron.detach().numpy()]
+        if spikes_times_trial_neuron.size == 1:
+            x = [spikes_times_trial_neuron]
         else:
-            x = spikes_times_trial_neuron.detach().numpy()
+            x = spikes_times_trial_neuron
+        if len(x)>0:
+            min_time = min(min_time, min(x))
+            max_time = max(max_time, max(x))
         trace = go.Scatter(
             x=x,
             y=r*np.ones(len(x)),
@@ -118,6 +141,23 @@ def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
             # hoverinfo="skip",
         )
         fig.add_trace(trace)
+    trials_indices = np.arange(0, nTrials)
+    n_marked_events = marked_events.shape[1]
+    for i in range(n_marked_events):
+        marked_times = marked_events[:, i]-align_event
+        marked_times = np.where(marked_times<min_time,
+                                np.ones(marked_times.shape)*min_time,
+                                marked_times)
+        marked_times = np.where(marked_times>max_time,
+                                np.ones(marked_times.shape)*max_time,
+                                marked_times)
+        trace_event = go.Scatter(x=marked_times,
+                                 y=trials_indices,
+                                 line=dict(color=event_line_color,
+                                           width=event_line_width),
+                                 showlegend=False)
+        fig.add_trace(trace_event)
+
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
     fig.update_layout(title=title)
@@ -1402,7 +1442,7 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
                               xlabel="Time (sec)",
                               ylabel="Value",
                               titlePattern="Latent {:d}"):
-    times = times.detach().numpy()
+    # times = times.detach().numpy()
     latentsMeans = latentsMeans.detach().numpy()
     latentsSTDs = latentsSTDs.detach().numpy()
     if not indPointsLocs is None:
@@ -1479,7 +1519,7 @@ def getPlotOrthonormalizedLatentAcrossTrials(
         indPointsLocsColor="rgba(255,0,0,0.5)",
         colorsList=plotly.colors.qualitative.Plotly,
         xlabel="Time (sec)", ylabel="Value", titlePattern="Latent {:d}"):
-    times = times.detach().numpy()
+    # times = times.detach().numpy()
     latentsMeans = latentsMeans.detach().numpy()
     C = C.detach().numpy()
     U, S, Vh = np.linalg.svd(C)
@@ -1543,37 +1583,79 @@ def getPlotOrthonormalizedLatentAcrossTrials(
 
 def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
         times, latentsMeans, latentToPlot, C,
-        sort_event=None, title="", xlabel="Time (sec)",
-        ylabel="Sorted Trial Index", event_line_color="white",
-        event_line_width=5):
-    times = times.detach().numpy()
-    latentsMeans = latentsMeans.detach().numpy()
-    C = C.detach().numpy()
+        sort_event=None, align_event=None, marked_events=None,
+        trials_labels=None, trials_annotations=None,
+        title="", xlabel="Time (sec)", ylabel="Trial Index",
+        event_line_color="white", event_line_width=5):
+    # times = times.detach().numpy()
+    # latentsMeans = latentsMeans.detach().numpy()
+    # C = C.detach().numpy()
+    # creating latents orthonormalization matrix
     U, S, Vh = np.linalg.svd(C)
     orthoMatrix = Vh.T*S
 
     # pio.renderers.default = "browser"
     nTrials = len(latentsMeans)
+    nTimes = len(times)
     latents_image = np.empty(shape=(nTrials, len(times)))
+    # creating orthonormalized latents_image
     for r in range(nTrials):
         # meanToPlot = latentsMeans[r][latentToPlot,:]
         oTrialLatentsMean = np.matmul(latentsMeans[r], orthoMatrix)
         latents_image[r, :] = oTrialLatentsMean[:, latentToPlot]
+    if align_event is None:
+        # align_event = np.zeros(shape=(len(sort_event), 1))
+        align_event = np.zeros(shape=(nTrials, 1))
+    sorted_trials_indices = np.arange(0, nTrials)
+    if trials_labels is None:
+        trials_labels = [str(i) for i in sorted_trials_indices]
     if sort_event is not None:
-        sort_indices = np.argsort(sort_event)
+        sort_indices = np.argsort(sort_event-align_event).tolist()
         latents_image = latents_image[sort_indices, :]
-    nTrials = len(latentsMeans)
-    trials_indices = np.arange(0, nTrials)
-    trace_hm = go.Heatmap(x=times, y=trials_indices, z=latents_image)
+        trials_labels = trials_labels[sort_indices]
+        marked_events = marked_events[sort_indices, :]
+        align_event = align_event[sort_indices]
+    hover_text = [["Trial: {:s}<br>Time: {:f}<br>Amplitude: {:f}".format(trial_label, time, latents_image[r, i]) 
+                   for i, time in enumerate(times)] 
+                  for r, trial_label in enumerate(trials_labels)]
+    if trials_annotations is not None:
+        if sort_event is not None:
+            for trial_annotation_key in trials_annotations.keys():
+                trials_annotations[trial_annotation_key] = \
+                    trials_annotations[trial_annotation_key][sort_indices]
+        annotations_keys = trials_annotations.keys()
+        nAnnotations = len(annotations_keys)
+        for r in range(nTrials):
+            an_annotation = ""
+            for trial_annotation_key in trials_annotations.keys():
+                an_annotation += "<br>{:s}: {}".format(trial_annotation_key, trials_annotations[trial_annotation_key][r])
+            for i in range(nTimes):
+                hover_text[r][i] = hover_text[r][i] + an_annotation
+    # import pdb; pdb.set_trace()
+    trace_hm = go.Heatmap(x=times,
+                          y=sorted_trials_indices,
+                          z=latents_image,
+                          hoverinfo="text",
+                          text=hover_text)
 
     fig = go.Figure()
     fig.add_trace(trace_hm)
-    fig.add_vline(x=0.0, line=dict(color=event_line_color,
-                                   width=event_line_width))
-    if sort_event is not None:
-        trace_event = go.Scatter(x=sort_event[sort_indices], y=trials_indices,
+    n_marked_events = marked_events.shape[1]
+    min_time = times.min()
+    max_time = times.max()
+    for i in range(n_marked_events):
+        marked_times = marked_events[:, i]-align_event
+        marked_times = np.where(marked_times<min_time,
+                                np.ones(marked_times.shape)*min_time,
+                                marked_times)
+        marked_times = np.where(marked_times>max_time,
+                                np.ones(marked_times.shape)*max_time,
+                                marked_times)
+        trace_event = go.Scatter(x=marked_times,
+                                 y=sorted_trials_indices,
                                  line=dict(color=event_line_color,
-                                           width=event_line_width))
+                                           width=event_line_width),
+                                 showlegend=False)
         fig.add_trace(trace_event)
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
@@ -2127,7 +2209,7 @@ def getPlotCIF(times, values, title="", xlabel="Time (sec)", ylabel="Conditional
 
 
 def getPlotCIFsOneNeuronAllTrials(times, cif_values, neuron_index,
-                                  sort_event=None,
+                                  sort_event=None, align_event=None, marked_events=None,
                                   title="", xlabel="Time (sec)",
                                   ylabel="Sorted Trial Index",
                                   event_line_color="white",
@@ -2139,18 +2221,30 @@ def getPlotCIFsOneNeuronAllTrials(times, cif_values, neuron_index,
     for r in range(nTrials):
         cifs_image[r, :] = cif_values[r][neuron_index]
     if sort_event is not None:
-        sort_indices = np.argsort(sort_event)
+        sort_indices = np.argsort(sort_event-align_event)
         cifs_image = cifs_image[sort_indices, :]
+    if align_event is None:
+        align_event = np.zeros(shape=(len(sort_event), 1))
     trace_hm = go.Heatmap(x=times, y=trials_indices, z=cifs_image)
 
     fig = go.Figure()
     fig.add_trace(trace_hm)
-    fig.add_vline(x=0.0, line=dict(color=event_line_color,
-                                   width=event_line_width))
-    if sort_event is not None:
-        trace_event = go.Scatter(x=sort_event[sort_indices], y=trials_indices,
+    n_marked_events = marked_events.shape[1]
+    min_time = times.min()
+    max_time = times.max()
+    for i in range(n_marked_events):
+        marked_times = marked_events[sort_indices, i]-align_event[sort_indices]
+        marked_times = np.where(marked_times<min_time,
+                                np.ones(marked_times.shape)*min_time,
+                                marked_times)
+        marked_times = np.where(marked_times>max_time,
+                                np.ones(marked_times.shape)*max_time,
+                                marked_times)
+        trace_event = go.Scatter(x=marked_times,
+                                 y=trials_indices,
                                  line=dict(color=event_line_color,
-                                           width=event_line_width))
+                                           width=event_line_width),
+                                 showlegend=False)
         fig.add_trace(trace_event)
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
