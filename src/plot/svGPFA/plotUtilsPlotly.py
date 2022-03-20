@@ -1514,95 +1514,215 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
     fig.update_layout(title_text=title)
     return fig
 
+
 def getPlotOrthonormalizedLatentAcrossTrials(
-        times, latentsMeans, latentToPlot, C, indPointsLocs=None,
-        indPointsLocsColor="rgba(255,0,0,0.5)",
+        times, latentsMeans, latentToPlot, C,
+        align_event=None, marked_events=None,
+        trials_labels=None, trials_annotations=None, ylim=None,
         colorsList=plotly.colors.qualitative.Plotly,
         xlabel="Time (sec)", ylabel="Value", titlePattern="Latent {:d}"):
     # times = times.detach().numpy()
-    latentsMeans = latentsMeans.detach().numpy()
-    C = C.detach().numpy()
+    # latentsMeans = latentsMeans.detach().numpy()
+    # C = C.detach().numpy()
+    nTimes = len(times)
+    nTrials = len(latentsMeans)
     U, S, Vh = np.linalg.svd(C)
     orthoMatrix = Vh.T*S
-    if not indPointsLocs is None:
-        indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
-
+    if ylim is None:
+        latents_max = -np.Inf
+        latents_min = np.Inf
+    oLatentsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        oLatentsMeans[r] = np.matmul(latentsMeans[r], orthoMatrix)
+        if ylim is None:
+            oLatentsMeansr_min = oLatentsMeans[r].min()
+            oLatentsMeansr_max = oLatentsMeans[r].max()
+            if oLatentsMeansr_min < latents_min:
+                latents_min = oLatentsMeansr_min
+            if oLatentsMeansr_max > latents_max:
+                latents_max = oLatentsMeansr_max
+    if ylim is None:
+        ylim = [latents_min, latents_max]
     # pio.renderers.default = "browser"
     fig = go.Figure()
     title = titlePattern.format(latentToPlot)
-    nTrials = latentsMeans.shape[0]
+
+    n_marked_events = marked_events.shape[1]
+    min_time = times.min()
+    max_time = times.max()
+    marked_times = marked_events-np.expand_dims(align_event, 1)
+    marked_times = np.where(marked_times < min_time,
+                            np.ones(marked_times.shape)*min_time,
+                            marked_times)
+    marked_times = np.where(marked_times > max_time,
+                            np.ones(marked_times.shape)*max_time,
+                            marked_times)
+
+    if trials_annotations is not None and trials_labels is not None:
+        hover_text = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
+                       for i, time in enumerate(times)]
+                      for r, trial_label in enumerate(trials_labels)]
+        for r in range(nTrials):
+            an_annotation = ""
+            for trial_annotation_key in trials_annotations:
+                an_annotation += "<br>{:s}: {}".format(trial_annotation_key,
+                                                       trials_annotations[trial_annotation_key][r])
+            for i in range(nTimes):
+                hover_text[r][i] = hover_text[r][i] + an_annotation
     for r in range(nTrials):
         # meanToPlot = latentsMeans[r,:,latentToPlot]
-        oTrialLatentsMeans = np.matmul(latentsMeans[r,:,:], orthoMatrix)
-        meanToPlot = oTrialLatentsMeans[:, latentToPlot]
-        color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
+        meanToPlot = oLatentsMeans[r][:, latentToPlot]
+        color_rgb = plotly.colors.hex_to_rgb(colorsList[r % len(colorsList)])
         color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
 
-        # pdb.set_trace()
-#         import matplotlib
-#         matplotlib.use('TkAgg')
-#         import matplotlib.pyplot as plt
-#         plt.plot(times, meanToPlot)
-#         plt.show()
-#         pdb.set_trace()
-
-        x = times
-        y = meanToPlot
-        ymax = np.max(meanToPlot)
-        ymin = np.min(meanToPlot)
-
         traceMean = go.Scatter(
-            x=x,
-            y=y,
+            x=times,
+            y=meanToPlot,
             line=dict(color=color_rgba_pattern.format(1.0)),
             mode="lines",
-            name="trial {:d}".format(r),
-            legendgroup="trial{:02d}".format(r)
+            name="trial {:s}".format(trials_labels[r]),
+            legendgroup="trial{:02d}".format(r),
+            showlegend=True,
+            hoverinfo="text",
+            text=hover_text[r],
         )
         fig.add_trace(traceMean)
 
-        if not indPointsLocs is None:
-            for n in range(indPointsLocs[latentToPlot].shape[1]):
-                fig.add_shape(
-                    dict(
-                        type="line",
-                        x0=indPointsLocs[latentToPlot][r,n,0],
-                        y0=ymin,
-                        x1=indPointsLocs[latentToPlot][r,n,0],
-                        y1=ymax,
-                        line=dict(
-                            color=color_rgba_pattern.format(0.7),
-                            width=3
-                        ),
-                    ),
-                )
+        marked_indices = np.empty((n_marked_events), dtype=np.int)
+        for i in range(n_marked_events):
+            marked_indices[i] = np.argmin(np.abs(times-marked_times[r, i]))
+
+        trace_markers = go.Scatter(
+            x=times[marked_indices],
+            y=meanToPlot[marked_indices],
+            marker=dict(color="red", size=10),
+            mode="markers",
+            legendgroup="trial{:02d}".format(r),
+            showlegend=False)
+        fig.add_trace(trace_markers)
+
     fig.update_xaxes(title_text=xlabel)
-    fig.update_yaxes(title_text=ylabel)
+    fig.update_yaxes(title_text=ylabel, range=ylim)
     fig.update_layout(title_text=title)
     return fig
+
+
+def get3DPlotOrthonormalizedLatentsAcrossTrials(
+        times, latentsMeans, C, latentsToPlot=[0, 1, 2],
+        align_event=None, marked_events=None,
+        trials_labels=None, trials_annotations=None,
+        colorsList=plotly.colors.qualitative.Plotly,
+        xyzLabelsPattern="Latent {:d}", title=""):
+    nTimes = len(times)
+    nTrials = len(latentsMeans)
+    U, S, Vh = np.linalg.svd(C)
+    orthoMatrix = Vh.T*S
+
+    n_marked_events = marked_events.shape[1]
+    min_time = times.min()
+    max_time = times.max()
+    marked_times = marked_events-np.expand_dims(align_event, 1)
+    marked_times = np.where(marked_times < min_time,
+                            np.ones(marked_times.shape)*min_time,
+                            marked_times)
+    marked_times = np.where(marked_times > max_time,
+                            np.ones(marked_times.shape)*max_time,
+                            marked_times)
+
+    oLatentsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        oLatentsMeans[r] = np.matmul(latentsMeans[r], orthoMatrix)
+
+    if trials_annotations is not None and trials_labels is not None:
+        hover_text = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
+                       for i, time in enumerate(times)]
+                      for r, trial_label in enumerate(trials_labels)]
+        for r in range(nTrials):
+            an_annotation = ""
+            for trial_annotation_key in trials_annotations:
+                an_annotation += "<br>{:s}: {}".format(trial_annotation_key,
+                                                       trials_annotations[trial_annotation_key][r])
+            for i in range(nTimes):
+                hover_text[r][i] = hover_text[r][i] + an_annotation
+    fig = go.Figure()
+    for r in range(nTrials):
+        if trials_annotations["choice"][r] == 1.0:
+            latent_color = "red"
+        elif trials_annotations["choice"][r] == -1.0:
+            latent_color = "blue"
+        else:
+            raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
+        trace_latent_mean = go.Scatter3d(
+            x=oLatentsMeans[r][:, latentsToPlot[0]],
+            y=oLatentsMeans[r][:, latentsToPlot[1]],
+            z=oLatentsMeans[r][:, latentsToPlot[2]],
+            mode="lines",
+            line=dict(color=latent_color, width=2),
+            name="trial {:s}".format(trials_labels[r]),
+            legendgroup="trial{:02d}".format(r),
+            showlegend=True,
+            hoverinfo="text",
+            text=hover_text[r],
+        )
+        fig.add_trace(trace_latent_mean)
+        marked_colors = ("yellow", "red", "blue", "black")
+        for i in range(n_marked_events):
+            marked_index = np.argmin(np.abs(times-marked_times[r, i]))
+
+            trace_marker = go.Scatter3d(
+                x=[oLatentsMeans[r][marked_index, latentsToPlot[0]]],
+                y=[oLatentsMeans[r][marked_index, latentsToPlot[1]]],
+                z=[oLatentsMeans[r][marked_index, latentsToPlot[2]]],
+                marker=dict(color=marked_colors[i], size=5),
+                mode="markers",
+                legendgroup="trial{:02d}".format(r),
+                showlegend=False)
+            fig.add_trace(trace_marker)
+
+    fig.update_layout(scene=dict(
+        xaxis_title=xyzLabelsPattern.format(latentsToPlot[0]),
+        yaxis_title=xyzLabelsPattern.format(latentsToPlot[1]),
+        zaxis_title=xyzLabelsPattern.format(latentsToPlot[2])),
+    )
+    return fig
+
 
 def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
         times, latentsMeans, latentToPlot, C,
         sort_event=None, align_event=None, marked_events=None,
-        trials_labels=None, trials_annotations=None,
+        trials_labels=None, trials_annotations=None, zlim=None,
         title="", xlabel="Time (sec)", ylabel="Trial Index",
         event_line_color="white", event_line_width=5):
     # times = times.detach().numpy()
     # latentsMeans = latentsMeans.detach().numpy()
     # C = C.detach().numpy()
     # creating latents orthonormalization matrix
-    U, S, Vh = np.linalg.svd(C)
-    orthoMatrix = Vh.T*S
-
-    # pio.renderers.default = "browser"
     nTrials = len(latentsMeans)
     nTimes = len(times)
+    U, S, Vh = np.linalg.svd(C)
+    orthoMatrix = Vh.T*S
+    if zlim is None:
+        latents_max = -np.Inf
+        latents_min = np.Inf
+    oLatentsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        oLatentsMeans[r] = np.matmul(latentsMeans[r], orthoMatrix)
+        if zlim is None:
+            oLatentsMeansr_min = oLatentsMeans[r].min()
+            oLatentsMeansr_max = oLatentsMeans[r].max()
+            if oLatentsMeansr_min < latents_min:
+                latents_min = oLatentsMeansr_min
+            if oLatentsMeansr_max > latents_max:
+                latents_max = oLatentsMeansr_max
+    if zlim is None:
+        zlim = [latents_min, latents_max]
+    # pio.renderers.default = "browser"
     latents_image = np.empty(shape=(nTrials, len(times)))
     # creating orthonormalized latents_image
     for r in range(nTrials):
         # meanToPlot = latentsMeans[r][latentToPlot,:]
-        oTrialLatentsMean = np.matmul(latentsMeans[r], orthoMatrix)
-        latents_image[r, :] = oTrialLatentsMean[:, latentToPlot]
+        # oTrialLatentsMean = np.matmul(latentsMeans[r], orthoMatrix)
+        latents_image[r, :] = oLatentsMeans[r][:, latentToPlot]
     if align_event is None:
         # align_event = np.zeros(shape=(len(sort_event), 1))
         align_event = np.zeros(shape=(nTrials, 1))
@@ -1623,11 +1743,9 @@ def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
             for trial_annotation_key in trials_annotations.keys():
                 trials_annotations[trial_annotation_key] = \
                     trials_annotations[trial_annotation_key][sort_indices]
-        annotations_keys = trials_annotations.keys()
-        nAnnotations = len(annotations_keys)
         for r in range(nTrials):
             an_annotation = ""
-            for trial_annotation_key in trials_annotations.keys():
+            for trial_annotation_key in trials_annotations:
                 an_annotation += "<br>{:s}: {}".format(trial_annotation_key, trials_annotations[trial_annotation_key][r])
             for i in range(nTimes):
                 hover_text[r][i] = hover_text[r][i] + an_annotation
@@ -1635,6 +1753,8 @@ def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
     trace_hm = go.Heatmap(x=times,
                           y=sorted_trials_indices,
                           z=latents_image,
+                          zmin=zlim[0],
+                          zmax=zlim[1],
                           hoverinfo="text",
                           text=hover_text)
 
@@ -1667,7 +1787,7 @@ def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     tTimes, tLatentsSamples, tLatentsMeans, tLatentsSTDs, tIndPointsLocs,
     eTimes, eLatentsMeans, eLatentsSTDs, eIndPointsLocs,
     title,
-    CBalpha = 0.2,
+    CBalpha=0.2,
     tCBFillColorPattern="rgba(0,0,255,{:f})",
     tSamplesLineColor="black",
     tMeanLineColor="blue",
@@ -1678,7 +1798,6 @@ def getPlotTrueAndEstimatedLatentsOneTrialOneLatent(
     xlabel="Time (sec)",
     ylabel="Latent Value"):
 
-    ault = "browser"
     fig = go.Figure()
 
     tCI = 1.96*tLatentsSTDs
