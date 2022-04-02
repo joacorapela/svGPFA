@@ -1,10 +1,10 @@
 import numpy as np
 
 
-def binSpikes(spikes, bin_edges):
-    bin_counts, bin_edges_output = np.histogram(input=spikes,
-                                                   bins=bin_edges)
-    bin_centers = (bin_edges_output[:-1]+bin_edges_output[1:])/2.0
+def binSpikes(spikes, bins_edges):
+    bin_counts, bins_edges_output = np.histogram(input=spikes,
+                                                   bins=bins_edges)
+    bin_centers = (bins_edges_output[:-1]+bins_edges_output[1:])/2.0
     return bin_counts, bin_centers
 
 
@@ -104,7 +104,7 @@ def selectUnitsWithLessSpikesThanThrInTrial(spikes_times, thr):
     return selected_units
 
 
-def removeUnitsWithLessSpikesThanThrInAnyTrials(
+def removeUnitsWithLessSpikesThanThrInAnyTrial(
         spikes_times, min_nSpikes_perNeuron_perTrial):
     nNeurons = len(spikes_times[0])
     neurons_indices = [n for n in range(nNeurons)]
@@ -119,10 +119,10 @@ def removeUnitsWithLessSpikesThanThrInAnyTrials(
     return spikes_times, neurons_indices
 
 
-def binSpikes(spikes_times, bin_edges, time_unit):
+def binSpikes(spikes_times, bins_edges, time_unit):
     # spike_times in msec
-    bin_width = bin_edges[1]-bin_edges[0]
-    binned_spikes, _ = np.histogram(a=spikes_times, bins=bin_edges)
+    bin_width = bins_edges[1]-bins_edges[0]
+    binned_spikes, _ = np.histogram(a=spikes_times, bins=bins_edges)
     binned_spikes = binned_spikes.astype(float)
     if time_unit == "sec":
         binned_spikes *= 1.0/bin_width
@@ -134,44 +134,44 @@ def binSpikes(spikes_times, bin_edges, time_unit):
 
 
 def binMultiTrialSpikes(spikes_times, neuron_index, trials_indices,
-                        bin_edges, time_unit):
-    mt_binned_spikes = np.empty((len(trials_indices), len(bin_edges)-1),
+                        bins_edges, time_unit):
+    mt_binned_spikes = np.empty((len(trials_indices), len(bins_edges)-1),
                                 dtype=np.double)
     for i, trial_index in enumerate(trials_indices):
         aligned_spikes_trial_neuron = spikes_times[trial_index][neuron_index]
         binned_spikes = binSpikes(
             spikes_times=aligned_spikes_trial_neuron,
-            bin_edges=bin_edges, time_unit=time_unit)
+            bins_edges=bins_edges, time_unit=time_unit)
         mt_binned_spikes[i, :] = binned_spikes
     return mt_binned_spikes
 
 
 def computeBinnedSpikesAndPSTH(spikes_times, neuron_index, trials_indices,
-                               bin_edges, time_unit):
+                               bins_edges, time_unit):
     binned_spikes = binMultiTrialSpikes(spikes_times=spikes_times,
                                         neuron_index=neuron_index,
                                         trials_indices=trials_indices,
-                                        bin_edges=bin_edges,
+                                        bins_edges=bins_edges,
                                         time_unit=time_unit)
-    psth = np.empty(len(bin_edges)-1, dtype=np.double)
-    for j in range(len(bin_edges)-1):
+    psth = np.empty(len(bins_edges)-1, dtype=np.double)
+    for j in range(len(bins_edges)-1):
         psth[j] = binned_spikes[:, j].mean()
     return binned_spikes, psth
 
 
 def computeBinnedSpikesAndPSTHwithCI(spikes_times, neuron_index,
                                      trials_indices, epoch_times,
-                                     bin_edges, time_unit,
+                                     bins_edges, time_unit,
                                      nResamples, alpha):
     binned_spikes = binMultiTrialSpikes(spikes_times=spikes_times,
                                         neuron_index=neuron_index,
                                         trials_indices=trials_indices,
                                         epoch_times=epoch_times,
-                                        bin_edges=bin_edges,
+                                        bins_edges=bins_edges,
                                         time_unit=time_unit)
-    psth = np.empty(len(bin_edges)-1, dtype=np.double)
-    psth_ci = np.empty((len(bin_edges)-1, 2), dtype=np.double)
-    for j in range(len(bin_edges)-1):
+    psth = np.empty(len(bins_edges)-1, dtype=np.double)
+    psth_ci = np.empty((len(bins_edges)-1, 2), dtype=np.double)
+    for j in range(len(bins_edges)-1):
         psth[j] = binned_spikes[:, j].mean()
         bootstrapped_mean = stats.bootstrapTests.bootstrapMean(
             observations=binned_spikes[:, j], nResamples=nResamples)
