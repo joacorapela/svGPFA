@@ -12,6 +12,8 @@ import stats.pointProcess.sampling
 
 def timeRescaling(Y, pk):
     n = int(torch.sum(Y).item())
+    if n==0:
+        return None
     rISIs = torch.zeros(n-1, dtype=torch.double)
     spikeindicies = Y.nonzero()
     for r in range(n-1):
@@ -66,10 +68,11 @@ def KSTestTimeRescalingNumericalCorrection(spikesTimes, cifTimes, cifValues, gam
         zSimIter = timeRescalingForUnbinnedSpikes(spikesTimes=simSpikesTimes,
                                                   cifValues=cifValues,
                                                   t0=t0, tf=tf, dt=dt)
-        if zSim is None:
-            zSim = zSimIter
-        else:
-            zSim = torch.cat((zSim, zSimIter))
+        if zSimIter is not None:
+            if zSim is None:
+                zSim = zSimIter
+            else:
+                zSim = torch.cat((zSim, zSimIter))
     expECDFx, _ = torch.sort(zExp)
     expECDFy = torch.linspace(0, 1, len(zExp))
     simECDFx, _ = torch.sort(zSim)
