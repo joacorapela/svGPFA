@@ -3,7 +3,6 @@ import pdb
 import sys
 import os
 import torch
-import myMath.utils
 import stats.svGPFA.kernelsMatricesStore
 import utils.svGPFA.miscUtils
 
