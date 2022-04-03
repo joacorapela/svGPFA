@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import scipy.stats
 # import matplotlib.pyplot as plt
+
 import numericalMethods.utils
 import stats.gaussianProcesses.eval
 
@@ -201,17 +202,19 @@ def pinv3D(K, rcond=1e-15):
         Kpinv[i,:,:] = torch.linalg.pinv(K[i,:,:], rcond=rcond)
     return Kpinv
 
+
 def getLegQuadPointsAndWeights(nQuad, trials_start_times, trials_end_times,
                                dtype=torch.double):
     nTrials = len(trials_start_times)
-    assert(nTrials==len(trials_end_times))
+    assert(nTrials == len(trials_end_times))
     leg_quad_points = torch.empty((nTrials, nQuad, 1), dtype=dtype)
     leg_quad_weights = torch.empty((nTrials, nQuad, 1), dtype=dtype)
     for r in range(nTrials):
-        leg_quad_points[r,:,0], leg_quad_weights[r,:,0] = \
-                math.utils.leggaussVarLimits(n=nQuad, a=trials_start_times[r],
-                                               b=trials_end_times[r])
+        leg_quad_points[r, :, 0], leg_quad_weights[r, :, 0] = \
+                numericalMethods.utils.leggaussVarLimits(
+                    n=nQuad, a=trials_start_times[r], b=trials_end_times[r])
     return leg_quad_points, leg_quad_weights
+
 
 def getTrialsTimes(trialsLengths, dt):
     nTrials = len(trialsLengths)

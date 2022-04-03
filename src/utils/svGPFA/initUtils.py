@@ -76,7 +76,22 @@ def getSRQSigmaVecsFromKzz(Kzz):
     answer = getSRQSigmaVecsFromSRMatrices(srMatrices=Kzz_chol)
     return answer
 
+
 def getSRQSigmaVecsFromSRMatrices(srMatrices):
+    """Returns vectors containing the lower-triangular elements of the input
+    lower- triangular matrices.
+
+    :param srMatrices: a list of length nLatents, with srMatrices[k] a tensor
+    of dimension nTrials x nIndPoints x nIndPoints, where
+    srMatrices[k][r, :, :] is a lower-triangular matrix.
+
+    :type srMatrices: list
+    :return: a list srQSigmaVec of length nLatents, whith srQSigmaVec[k] a
+    tensor of dimension nTrials x (nIndPoints+1)*nIndPoints/2 x 0, where
+    srQSigmaVec[k][r, :, 0] contains the lower-triangular elements of
+    srMatrices[k][r, :, :]
+    """
+
     nLatents = len(srMatrices)
     nTrials = srMatrices[0].shape[0]
 
@@ -91,4 +106,98 @@ def getSRQSigmaVecsFromSRMatrices(srMatrices):
             cholKRVec = cholKR[trilIndices[0,:], trilIndices[1,:]]
             srQSigmaVec[k][r,:,0] = cholKRVec
     return srQSigmaVec
+
+def getIndPointsLocs0(nLatents, nTrials, config):
+    Z0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        option_array = "indPointsLocsLatent{:d}Trial{:d}".format(k,0).lower()
+        option_filename = "indPointsLocsLatent{:d}Trial{:d}_filename".format(k,0).lower()
+        if option_array in config.options("indPoints_params"):
+            Z0_k_r0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,0)][1:-1].split(", ")], dtype=torch.double)
+        elif option_filename in config.options("indPoints_params"):
+            Z0_k_r0 = torch.from_numpy(np.loadtxt(config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}_filename".format(k,0)], delimiter=","))
+        else:
+            raise ValueError("option={:s} not found in config.options('indPoints_params')")
+        nIndPointsForLatent = len(Z0_k_r0)
+        Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1), dtype=torch.double)
+        Z0[k][0,:,0] = Z0_k_r0
+        for r in range(1, nTrials):
+            option_array = "indPointsLocsLatent{:d}Trial{:d}".format(k,r).lower()
+            option_filename = "indPointsLocsLatent{:d}Trial{:d}_filename".format(k,r).lower()
+            if option_array in config.options("indPoints_params"):
+                Z0[k][r,:,0] = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}".format(k,r)][1:-1].split(", ")], dtype=torch.double)
+            elif option_filename in config.options("indPoints_params"):
+                Z0[k][r,:,0] = torch.from_numpy(np.loadtxt(config["indPoints_params"]["indPointsLocsLatent{:d}Trial{:d}_filename".format(k,r)], delimiter=","))
+            else:
+                raise ValueError("option={:s} not found in config.options('indPoints_params')")
+    return Z0
+
+
+def getIdenticalIndPointsLocs0(nLatents, nTrials, config):
+    Z0 = [[] for k in range(nLatents)]
+    for k in range(nLatents):
+        the_Z0 = torch.tensor([float(str) for str in config["indPoints_params"]["indPointsLocs"][1:-1].split(", ")],
+                              dtype=torch.double)
+        nIndPointsForLatent = len(the_Z0)
+        Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1),
+                            dtype=torch.double)
+        Z0[k][:, :, 0] = the_Z0
+    return Z0
+
+
+def getVariationalMean0(nLatents, nTrials, config, keyNamePattern="qMu0Latent{:d}Trial{:d}_filename"):
+    qMu0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qMu0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qMu0k0 = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+        nIndPointsK = len(qMu0k0)
+        qMu0[k] = torch.empty((nTrials, nIndPointsK, 1), dtype=torch.double)
+        qMu0[k][0,:,0] = qMu0k0
+        for r in range(1, nTrials):
+            qMu0Filename = config["variational_params"][keyNamePattern.format(k, r)]
+            qMu0kr = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+            qMu0[k][r,:,0] = qMu0kr
+    return qMu0
+
+
+def getIdenticalVariationalMean0(nLatents, nTrials, config,
+                                 keyName="qMu0_filename"):
+    qMu0 = [[] for r in range(nLatents)]
+    qMu0Filename = config["variational_params"][keyName]
+    the_qMu0 = torch.from_numpy(pd.read_csv(qMu0Filename, header=None).to_numpy()).flatten()
+    nIndPoints = len(the_qMu0)
+    for k in range(nLatents):
+        qMu0[k] = torch.empty((nTrials, nIndPoints, 1), dtype=torch.double)
+        qMu0[k][:, :, 0] = the_qMu0
+    return qMu0
+
+
+def getVariationalCov0(nLatents, nTrials, config, keyNamePattern="qSigma0Latent{:d}Trial{:d}_filename"):
+    qSigma0 = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        qSigma0Filename = config["variational_params"][keyNamePattern.format(k, 0)]
+        qSigma0k0 = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).to_numpy())
+        nIndPointsK = qSigma0k0.shape[0]
+        qSigma0[k] = torch.empty((nTrials, nIndPointsK, nIndPointsK), dtype=torch.double)
+        qSigma0[k][0,:,:] = qSigma0k0
+        for r in range(1, nTrials):
+            qSigma0Filename = config["variational_params"][keyNamePattern.format(k, r)]
+            qSigma0kr = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).values)
+            qSigma0[k][r,:,:] = qSigma0kr
+    return qSigma0
+
+
+def getIdenticalVariationalCov0(nLatents, nTrials, config,
+                                keyName="qSigma0_filename"):
+    qSigma0 = [[] for r in range(nLatents)]
+    qSigma0Filename = config["variational_params"][keyName]
+    the_qSigma0 = torch.from_numpy(pd.read_csv(qSigma0Filename, header=None).to_numpy())
+    nIndPoints = the_qSigma0.shape[0]
+    for k in range(nLatents):
+        qSigma0[k] = torch.empty((nTrials, nIndPoints, nIndPoints),
+                                 dtype=torch.double)
+        # qSigma0[k][r,:,:] = qSigma0kr
+        qSigma0[k][:, :, :] = the_qSigma0
+    return qSigma0
+
 
