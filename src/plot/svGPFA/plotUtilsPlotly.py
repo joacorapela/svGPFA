@@ -1537,21 +1537,21 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
         fig.add_trace(traceCB)
         fig.add_trace(traceMean)
 
-        if not indPointsLocs is None:
-            for n in range(indPointsLocs[latentToPlot].shape[1]):
-                fig.add_shape(
-                    dict(
-                        type="line",
-                        x0=indPointsLocs[latentToPlot][r,n,0],
-                        y0=ymin,
-                        x1=indPointsLocs[latentToPlot][r,n,0],
-                        y1=ymax,
-                        line=dict(
-                            color=color_rgba_pattern.format(0.7),
-                            width=3
-                        ),
-                    ),
-                )
+#         if not indPointsLocs is None:
+#             for n in range(indPointsLocs[latentToPlot].shape[1]):
+#                 fig.add_shape(
+#                     dict(
+#                         type="line",
+#                         x0=indPointsLocs[latentToPlot][r,n,0],
+#                         y0=ymin,
+#                         x1=indPointsLocs[latentToPlot][r,n,0],
+#                         y1=ymax,
+#                         line=dict(
+#                             color=color_rgba_pattern.format(0.7),
+#                             width=3
+#                         ),
+#                     ),
+#                 )
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
     fig.update_layout(title_text=title)
@@ -2403,28 +2403,29 @@ def getPlotCIFsImageOneNeuronAllTrials(times, cif_values, neuron_index,
         sort_indices = np.argsort(sort_event-align_event)
         cifs_image = cifs_image[sort_indices, :]
     if align_event is None:
-        align_event = np.zeros(shape=(len(sort_event), 1))
+        align_event = np.zeros(shape=(len(trials_indices), 1))
     trace_hm = go.Heatmap(x=times, y=trials_indices, z=cifs_image)
 
     fig = go.Figure()
     fig.add_trace(trace_hm)
-    n_marked_events = marked_events.shape[1]
-    min_time = times.min()
-    max_time = times.max()
-    for i in range(n_marked_events):
-        marked_times = marked_events[sort_indices, i]-align_event[sort_indices]
-        marked_times = np.where(marked_times<min_time,
-                                np.ones(marked_times.shape)*min_time,
-                                marked_times)
-        marked_times = np.where(marked_times>max_time,
-                                np.ones(marked_times.shape)*max_time,
-                                marked_times)
-        trace_event = go.Scatter(x=marked_times,
-                                 y=trials_indices,
-                                 line=dict(color=event_line_color,
-                                           width=event_line_width),
-                                 showlegend=False)
-        fig.add_trace(trace_event)
+    if marked_events is not None:
+        n_marked_events = marked_events.shape[1]
+        min_time = times.min()
+        max_time = times.max()
+        for i in range(n_marked_events):
+            marked_times = marked_events[sort_indices, i]-align_event[sort_indices]
+            marked_times = np.where(marked_times<min_time,
+                                    np.ones(marked_times.shape)*min_time,
+                                    marked_times)
+            marked_times = np.where(marked_times>max_time,
+                                    np.ones(marked_times.shape)*max_time,
+                                    marked_times)
+            trace_event = go.Scatter(x=marked_times,
+                                    y=trials_indices,
+                                    line=dict(color=event_line_color,
+                                            width=event_line_width),
+                                    showlegend=False)
+            fig.add_trace(trace_event)
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
     fig.update_layout(title=title)
@@ -2456,22 +2457,25 @@ def getPlotCIFsOneNeuronAllTrials(
                     cif_values_max = cif_valuesr_max
         ylim = [cif_values_min, cif_values_max]
 
+    if trials_labels is None:
+        trials_labels = [str(r) for r in range(nTrials)]
     fig = go.Figure()
     title = titlePattern.format(neuron_index)
 
-    n_marked_events = marked_events.shape[1]
-    min_time = times.min()
-    max_time = times.max()
-    if align_event is not None:
-        marked_times = marked_events-np.expand_dims(align_event, 1)
-    else:
-        marked_times = marked_events
-    marked_times = np.where(marked_times < min_time,
-                            np.ones(marked_times.shape)*min_time,
-                            marked_times)
-    marked_times = np.where(marked_times > max_time,
-                            np.ones(marked_times.shape)*max_time,
-                            marked_times)
+    if marked_events is not None:
+        n_marked_events = marked_events.shape[1]
+        min_time = times.min()
+        max_time = times.max()
+        if align_event is not None:
+            marked_times = marked_events-np.expand_dims(align_event, 1)
+        else:
+            marked_times = marked_events
+        marked_times = np.where(marked_times < min_time,
+                                np.ones(marked_times.shape)*min_time,
+                                marked_times)
+        marked_times = np.where(marked_times > max_time,
+                                np.ones(marked_times.shape)*max_time,
+                                marked_times)
 
     if trials_annotations is not None and trials_labels is not None:
         hover_text = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
@@ -2484,6 +2488,8 @@ def getPlotCIFsOneNeuronAllTrials(
                                                        trials_annotations[trial_annotation_key][r])
             for i in range(nTimes):
                 hover_text[r][i] = hover_text[r][i] + an_annotation
+    if trials_annotations is None:
+        colorsList = plotly.colors.qualitative.Plotly
     for r in range(nTrials):
         cifToPlot = cif_values[r][neuron_index]
         if trials_annotations is not None:
@@ -2494,19 +2500,30 @@ def getPlotCIFsOneNeuronAllTrials(
             else:
                 raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
         else:
-            cif_color = no_trial_annotation_color
+            cif_color = colorsList[r%len(colorsList)]
 
-        traceMean = go.Scatter(
-            x=times,
-            y=cifToPlot,
-            line=dict(color=cif_color),
-            mode="lines",
-            name="trial {:s}".format(trials_labels[r]),
-            legendgroup="trial{:02d}".format(r),
-            showlegend=True,
-            hoverinfo="text",
-            text=hover_text[r],
-        )
+        if trials_annotations is not None and trials_labels is not None:
+            traceMean = go.Scatter(
+                x=times,
+                y=cifToPlot,
+                line=dict(color=cif_color),
+                mode="lines",
+                name="trial {:s}".format(trials_labels[r]),
+                legendgroup="trial{:02d}".format(r),
+                showlegend=True,
+                hoverinfo="text",
+                text=hover_text[r],
+            )
+        else:
+            traceMean = go.Scatter(
+                x=times,
+                y=cifToPlot,
+                line=dict(color=cif_color),
+                mode="lines",
+                name="trial {:s}".format(trials_labels[r]),
+                legendgroup="trial{:02d}".format(r),
+                showlegend=True,
+            )
         fig.add_trace(traceMean)
 
         if spikes_times is not None:
@@ -2670,3 +2687,62 @@ def getPlotLowerBoundVsTwoParamsParam(param1Values,
     return fig
 
 
+# KS test
+
+def getPlotResKSTestTimeRescalingNumericalCorrection(
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy,
+    cb, title="",
+    dataColor="blue", cbColor="red", refColor="black",
+    estECDFcolor="magenta", simECDFcolor="cyan",
+    estECDFmarker="cross", simECDFmarker="x",
+    dataLinestyle="solid", cbLinestyle="dash", refLinestyle="solid",
+    dataMarker="circle",
+    ylabel="Empirical Cumulative Distribution Function",
+    xlabel="Rescaled Time",
+    diffLabel="Difference", estECDFlabel="Estimated",
+    simECDFlabel="True"):
+
+    fig = go.Figure()
+    trace_diff = go.Scatter(x=diffECDFsX, y=diffECDFsY, mode="lines+markers",
+                            line=dict(color=dataColor, dash=dataLinestyle),
+                            marker=dict(symbol=dataMarker),
+                            name=diffLabel)
+    trace_est = go.Scatter(x=estECDFx, y=estECDFy, mode="markers",
+                           marker=dict(color=estECDFcolor, symbol=estECDFmarker),
+                           name=estECDFlabel)
+    trace_sim = go.Scatter(x=simECDFx, y=simECDFy, mode="markers",
+                           marker=dict(color=simECDFcolor, symbol=simECDFmarker),
+                           name=simECDFlabel)
+    fig.add_trace(trace_diff)
+    fig.add_trace(trace_est)
+    fig.add_trace(trace_sim)
+    fig.add_hline(y=0, line=dict(color=refColor, dash=refLinestyle))
+    fig.add_hline(y=cb, line=dict(color=cbColor, dash=cbLinestyle))
+    fig.add_hline(y=-cb, line=dict(color=cbColor, dash=cbLinestyle))
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
+# ROC analysis
+
+def getPlotResROCAnalysis(fpr, tpr, auc, title="", colorROC="red",
+                          colorRef="black", linestyleROC="dash",
+                          linestyleRef="dot",
+                          labelPattern="ROC curve (area={:0.2f})",
+                          xlabel="False Positive Rate",
+                          ylabel="True Positive Rate",
+                          legendLoc="lower right"):
+    fig = go.Figure()
+    line_ROC = go.Scatter(x=fpr, y=tpr, mode="lines+markers",
+                          line=dict(color=colorROC, dash=linestyleROC),
+                          name=labelPattern.format(auc))
+    line_ref = go.Scatter(x=[0, 1], y=[0, 1], mode="lines",
+                          line=dict(color=colorRef, dash=linestyleRef),
+                          showlegend=False)
+    fig.add_trace(line_ROC)
+    fig.add_trace(line_ref)
+    fig.update_xaxes(title_text=xlabel, range=(0.0, 1.0))
+    fig.update_yaxes(title_text=ylabel, range=(0.0, 1.05))
+    fig.update_layout(title_text=title)
+    return fig
