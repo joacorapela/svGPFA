@@ -1,11 +1,10 @@
 
-import pdb
 import sys
 import os
 from scipy.io import loadmat
 import torch
 sys.path.append("../src")
-from myMath.utils import leggaussVarLimits
+import numericalMethods.utils
 
 def test_leggaussVarLimits():
     tol = 1e-6
@@ -18,7 +17,7 @@ def test_leggaussVarLimits():
     x = torch.flip(input=torch.from_numpy(mat["x"]).type(torch.DoubleTensor), dims=[1])
     w = torch.flip(input=torch.from_numpy(mat["w"]).type(torch.DoubleTensor), dims=[1])
 
-    px, pw = leggaussVarLimits(n=n, a=a, b=b, dtype=torch.double)
+    px, pw = numericalMethods.utils.leggaussVarLimits(n=n, a=a, b=b, dtype=torch.double)
     xDiff = torch.mean((x-px)**2)
     assert(xDiff<tol)
     wDiff = torch.mean((w-pw)**2)
