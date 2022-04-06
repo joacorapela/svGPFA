@@ -32,7 +32,7 @@ def main(argv):
     simResFilename = "results/{:08d}_simRes.pickle".format(simResNumber)
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     # cifTimes = simRes["cifTimes"]
-    cifTimes = simRes["times"]
+    cifTimes = simRes["latentsTrialsTimes"]
     nTrials = len(cifTimes)
     oneTrialCIFTimes = cifTimes[trialToPlot]
     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
@@ -41,14 +41,16 @@ def main(argv):
     with open(modelFilename, "rb") as f: modelRes = pickle.load(f)
 
     model = modelRes["model"]
-    estMeanCIFsValues = model.computeCIFsMeans(times=cifTimes)
-    estExpectedCIFsValues = model.computeExpectedCIFs(times=cifTimes)
+#     estMeanCIFsValues = model.computeCIFsMeans(times=cifTimes)
+#     estExpectedCIFsValues = model.computeExpectedCIFs(times=cifTimes)
+    expectedPosteriorCIFsValues = model.computeExpectedPosteriorCIFs(times=oneTrialCIFTimes)
 
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
     plot.svGPFA.plotUtils.plotSimulatedAndEstimatedCIFs(times=cifTimes[trialToPlot, :, 0],
                                                         simCIFValues=simCIFsValues[trialToPlot][neuronToPlot],
-                                                        estMeanCIFValues=estMeanCIFsValues[trialToPlot][neuronToPlot].detach(),
-                                                        estExpectedCIFValues=estExpectedCIFsValues[trialToPlot][neuronToPlot].detach(),
+#                                                         estMeanCIFValues=estMeanCIFsValues[trialToPlot][neuronToPlot].detach(),
+#                                                         estExpectedCIFValues=estExpectedCIFsValues[trialToPlot][neuronToPlot].detach(),
+                                                        estCIFValues=expectedPosteriorCIFsValues[trialToPlot][neuronToPlot].detach(),
                                                         figFilename=figFilename, title=title)
 
     plt.show()

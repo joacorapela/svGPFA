@@ -1,5 +1,4 @@
 
-import pdb
 import sys
 import abc
 import io
@@ -198,7 +197,6 @@ class SVEM_PyTorch(SVEM):
             return answer
         optimizer = torch.optim.LBFGS(x, **optimParams)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
-        print("Kernel params:", x)
         return answer
 
     def _mStepIndPointsLocs(self, model, optimParams):

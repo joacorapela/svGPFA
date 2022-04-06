@@ -19,7 +19,7 @@ def main(argv):
     args = parser.parse_args()
     mEstNumber = args.mEstNumber
 
-    mEstParamsFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
+    mEstParamsFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationParams.ini".format(mEstNumber)
     mEstConfig = configparser.ConfigParser()
     mEstConfig.read(mEstParamsFilename)
     pEstNumber = int(mEstConfig["data"]["pEstNumber"])
@@ -41,7 +41,7 @@ def main(argv):
     kernelsTypes = [type(tKernels[k]).__name__ for k in range(nLatents)]
     tKernelsParams = utils.svGPFA.initUtils.getKernelsParams0(kernels=tKernels, noiseSTD=0.0)
 
-    mModelSaveFilename = "../../matlabCode/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
+    mModelSaveFilename = "../../matlabCode/working/scripts/results/{:08d}-pointProcessEstimationRes.mat".format(mEstNumber)
     pModelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(pEstNumber)
     figFilenamePattern = "figures/{:08d}_{:08d}_truePythonMatlabKernelsParamsPointProcess.{{:s}}".format(pEstNumber, mEstNumber)
 

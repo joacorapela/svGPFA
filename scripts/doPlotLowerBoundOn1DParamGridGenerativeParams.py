@@ -64,16 +64,23 @@ def main(argv):
     nNeurons = int(simInitConfig["control_variables"]["nNeurons"])
     trialsLengths = [float(str) for str in simInitConfig["control_variables"]["trialsLengths"][1:-1].split(",")]
     nTrials = len(trialsLengths)
+    trials_start_times = [0.0 for i in range(nTrials)]
+    trials_end_times = trialsLengths
     # firstIndPointLoc = float(simInitConfig["control_variables"]["firstIndPointLoc"])
     # indPointsLocsKMSRegEpsilon = float(simInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
-    KzzChol = simRes["KzzChol"]
+    # KzzChol = simRes["KzzChol"]
+    Kzz = simRes["Kzz"]
     indPointsMeans = simRes["indPointsMeans"]
     C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(CFilename=simInitConfig["embedding_params"]["C_filename"], dFilename=simInitConfig["embedding_params"]["d_filename"])
 
-    legQuadPoints, legQuadWeights = utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(nQuad=nQuad, trialsLengths=trialsLengths)
+    legQuadPoints, legQuadWeights = \
+            utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(
+                nQuad=nQuad, trials_start_times=trials_start_times,
+                trials_end_times=trials_end_times)
+
 
     kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents, config=simInitConfig, forceUnitScale=True)
     kernelsParams0 = utils.svGPFA.initUtils.getKernelsParams0(kernels=kernels, noiseSTD=0.0)
@@ -90,7 +97,7 @@ def main(argv):
             qMu0[k][r,:,:] = indPointsMeans[r][k]
     # end patch
 
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(srMatrices=KzzChol)
+    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromKzz(Kzz=Kzz)
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
@@ -104,15 +111,18 @@ def main(argv):
                   "legQuadWeights": legQuadWeights}
 
     # create model
-    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModel(
+    kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.kernelMatrixInvChol
+    indPointsCovRep = stats.svGPFA.svGPFAModelFactory.indPointsCovChol
+    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
         conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
         linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
         embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels)
+        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
+        indPointsCovRep=indPointsCovRep)
 
     model.setMeasurements(measurements=spikesTimes)
     model.setInitialParams(initialParams=initialParams)
-    model.setQuadParams(quadParams=quadParams)
+    model.setELLCalculationParams(eLLCalculationParams=quadParams)
     model.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
     model.buildKernelsMatrices()
 

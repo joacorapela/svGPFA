@@ -9,8 +9,8 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("nNeurons", help="Number of neurons", type=int)
     parser.add_argument("nLatents", help="Number of latents", type=int)
-    parser.add_argument("--mean", help="Mean of C values", type=float, default=1.0)
-    parser.add_argument("--std", help="Standard deviation of C values", type=float, default=0.3)
+    parser.add_argument("--mean", help="Mean of C values", type=float, default=0.0)
+    parser.add_argument("--std", help="Standard deviation of C values", type=float, default=0.2)
     args = parser.parse_args()
 
     nNeurons = args.nNeurons

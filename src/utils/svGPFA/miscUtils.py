@@ -5,8 +5,19 @@ import numpy as np
 import torch
 import scipy.stats
 # import matplotlib.pyplot as plt
-import myMath.utils
+
+import numericalMethods.utils
 import stats.gaussianProcesses.eval
+
+def orthonormalizeLatentsMeans(latentsMeans, C):
+    U, S, Vh = np.linalg.svd(C)
+    orthoMatrix = Vh.T*S
+    nTrials = len(latentsMeans)
+    oLatentsMeans = [[] for r in range(nTrials)]
+    for r in range(nTrials):
+        oLatentsMeans[r] = np.matmul(latentsMeans[r], orthoMatrix)
+    return oLatentsMeans
+
 
 def getOptimParams(optimParamsDict):
     optimMethod = optimParamsDict["em_method"]
@@ -191,17 +202,19 @@ def pinv3D(K, rcond=1e-15):
         Kpinv[i,:,:] = torch.linalg.pinv(K[i,:,:], rcond=rcond)
     return Kpinv
 
+
 def getLegQuadPointsAndWeights(nQuad, trials_start_times, trials_end_times,
                                dtype=torch.double):
     nTrials = len(trials_start_times)
-    assert(nTrials==len(trials_end_times))
+    assert(nTrials == len(trials_end_times))
     leg_quad_points = torch.empty((nTrials, nQuad, 1), dtype=dtype)
     leg_quad_weights = torch.empty((nTrials, nQuad, 1), dtype=dtype)
     for r in range(nTrials):
-        leg_quad_points[r,:,0], leg_quad_weights[r,:,0] = \
-                myMath.utils.leggaussVarLimits(n=nQuad, a=trials_start_times[r],
-                                               b=trials_end_times[r])
+        leg_quad_points[r, :, 0], leg_quad_weights[r, :, 0] = \
+                numericalMethods.utils.leggaussVarLimits(
+                    n=nQuad, a=trials_start_times[r], b=trials_end_times[r])
     return leg_quad_points, leg_quad_weights
+
 
 def getTrialsTimes(trialsLengths, dt):
     nTrials = len(trialsLengths)
@@ -333,4 +346,19 @@ def getSRQSigmaVec(qSVec, qSDiag):
 #         for r in range(nTrials):
 #             Z0[k][r,:,0] = torch.linspace(firstIndPointLoc, trialsLengths[r], nIndPointsPerLatent[k])
 #     return Z0
+
+def getEmbeddingSamples(C, d, latentsSamples):
+    nTrials = len(latentsSamples)
+    answer = [torch.matmul(C, latentsSamples[r])+d for r in range(nTrials)]
+    return answer
+
+def getEmbeddingMeans(C, d, latentsMeans):
+    nTrials = len(latentsMeans)
+    answer = [torch.matmul(C, latentsMeans[r])+d for r in range(nTrials)]
+    return answer
+
+def getEmbeddingSTDs(C, latentsSTDs):
+    nTrials = len(latentsSTDs)
+    answer = [torch.matmul(C**2, latentsSTDs[r]**2).sqrt() for r in range(nTrials)]
+    return answer
 

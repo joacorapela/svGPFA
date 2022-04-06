@@ -63,12 +63,14 @@ class LinearSVEmbedding(SVEmbedding):
         self._C = svEmbeddingInitialParams["C0"]
         self._d = svEmbeddingInitialParams["d0"]
         svPosteriorOnLatentsInitialParams = initialParams["svPosteriorOnLatents"]
-        self._svPosteriorOnLatents.setInitialParams(initialParams=svPosteriorOnLatentsInitialParams)
+        self._svPosteriorOnLatents.setInitialParams(
+            initialParams=svPosteriorOnLatentsInitialParams)
 
-#     def sample(self, times):
-#         latentsSamples = self._svPosteriorOnLatents.sample(times=times)
-#         answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
-#         return answer
+    def sample(self, times, nudget=1e-3):
+        latentsSamples, _, _ = self._svPosteriorOnLatents.sample(times=times,
+                                                                 nudget=nudget)
+        answer = [self._C.matmul(latentsSamples[r])+self._d for r in range(len(latentsSamples))]
+        return answer
 
     def getParams(self):
         return [self._C, self._d]
@@ -94,10 +96,10 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 #         qHMu = torch.matmul(qKMu, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
 #         return qHMu
 # 
-#     def computeMeansAndVarsAtTimes(self, times):
-#         qKMu, qKVar = self._svPosteriorOnLatents.computeMeansAndVarsAtTimes(times=times)
-#         answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
-#         return answer
+    def computeMeansAndVarsAtTimes(self, times):
+        qKMu, qKVar = self._svPosteriorOnLatents.computeMeansAndVarsAtTimes(times=times)
+        answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
+        return answer
 
     def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
         self._svPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)

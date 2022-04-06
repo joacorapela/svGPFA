@@ -78,7 +78,6 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
             indPointsLocsKMS=self._indPointsLocsKMS,
             indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
         qKMu, qKVar = svPosteriorOnLatents.computeMeansAndVars()
-
         return qKMu, qKVar
 
     def computeMeansAndVars(self):
@@ -102,74 +101,78 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 #         answer = self.__computeMeansGivenKernelMatrices(Kzz=Kzz, KzzInv=KzzInv, Ktz=Ktz)
 #         return answer
 # 
-#     def computeMeansAndVarsAtTimes(self, times):
-#         Kzz = self._indPointsLocsKMS.getKzz()
-#         KzzInv = self._indPointsLocsKMS.getKzzInv()
-# 
-#         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-#         indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
-#         indPointsLocsAndAllTimesKMS.setTimes(times=times)
-#         indPointsLocsAndAllTimesKMS.setIndPointsLocs(
-#             indPointsLocs=self.getIndPointsLocs())
-#         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
-# 
-#         Ktz = indPointsLocsAndAllTimesKMS.getKtz()
-#         KttDiag = indPointsLocsAndAllTimesKMS.getKttDiag()
-#         answer = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, KzzInv=KzzInv, Ktz=Ktz, KttDiag=KttDiag)
-# 
-#         return answer
-# 
-#     def sample(self, times, nSamples=1, regFactor=1e-3):
-#         Kzz = self._indPointsLocsKMS.getKzz()
-#         KzzInv = self._indPointsLocsKMS.getKzzInv()
-# 
-#         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-#         indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
-#         indPointsLocsAndAllTimesKMS.setIndPointsLocs(indPointsLocs=self._indPointsLocsKMS.getIndPointsLocs())
-#         indPointsLocsAndAllTimesKMS.setTimes(times=times)
-#         indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
-#         indPointsLocsAndAllTimesKMS.buildKttKernelsMatrices()
-#         Ktz = indPointsLocsAndAllTimesKMS.getKtz()
-#         Ktt = indPointsLocsAndAllTimesKMS.getKtt()
-# 
-#         qMu = self._svPosteriorOnIndPoints.getQMu()
-#         qSigma = self._svPosteriorOnIndPoints.buildQSigma()
-# 
-#         nLatents = len(Kzz)
-#         nTrials = Kzz[0].shape[0]
-#         samples = [[] for r in range(nTrials)]
-#         means = [[] for r in range(nTrials)]
-#         variances = [[] for r in range(nTrials)]
-#         for r in range(nTrials):
-#             samples[r] = torch.empty((nLatents, nSamples, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
-#             means[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
-#             variances[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
-#             for k in range(nLatents):
-#                 print("Processing trial {:d} and latent {:d}".format(r, k))
-#                 Kzzrk = Kzz[k][r,:,:]
-#                 KzzInvrk = KzzInv[k][r,:,:]
-#                 Ktzrk = Ktz[k][r,:,:]
-#                 Kttrk = Ktt[k][r,:,:]
-#                 qMurk = qMu[k][r,:,:]
-#                 qSigmark = qSigma[k][r,:,:]
-# 
-#                 ### being compute mean ###
-#                 b = torch.cholesky_solve(qMurk, KzzInvrk)
-#                 meanrk = torch.squeeze(Ktzrk.matmul(b)).detach().numpy()
-#                 ### end compute mean ###
-# 
-#                 ### being compute covar ###
-#                 B = torch.cholesky_solve(torch.t(Ktzrk), KzzInvrk)
-#                 covarrk = Kttrk+torch.t(B).matmul(qSigmark-Kzzrk).matmul(B)
-#                 ### end compute covar ###
-# 
-#                 covarrk += torch.eye(covarrk.shape[0])*regFactor
-#                 covarrk = covarrk.detach().numpy()
-#                 mn = scipy.stats.multivariate_normal(mean=meanrk, cov=covarrk)
-#                 samples[r][k,:,:] = torch.from_numpy(mn.rvs(size=nSamples))
-#                 means[r][k,:] = torch.from_numpy(meanrk)
-#                 variances[r][k,:] = torch.diag(torch.from_numpy(covarrk))
-#         return samples, means, variances
+    def computeMeansAndVarsAtTimes(self, times):
+        Kzz = self._indPointsLocsKMS.getKzz()
+
+        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
+        indPointsLocsAndAllTimesKMS.setTimes(times=times)
+        indPointsLocsAndAllTimesKMS.setIndPointsLocs(
+            indPointsLocs=self.getIndPointsLocs())
+        indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
+
+        Ktz = indPointsLocsAndAllTimesKMS.getKtz()
+        KttDiag = indPointsLocsAndAllTimesKMS.getKttDiag()
+        answer = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz, Ktz=Ktz, KttDiag=KttDiag)
+
+        return answer
+
+    def sample(self, times, nudget=1e-3):
+        Kzz = self._indPointsLocsKMS.getKzz()
+        # KzzInv = self._indPointsLocsKMS.getKzzInv()
+
+        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
+        indPointsLocsAndAllTimesKMS.setIndPointsLocs(indPointsLocs=self._indPointsLocsKMS.getIndPointsLocs())
+        indPointsLocsAndAllTimesKMS.setTimes(times=times)
+        indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
+        indPointsLocsAndAllTimesKMS.buildKttKernelsMatrices()
+        Ktz = indPointsLocsAndAllTimesKMS.getKtz()
+        Ktt = indPointsLocsAndAllTimesKMS.getKtt()
+
+        qMu = self._svPosteriorOnIndPoints.getQMu()
+        qSigma = self._svPosteriorOnIndPoints.buildQSigma()
+
+        nLatents = len(Kzz)
+        nTrials = Kzz[0].shape[0]
+        samples = [[] for r in range(nTrials)]
+        means = [[] for r in range(nTrials)]
+        variances = [[] for r in range(nTrials)]
+        for r in range(nTrials):
+            samples[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
+            means[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
+            variances[r] = torch.empty((nLatents, Ktt[0].shape[1]), dtype=Kzz[0].dtype)
+            for k in range(nLatents):
+                print("Processing trial {:d} and latent {:d}".format(r, k))
+                Kzzrk = Kzz[k][r,:,:]
+                # KzzInvrk = KzzInv[k][r,:,:]
+                Ktzrk = Ktz[k][r,:,:]
+                Kttrk = Ktt[k][r,:,:]
+                qMurk = qMu[k][r,:,:]
+                qSigmark = qSigma[k][r,:,:]
+
+                ### being compute mean ###
+                # b = torch.cholesky_solve(qMurk, KzzInvrk)
+                b = self._indPointsLocsKMS.solveForLatentAndTrial(input=qMurk,
+                                                                  latentIndex=k,
+                                                                  trialIndex=r)
+                meanrk = torch.squeeze(Ktzrk.matmul(b)).detach().numpy()
+                ### end compute mean ###
+
+                ### being compute covar ###
+                # B = torch.cholesky_solve(torch.t(Ktzrk), KzzInvrk)
+                B = self._indPointsLocsKMS.solveForLatentAndTrial(
+                    input=torch.t(Ktzrk), latentIndex=k, trialIndex=r)
+                covarrk = Kttrk+torch.t(B).matmul(qSigmark-Kzzrk).matmul(B)
+                ### end compute covar ###
+
+                covarrk += torch.eye(covarrk.shape[0])*nudget
+                covarrk = covarrk.detach().numpy()
+                mn = scipy.stats.multivariate_normal(mean=meanrk, cov=covarrk)
+                samples[r][k,:] = torch.from_numpy(mn.rvs(size=1))
+                means[r][k,:] = torch.from_numpy(meanrk)
+                variances[r][k,:] = torch.diag(torch.from_numpy(covarrk))
+        return samples, means, variances
 
     def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, Ktz, KttDiag):
         nTrials = KttDiag.shape[0]

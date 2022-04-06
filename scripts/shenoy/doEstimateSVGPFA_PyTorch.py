@@ -14,6 +14,7 @@ import shenoyUtils
 sys.path.append("../../src")
 import stats.svGPFA.svGPFAModelFactory
 import stats.svGPFA.svEM
+import utils.neuralDataAnalysis
 import utils.svGPFA.configUtils
 import utils.svGPFA.miscUtils
 import utils.svGPFA.initUtils
@@ -52,14 +53,14 @@ def main(argv):
     save_partial_filename_pattern_pattern = args.save_partial_filename_pattern_pattern
     data_filename = args.data_filename
 
-    spikes_times, neurons_indices = \
-            shenoyUtils.getSpikesTimes(data_filename=data_filename,
-                                       trials_indices=trials_indices,
-                                       location=location,
-                                       from_time=from_time,
-                                       to_time=to_time,
-                                       min_nSpikes_perNeuron_perTrial=
-                                        min_nSpikes_perNeuron_perTrial)
+    spikes_times = shenoyUtils.getSpikesTimes(
+        data_filename=data_filename, trials_indices=trials_indices,
+        location=location, from_time=from_time, to_time=to_time)
+    spikes_times, neurons_indices = utils.neuralDataAnalysis.removeUnitsWithLessSpikesThanThrInAnyTrials(
+                spikes_times=spikes_times,
+                min_nSpikes_perNeuron_perTrial=
+                 min_nSpikes_perNeuron_perTrial)
+
     nNeurons = len(spikesTimes[0])
 
     estInitConfigFilename = "data/{:08d}_estimation_metaData.ini".format(estInitNumber)

@@ -27,14 +27,12 @@ class SVLowerBound:
         if torch.isinf(theEval):
             # raise RuntimeError("infinity lower bound detected")
             warnings.warn("infinity lower bound detected")
-        if torch.isnan(theEval):
-            pdb.set_trace()
         return theEval
 
-#     def sampleCIFs(self, times):
-#         answer = self._eLL.sampleCIFs(times=times)
-#         return answer
-# 
+    def sampleCIFs(self, times, nudget=1e-3):
+        answer = self._eLL.sampleCIFs(times=times, nudget=nudget)
+        return answer
+
 #     def computeCIFsMeans(self, times):
 #         answer = self._eLL.computeCIFsMeans(times=times)
 #         return answer
@@ -43,9 +41,9 @@ class SVLowerBound:
         answer = self._eLL.computeExpectedPosteriorCIFs(times=times)
         return answer
 
-#     def computeEmbeddingMeansAndVarsAtTimes(self, times):
-#         answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
-#         return answer
+    def computeEmbeddingMeansAndVarsAtTimes(self, times):
+        answer = self._eLL.computeEmbeddingsMeansAndVarsAtTimes(times=times)
+        return answer
 
     def evalELLSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats):
         answer = self._eLL.evalSumAcrossTrialsAndNeurons(

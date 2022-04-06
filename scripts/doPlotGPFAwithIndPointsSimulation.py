@@ -59,17 +59,17 @@ def main(argv):
     cifFigFilenamePattern = \
         "figures/{:08d}_simulation_cif_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
     spikesTimesFigFilenamePattern = \
-        "figures/{:08d}_simulation_spikesTimes_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
+        "figures/{:08d}_simulation_spikesTimes_trial{:03d}.{{:s}}".format(simResNumber, trialToPlot)
     spikesRatesFigFilenamePattern = \
-       "figures/{:08d}_simulation_spikesRates_neuron{:03d}.{{:s}}".format(simResNumber, neuronToPlot)
+       "figures/{:08d}_simulation_spikesRates.{{:s}}".format(simResNumber)
     ksTestTimeRescalingFigFilenamePattern = \
         "figures/{:08d}_simulation_ksTestTimeRescaling_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
     rocFigFilenamePattern = \
         "figures/{:08d}_simulation_rocAnalysis_trial{:03d}_neuron{:03d}.{{:s}}".format(simResNumber, trialToPlot, neuronToPlot)
 
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
-    times = simRes["times"]
-    latentsSamples = simRes["latents"]
+    times = simRes["latentsTrialsTimes"]
+    latentsSamples = simRes["latentsSamples"]
     latentsMeans = simRes["latentsMeans"]
     latentsSTDs = simRes["latentsSTDs"]
     cifValues = simRes["cifValues"]
@@ -109,12 +109,12 @@ def main(argv):
     fig.write_html(cifFigFilenamePattern.format("html"))
     fig.show()
 
-    spikesToPlot = spikes[trialToPlot]
-    title = "Trial {:d}".format(trialToPlot)
-    fig = plot.svGPFA.plotUtilsPlotly.getSimulatedSpikesTimesPlotOneTrial(spikesTimes=spikesToPlot, title=title)
-    fig.write_image(spikesTimesFigFilenamePattern.format("png"))
-    fig.write_html(spikesTimesFigFilenamePattern.format("html"))
-    fig.show()
+#     spikesToPlot = spikes[trialToPlot]
+#     title = "Trial {:d}".format(trialToPlot)
+#     fig = plot.svGPFA.plotUtilsPlotly.getSpikesTimesPlotOneTrial(spikes_times=spikesToPlot, title=title)
+#     fig.write_image(spikesTimesFigFilenamePattern.format("png"))
+#     fig.write_html(spikesTimesFigFilenamePattern.format("html"))
+#     fig.show()
 
     spikesRates = utils.svGPFA.miscUtils.computeSpikeRates(trialsTimes=times, spikesTimes=spikes)
     fig = plot.svGPFA.plotUtilsPlotly.getPlotSpikeRatesForAllTrialsAndAllNeurons(spikesRates=spikesRates)
@@ -129,23 +129,26 @@ def main(argv):
     spikesTimesKS = spikes[trialToPlot][neuronToPlot]
     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = stats.pointProcess.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=cifTimesKS, cifValues=cifValuesKS, gamma=nResamplesKSTest)
     title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
-    fig = plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
-    plt.savefig(fname=ksTestTimeRescalingFigFilenamePattern.format("png"))
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(
+        diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx,
+        estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb,
+        title=title)
+    fig.write_image(ksTestTimeRescalingFigFilenamePattern.format("png"))
+    fig.write_html(ksTestTimeRescalingFigFilenamePattern.format("html"))
+    fig.show()
 
-    plt.figure()
-
-    pk = cifValuesKS*dtCIF
+    pk = cifValuesKS*dtCI
     bins = pd.interval_range(start=0, end=T, periods=len(pk))
-    # start binning spikes using pandas
     cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
     Y = torch.from_numpy(cutRes.value_counts().values)
     fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
     roc_auc = sklearn.metrics.auc(fpr, tpr)
     title = "Trial {:d}, Neuron {:d}".format(trialToPlot, neuronToPlot)
-    fig = plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
-    plt.savefig(fname=rocFigFilenamePattern.format("png"))
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
+    fig.write_image(rocFigFilenamePattern.format("png"))
+    fig.write_html(rocFigFilenamePattern.format("html"))
+    fig.show()
 
-    plt.show()
 
     pdb.set_trace()
 

@@ -4,6 +4,7 @@ import os
 import pdb
 import math
 from scipy.io import loadmat
+import numpy as np
 import torch
 import pickle
 import argparse
@@ -42,7 +43,7 @@ def main(argv):
 
     estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
     modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
-    lowerBoundHistVsIterNoFigFilenamePattern = "figures/{:08d}_lowerBoundHistVSIterNo.{{:s}}".format(estResNumber)
+    lowerBoundHistVsIterNoFigFilenamePattern = "figures/{:08d}_lowerBoundHistVsIterNo.{{:s}}".format(estResNumber)
     lowerBoundHistVsElapsedTimeFigFilenamePattern = "figures/{:08d}_lowerBoundHistVsElapsedTime.{{:s}}".format(estResNumber)
     latentsFigFilenamePattern = "figures/{:08d}_estimatedLatent_trial{:03d}_neuron{:03d}.{{:s}}".format(estResNumber, trialToPlot, neuronToPlot)
     ksTestTimeRescalingNumericalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_numericalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
@@ -79,10 +80,10 @@ def main(argv):
     tIndPointsLocs = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials, config=simInitConfig)
     with open(simResFilename, "rb") as f: simRes = pickle.load(f)
     spikesTimes = simRes["spikes"]
-    trueLatentsSamples = simRes["latents"]
+    trueLatentsSamples = simRes["latentsSamples"]
     simCIFsValues = simRes["cifValues"]
     trueLatentsSamples = [trueLatentsSamples[r][:nLatents,:] for r in range(nTrials)]
-    trueLatentsTimes = simRes["times"]
+    trueLatentsTimes = simRes["latentsTrialsTimes"]
     trueLatentsMeans = simRes["latentsMeans"]
     trueLatentsMeans = [trueLatentsMeans[r][:nLatents,:] for r in range(nTrials)]
     trueLatentsSTDs = simRes["latentsSTDs"]
@@ -105,43 +106,60 @@ def main(argv):
     fig.write_html(lowerBoundHistVsElapsedTimeFigFilenamePattern.format("html"))
 
     # plot true and estimated latents
-    testMuK, testVarK = model.predictLatents(newTimes=trueLatentsTimes[0])
+    testMuK, testVarK = model.predictLatents(times=trueLatentsTimes[0])
     eIndPointsLocs = model.getIndPointsLocs()
     fig = plot.svGPFA.plotUtilsPlotly.getPlotTrueAndEstimatedLatents(tTimes=trueLatentsTimes[0], tLatentsSamples=trueLatentsSamples, tLatentsMeans=trueLatentsMeans, tLatentsSTDs=trueLatentsSTDs, tIndPointsLocs=tIndPointsLocs, eTimes=trueLatentsTimes[0], eLatentsMeans=testMuK, eLatentsSTDs=torch.sqrt(testVarK), eIndPointsLocs=eIndPointsLocs, trialToPlot=trialToPlot)
     fig.write_image(latentsFigFilenamePattern.format("png"))
     fig.write_html(latentsFigFilenamePattern.format("html"))
 
     # KS test time rescaling with numerical correction
-#     T = torch.tensor(trialsLengths).max()
-#     oneTrialCIFTimes = torch.arange(0, T, dtCIF)
-#     cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
-#     with torch.no_grad():
+    T = torch.tensor(trialsLengths).max()
+    oneTrialCIFTimes = torch.arange(0, T, dtCIF)
+    cifTimes = torch.unsqueeze(torch.ger(torch.ones(nTrials), oneTrialCIFTimes), dim=2)
+    with torch.no_grad():
 #         emcifValues = model.computeCIFsMeans(times=cifTimes)
 #         epmcifValues = model.computeExpectedCIFs(times=cifTimes)
-#     spikesTimesKS = spikesTimes[trialToPlot][neuronToPlot]
-#     cifTimesKS = cifTimes[trialToPlot,:,0]
-#     cifValuesKS = epmcifValues[trialToPlot][neuronToPlot]
+        epcifValues = model.computeExpectedPosteriorCIFs(times=oneTrialCIFTimes)
+    spikesTimesKS = spikesTimes[trialToPlot][neuronToPlot]
+    cifTimesKS = cifTimes[trialToPlot,:,0]
+    cifValuesKS = epcifValues[trialToPlot][neuronToPlot]
 
-#     title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
+    title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
 
-#     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = stats.pointProcess.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=oneTrialCIFTimes, cifValues=cifValuesKS, gamma=ksTestGamma)
-#     plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingNumericalCorrectionFigFilename, title=title)
-#     plt.close("all")
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = stats.pointProcess.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=oneTrialCIFTimes, cifValues=cifValuesKS, gamma=ksTestGamma)
+    plot.svGPFA.plotUtils.plotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, figFilename=ksTestTimeRescalingNumericalCorrectionFigFilename, title=title)
+    plt.close("all")
 
     # CIF
-#     fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs(tTimes=timesTrueValues, tCIF=simCIFsValues[trialToPlot][neuronToPlot], tLabel="True", eMeanTimes=oneTrialCIFTimes, eMeanCIF=emcifValues[trialToPlot][neuronToPlot], eMeanLabel="Mean", ePosteriorMeanTimes=oneTrialCIFTimes, ePosteriorMeanCIF=epmcifValues[trialToPlot][neuronToPlot], ePosteriorMeanLabel="Posterior Mean", title=title)
-#     fig.write_image(trueAndEstimatedCIFsFigFilenamePattern.format("png"))
-#     fig.write_html(trueAndEstimatedCIFsFigFilenamePattern.format("html"))
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs(
+        tTimes=timesTrueValues, 
+        tCIF=simCIFsValues[trialToPlot][neuronToPlot], 
+        tLabel="True", 
+        eMeanTimes=oneTrialCIFTimes, 
+#         eMeanCIF=emcifValues[trialToPlot][neuronToPlot], 
+        eMeanCIF=epcifValues[trialToPlot][neuronToPlot], 
+        eMeanLabel="Mean", 
+#         ePosteriorMeanTimes=oneTrialCIFTimes, 
+#         ePosteriorMeanCIF=epmcifValues[trialToPlot][neuronToPlot], 
+#         ePosteriorMeanLabel="Posterior Mean",
+        title=title)
+    fig.write_image(trueAndEstimatedCIFsFigFilenamePattern.format("png"))
+    fig.write_html(trueAndEstimatedCIFsFigFilenamePattern.format("html"))
 
     # ROC predictive analysis
-#     pk = cifValuesKS*dtCIF
-#     bins = pd.interval_range(start=0, end=int(T), periods=len(pk))
-#     cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
-#     Y = torch.from_numpy(cutRes.value_counts().values)
-#     fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
-#     roc_auc = sklearn.metrics.auc(fpr, tpr)
-#     plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title, figFilename=rocFigFilename)
-#     plt.close("all")
+    cifValuesKS_upsampled = torch.from_numpy(np.interp(x=np.arange(0, T, 1e-3),
+                                                       xp=np.arange(0, T,
+                                                                    dtCIF),
+                                                       fp=cifValuesKS))
+    pk = cifValuesKS_upsampled*dtCIF
+    bins = pd.interval_range(start=0, end=int(T), periods=len(pk))
+    cutRes, _ = pd.cut(spikesTimesKS, bins=bins, retbins=True)
+    Y = torch.from_numpy(cutRes.value_counts().values)
+    Y[Y>1] = 1
+    fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
+    plot.svGPFA.plotUtils.plotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title, figFilename=rocFigFilename)
+    plt.close("all")
 
     # plot model params
     mKernelsParams = model.getKernelsParams()

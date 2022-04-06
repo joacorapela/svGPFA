@@ -68,7 +68,7 @@ def main(argv):
     latentsFigFilenamePattern = "figures/{:08d}_estimatedLatent_latent{:03d}.{{:s}}".format(estResNumber, latentToPlot)
     embeddingsFigFilenamePattern = "figures/{:08d}_estimatedEmbedding_neuron{:d}.{{:s}}".format(estResNumber, neuronToPlot)
     embeddingParamsFigFilenamePattern = "figures/{:08d}_estimatedEmbeddingParams.{{:s}}".format(estResNumber)
-    CIFFigFilenamePattern = "figures/{:08d}_CIF_trial{:03d}_neuron{:03d}.{{:s}}".format(estResNumber, trialToPlot, neuronToPlot)
+    CIFFigFilenamePattern = "figures/{:08d}_CIF_neuron{:03d}.{{:s}}".format(estResNumber, neuronToPlot)
     ksTestTimeRescalingNumericalCorrectionFigFilename = "figures/{:08d}_ksTestTimeRescaling_numericalCorrection_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     rocFigFilename = "figures/{:08d}_rocAnalysis_trial{:03d}_neuron{:03d}.png".format(estResNumber, trialToPlot, neuronToPlot)
     kernelsParamsFigFilenamePattern = "figures/{:08d}_estimatedKernelsParams.{{:s}}".format(estResNumber)
@@ -136,7 +136,7 @@ def main(argv):
     title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(trialToPlot, neuronToPlot, len(spikesTimesKS))
 
     # CIF
-    fig = plot.svGPFA.plotUtilsPlotly.getPlotCIF(times=trial_times, values=ePosCIFValues[trialToPlot][neuronToPlot], title=title)
+    fig = plot.svGPFA.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(times=trials_times, cif_values=ePosCIFValues, neuron_index=neuronToPlot)
     fig.write_image(CIFFigFilenamePattern.format("png"))
     fig.write_html(CIFFigFilenamePattern.format("html"))
 
