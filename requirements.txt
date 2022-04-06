@@ -1,2 +1,6 @@
-torch
+numpy
+pandas
+plotly
 scipy
+scikit-learn
+torch
