@@ -8,11 +8,11 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 requirements = [
-    "notebook==6.0.1",
-    "numpy==1.17.2",
-    "pandas==0.25.3",
+    "notebook",
+    "numpy",
+    "pandas",
     "plotly",
-    "scipy==1.3.1",
+    "scipy",
     "scikit-learn",
     "torch",
 ]
