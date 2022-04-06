@@ -78,7 +78,6 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
             indPointsLocsKMS=self._indPointsLocsKMS,
             indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
         qKMu, qKVar = svPosteriorOnLatents.computeMeansAndVars()
-
         return qKMu, qKVar
 
     def computeMeansAndVars(self):
