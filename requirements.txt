@@ -1,4 +1,4 @@
-notebook==6.0.1
+notebook==6.4.10
 numpy==1.17.2
 pandas==0.25.3
 plotly
