@@ -27,8 +27,6 @@ class SVLowerBound:
         if torch.isinf(theEval):
             # raise RuntimeError("infinity lower bound detected")
             warnings.warn("infinity lower bound detected")
-        if torch.isnan(theEval):
-            pdb.set_trace()
         return theEval
 
     def sampleCIFs(self, times, nudget=1e-3):
