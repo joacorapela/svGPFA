@@ -5,7 +5,7 @@ import torch
 
 sys.path.append("../src")
 import stats.pointProcess.sampling
-import stats.neuralDataUtils
+import utils.neuralDataAnalysis
 
 def test_thinning(plot=False):
     freq = 1.0 # Hz
@@ -21,7 +21,7 @@ def test_thinning(plot=False):
     epoch_times = [0.0 for r in range(nTrials)]                                  
 
     CIF_times = torch.arange(start_time, end_time, CIF_time_step)
-    psth_bin_edges = np.arange(start_time,
+    psth_bins_edges = np.arange(start_time,
                                end_time+psth_bin_size,
                                psth_bin_size)
     CIF_values = torch.exp(amplitude*torch.cos(2*torch.pi*freq*CIF_times+phase))
@@ -31,11 +31,11 @@ def test_thinning(plot=False):
             stats.pointProcess.sampling.sampleInhomogeneousPP_thinning(
                 CIF_times=CIF_times, CIF_values=CIF_values)["inhomogeneous"]
         spikes_times.append([np.array(spikes_times_one_neuron)])
-    binned_spikes, psth = stats.neuralDataUtils.computeBinnedSpikesAndPSTH(
+    binned_spikes, psth = utils.neuralDataAnalysis.computeBinnedSpikesAndPSTH(
             spikes_times=spikes_times, neuron_index=0,
-            trials_indices=np.arange(nTrials), epoch_times=epoch_times,
-            bin_edges=psth_bin_edges, time_unit="sec")
-    psth_bin_centers = (psth_bin_edges[1:]+psth_bin_edges[:-1])/2
+            trials_indices=np.arange(nTrials),
+            bins_edges=psth_bins_edges, time_unit="sec")
+    psth_bin_centers = (psth_bins_edges[1:]+psth_bins_edges[:-1])/2
     CIF_values_interp = np.interp(x=psth_bin_centers, xp=CIF_times,
                                   fp=CIF_values)
     mse = np.mean((psth-CIF_values_interp)**2)
@@ -65,7 +65,7 @@ def test_timeRescaling(plot=False):
     epoch_times = [0.0 for r in range(nTrials)]
 
     CIF_times = torch.arange(start_time, end_time, CIF_time_step)
-    psth_bin_edges = np.arange(start_time,
+    psth_bins_edges = np.arange(start_time,
                                end_time+psth_bin_size,
                                psth_bin_size)
     CIF_values = torch.exp(amplitude*torch.cos(2*torch.pi*freq*CIF_times+phase))
@@ -75,11 +75,11 @@ def test_timeRescaling(plot=False):
             stats.pointProcess.sampling.sampleInhomogeneousPP_timeRescaling(
                 CIF_times=CIF_times, CIF_values=CIF_values)
         spikes_times.append([np.array(spikes_times_one_neuron)])
-    binned_spikes, psth = stats.neuralDataUtils.computeBinnedSpikesAndPSTH(
+    binned_spikes, psth = utils.neuralDataAnalysis.computeBinnedSpikesAndPSTH(
             spikes_times=spikes_times, neuron_index=0,
-            trials_indices=np.arange(nTrials), epoch_times=epoch_times,
-            bin_edges=psth_bin_edges, time_unit="sec")
-    psth_bin_centers = (psth_bin_edges[1:]+psth_bin_edges[:-1])/2
+            trials_indices=np.arange(nTrials),
+            bins_edges=psth_bins_edges, time_unit="sec")
+    psth_bin_centers = (psth_bins_edges[1:]+psth_bins_edges[:-1])/2
     CIF_values_interp = np.interp(x=psth_bin_centers, xp=CIF_times,
                                   fp=CIF_values)
     mse = np.mean((psth-CIF_values_interp)**2)
