@@ -1591,19 +1591,10 @@ def getPlotOrthonormalizedLatentAcrossTrials(
     fig = go.Figure()
     title = titlePattern.format(latentToPlot)
 
-    n_marked_events = marked_events.shape[1]
     min_time = times.min()
     max_time = times.max()
-    marked_times = marked_events-np.expand_dims(align_event, 1)
-    marked_times = np.where(marked_times < min_time,
-                            np.ones(marked_times.shape)*min_time,
-                            marked_times)
-    marked_times = np.where(marked_times > max_time,
-                            np.ones(marked_times.shape)*max_time,
-                            marked_times)
-
     if trials_annotations is not None and trials_labels is not None:
-        hover_text = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
+        hover_texts = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
                        for i, time in enumerate(times)]
                       for r, trial_label in enumerate(trials_labels)]
         for r in range(nTrials):
@@ -1612,26 +1603,36 @@ def getPlotOrthonormalizedLatentAcrossTrials(
                 an_annotation += "<br>{:s}: {}".format(trial_annotation_key,
                                                        trials_annotations[trial_annotation_key][r])
             for i in range(nTimes):
-                hover_text[r][i] = hover_text[r][i] + an_annotation
+                hover_texts[r][i] = hover_texts[r][i] + an_annotation
+    else:
+        hover_texts = [["" for r in range(nTrials)] for r in range(nTimes)]
+
     for r in range(nTrials):
         meanToPlot = oLatentsMeans[r][:, latentToPlot]
-        if trials_annotations["choice"][r] == 1.0:
-            latent_color = choice1Col
-        elif trials_annotations["choice"][r] == -1.0:
-            latent_color = choiceM1Col
+        if trials_annotations is not None:
+            if trials_annotations["choice"][r] == 1.0:
+                latent_color = choice1Col
+            elif trials_annotations["choice"][r] == -1.0:
+                latent_color = choiceM1Col
+            else:
+                raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
         else:
-            raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
+            latent_color = "gray"
 
+        if trials_labels is not None:
+            trial_label = trials_labels[r]
+        else:
+            trial_label = "{:02d}".format(r)
         traceMean = go.Scatter(
             x=times,
             y=meanToPlot,
             line=dict(color=latent_color),
             mode="lines",
-            name="trial {:s}".format(trials_labels[r]),
+            name="trial {:s}".format(trial_label),
             legendgroup="trial{:02d}".format(r),
             showlegend=True,
             hoverinfo="text",
-            text=hover_text[r],
+            text=hover_texts[r],
         )
         fig.add_trace(traceMean)
 
@@ -1650,6 +1651,15 @@ def getPlotOrthonormalizedLatentAcrossTrials(
 
         if marked_events is not None and align_event is not None and \
            marked_colors is not None:
+            n_marked_events = marked_events.shape[1]
+            marked_times = marked_events-np.expand_dims(align_event, 1)
+            marked_times = np.where(marked_times < min_time,
+                                    np.ones(marked_times.shape)*min_time,
+                                    marked_times)
+            marked_times = np.where(marked_times > max_time,
+                                    np.ones(marked_times.shape)*max_time,
+                                    marked_times)
+
             for i in range(n_marked_events):
                 marked_index = np.argmin(np.abs(times-marked_times[r, i]))
 
