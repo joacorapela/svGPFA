@@ -2,7 +2,7 @@
 import pdb
 import torch
 import abc
-import utils.svGPFA.miscUtils
+import svGPFA.utils.miscUtils
 
 class KernelsMatricesStore(abc.ABC):
 
@@ -121,7 +121,7 @@ class IndPointsLocsKMS(KernelsMatricesStore):
 class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
 
     def _invertKzz3D(self, Kzz):
-        KzzInv = utils.svGPFA.miscUtils.chol3D(Kzz) # O(n^3)
+        KzzInv = svGPFA.utils.miscUtils.chol3D(Kzz) # O(n^3)
         return KzzInv
 
     def solveForLatent(self, input, latentIndex):
@@ -139,7 +139,7 @@ class IndPointsLocsKMS_CholWithGettersAndSetters(IndPointsLocsKMS_Chol, KernelMa
 class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
 
     def _invertKzz3D(self, Kzz):
-        KzzInv = utils.svGPFA.miscUtils.pinv3D(Kzz) # O(n^3)
+        KzzInv = svGPFA.utils.miscUtils.pinv3D(Kzz) # O(n^3)
         return KzzInv
 
     def solveForLatent(self, input, latentIndex):
