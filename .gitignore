@@ -47,4 +47,4 @@ gui/doRunGUI.log
 scripts/shenoy/data/*
 scripts/shenoy/figures/*
 scripts/shenoy/results/*
-
+lib/svGPFA.egg-info/
