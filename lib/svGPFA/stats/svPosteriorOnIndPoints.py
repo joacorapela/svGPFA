@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import math
 import torch
 
-import utils.svGPFA.miscUtils
+import svGPFA.utils.miscUtils
 
 class SVPosteriorOnIndPoints(ABC):
 
@@ -44,7 +44,7 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
         return self._qMu
 
     def buildQSigma(self):
-        qSigma = utils.svGPFA.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
+        qSigma = svGPFA.utils.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
         return qSigma
 
 class SVPosteriorOnIndPointsCholWithGettersAndSetters(SVPosteriorOnIndPointsChol):
@@ -110,7 +110,7 @@ class SVPosteriorOnIndPointsRank1PlusDiag(SVPosteriorOnIndPoints):
             qq = self._qSVec[k].reshape(shape=(R, nIndK, 1))
             # dd \in nTrials x nInd[k] x 1
             nIndKVarRnkK = self._qSVec[k].shape[1]
-            dd = utils.svGPFA.miscUtils.build3DdiagFromDiagVector(v=(self._qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
+            dd = svGPFA.utils.miscUtils.build3DdiagFromDiagVector(v=(self._qSDiag[k].flatten())**2, M=R, N=nIndKVarRnkK)
             qSigma[k] = torch.matmul(qq, torch.transpose(a=qq, dim0=1, dim1=2)) + dd
         return(qSigma)
 
