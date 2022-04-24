@@ -32,9 +32,12 @@ src/stats/gaussianProcesses/kernels.py
 old/
 gui/guiUtils-debug.py
 scripts/data/*
-scripts/results/*
-!scripts/results/32451751_simRes.pickle
-scripts/figures/
+results/
+!projects/svGPFA_simulations/results/32451751_simRes.pickle
+figures/
+data/
+notes/
+logs/
 scripts/notes/
 scripts/doEstimateSVGPFAPythonSimulationChol_021621.py
 scripts/doSearchBug?.py
