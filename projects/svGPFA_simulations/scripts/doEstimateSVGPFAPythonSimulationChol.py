@@ -7,12 +7,11 @@ import pickle
 import argparse
 import configparser
 
-sys.path.append("../src")
-import stats.svGPFA.svGPFAModelFactory
-import stats.svGPFA.svEM
-import utils.svGPFA.configUtils
-import utils.svGPFA.miscUtils
-import utils.svGPFA.initUtils
+import svGPFA.stats.svGPFAModelFactory
+import svGPFA.stats.svEM
+import svGPFA.utils.configUtils
+import svGPFA.utils.miscUtils
+import svGPFA.utils.initUtils
 
 
 def main(argv):
@@ -28,9 +27,10 @@ def main(argv):
     estInitNumber = args.estInitNumber
 
     estInitConfigFilename = \
-        "data/{:08d}_estimation_metaData.ini".format(estInitNumber)
+        "../data/{:08d}_estimation_metaData.ini".format(estInitNumber)
     estInitConfig = configparser.ConfigParser()
     estInitConfig.read(estInitConfigFilename)
+    import pdb; pdb.set_trace()
     nQuad = int(estInitConfig["control_variables"]["nQuad"])
     indPointsLocsKMSRegEpsilon = \
         float(estInitConfig["control_variables"]["indPointsLocsKMSRegEpsilon"])
@@ -55,7 +55,7 @@ def main(argv):
 
     # load data and initial values
     simResConfigFilename = \
-        "results/{:08d}_simulation_metaData.ini".format(simResNumber)
+        "../results/{:08d}_simulation_metaData.ini".format(simResNumber)
     simResConfig = configparser.ConfigParser()
     simResConfig.read(simResConfigFilename)
     simInitConfigFilename = \
@@ -83,7 +83,7 @@ def main(argv):
     else:
         CFilename = estInitConfig["embedding_params"]["C_filename"]
         dFilename = estInitConfig["embedding_params"]["d_filename"]
-        C, d = utils.svGPFA.configUtils.getLinearEmbeddingParams(
+        C, d = svGPFA.utils.configUtils.getLinearEmbeddingParams(
             CFilename=CFilename, dFilename=dFilename)
         initCondEmbeddingSTD = \
             float(estInitConfig["control_variables"]["initCondEmbeddingSTD"])
@@ -91,25 +91,25 @@ def main(argv):
         d0 = (d + torch.randn(d.shape)*initCondEmbeddingSTD).contiguous()
 
     legQuadPoints, legQuadWeights = \
-        utils.svGPFA.miscUtils.getLegQuadPointsAndWeights(
+        svGPFA.utils.miscUtils.getLegQuadPointsAndWeights(
             nQuad=nQuad, trials_start_times=trials_start_times,
             trials_end_times=trials_end_times)
 
-    # kernels = utils.svGPFA.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
-    kernels = utils.svGPFA.configUtils.getKernels(nLatents=nLatents,
+    # kernels = svGPFA.utils.configUtils.getScaledKernels(nLatents=nLatents, config=estInitConfig, forceUnitScale=True)["kernels"]
+    kernels = svGPFA.utils.configUtils.getKernels(nLatents=nLatents,
                                                   config=estInitConfig,
                                                   forceUnitScale=True)
-    kernelsScaledParams0 = utils.svGPFA.initUtils.getKernelsScaledParams0(
+    kernelsScaledParams0 = svGPFA.utils.initUtils.getKernelsScaledParams0(
         kernels=kernels, noiseSTD=0.0)
-    Z0 = utils.svGPFA.configUtils.getIndPointsLocs0(nLatents=nLatents,
+    Z0 = svGPFA.utils.initUtils.getIndPointsLocs0(nLatents=nLatents,
                                                     nTrials=nTrials,
                                                     config=estInitConfig)
     nIndPointsPerLatent = [Z0[k].shape[1] for k in range(nLatents)]
 
-    qMu0 = utils.svGPFA.configUtils.getVariationalMean0(nLatents=nLatents,
+    qMu0 = svGPFA.utils.initUtils.getVariationalMean0(nLatents=nLatents,
                                                         nTrials=nTrials,
                                                         config=estInitConfig)
-#     indPointsMeans = utils.svGPFA.configUtils.getVariationalMean0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
+#     indPointsMeans = svGPFA.utils.configUtils.getVariationalMean0(nLatents=nLatents, nTrials=nTrials, config=estInitConfig)
 #     # patch to acommodate Lea's equal number of inducing points across trials
 #     qMu0 = [[] for k in range(nLatents)]
 #     for k in range(nLatents):
@@ -118,10 +118,10 @@ def main(argv):
 #             qMu0[k][r,:,:] = indPointsMeans[k][r]
 #     # end patch
 
-    qSigma0 = utils.svGPFA.configUtils.getVariationalCov0(nLatents=nLatents,
+    qSigma0 = svGPFA.utils.initUtils.getVariationalCov0(nLatents=nLatents,
                                                           nTrials=nTrials,
                                                           config=estInitConfig)
-    srQSigma0Vecs = utils.svGPFA.initUtils.getSRQSigmaVecsFromSRMatrices(
+    srQSigma0Vecs = svGPFA.utils.initUtils.getSRQSigmaVecsFromSRMatrices(
         srMatrices=qSigma0)
 
     qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
@@ -138,21 +138,21 @@ def main(argv):
     estPrefixUsed = True
     while estPrefixUsed:
         estResNumber = random.randint(0, 10**8)
-        estimResMetaDataFilename = "results/{:08d}_estimation_metaData.ini".format(estResNumber)
+        estimResMetaDataFilename = "../results/{:08d}_estimation_metaData.ini".format(estResNumber)
         if not os.path.exists(estimResMetaDataFilename):
             estPrefixUsed = False
-    modelSaveFilename = "results/{:08d}_estimatedModel.pickle".format(estResNumber)
+    modelSaveFilename = "../results/{:08d}_estimatedModel.pickle".format(estResNumber)
 
     kernelsTypes = [type(kernels[k]).__name__ for k in range(len(kernels))]
-    qSVec0, qSDiag0 = utils.svGPFA.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
-    estimationDataForMatlabFilename = "results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
+    qSVec0, qSDiag0 = svGPFA.utils.miscUtils.getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs=srQSigma0Vecs)
+    estimationDataForMatlabFilename = "../results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
     if "latentsTrialsTimes" in simRes.keys():
         latentsTrialsTimes = simRes["latentsTrialsTimes"]
     elif "times" in simRes.keys():
         latentsTrialsTimes = simRes["times"]
     else:
         raise ValueError("latentsTrialsTimes or times cannot be found in {:s}".format(simResFilename))
-    utils.svGPFA.miscUtils.saveDataForMatlabEstimations(
+    svGPFA.utils.miscUtils.saveDataForMatlabEstimations(
         qMu=qMu0, qSVec=qSVec0, qSDiag=qSDiag0,
         C=C0, d=d0,
         indPointsLocs=Z0,
@@ -176,12 +176,12 @@ def main(argv):
         return kernelParams
 
     # create model
-    kernelMatrixInvMethod = stats.svGPFA.svGPFAModelFactory.kernelMatrixInvChol
-    indPointsCovRep = stats.svGPFA.svGPFAModelFactory.indPointsCovChol
-    model = stats.svGPFA.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
-        conditionalDist=stats.svGPFA.svGPFAModelFactory.PointProcess,
-        linkFunction=stats.svGPFA.svGPFAModelFactory.ExponentialLink,
-        embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
+    kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
+    indPointsCovRep = svGPFA.stats.svGPFAModelFactory.indPointsCovChol
+    model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
+        conditionalDist=svGPFA.stats.svGPFAModelFactory.PointProcess,
+        linkFunction=svGPFA.stats.svGPFAModelFactory.ExponentialLink,
+        embeddingType=svGPFA.stats.svGPFAModelFactory.LinearEmbedding,
         kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
         indPointsCovRep=indPointsCovRep)
 
@@ -192,7 +192,7 @@ def main(argv):
         indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
 
     # maximize lower bound
-    svEM = stats.svGPFA.svEM.SVEM_PyTorch()
+    svEM = svGPFA.stats.svEM.SVEM_PyTorch()
     lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
         svEM.maximize(model=model, optimParams=optimParams, method=optimMethod,
                       getIterationModelParamsFn=getKernelParams)
