@@ -6,8 +6,8 @@ import torch
 import scipy.stats
 # import matplotlib.pyplot as plt
 
-import numericalMethods.utils
-import stats.gaussianProcesses.eval
+import gcnu_common.numerical_methods.utils
+import gcnu_common.stats.gaussian_processes.eval
 
 def orthonormalizeLatentsMeans(latentsMeans, C):
     U, S, Vh = np.linalg.svd(C)
@@ -211,7 +211,7 @@ def getLegQuadPointsAndWeights(nQuad, trials_start_times, trials_end_times,
     leg_quad_weights = torch.empty((nTrials, nQuad, 1), dtype=dtype)
     for r in range(nTrials):
         leg_quad_points[r, :, 0], leg_quad_weights[r, :, 0] = \
-                numericalMethods.utils.leggaussVarLimits(
+                gcnu_common.numerical_methods.utils.leggaussVarLimits(
                     n=nQuad, a=trials_start_times[r], b=trials_end_times[r])
     return leg_quad_points, leg_quad_weights
 
@@ -233,7 +233,7 @@ def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
         latentsMeans[r] = torch.empty((nLatents, len(trialsTimes[r])))
         latentsSTDs[r] = torch.empty((nLatents, len(trialsTimes[r])))
         for k in range(nLatents):
-            gp = stats.gaussianProcesses.eval.GaussianProcess(mean=meansFuncs[k], kernel=kernels[k])
+            gp = gcnu_common.stats.gaussian_processes.eval.GaussianProcess(mean=meansFuncs[k], kernel=kernels[k])
             latentsMeans[r][k,:] = gp.mean(t=trialsTimes[r])
             latentsSTDs[r][k,:] = gp.std(t=trialsTimes[r])
     return latentsMeans, latentsSTDs

@@ -3,8 +3,39 @@ import pdb
 import sys
 import os
 import torch
-import stats.svGPFA.kernelsMatricesStore
-import utils.svGPFA.miscUtils
+import pandas as pd
+import svGPFA.stats.kernelsMatricesStore
+import svGPFA.utils.miscUtils
+
+def getEmbeddingParams0(nNeurons, nLatents, config, 
+                        C_mean_dft=0, C_std_dft=0.01,
+                        d_mean_dft=0, d_std_dft=0.01,
+                       ):
+    if config is not None and \
+       "embedding_params" in config.section() and \
+       "C_filename" in dict(config.items("embedding_params")).keys() and \
+       "d_filename" in dict(config.items("embedding_params")).keys():
+        CFilename = config["embedding_params"]["C_filename"]
+        dFilename = config["embedding_params"]["d_filename"]
+        C0, d0 = svGPFA.utils.configUtils.getLinearEmbeddingParams(
+            CFilename=CFilename, dFilename=dFilename)
+    else:
+        # C default to N(C_mean_dft, C_std_dft)
+        # d default to N(d_mean_dft, d_std_dft)
+        C0 = torch.normal(C_mean_dft, C_std_dft, size=(nNeurons, nLatents),
+                          dtype=torch.double).contiguous()
+        d0 = torch.normal(d_mean_dft, d_std_dft, size=(nNeurons, 1),
+                          dtype=torch.double).contiguous()
+    return C0, d0
+
+def getParams0(nNeurons, nLatents, nIndPoints, config=None,
+               C_mean_dft=0, C_std_dft=0.01,
+               d_mean_dft=0, d_std_dft=0.01,
+              ):
+    C0, d0 = getEmbeddingParams0(nNeurons=nNeurons, nLatents=nLatents,
+                                 config=config,
+                                 C_mean_dft=C_mean_dft, C_std_dft=C_std_dft,
+                                 d_mean_dft=d_mean_dft, d_std_dft=d_std_dft)
 
 def getUniformIndPointsMeans(nTrials, nLatents, nIndPointsPerLatent, min=-1, max=1):
     indPointsMeans = [[] for r in range(nTrials)]
@@ -23,7 +54,7 @@ def getConstantIndPointsMeans(constantValue, nTrials, nLatents, nIndPointsPerLat
     return indPointsMeans
 
 def getKzzChol0(kernels, kernelsParams0, indPointsLocs0, epsilon):
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS()
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS()
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setKernelsParams(kernelsParams=kernelsParams0)
     indPointsLocsKMS.setIndPointsLocs(indPointsLocs=indPointsLocs0)
@@ -72,7 +103,7 @@ def getKernelsScaledParams0(kernels, noiseSTD):
 def getSRQSigmaVecsFromKzz(Kzz):
     Kzz_chol = []
     for aKzz in Kzz:
-        Kzz_chol.append(utils.svGPFA.miscUtils.chol3D(aKzz))
+        Kzz_chol.append(svGPFA.utils.miscUtils.chol3D(aKzz))
     answer = getSRQSigmaVecsFromSRMatrices(srMatrices=Kzz_chol)
     return answer
 

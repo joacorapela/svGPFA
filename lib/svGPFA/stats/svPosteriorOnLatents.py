@@ -3,7 +3,7 @@ import pdb
 from abc import ABC, abstractmethod
 import torch
 import scipy.stats
-import stats.svGPFA.kernelsMatricesStore
+import svGPFA.stats.kernelsMatricesStore
 
 class SVPosteriorOnLatents(ABC):
 
@@ -66,7 +66,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
             times.reshape(1,-1))
         timesReformatted = timesReformatted.unsqueeze(2)
 
-        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
         indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
         indPointsLocsAndAllTimesKMS.setTimes(times=timesReformatted)
         indPointsLocsAndAllTimesKMS.setIndPointsLocs(
@@ -91,7 +91,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 #         Kzz = self._indPointsLocsKMS.getKzz()
 #         KzzInv = self._indPointsLocsKMS.getKzzInv()
 # 
-#         indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+#         indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
 #         indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
 #         indPointsLocsAndAllTimesKMS.setIndPointsLocs(indPointsLocs=self.getIndPointsLocs())
 #         indPointsLocsAndAllTimesKMS.setTimes(times=times)
@@ -104,7 +104,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
     def computeMeansAndVarsAtTimes(self, times):
         Kzz = self._indPointsLocsKMS.getKzz()
 
-        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
         indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
         indPointsLocsAndAllTimesKMS.setTimes(times=times)
         indPointsLocsAndAllTimesKMS.setIndPointsLocs(
@@ -121,7 +121,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         Kzz = self._indPointsLocsKMS.getKzz()
         # KzzInv = self._indPointsLocsKMS.getKzzInv()
 
-        indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+        indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
         indPointsLocsAndAllTimesKMS.setKernels(kernels=self._indPointsLocsKMS.getKernels())
         indPointsLocsAndAllTimesKMS.setIndPointsLocs(indPointsLocs=self._indPointsLocsKMS.getIndPointsLocs())
         indPointsLocsAndAllTimesKMS.setTimes(times=times)
