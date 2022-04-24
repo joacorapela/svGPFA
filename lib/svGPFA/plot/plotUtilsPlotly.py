@@ -11,7 +11,7 @@ import plotly
 # import plotly.io as pio
 # import plotly.express as px
 
-import utils.svGPFA.miscUtils
+import svGPFA.utils.miscUtils
 # spike rates and times
 def getPlotSpikeRatesForAllTrialsAndAllNeurons(spikesRates, xlabel="Neuron", ylabel="Average Spike Rate (Hz)", legendLabelPattern = "Trial {:d}"):
     nTrials = spikesRates.shape[0]
