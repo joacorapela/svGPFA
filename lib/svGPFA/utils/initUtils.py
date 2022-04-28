@@ -7,10 +7,61 @@ import pandas as pd
 import svGPFA.stats.kernelsMatricesStore
 import svGPFA.utils.miscUtils
 
-def getEmbeddingParams0(nNeurons, nLatents, config, 
+
+def getKernelsParams0AndTypes(nLatents, foreceKernelsUnitScale, config=None,
+                              kernel_type_dft="exponentialQuadratic",
+                              kernel_params_dft=torch.Tensor([1.0])):
+    if config is not None and "kernels_params" in config.sections():
+        if "ktypelatents" in dict(config.items("kernels_params")).keys():
+            if config["kernels_params"]["kTypeLatents"] == "exponentialQuadratic":
+                kernels_types = ["exponentialQuadratic" \
+                                 for k in range(nLatents)]
+                lengthscaleValue = float(config["kernels_params"]["kLengthscaleValueLatents"])
+                params0 = [torch.Tensor([lengthscaleValue]) \
+                           for k in range(nLatents)]
+            elif config["kernels_params"]["kTypeLatents"] == "periodic":
+                kernels_types = ["periodic" for k in range(nLatents)]
+                lengthscaleValue = float(config["kernels_params"]["kLengthscaleValueLatents"])
+                periodValue = float(config["kernels_params"]["kPeriodValueLatents"])
+                params0 = [torch.Tensor([lengthscaleValue, periodValue])
+                           for k in range(nLatents)]
+            else:
+                raise RuntimeError(
+                    f"Invalid kTypeLatents={config['kernels_params']['kTypeLatents']}")
+        elif "ktypelatent0" in dict(config.items("kernels_params")).keys():
+            kernels_types = []
+            params0 = []
+            for k in range(nLatents):
+                if config["kernels_params"][f"ktypelatent{k}"] == "exponentialQuadratic":
+                    kernels_types.append("exponentialQuadratic")
+                    lengthscaleValue = \
+                        float(config["kernels_params"][f"klengthscalevaluelatent{k}"])
+                    params0.append(torch.Tensor([lengthscaleValue]))
+                elif config["kernels_params"][f"kTypeLatent{k}"] == "periodic":
+                    kernels_types.append("periodic")
+                    lengthscaleValue = \
+                        float(config["kernels_params"][f"kLengthscaleValueLatent{k}"])
+                    periodValue = \
+                        float(config["kernels_params"][f"kPeriodValueLatent{k}"])
+                    params0.append(torch.Tensor([lengthscaleValue,
+                                                 periodValue]))
+                else:
+                    raise RuntimeError("Invalid kTypeLatent{:d}={:f}".format(
+                        k, config['kernels_params']['kTypeLatent{:d}'.format(k)]))
+        else:
+            raise RuntimeError("Either item ktypelatents or item ktypelatent0 "
+                               "should appear under section kernels_params")
+    else:
+        kernels_types = [kernel_type_dft for k in range(nLatents)]
+        params0 = [torch.Tensor([kernel_params_dft]) for k in range(nLatents)]
+
+    return params0, kernels_types
+
+
+def getEmbeddingParams0(nNeurons, nLatents, config=None,
                         C_mean_dft=0, C_std_dft=0.01,
                         d_mean_dft=0, d_std_dft=0.01,
-                       ):
+                        ):
     if config is not None and \
        "embedding_params" in config.section() and \
        "C_filename" in dict(config.items("embedding_params")).keys() and \
@@ -28,14 +79,56 @@ def getEmbeddingParams0(nNeurons, nLatents, config,
                           dtype=torch.double).contiguous()
     return C0, d0
 
-def getParams0(nNeurons, nLatents, nIndPoints, config=None,
-               C_mean_dft=0, C_std_dft=0.01,
-               d_mean_dft=0, d_std_dft=0.01,
-              ):
+
+def getIndPointsLocs)(nLatents, nTrials, config=None,
+                      ind_points_locs0_layout="equispaced"):
+    if config is not None and \
+       "indPoints_params" in config.section() and \
+       "indPointsLocsLatentsTrials" in dict(config.items("indPoints_params")).keys():
+        Z0 = getSameAcrossLatentsAndTrialsIndPointsLocs0(nLatents=nLatents,
+                                                         nTrials=nTrials,
+                                                         config=config)
+    elif config is not None and \
+            "indPoints_params" in config.section() and \
+            "indPointsLocsLatent0Trial0" in dict(config.items("indPoints_params")).keys():
+        Z0 = getIndPointsLocs0(nLatents=nLatents, nTrials=nTrials,
+                               confi=config)
+    else:
+        n_ind_points = int(config["indPoints_params"]["nIndPoints"])
+        if ind_points_locs0_layout is None:
+            ind_points_locs0_layout = \
+                config["indPoints_params"]["ind_points_locs0_layout"]
+        if "trialsStartTime" in dict(config.items("trials_params")):
+            trials_start_time = float(config["trials_params"]["trialsStartTime"])
+            trials_start_times = [trialsStartTime for r in range(nTrials)]
+        elif "trial0StartTime" in dict(config.items("trials_params")):
+            trials_start_times = \
+                [float(config[f"trials_params"]["trial{r}StartTime"]) for r in range(nTrials)]
+        if "trialsEndTime" in dict(config.items("trials_params")):
+            trials_end_time = float(config["trials_params"]["trialsEndTime"])
+            trials_end_times = [trialsEndTime for r in range(nTrials)]
+        elif "trial0EndTime" in dict(config.items("trials_params")):
+            trials_end_times = \
+                [float(config[f"trials_params"]["trial{r}EndTime"]) for r in range(nTrials)]
+        raise RuntimeError("Either item indPointsLocsLatentsTrials or "
+                           "item indPointsLocsLatent0Trial0 should appear in "
+                           "section indPoints_params")
+    return Z0
+
+
+def getParams0AndKernelsTypes(nNeurons, nLatents, config=None,
+                              C_mean_dft=0, C_std_dft=0.01,
+                              d_mean_dft=0, d_std_dft=0.01,
+                              forceKernelsUnitScale=True,
+                              ):
+    kernelsScaledParams0, kernelsTypes = getKernelsParams0AndTypes(
+        nLatents=nLatents, forceKernelsUnitScale=forceKernelsUnitScale,
+        config=config)
     C0, d0 = getEmbeddingParams0(nNeurons=nNeurons, nLatents=nLatents,
                                  config=config,
                                  C_mean_dft=C_mean_dft, C_std_dft=C_std_dft,
                                  d_mean_dft=d_mean_dft, d_std_dft=d_std_dft)
+    qMu0 = getIndPointsParams(prefix="indPointsLoc", config=config)
 
 def getUniformIndPointsMeans(nTrials, nLatents, nIndPointsPerLatent, min=-1, max=1):
     indPointsMeans = [[] for r in range(nTrials)]
@@ -84,20 +177,49 @@ def getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent, nLatents, nTrials, sca
         qSDiag0[k] = scale*torch.ones(nIndPointsPerLatent[k], 1, dtype=torch.double).repeat(nTrials, 1, 1)
     return qMu0, qSVec0, qSDiag0
 
+def getKernels(nLatents, config, forceUnitScale):
+    kernels = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
+        if kernelType=="periodic":
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            period = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
+            kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
+            kernel.setParams(params=torch.Tensor([lengthscale, period]).double())
+        elif kernelType=="exponentialQuadratic":
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale)
+            kernel.setParams(params=torch.Tensor([lengthscale]).double())
+        else:
+            raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
+        kernels[k] = kernel
+    return kernels
+
+
 def getKernelsParams0(kernels, noiseSTD):
     nLatents = len(kernels)
-    kernelsParams0 = [[] for r in range(nLatents)]
-    for k in range(nLatents):
-        trueParams = kernels[k].getParams()
-        kernelsParams0[k] = noiseSTD*torch.randn(len(trueParams))+trueParams
+    kernelsParams0 = [kernels[k].getParams() for k in range(nLatents)]
+    if noiseSTD > 0.0:
+        kernelsParams0 = [kernelsParams0[0] +
+                          noiseSTD*torch.randn(len(kernelsParams0[k]))
+                          for k in range(nLatents)]
     return kernelsParams0
 
 def getKernelsScaledParams0(kernels, noiseSTD):
     nLatents = len(kernels)
-    kernelsParams0 = [[] for r in range(nLatents)]
-    for k in range(nLatents):
-        trueParams = kernels[k].getScaledParams()
-        kernelsParams0[k] = noiseSTD*torch.randn(len(trueParams))+trueParams
+    kernelsParams0 = [kernels[k].getScaledParams() for k in range(nLatents)]
+    if noiseSTD > 0.0:
+        kernelsParams0 = [kernelsParams0[0] +
+                          noiseSTD*torch.randn(len(kernelsParams0[k]))
+                          for k in range(nLatents)]
     return kernelsParams0
 
 def getSRQSigmaVecsFromKzz(Kzz):
