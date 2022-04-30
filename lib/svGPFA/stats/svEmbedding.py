@@ -101,8 +101,8 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
         answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
         return answer
 
-    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
-        self._svPosteriorOnLatents.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    def setPriorCovRegParam(self, priorCovRegParam):
+        self._svPosteriorOnLatents.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
 
 class LinearSVEmbeddingAllTimesWithParamsGettersAndSetters(LinearSVEmbeddingAllTimes):
     def get_flattened_params(self):
