@@ -11,11 +11,11 @@ class SVLowerBound:
         self._klDiv = klDiv
 
     def setInitialParamsAndData(self, measurements, initialParams,
-                                eLLCalculationParams, indPointsLocsKMSRegEpsilon):
+                                eLLCalculationParams, priorCovRegParam):
         self.setMeasurements(measurements=measurements)
         self.setInitialParams(initialParams=initialParams)
         self.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
-        self.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+        self.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
         self.buildKernelsMatrices()
 
     def eval(self):
@@ -68,8 +68,8 @@ class SVLowerBound:
     def setIndPointsLocs(self, locs):
         self._eLL.setIndPointsLocs(locs=locs)
 
-    def setIndPointsLocsKMSRegEpsilon(self, indPointsLocsKMSRegEpsilon):
-        self._eLL.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon)
+    def setPriorCovRegParam(self, priorCovRegParam):
+        self._eLL.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
 
     def setELLCalculationParams(self, eLLCalculationParams):
         self._eLL.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
