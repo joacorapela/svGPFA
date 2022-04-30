@@ -84,8 +84,8 @@ class KernelMatricesStoreGettersAndSetters(abc.ABC):
 
 class IndPointsLocsKMS(KernelsMatricesStore):
 
-    def setEpsilon(self, epsilon):
-        self._epsilon = epsilon
+    def setRegParam(self, regParam):
+        self._reg_param = regParam
 
     # @abc.abstractmethod
     def _invertKzz3D(self, Kzz):
@@ -106,7 +106,7 @@ class IndPointsLocsKMS(KernelsMatricesStore):
 
         for k in range(nLatent):
             self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])+
-                            self._epsilon*torch.eye(n=self._indPointsLocs[k].shape[1],
+                            self._reg_param*torch.eye(n=self._indPointsLocs[k].shape[1],
                                                     dtype=self._indPointsLocs[k].dtype,
                                                     device=self._indPointsLocs[k].device))
             # self._Kzz[k] = self._kernels[k].buildKernelMatrix(X1=self._indPointsLocs[k])
@@ -115,8 +115,8 @@ class IndPointsLocsKMS(KernelsMatricesStore):
     def getKzz(self):
         return self._Kzz
 
-    def getEpsilon(self):
-        return self._epsilon
+    def getRegParam(self):
+        return self._reg_param
 
 class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
 
