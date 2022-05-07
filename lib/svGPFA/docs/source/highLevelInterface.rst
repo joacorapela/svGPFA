@@ -13,7 +13,7 @@ To estimate a sparse variational Gaussian process factor analysis model we:
             embeddingType=stats.svGPFA.svGPFAModelFactory.LinearEmbedding,
             kernels=kernels)
 
-    by specifying a conditional distribution (e.g., point-process, :const:`~stats.svGPFA.svGPFAModelFactory.PointProcess`), an embedding type (e.g., linear, :const:`~stats.svGPFA.svGPFAModelFactory.LinearEmbedding`), a link function (e.g., :func:`~torch.exp`) and providing a set of kernels (:class:`~stats.kernels.Kernel`).
+    by specifying a conditional distribution (e.g., point-process, :py:const:`~svGPFA.stats.svGPFAModelFactory.PointProcess`), an embedding type (e.g., linear, :py:const:`~svGPFA.stats.svGPFAModelFactory.LinearEmbedding`), a link function (e.g., :py:func:`~torch.exp`) and providing a set of kernels (:py:class:`~svGPFA.stats.kernels.Kernel`).
 
 2. Estimate the parameters of the model
 
