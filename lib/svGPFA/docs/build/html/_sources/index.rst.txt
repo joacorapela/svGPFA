@@ -7,22 +7,28 @@ Sparse Variational Gaussian Processes Factor Analysis
 =====================================================
 
 .. toctree::
-   introduction
    :caption: Introduction:
 
+   introduction
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Description:
 
    highLevelInterface
    lowLevelInterface
+   params
 
 .. toctree::
-   :maxdepth: 4
+   :caption: Appendix:
+
+   references
+
+.. toctree::
+   :maxdepth: 5
    :caption: Code:
 
-   plot
-   stats
+   modules
 
 Indices and tables
 ==================

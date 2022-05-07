@@ -1,8 +1,7 @@
-src
-===
+svGPFA
+======
 
 .. toctree::
    :maxdepth: 4
 
-   plot
-   stats
+   svGPFA

@@ -90,11 +90,15 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="params.html">Parameter value specification</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="plot.html">plot package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stats.html">stats package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">svGPFA</a></li>
 </ul>
 
             
@@ -162,12 +166,14 @@
   <div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
 <p>This documentation describes the Python implementation of Sparse Variational
-Gaussian Process Factor Analysis (<code class="docutils literal notranslate"><span class="pre">svGPFA</span></code>, <a class="reference external" href="https://papers.nips.cc/paper/8245-temporal-alignment-and-latent-gaussian-process-factor-inference-in-population-spike-trains">Duncker and Sahani, 2018</a>) in <a class="reference external" href="https://github.com/gatsby-sahani/svGPFA">https://github.com/gatsby-sahani/svGPFA</a>.</p>
+Gaussian Process Factor Analysis (<code class="docutils literal notranslate"><span class="pre">svGPFA</span></code>, <span id="id1">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>)
+destributed in this <a class="reference external" href="https://github.com/gatsby-sahani/svGPFA">respository</a>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">svGPFA</span></code> identifies common latent structure in neural population
 spike-trains, which allows for variability both in the trajectory and in the
 rate of progression of the underlying computations. It uses shared latent
 Gaussian processes, which are combined linearly as in Gaussian Process Factor
-Analysis (GPFA, <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pubmed/19357332">Yu et al., 2009</a>).  <code class="docutils literal notranslate"><span class="pre">svGPFA</span></code> extends GPFA to
+Analysis (GPFA, <span id="id2">Yu <em>et al.</em> [<a class="reference internal" href="references.html#id3" title="Byron M Yu, John P Cunningham, Gopal Santhanam, Stephen I Ryu, Krishna V Shenoy, and Maneesh Sahani. Gaussian-process factor analysis for low-dimensional single-trial analysis of neural population activity. Journal of neurophysiology, 102(1):614–635, 2009.">YCS+09</a>]</span>).
+<code class="docutils literal notranslate"><span class="pre">svGPFA</span></code> extends GPFA to
 handle unbinned spike-train data by using a continuous time point-process
 likelihood model and achieving scalability using a sparse variational
 approximation. Variability in the trajectory is decomposed in terms capturing

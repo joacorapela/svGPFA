@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>src &mdash; svGPFA 0.0.1 documentation</title>
+  <title>svGPFA &mdash; svGPFA 0.0.1 documentation</title>
   
 
   
@@ -36,7 +36,9 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="svGPFA package" href="svGPFA.html" />
+    <link rel="prev" title="References" href="references.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -88,11 +90,18 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="params.html">Parameter value specification</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Code:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="plot.html">plot package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stats.html">stats package</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">svGPFA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.html">svGPFA package</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -138,7 +147,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>src</li>
+      <li>svGPFA</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -157,59 +166,46 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="src">
-<h1>src<a class="headerlink" href="#src" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="svgpfa">
+<h1>svGPFA<a class="headerlink" href="#svgpfa" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="plot.html">plot package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="plot.svGPFA.html">plot.svGPFA package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="plot.svGPFA.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plot.svGPFA.html#module-plot.svGPFA.plotUtils">plot.svGPFA.plotUtils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="plot.svGPFA.html#module-plot.svGPFA">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="svGPFA.html">svGPFA package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html">svGPFA.plot package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.plot.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.plot.html#module-svGPFA.plot.plotUtils">svGPFA.plot.plotUtils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.plot.html#module-svGPFA.plot.plotUtilsPlotly">svGPFA.plot.plotUtilsPlotly module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.plot.html#module-svGPFA.plot">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html">svGPFA.stats package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.expectedLogLikelihood">svGPFA.stats.expectedLogLikelihood module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.kernels">svGPFA.stats.kernels module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.kernelsMatricesStore">svGPFA.stats.kernelsMatricesStore module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.klDivergence">svGPFA.stats.klDivergence module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svEM">svGPFA.stats.svEM module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svEmbedding">svGPFA.stats.svEmbedding module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svGPFAModelFactory">svGPFA.stats.svGPFAModelFactory module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svLBFGS">svGPFA.stats.svLBFGS module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svLowerBound">svGPFA.stats.svLowerBound module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svPosteriorOnIndPoints">svGPFA.stats.svPosteriorOnIndPoints module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svPosteriorOnLatents">svGPFA.stats.svPosteriorOnLatents module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html">svGPFA.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.configUtils">svGPFA.utils.configUtils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.initUtils">svGPFA.utils.initUtils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.miscUtils">svGPFA.utils.miscUtils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="plot.html#module-plot">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="stats.html">stats package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="stats.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="stats.gaussianProcesses.html">stats.gaussianProcesses package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="stats.gaussianProcesses.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.eval">stats.gaussianProcesses.eval module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses.learn">stats.gaussianProcesses.learn module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.gaussianProcesses.html#module-stats.gaussianProcesses">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="stats.pointProcess.html">stats.pointProcess package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="stats.pointProcess.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.pointProcess.html#module-stats.pointProcess.sampler">stats.pointProcess.sampler module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.pointProcess.html#module-stats.pointProcess.tests">stats.pointProcess.tests module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.pointProcess.html#module-stats.pointProcess">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="stats.svGPFA.html">stats.svGPFA package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.expectedLogLikelihood">stats.svGPFA.expectedLogLikelihood module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#stats-svgpfa-kernelmatricesstore-module">stats.svGPFA.kernelMatricesStore module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.klDivergence">stats.svGPFA.klDivergence module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEM">stats.svGPFA.svEM module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svEmbedding">stats.svGPFA.svEmbedding module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svGPFAModelFactory">stats.svGPFA.svGPFAModelFactory module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svLowerBound">stats.svGPFA.svLowerBound module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svPosteriorOnIndPoints">stats.svGPFA.svPosteriorOnIndPoints module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA.svPosteriorOnLatents">stats.svGPFA.svPosteriorOnLatents module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#stats-svgpfa-utils-module">stats.svGPFA.utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="stats.svGPFA.html#module-stats.svGPFA">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats.kernels">stats.kernels module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="stats.html#module-stats">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.html#module-svGPFA">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -221,6 +217,15 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="svGPFA.html" class="btn btn-neutral float-right" title="svGPFA package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="references.html" class="btn btn-neutral float-left" title="References" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
