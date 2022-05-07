@@ -6,6 +6,26 @@ import torch
 import svGPFA.stats.kernels
 
 
+def getOptimParams(optim_params_config,
+                   steps=["estep", "mstep_embedding",
+                          "mstep_kernels", "mstep_indpointslocs"]):
+
+    optim_params = {}
+    optim_params["em_max_iter"] = int(optim_params_config["em_max_iter"])
+    for step in steps:
+        optim_params["{:s}_estimate".format(step)] = \
+            optim_params_config["{:s}_estimate".format(step)] == "True"
+        optim_params["{:s}_optim_params".format(step)] = {
+            "max_iter": int(optim_params_config["{:s}_max_iter".format(step)]),
+            "lr": float(optim_params_config["{:s}_lr".format(step)]),
+            "tolerance_grad": float(optim_params_config["{:s}_tolerance_grad".format(step)]),
+            "tolerance_change": float(optim_params_config["{:s}_tolerance_change".format(step)]),
+            "line_search_fn": optim_params_config["{:s}_line_search_fn".format(step)],
+        }
+    optim_params["verbose"] = optim_params_config["verbose"] == "True"
+    return optim_params
+
+
 def getScaledKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     kernelsParamsScales = [[] for r in range(nLatents)]
@@ -28,33 +48,6 @@ def getScaledKernels(nLatents, config, forceUnitScale):
         kernels[k] = kernel
     answer = {"kernels": kernels, "kernelsParamsScales": kernelsParamsScales}
     return answer
-
-
-def getKernels(nLatents, config, forceUnitScale):
-    kernels = [[] for r in range(nLatents)]
-    for k in range(nLatents):
-        kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
-        if kernelType=="periodic":
-            if not forceUnitScale:
-                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
-            else:
-                scale = 1.0
-            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
-            period = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
-            kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
-            kernel.setParams(params=torch.Tensor([lengthscale, period]).double())
-        elif kernelType=="exponentialQuadratic":
-            if not forceUnitScale:
-                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
-            else:
-                scale = 1.0
-            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
-            kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale)
-            kernel.setParams(params=torch.Tensor([lengthscale]).double())
-        else:
-            raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
-        kernels[k] = kernel
-    return kernels
 
 
 def getVariationalMean0FromList(nLatents, nTrials, config):
@@ -95,12 +88,4 @@ def getLatentsMeansFuncs(nLatents, nTrials, config):
         meansFuncs[k] = meanFunc
     return meansFuncs
 
-
-def getLinearEmbeddingParams(CFilename, dFilename):
-    df = pd.read_csv(CFilename, header=None)
-    C = torch.from_numpy(df.values)
-    df = pd.read_csv(dFilename, header=None)
-    d = torch.from_numpy(df.values)
-    # pdb.set_trace()
-    return C, d
 
