@@ -1,5 +1,6 @@
 *.pyc
 *.swp
+*.bak
 *~
 slurm-*
 # *.html
@@ -11,18 +12,20 @@ fromSyncData
 nextRefractoring.txt
 todo.txt
 .ipynb*
-docs/design/*bak*
+# lib/svGPFA/docs/design/*bak*
+# lib/svGPFA/docs/Makefile*
+# lib/svGPFA/docs/build
+# lib/svGPFA/docs/make*
+# lib/svGPFA/docs/requirements.txt
+# lib/svGPFA/docs/source/*.bak
+# lib/svGPFA/docs/source/images
+docs/*
+!docs/readthedocs/source
+!docs/design/svGPFA.vpp
+# !lib/svGPFA/docs/source/conf.py
+# !lib/svGPFA/docs/source/*.rst
+# !lib/svGPFA/docs/source/*.dic
 scripts/logs/*
-# docs/Makefile*
-# docs/build
-# docs/make*
-# docs/requirements.txt
-docs/source/*.bak
-# docs/source/images
-# docs/*
-# !docs/design/svGPFA.vpp
-# !docs/source/*.rst
-# !docs/source/*.dic
 .*lck*
 ci/Untitled*.ipynb
 ipynb/results
