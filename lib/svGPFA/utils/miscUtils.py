@@ -6,8 +6,25 @@ import torch
 import scipy.stats
 # import matplotlib.pyplot as plt
 
+import svGPFA.stats.kernels
 import gcnu_common.numerical_methods.utils
 import gcnu_common.stats.gaussian_processes.eval
+
+
+def buildKernels(kernels_types, kernels_params):
+    n_latents = len(kernels_types)
+    kernels = [None for k in range(n_latents)]
+
+    for i, kernel_type in enumerate(kernels_types):
+        if kernels_types[i] == "exponentialQuadratic":
+            kernels[i] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+        elif kernels_types[i] == "periodic":
+            kernels[i] = svGPFA.stats.kernels.PeriodicKernel()
+        else:
+            raise ValueError(f"Invalid kernels type: {kernels_types[i]}")
+        kernels[i].setParams(kernels_params[i])
+    return kernels
+
 
 def orthonormalizeLatentsMeans(latentsMeans, C):
     U, S, Vh = np.linalg.svd(C)
@@ -18,23 +35,6 @@ def orthonormalizeLatentsMeans(latentsMeans, C):
         oLatentsMeans[r] = np.matmul(latentsMeans[r], orthoMatrix)
     return oLatentsMeans
 
-
-def getOptimParams(optimParamsDict):
-    optimMethod = optimParamsDict["em_method"]
-    optimParams = {}
-    optimParams["em_max_iter"] = int(optimParamsDict["em_max_iter"])
-    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-    for step in steps:
-        optimParams["{:s}_estimate".format(step)] = optimParamsDict["{:s}_estimate".format(step)]=="True"
-        optimParams["{:s}_optim_params".format(step)] = {
-            "max_iter": int(optimParamsDict["{:s}_max_iter".format(step)]),
-            "lr": float(optimParamsDict["{:s}_lr".format(step)]),
-            "tolerance_grad": float(optimParamsDict["{:s}_tolerance_grad".format(step)]),
-            "tolerance_change": float(optimParamsDict["{:s}_tolerance_change".format(step)]),
-            "line_search_fn": optimParamsDict["{:s}_line_search_fn".format(step)],
-        }
-    optimParams["verbose"] = optimParamsDict["verbose"]=="True"
-    return optimParams
 
 def getPropSamplesCovered(sample, mean, std, percent=.95):
     if percent==.95:
@@ -128,28 +128,30 @@ def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
             qSigmas[k][r,:,:] = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
     return qSigmas
 
-def getQSVecsAndQSDiagsFromQSRSigmaVecs(srQSigmaVecs):
-    # srQSigmaVecs[k] \in nTrial x Pk
-    nLatents = len(srQSigmaVecs)
-    nTrials = srQSigmaVecs[0].shape[0]
+
+def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
+    # qsCholVecs[k] \in nTrial x Pk
+    nLatents = len(qsCholVecs)
+    nTrials = qsCholVecs[0].shape[0]
     qSVec = [[] for k in range(nLatents)]
     qSDiag = [[] for k in range(nLatents)]
     for k in range(nLatents):
-        Pk = srQSigmaVecs[k].shape[1]
+        Pk = qsCholVecs[k].shape[1]
         nIndPointsK = int((-1.0+math.sqrt(1+8*Pk))/2.0)
         qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         for r in range(nTrials):
-            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:,0], nIndPoints=nIndPointsK)
+            qSRSigmaKR = getSRQSigmaFromVec(vec=qsCholVecs[k][r, :, 0], nIndPoints=nIndPointsK)
             qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
             qSDiagKR = torch.diag(qSigmaKR)
             qSigmaKR = qSigmaKR - torch.diag(qSDiagKR)
             eValKR, eVecKR = torch.eig(qSigmaKR, eigenvectors=True)
             maxEvalIKR = torch.argmax(eValKR, dim=0)[0]
-            qSVecKR = eVecKR[:,maxEvalIKR]*torch.sqrt(eValKR[maxEvalIKR,0])
-            qSVec[k][r,:,0] = qSVecKR
-            qSDiag[k][r,:,0] = qSDiagKR
+            qSVecKR = eVecKR[:, maxEvalIKR]*torch.sqrt(eValKR[maxEvalIKR, 0])
+            qSVec[k][r, :, 0] = qSVecKR
+            qSDiag[k][r, :, 0] = qSDiagKR
     return qSVec, qSDiag
+
 
 def clock(func):
     def clocked(*args,**kargs):
@@ -361,4 +363,38 @@ def getEmbeddingSTDs(C, latentsSTDs):
     nTrials = len(latentsSTDs)
     answer = [torch.matmul(C**2, latentsSTDs[r]**2).sqrt() for r in range(nTrials)]
     return answer
+
+
+def getVectorRepOfLowerTrianMatrices(lt_matrices):
+    """Returns vectors containing the lower-triangular elements of the input
+    lower-triangular matrices.
+
+    :param lt_matrices: a list of length n_latents, with lt_matrices[k] a
+    tensor of dimension n_trials x nIndPoints x nIndPoints, where
+    lt_matrices[k][r, :, :] is a lower-triangular matrix.
+
+    :type lt_matrices: list
+
+    :return: a list srQSigmaVec of length n_latents, whith srQSigmaVec[k] a
+    tensor of dimension n_trials x (nIndPoints+1)*nIndPoints/2 x 0, where
+    srQSigmaVec[k][r, :, 0] contains the lower-triangular elements of
+    lt_matrices[k][r, :, :]
+    """
+
+    n_latents = len(lt_matrices)
+    n_trials = lt_matrices[0].shape[0]
+
+    srQSigmaVec = [[None] for k in range(n_latents)]
+    for k in range(n_latents):
+        nIndPointsK = lt_matrices[k].shape[1]
+        Pk = int((nIndPointsK+1)*nIndPointsK/2)
+        srQSigmaVec[k] = torch.empty((n_trials, Pk, 1), dtype=torch.double)
+        for r in range(n_trials):
+            cholKR = lt_matrices[k][r, :, :]
+            trilIndices = torch.tril_indices(nIndPointsK, nIndPointsK)
+            cholKRVec = cholKR[trilIndices[0, :], trilIndices[1, :]]
+            srQSigmaVec[k][r, :, 0] = cholKRVec
+    return srQSigmaVec
+
+
 
