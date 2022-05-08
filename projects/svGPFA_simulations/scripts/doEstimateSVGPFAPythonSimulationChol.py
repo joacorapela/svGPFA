@@ -17,10 +17,10 @@ import svGPFA.utils.initUtils
 def main(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("simResNumber", help="simuluation result number",
-                        type=int)
-    parser.add_argument("estInitNumber", help="estimation init number",
-                        type=int)
+    parser.add_argument("--simResNumber", help="simuluation result number",
+                        type=int, default=32451751)
+    parser.add_argument("--estInitNumber", help="estimation init number",
+                        type=int, default=463)
     args = parser.parse_args()
 
     simResNumber = args.simResNumber
@@ -30,6 +30,7 @@ def main(argv):
         "../data/{:08d}_estimation_metaData.ini".format(estInitNumber)
     est_init_config = configparser.ConfigParser()
     est_init_config.read(estInitConfigFilename)
+    import pdb; pdb.set_trace()
 
     # load data
     simResConfigFilename = \
