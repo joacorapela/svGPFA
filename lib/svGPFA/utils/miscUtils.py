@@ -365,6 +365,14 @@ def getEmbeddingSTDs(C, latentsSTDs):
     return answer
 
 
+def getSRQSigmaVecsFromKzz(Kzz):
+    Kzz_chol = []
+    for aKzz in Kzz:
+        Kzz_chol.append(svGPFA.utils.miscUtils.chol3D(aKzz))
+    answer = getVectorRepOfLowerTrianMatrices(lt_matrices=Kzz_chol)
+    return answer
+
+
 def getVectorRepOfLowerTrianMatrices(lt_matrices):
     """Returns vectors containing the lower-triangular elements of the input
     lower-triangular matrices.
