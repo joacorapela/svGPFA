@@ -50,16 +50,68 @@ def getKernelsParams0AndTypes(n_latents, config=None, foreceKernelsUnitScale=Tru
     return params0, kernels_types
 
 
-def getLinearEmbeddingParams0(config):
-    CFilename = config["embedding_params"]["C_filename"]
-    dFilename = config["embedding_params"]["d_filename"]
-
-    df = pd.read_csv(CFilename, header=None)
-    C = torch.from_numpy(df.values)
-    df = pd.read_csv(dFilename, header=None)
-    d = torch.from_numpy(df.values)
-    # pdb.set_trace()
+def getLinearEmbeddingParams0(n_neurons, n_latents, args, config=None,
+                              embedding_matrix_distribution_dft="Normal",
+                              embedding_matrix_loc_dft=0.0,
+                              embedding_matrix_scale_dft=1.0,
+                              embedding_offset_distribution_dft="Normal",
+                              embedding_offset_loc_dft=0.0,
+                              embedding_offset_scale_dft=1.0):
+    C = getEmbeddingParam0(param_label="C", n_neurons=n_neurons, n_latents=n_latents,
+                           args=args, config=config,
+                           embedding_param_distribution_dft= embedding_matrix_distribution_dft,
+                           embedding_param_loc_dft=embedding_matrix_loc_dft,
+                           embedding_param_scale_dft=embedding_matrix_scale_dft)
+    d = getEmbeddingParam0(param_label="d", n_neurons=n_neurons, n_latents=n_latents,
+                           args=args, config=config,
+                           embedding_param_distribution_dft= embedding_offset_distribution_dft,
+                           embedding_param_loc_dft=embedding_offset_loc_dft,
+                           embedding_param_scale_dft=embedding_offset_scale_dft)
     return C, d
+
+
+
+def getEmbeddingParam0(param_label, n_neurons, n_latents, args, config=None,
+                       embedding_param_distribution_dft="Normal",
+                       embedding_param_loc_dft=0.0,
+                       embedding_param_scale_dft=1.0)
+    param_filename = None
+    if len(args[f"{param_label}_filename"])>0:
+        param_filename = args[param_label]
+    elif config is not None and \
+            "embedding_params" in config.sections() \
+            param_label in dict(config.items("embedding_params")).keys():
+        param_Filename = config["embedding_params"][f"{param_label}_filename"]
+
+    # If param_filename was found either in the args or in the ini file read
+    # param from this filename
+    if param_filename is not None:
+        df = pd.read_csv(param_Filename, header=None)
+        param = torch.from_numpy(df.values)
+    else:
+        # Else look for param_distribution in the args or in the ini file or use
+        # its default function value
+        if len(args[f"{param_label}_distribution"])>0:
+            param_distribution = args[f"{param_label}_distribution"]
+            param_loc = float(args[f"{param_label}_loc"])
+            param_scale = float(args[f"{param_label}_scale"])
+        elif config is not None and \
+                "embedding_params" in config.sections() \
+                f"{param_label}_distribution" in dict(config.items("embedding_params")).keys():
+            param_distribution = config["embedding_params"][f"{param_label}_distribution"]
+            param_loc = float(config["embedding_params"][f"{param_label}_loc"])
+            param_scale = float(config["embedding_params"][f"{param_label}_scale"])
+        else:
+            param_distribution = embedding_param_distribution_dft
+            param_loc = embedding_param_loc_dft
+            param_scale = embedding_param_scale_dft
+        if param_distribution == "Normal":
+            param = torch.distributions.normal.Normal(
+                param_loc, param_scale).sample(sample_shape=[n_neurons, n_latents])
+        else:
+            raise ValueError(f"Invalid param_distribution={param_distribution}")
+
+    return param
 
 
 def getIndPointsLocs0(n_latents, n_trials, config=None):
@@ -352,19 +404,45 @@ def getSRQSigmaVecsFromKzz(Kzz):
     return answer
 
 
-def getInitialAndQuadParamsAndKernelsTypes(config, n_quad_dft=200):
-    n_latents = int(config["control_variables"]["n_latents"])
-    n_trials = int(config["control_variables"]["n_trials"])
+def getInitialAndQuadParamsAndKernelsTypes(n_neurons, n_trials,
+                                           args, config=None,
+                                           n_latents_dft=2,
+                                           n_quad_dft=200,
+                                           embedding_matrix_distribution_dft="Normal",
+                                           embedding_matrix_loc_dft=0.0,
+                                           embedding_matrix_scale_dft=1.0,
+                                           embedding_offset_distribution_dft="Normal",
+                                           embedding_offset_loc_dft=0.0,
+                                           embedding_offset_scale_dft=1.0,
+                                           ):
+    if args["n_latents"]>0:
+        n_latents = int(args["n_latents"])
+    elif config is not None and \
+            "other_param" in config.sections() and \
+            "n_latents" in dict(config.items("other_param")).keys():
+        n_latents = int(config["other_param"]["n_latents"])
+    else:
+        n_latents = n_latents_dft
 
     C0, d0 = svGPFA.utils.initUtils.getLinearEmbeddingParams0(
-        config=config)
+        args=args, config=config,
+        embedding_matrix_distribution_dft=embedding_matrix_distribution_dft,
+        embedding_matrix_loc_dft=embedding_matrix_loc_dft,
+        embedding_matrix_scale_dft=embedding_matrix_scale_dft,
+        embedding_offset_distribution_dft=embedding_offset_distribution_dft,
+        embedding_offset_loc_dft=embedding_offset_loc_dft,
+        embedding_offset_scale_dft=embedding_offset_scale_dft,
+    )
     C0 = C0.contiguous()
     d0 = d0.contiguous()
 
-    if "n_quad" in dict(config.items("control_variables").keys()):
-        n_quad = config["control_variables"]["n_quad"]
+    if args["n_quad"]>0:
+        n_quad = int(args["n_quad"])
+    elif config is not None and "n_quad" in config.items("other_param"):
+        n_latents = int(config["other_param"]["n_quad"])
     else:
         n_quad = n_quad_dft
+
     trials_start_times, trials_end_times = getTrialsStartEndTimes(
         n_trials=n_trials, config=config)
 
