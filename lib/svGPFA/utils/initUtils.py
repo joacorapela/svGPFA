@@ -171,17 +171,6 @@ def getLinearEmbeddingParam0(param_label, n_neurons, n_latents, args, config=Non
     return param
 
 
-def getNumberOfQuadraturePoints(args, config, n_quad_dft):
-    if vars(args)["n_quad"] > 0:
-        n_quad = int(vars(args)["n_quad"])
-    elif config is not None and "n_quad" in config.items("other_param"):
-        n_quad = int(config["other_param"]["n_quad"])
-    else:
-        n_quad = n_quad_dft
-
-    return n_quad
-
-
 def getTrialsStartEndTimes(n_trials, args, config,
                            trials_start_time=-1.0, trials_end_time=-1.0):
     trials_start_times = getTrialsTimes(
@@ -335,7 +324,7 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
             "indPointsLocs_latent0_trial0_filename" in dict(config.items("indPoints_params")).keys():
         ind_points_locs0 = getDiffAcrossLatentsAndTrialsIndPointsLocs0(
             n_latents=n_latents, n_trials=n_trials, confi=config)
-    # config indPointsLocs_layout
+   # config indPointsLocs_layout
     elif config is not None and "indPoints_params" in config.sections() and \
             "indPointsLocs_layout" in dict(config.items("indPoints_params")).keys() and \
             n_indPoints > 0 and  \
