@@ -106,27 +106,27 @@ def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
             mdict.update({"spikesTimes_{:d}_{:d}".format(r, n): spikesTimes[r][n].numpy().astype(np.float64)})
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
 
-def getSRQSigmaFromVec(vec, nIndPoints):
-    srQSigma = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
+def getCholFromVec(vec, nIndPoints):
+    chol = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
     trilIndices = torch.tril_indices(nIndPoints, nIndPoints)
-    srQSigma[trilIndices[0,:],trilIndices[1,:]] = vec
-    return srQSigma
+    chol[trilIndices[0,:],trilIndices[1,:]] = vec
+    return chol
 
-def buildQSigmasFromSRQSigmaVecs(srQSigmaVecs):
-    K = len(srQSigmaVecs)
-    R = srQSigmaVecs[0].shape[0]
-    qSigmas = [[None] for k in range(K)]
+def buildCovsFromCholVecs(cholVecs):
+    K = len(cholVecs)
+    R = cholVecs[0].shape[0]
+    covs = [[None] for k in range(K)]
     for k in range(K):
-        # srQSigmaVecs[k] \in nTrials x Pk x 1
+        # cholVecs[k] \in nTrials x Pk x 1
         # Pk = ((nIndPointsK+1)*nIndPointsK)/2
         # nIndPointsK = (-1+sqrt(1+8*Pk))/2
-        Pk = srQSigmaVecs[k].shape[1]
+        Pk = cholVecs[k].shape[1]
         nIndPointsK = int((-1+math.sqrt(1+8*Pk))/2)
-        qSigmas[k] = torch.empty((R, nIndPointsK, nIndPointsK), dtype=torch.double)
+        covs[k] = torch.empty((R, nIndPointsK, nIndPointsK), dtype=torch.double)
         for r in range(R):
-            qSRSigmaKR = getSRQSigmaFromVec(vec=srQSigmaVecs[k][r,:,0], nIndPoints=nIndPointsK)
-            qSigmas[k][r,:,:] = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
-    return qSigmas
+            cholKR = getCholFromVec(vec=cholVecs[k][r,:,0], nIndPoints=nIndPointsK)
+            covs[k][r,:,:] = torch.matmul(cholKR, torch.transpose(cholKR, 0, 1))
+    return covs
 
 
 def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
@@ -141,7 +141,7 @@ def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
         qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
         for r in range(nTrials):
-            qSRSigmaKR = getSRQSigmaFromVec(vec=qsCholVecs[k][r, :, 0], nIndPoints=nIndPointsK)
+            qSRSigmaKR = getCholFromVec(vec=qsCholVecs[k][r, :, 0], nIndPoints=nIndPointsK)
             qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
             qSDiagKR = torch.diag(qSigmaKR)
             qSigmaKR = qSigmaKR - torch.diag(qSDiagKR)
@@ -374,19 +374,12 @@ def getSRQSigmaVecsFromKzz(Kzz):
 
 
 def getVectorRepOfLowerTrianMatrices(lt_matrices):
-    """Returns vectors containing the lower-triangular elements of the input
-    lower-triangular matrices.
+    """Returns vectors containing the lower-triangular elements of the input lower-triangular matrices.
 
-    :param lt_matrices: a list of length n_latents, with lt_matrices[k] a
-    tensor of dimension n_trials x nIndPoints x nIndPoints, where
-    lt_matrices[k][r, :, :] is a lower-triangular matrix.
-
+    :parameter lt_matrices: a list of length n_latents, with lt_matrices[k] a tensor of dimension n_trials x nIndPoints x nIndPoints, where lt_matrices[k][r, :, :] is a lower-triangular matrix.
     :type lt_matrices: list
 
-    :return: a list srQSigmaVec of length n_latents, whith srQSigmaVec[k] a
-    tensor of dimension n_trials x (nIndPoints+1)*nIndPoints/2 x 0, where
-    srQSigmaVec[k][r, :, 0] contains the lower-triangular elements of
-    lt_matrices[k][r, :, :]
+    :return: a list srQSigmaVec of length n_latents, whith srQSigmaVec[k] a tensor of dimension n_trials x (nIndPoints+1)*nIndPoints/2 x 0, where srQSigmaVec[k][r, :, 0] contains the lower-triangular elements of lt_matrices[k][r, :, :]
     """
 
     n_latents = len(lt_matrices)
