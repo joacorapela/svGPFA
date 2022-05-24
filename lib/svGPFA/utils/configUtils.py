@@ -6,26 +6,6 @@ import torch
 import svGPFA.stats.kernels
 
 
-def getOptimParams(optim_params_config,
-                   steps=["estep", "mstep_embedding",
-                          "mstep_kernels", "mstep_indpointslocs"]):
-
-    optim_params = {}
-    optim_params["em_max_iter"] = int(optim_params_config["em_max_iter"])
-    for step in steps:
-        optim_params["{:s}_estimate".format(step)] = \
-            optim_params_config["{:s}_estimate".format(step)] == "True"
-        optim_params["{:s}_optim_params".format(step)] = {
-            "max_iter": int(optim_params_config["{:s}_max_iter".format(step)]),
-            "lr": float(optim_params_config["{:s}_lr".format(step)]),
-            "tolerance_grad": float(optim_params_config["{:s}_tolerance_grad".format(step)]),
-            "tolerance_change": float(optim_params_config["{:s}_tolerance_change".format(step)]),
-            "line_search_fn": optim_params_config["{:s}_line_search_fn".format(step)],
-        }
-    optim_params["verbose"] = optim_params_config["verbose"] == "True"
-    return optim_params
-
-
 def getScaledKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     kernelsParamsScales = [[] for r in range(nLatents)]
