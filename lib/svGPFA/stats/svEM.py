@@ -12,7 +12,7 @@ import scipy.optimize
 class SVEM(abc.ABC):
 
     @abc.abstractmethod
-    def maximize(self, model, optimParams, method="EM", getIterationModelParamsFn=None,
+    def maximize(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -24,19 +24,19 @@ class SVEM(abc.ABC):
 
 
     @abc.abstractmethod
-    def _eStep(self, model, optimParams):
+    def _eStep(self, model, optim_params):
         pass
 
     @abc.abstractmethod
-    def _mStepEmbedding(self, model, optimParams):
+    def _mStepEmbedding(self, model, optim_params):
         pass
 
     @abc.abstractmethod
-    def _mStepKernels(self, model, optimParams):
+    def _mStepKernels(self, model, optim_params):
         pass
 
     @abc.abstractmethod
-    def _mStepIndPointsLocs(self, model, optimParams):
+    def _mStepIndPointsLocs(self, model, optim_params):
         pass
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
@@ -51,7 +51,7 @@ class SVEM(abc.ABC):
 
 class SVEM_PyTorch(SVEM):
 
-    def maximize(self, model, optimParams, method="EM", getIterationModelParamsFn=None,
+    def maximize(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -91,7 +91,7 @@ class SVEM_PyTorch(SVEM):
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
-        if method=="EM":
+        if method=="ECM":
             steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
             functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
         elif method=="mECM":
@@ -103,14 +103,14 @@ class SVEM_PyTorch(SVEM):
             raise ValueError("Invalid method={:s}. Supported values are EM and mECM".format(method))
         if getIterationModelParamsFn is not None:
             initialModelsParams = getIterationModelParamsFn(model=model)
-            iterationsModelParams = torch.empty((optimParams["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
+            iterationsModelParams = torch.empty((optim_params["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
             iterationsModelParams[0,:] = initialModelsParams
         else:
             iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
-        while iter<optimParams["em_max_iter"]:
+        while iter<optim_params["em_max_iter"]:
             for step in steps:
-                if optimParams["{:s}_estimate".format(step)]:
+                if optim_params["{:s}_estimate".format(step)]:
                     message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
                     if verbose:
                         out.write(message)
@@ -121,7 +121,7 @@ class SVEM_PyTorch(SVEM):
                         logStreamFN=logStreamFN
                     )
 #                     try:
-                    maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
+                    maxRes = functions_for_steps[step](model=model, optim_params=optim_params["{:s}_optim_params".format(step)])
                     message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
 #                     except Exception as e:
 #                         ex_type, ex_value, ex_traceback = sys.exc_info()
@@ -172,42 +172,42 @@ class SVEM_PyTorch(SVEM):
                 lowerBoundLock.unlock()
 
             iter += 1
-        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optimParams["em_max_iter"]))
+        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optim_params["em_max_iter"]))
         return lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams
 
-    def _eStep(self, model, optimParams):
+    def _eStep(self, model, optim_params):
         x = model.getSVPosteriorOnIndPointsParams()
         evalFunc = model.eval
-        optimizer = torch.optim.LBFGS(x, **optimParams)
+        optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _mStepEmbedding(self, model, optimParams):
+    def _mStepEmbedding(self, model, optim_params):
         x = model.getSVEmbeddingParams()
         svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
         evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
         # evalFunc = model.eval
-        optimizer = torch.optim.LBFGS(x, **optimParams)
+        optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _mStepKernels(self, model, optimParams):
+    def _mStepKernels(self, model, optim_params):
         x = model.getKernelsParams()
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
-        optimizer = torch.optim.LBFGS(x, **optimParams)
+        optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _mStepIndPointsLocs(self, model, optimParams):
+    def _mStepIndPointsLocs(self, model, optim_params):
         x = model.getIndPointsLocs()
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
-        optimizer = torch.optim.LBFGS(x, **optimParams)
+        optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
@@ -243,7 +243,7 @@ class SVEM_PyTorch(SVEM):
 
 class SVEM_SciPy(SVEM):
 
-    def maximize(self, model, optimParams, method="EM", getIterationModelParamsFn=None,
+    def maximize(self, model, optim_params, method="EM", getIterationModelParamsFn=None,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -290,14 +290,14 @@ class SVEM_SciPy(SVEM):
             raise ValueError("Invalid method={:s}. Supported values are EM and mECM".format(method))
         if getIterationModelParamsFn is not None:
             initialModelsParams = getIterationModelParamsFn(model=model)
-            iterationsModelParams = torch.empty((optimParams["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
+            iterationsModelParams = torch.empty((optim_params["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
             iterationsModelParams[0,:] = initialModelsParams
         else:
             iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
-        while iter<optimParams["em_max_iter"]:
+        while iter<optim_params["em_max_iter"]:
             for step in steps:
-                if optimParams["{:s}_estimate".format(step)]:
+                if optim_params["{:s}_estimate".format(step)]:
                     message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
                     if verbose:
                         out.write(message)
@@ -307,7 +307,7 @@ class SVEM_SciPy(SVEM):
                         logStream=logStream,
                         logStreamFN=logStreamFN
                     )
-                    maxRes = functions_for_steps[step](model=model, optimParams=optimParams["{:s}_optim_params".format(step)])
+                    maxRes = functions_for_steps[step](model=model, optim_params=optim_params["{:s}_optim_params".format(step)])
                     message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}, success: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"], maxRes["success"])
                     if verbose:
                         out.write(message)
@@ -341,10 +341,10 @@ class SVEM_SciPy(SVEM):
                 lowerBoundLock.unlock()
 
             iter += 1
-        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optimParams["em_max_iter"]))
+        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optim_params["em_max_iter"]))
         return lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams
 
-    def _eStep(self, model, optimParams, method="L-BFGS-B"):
+    def _eStep(self, model, optim_params, method="L-BFGS-B"):
         def eval_func(z):
             model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=z.tolist())
             model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=True)
@@ -358,7 +358,7 @@ class SVEM_SciPy(SVEM):
         z0 = np.array(model.get_flattened_svPosteriorOnIndPoints_params())
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
-                                            options=optimParams)
+                                            options=optim_params)
         model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
         model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
         lowerBound = -optim_res.fun
@@ -367,7 +367,7 @@ class SVEM_SciPy(SVEM):
         success = optim_res.success
         answer = {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter, "success": success}
 
-    def _eStep(self, model, optimParams, method="L-BFGS-B"):
+    def _eStep(self, model, optim_params, method="L-BFGS-B"):
         def eval_func(z):
             model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=z.tolist())
             model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=True)
@@ -381,7 +381,7 @@ class SVEM_SciPy(SVEM):
         z0 = np.array(model.get_flattened_svPosteriorOnIndPoints_params())
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
-                                            options=optimParams)
+                                            options=optim_params)
         model.set_svPosteriorOnIndPoints_params_requires_grad(requires_grad=False)
         model.set_svPosteriorOnIndPoints_params_from_flattened(flattened_params=optim_res.x.tolist())
         lowerBound = -optim_res.fun
@@ -391,7 +391,7 @@ class SVEM_SciPy(SVEM):
         answer = {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter, "success": success}
         return answer
 
-    def _mStepEmbedding(self, model, optimParams, method="L-BFGS-B"):
+    def _mStepEmbedding(self, model, optim_params, method="L-BFGS-B"):
         def eval_func(z):
             model.set_svEmbedding_params_from_flattened(flattened_params=z.tolist())
             model.set_svEmbedding_params_requires_grad(requires_grad=True)
@@ -407,7 +407,7 @@ class SVEM_SciPy(SVEM):
         z0 = np.array(model.get_flattened_svEmbedding_params())
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
-                                            options=optimParams)
+                                            options=optim_params)
         model.set_svEmbedding_params_requires_grad(requires_grad=False)
         model.set_svEmbedding_params_from_flattened(flattened_params=optim_res.x.tolist())
         lowerBound = -optim_res.fun
@@ -417,7 +417,7 @@ class SVEM_SciPy(SVEM):
         answer = {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter, "success": success}
         return answer
 
-    def _mStepKernels(self, model, optimParams, method="L-BFGS-B"):
+    def _mStepKernels(self, model, optim_params, method="L-BFGS-B"):
         def eval_func(z):
             model.set_kernels_params_from_flattened(flattened_params=z.tolist())
             model.set_kernels_params_requires_grad(requires_grad=True)
@@ -433,7 +433,7 @@ class SVEM_SciPy(SVEM):
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
                                             # bounds=scipy.optimize.Bounds(lb=0.1, ub=30.0),
-                                            options=optimParams)
+                                            options=optim_params)
         model.set_kernels_params_requires_grad(requires_grad=False)
         model.set_kernels_params_from_flattened(flattened_params=optim_res.x.tolist())
         lowerBound = -optim_res.fun
@@ -445,7 +445,7 @@ class SVEM_SciPy(SVEM):
         answer = {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter, "success": success}
         return answer
 
-    def _mStepIndPointsLocs(self, model, optimParams, method="L-BFGS-B"):
+    def _mStepIndPointsLocs(self, model, optim_params, method="L-BFGS-B"):
         def eval_func(z):
             model.set_indPointsLocs_from_flattened(flattened_params=z.tolist())
             model.set_indPointsLocs_requires_grad(requires_grad=True)
@@ -460,7 +460,7 @@ class SVEM_SciPy(SVEM):
         z0 = np.array(model.get_flattened_indPointsLocs())
         optim_res = scipy.optimize.minimize(fun=eval_func, x0=z0,
                                             method=method, jac=True,
-                                            options=optimParams)
+                                            options=optim_params)
         model.set_indPointsLocs_requires_grad(requires_grad=False)
         model.set_indPointsLocs_from_flattened(flattened_params=optim_res.x.tolist())
         lowerBound = -optim_res.fun
