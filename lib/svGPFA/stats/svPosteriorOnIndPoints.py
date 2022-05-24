@@ -17,11 +17,11 @@ class SVPosteriorOnIndPoints(ABC):
         pass
 
     @abstractmethod
-    def getQMu(self):
+    def getMean(self):
         pass
 
     @abstractmethod
-    def buildQSigma(self):
+    def buildCov(self):
         pass
 
 class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
@@ -30,55 +30,57 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
         super(SVPosteriorOnIndPoints, self).__init__()
 
     def setInitialParams(self, initialParams):
-        nLatents = len(initialParams["qMu0"])
-        self._qMu = [initialParams["qMu0"][k] for k in range(nLatents)]
-        self._srQSigmaVecs = [initialParams["srQSigma0Vecs"][k] for k in range(nLatents)]
+        nLatents = len(initialParams["mean"])
+        self._mean = [initialParams["mean"][k] for k in range(nLatents)]
+        self._cholVecs = [initialParams["cholVecs"][k] for k in range(nLatents)]
 
     def getParams(self):
         listOfTensors = []
-        listOfTensors.extend([self._qMu[k] for k in range(len(self._qMu))])
-        listOfTensors.extend([self._srQSigmaVecs[k] for k in range(len(self._srQSigmaVecs))])
+        listOfTensors.extend([self._mean[k] for k in range(len(self._mean))])
+        listOfTensors.extend([self._cholVecs[k] for k in
+                              range(len(self._cholVecs))])
         return listOfTensors
 
-    def getQMu(self):
-        return self._qMu
+    def getMean(self):
+        return self._mean
 
-    def buildQSigma(self):
-        qSigma = svGPFA.utils.miscUtils.buildQSigmasFromSRQSigmaVecs(srQSigmaVecs=self._srQSigmaVecs)
+    def buildCov(self):
+        qSigma = svGPFA.utils.miscUtils.buildCovsFromCholVecs(cholVecs=self._cholVecs)
         return qSigma
 
 class SVPosteriorOnIndPointsCholWithGettersAndSetters(SVPosteriorOnIndPointsChol):
     def get_flattened_params(self):
         flattened_params = []
-        for k in range(len(self._qMu)):
-            flattened_params.extend(self._qMu[k].flatten().tolist())
-        for k in range(len(self._srQSigmaVecs)):
-            flattened_params.extend(self._srQSigmaVecs[k].flatten().tolist())
+        for k in range(len(self._mean)):
+            flattened_params.extend(self._mean[k].flatten().tolist())
+        for k in range(len(self._cholVecs)):
+            flattened_params.extend(self._cholVecs[k].flatten().tolist())
         return flattened_params
 
     def get_flattened_params_grad(self):
         flattened_params_grad = []
-        for k in range(len(self._qMu)):
-            flattened_params_grad.extend(self._qMu[k].grad.flatten().tolist())
-        for k in range(len(self._srQSigmaVecs)):
-            flattened_params_grad.extend(self._srQSigmaVecs[k].grad.flatten().tolist())
+        for k in range(len(self._mean)):
+            flattened_params_grad.extend(self._mean[k].grad.flatten().tolist())
+        for k in range(len(self._cholVecs)):
+            flattened_params_grad.extend(self._cholVecs[k].grad.flatten().tolist())
         return flattened_params_grad
 
     def set_params_from_flattened(self, flattened_params):
-        for k in range(len(self._qMu)):
-            flattened_param = flattened_params[:self._qMu[k].numel()]
-            self._qMu[k] = torch.tensor(flattened_param, dtype=torch.double).reshape(self._qMu[k].shape)
-            flattened_params = flattened_params[self._qMu[k].numel():]
-        for k in range(len(self._srQSigmaVecs)):
-            flattened_param = flattened_params[:self._srQSigmaVecs[k].numel()]
-            self._srQSigmaVecs[k] = torch.tensor(flattened_param, dtype=torch.double).reshape(self._srQSigmaVecs[k].shape)
-            flattened_params = flattened_params[self._srQSigmaVecs[k].numel():]
+        for k in range(len(self._mean)):
+            flattened_param = flattened_params[:self._mean[k].numel()]
+            self._mean[k] = torch.tensor(flattened_param, dtype=torch.double).reshape(self._mean[k].shape)
+            flattened_params = flattened_params[self._mean[k].numel():]
+        for k in range(len(self._cholVecs)):
+            flattened_param = flattened_params[:self._cholVecs[k].numel()]
+            self._cholVecs[k] = torch.tensor(flattened_param,
+                                                   dtype=torch.double).reshape(self._cholVecs[k].shape)
+            flattened_params = flattened_params[self._cholVecs[k].numel():]
 
     def set_params_requires_grad(self, requires_grad):
-        for k in range(len(self._qMu)):
-            self._qMu[k].requires_grad = requires_grad
-        for k in range(len(self._srQSigmaVecs)):
-            self._srQSigmaVecs[k].requires_grad = requires_grad
+        for k in range(len(self._mean)):
+            self._mean[k].requires_grad = requires_grad
+        for k in range(len(self._cholVecs)):
+            self._cholVecs[k].requires_grad = requires_grad
 
 class SVPosteriorOnIndPointsRank1PlusDiag(SVPosteriorOnIndPoints):
 
@@ -86,21 +88,21 @@ class SVPosteriorOnIndPointsRank1PlusDiag(SVPosteriorOnIndPoints):
         super(SVPosteriorOnIndPoints, self).__init__()
 
     def setInitialParams(self, initialParams):
-        self._qMu = initialParams["qMu0"]
+        self._mean = initialParams["mean"]
         self._qSVec = initialParams["qSVec0"]
         self._qSDiag = initialParams["qSDiag0"]
 
     def getParams(self):
         listOfTensors = []
-        listOfTensors.extend([self._qMu[k] for k in range(len(self._qMu))])
+        listOfTensors.extend([self._mean[k] for k in range(len(self._mean))])
         listOfTensors.extend([self._qSVec[k] for k in range(len(self._qSVec))])
         listOfTensors.extend([self._qSDiag[k] for k in range(len(self._qSDiag))])
         return listOfTensors
 
-    def getQMu(self):
-        return self._qMu
+    def getMean(self):
+        return self._mean
 
-    def buildQSigma(self):
+    def buildCov(self):
         R = self._qSVec[0].shape[0]
         K = len(self._qSVec)
         qSigma = [[None] for k in range(K)]
