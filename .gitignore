@@ -20,3 +20,6 @@ data/
 scripts/
 slurm/
 svGPFA.egg-info/
+old/
+notes/
+log/
