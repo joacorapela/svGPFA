@@ -19,9 +19,11 @@ todo.txt
 # lib/svGPFA/docs/requirements.txt
 # lib/svGPFA/docs/source/*.bak
 # lib/svGPFA/docs/source/images
-docs/*
+docs/design/*
+docs/readthedocs/*
 !docs/readthedocs/source
-!docs/design/svGPFA.vpp
+# !docs/readthedocs/source
+# !docs/design/svGPFA.vpp
 # !lib/svGPFA/docs/source/conf.py
 # !lib/svGPFA/docs/source/*.rst
 # !lib/svGPFA/docs/source/*.dic
