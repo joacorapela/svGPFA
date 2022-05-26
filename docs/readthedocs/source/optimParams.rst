@@ -1,12 +1,12 @@
 Optimization parameters
 =======================
 
-Parameters values that control the optimization algorithm should be specified
+Parameters values that control the optimization should be specified
 in section ``[optim_params]``.
 
-* ``optim_algorithm`` specifies the algorithm used for for parameter optimization. 
+* ``optim_method`` specifies the method used for for parameter optimization. 
   
-  If ``optim_algorithm = ECM`` then the Expectation Conditional Maximization
+  If ``optim_method = ECM`` then the Expectation Conditional Maximization
   method is used (:cite:t:`mcLachlanAndKrishnan08`, section 5.2).  Here the
   M-step is broken into three conditional maximization steps: maximization of
   the lower bound wrt the embedding parameters (mstep-embedding), wrt the
@@ -15,7 +15,7 @@ in section ``[optim_params]``.
   maximiziation of the lower bound wrt the embedding parameters) followed by
   the three previous M-step conditional maximizations.
 
-  If ``optim_algorithm = mECM`` then the Multicycle ECM is used
+  If ``optim_method = mECM`` then the Multicycle ECM is used
   (:cite:t:`mcLachlanAndKrishnan08`, section 5.3). Here
   one E-step maximization is performed before each of the M-step conditional
   maximizations. Thus, one mECM iteration comprises estep, mstep-embedding,

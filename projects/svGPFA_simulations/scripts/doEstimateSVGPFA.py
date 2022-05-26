@@ -1,6 +1,7 @@
 import sys
 import os
 import pdb
+import math
 import random
 import torch
 import pickle
@@ -20,70 +21,21 @@ def main(argv):
     parser.add_argument("--simResNumber", help="simuluation result number",
                         type=int, default=32451751)
     parser.add_argument("--estInitNumber", help="estimation init number",
-                        type=int, default=99999999)
-    parser.add_argument("--n_latents", help="number of latents",
                         type=int, default=-1)
-    parser.add_argument("--C_filename",
-                        help="name of file containing the embedding matrix C",
-                        type=str, default="")
-    parser.add_argument("--C_distribution",
-                        help="distribution of the initial values of the embedding matrix C",
-                        type=str, default="")
-    parser.add_argument("--C_location",
-                        help="location of the distribution of the initial values of the embedding matrix C",
-                        type=float, default=-1.0)
-    parser.add_argument("--C_scale",
-                        help="scale of the distribution of the initial values of the embedding matrix C",
-                        type=float, default=-1.0)
-    parser.add_argument("--d_filename",
-                        help="name of file containing the embedding offset vector d",
-                        type=str, default="")
-    parser.add_argument("--d_distribution",
-                        help="distribution of the initial values of the embedding offset vector d",
-                        type=str, default="")
-    parser.add_argument("--d_location",
-                        help="location of the distribution of the initial values of the embedding offset vector d",
-                        type=float, default=-1.0)
-    parser.add_argument("--d_scale",
-                        help="scale of the distribution of the initial values of the embedding offset vector d",
-                        type=float, default=-1.0)
-    parser.add_argument("--n_quad", help="number of quadrature points",
-                        type=int, default=-1)
-    parser.add_argument("--trials_start_times", help="trials start times",
-                        type=str, default="")
-    parser.add_argument("--trials_start_time", help="commont start time for all trials",
-                        type=float, default=-1)
-    parser.add_argument("--trials_end_times", help="trials end times",
-                        type=str, default="")
-    parser.add_argument("--trials_end_time", help="commont end time for all trials",
-                        type=float, default=-1)
-    parser.add_argument("--embedding_matrix_distribution_dft",
-                        help="distribution of random values for the embeding matrix",
-                        type=str, default="Normal")
-    parser.add_argument("--embedding_matrix_loc_dft",
-                        help="location of random values for the embeding matrix",
-                        type=float, default=0.0)
-    parser.add_argument("--embedding_matrix_scale_dft",
-                        help="scale of random values for the embeding matrix",
-                        type=float, default=1.0)
-    parser.add_argument("--embedding_offset_distribution_dft",
-                        help="distribution of random values for the embeding offset",
-                        type=str, default="Normal")
-    parser.add_argument("--embedding_offset_loc_dft",
-                        help="location of random values for the embeding offset",
-                        type=float, default=0.0)
-    parser.add_argument("--embedding_offset_scale_dft",
-                        help="scale of random values for the embeding offset",
-                        type=float, default=1.0)
+#                         type=int, default=99999998)
+#                         type=int, default=99999999)
     args = parser.parse_args()
 
     simResNumber = args.simResNumber
     estInitNumber = args.estInitNumber
 
-    estInitConfigFilename = \
-        "../data/{:08d}_estimation_metaData.ini".format(estInitNumber)
-    est_init_config = configparser.ConfigParser()
-    est_init_config.read(estInitConfigFilename)
+    if estInitNumber > 0:
+        estInitConfigFilename = \
+            "../data/{:08d}_estimation_metaData.ini".format(estInitNumber)
+        est_init_config = configparser.ConfigParser()
+        est_init_config.read(estInitConfigFilename)
+    else:
+        est_init_config = None
 
     # load data
     simResConfigFilename = \
@@ -97,20 +49,35 @@ def main(argv):
     n_trials = len(spikes_times)
     n_neurons = len(spikes_times[0])
 
+    max_spike_time = -math.inf
+    min_spike_time = +math.inf
+    for r in range(n_trials):
+        for n in range(n_neurons):
+            spikes_tensor = torch.tensor(spikes_times[r][n])
+
+            if len(spikes_tensor) > 0:
+                kr_max_spike_time = spikes_tensor.max()
+                if max_spike_time < kr_max_spike_time :
+                    max_spike_time = kr_max_spike_time
+
+                kr_min_spike_time = spikes_tensor.min()
+                if min_spike_time > kr_min_spike_time :
+                    min_spike_time = kr_min_spike_time
+
     # get initial parameters
-    prior_cov_reg_param = \
-        float(est_init_config["other_params"]["prior_cov_reg_param"])
     initial_params, quad_params, kernels_types = \
         svGPFA.utils.initUtils.getInitialAndQuadParamsAndKernelsTypes(
             n_trials=n_trials, n_neurons=n_neurons, args=args,
-            config=est_init_config)
+            config=est_init_config,
+            trials_start_time_dft=min_spike_time,
+            trials_end_time_dft=max_spike_time)
     kernels_params0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["kernelsParams0"]
 
     # get optimization parameters
-    optim_params_config = est_init_config._sections["optim_params"]
-    optim_method = optim_params_config["em_method"]
-    optimParams = svGPFA.utils.configUtils.getOptimParams(
-        optim_params_config=optim_params_config)
+    optim_params = svGPFA.utils.initUtils.getOptimParams(
+        args=args, config=est_init_config)
+    optim_method = optim_params["optim_method"]
+    prior_cov_reg_param = optim_params["prior_cov_reg_param"]
 
     # build modelSaveFilename
     estPrefixUsed = True
@@ -123,8 +90,8 @@ def main(argv):
 
     # save data for Matlab estimation
     qSVec0, qSDiag0 = svGPFA.utils.miscUtils.getQSVecsAndQSDiagsFromQSCholVecs(
-        qsCholVecs=initial_params["svPosteriorOnLatents"]["svPosteriorOnIndPoints"]["srQSigma0Vecs"])
-    qMu0 = initial_params["svPosteriorOnLatents"]["svPosteriorOnIndPoints"]["qMu0"]
+        qsCholVecs=initial_params["svPosteriorOnLatents"]["svPosteriorOnIndPoints"]["cholVecs"])
+    qMu0 = initial_params["svPosteriorOnLatents"]["svPosteriorOnIndPoints"]["mean"]
     qSVec0 = qSVec0
     qSDiag0 = qSDiag0
     C0 = initial_params["svEmbedding"]["C0"]
@@ -132,9 +99,10 @@ def main(argv):
     Z0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["inducingPointsLocs0"]
     legQuadPoints = quad_params["legQuadPoints"]
     legQuadWeights = quad_params["legQuadWeights"]
-    n_trials = int(est_init_config["control_variables"]["n_trials"])
     trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials, config=est_init_config)
+        n_trials=n_trials, args=args, config=est_init_config,
+        trials_start_time_dft=min_spike_time,
+        trials_end_time_dft=max_spike_time)
     trials_lengths = [trials_end_times[r] - trials_start_times[r]
                       for r in range(n_trials)]
     if "latentsTrialsTimes" in simRes.keys():
@@ -157,11 +125,11 @@ def main(argv):
         indPointsLocsKMSRegEpsilon=prior_cov_reg_param,
         trialsLengths=torch.tensor(trials_lengths).reshape(-1, 1),
         latentsTrialsTimes=latentsTrialsTimes,
-        emMaxIter=optimParams["em_max_iter"],
-        eStepMaxIter=optimParams["estep_optim_params"]["max_iter"],
-        mStepEmbeddingMaxIter=optimParams["mstep_embedding_optim_params"]["max_iter"],
-        mStepKernelsMaxIter=optimParams["mstep_kernels_optim_params"]["max_iter"],
-        mStepIndPointsMaxIter=optimParams["mstep_indpointslocs_optim_params"]["max_iter"],
+        emMaxIter=optim_params["em_max_iter"],
+        eStepMaxIter=optim_params["estep_optim_params"]["max_iter"],
+        mStepEmbeddingMaxIter=optim_params["mstep_embedding_optim_params"]["max_iter"],
+        mStepKernelsMaxIter=optim_params["mstep_kernels_optim_params"]["max_iter"],
+        mStepIndPointsMaxIter=optim_params["mstep_indpointslocs_optim_params"]["max_iter"],
         saveFilename=estimationDataForMatlabFilename)
 
     # build kernels
@@ -191,13 +159,13 @@ def main(argv):
 
     svEM = svGPFA.stats.svEM.SVEM_PyTorch()
     lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-        svEM.maximize(model=model, optimParams=optimParams, method=optim_method,
+        svEM.maximize(model=model, optim_params=optim_params, method=optim_method,
                       getIterationModelParamsFn=getKernelParams)
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
     estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
-    estimResConfig["optim_params"] = optimParams
+    estimResConfig["optim_params"] = optim_params
     estimResConfig["estimation_params"] = {
         "estInitNumber": estInitNumber,
     }

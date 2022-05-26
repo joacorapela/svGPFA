@@ -151,10 +151,10 @@ The inducing points locations, or input locations, are the points
 process are evaluated to obtain the inducing points. Their initial values are
 given in section ``[indPointsLocs_params]`` of the ``*.ini`` file.
 
-Shorter format
-^^^^^^^^^^^^^^
+Shorter format 1
+^^^^^^^^^^^^^^^^
 
-The shorter format requires the specification of the number of inducing points
+The shorter format 1 requires the specification of the number of inducing points
 in the item ``n_ind_points``. The layout of the initial inducing points
 locations is given by the item ``ind_points_locs0_layout``. If
 ``ind_points_locs0_layout = equidistant`` the initial location of the inducing
@@ -163,11 +163,26 @@ points is equidistant between the trial start and trial end. If
 positioned between the start and end of the trial.
 
     .. code-block:: none
-       :caption: example section [indPointsLocs_params] in the shorter format
+       :caption: example section [indPointsLocs_params] in the shorter format 1
 
        [indPointsLocs_params]
        n_ind_points = 9
        ind_points_locs0_layout = equidistant
+
+Shorter format 2
+^^^^^^^^^^^^^^^^
+
+The shorter format 2 requires the specification, in section
+``[indPointsLocs_params],``  of the item
+``indPointsLocs_filename=indPointsLocs.csv`` giving the name of the file (csv
+format readable by pandas *read_csv* function) containing the initial inducing points
+locations for all latents and trials.
+
+    .. code-block:: none
+       :caption: example section [indPointsLocs_params] in the shorter format 2
+
+       [indPointsLocs_params]
+       indPointsLocs_filename=indPointsLocs.csv
 
 Longer format
 ^^^^^^^^^^^^^
@@ -176,7 +191,7 @@ For each latent k and trial r, section ``[indPointsLocs_params]`` should
 contain item
 ``indPointsLocs_latent<k>_trial<r>_filename=indPointsLocs_latentk_trialr.csv``
 giving the name of the file (csv format readable by pandas *read_csv* function)
-containing the inducing points locations for latent k and trial r.
+containing the initial inducing points locations for latent k and trial r.
 
     .. code-block:: none
        :caption: example section [indPointsLocs_params] in the longer format (2 latents, 2 trials)

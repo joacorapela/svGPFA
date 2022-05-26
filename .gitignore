@@ -1,55 +1,22 @@
+# files
+*~
 *.pyc
 *.swp
 *.bak
-*~
-slurm-*
-# *.html
-.nfs*
-toRsync*
-fromRsync*
-toSyncData
-fromSyncData
-nextRefractoring.txt
-todo.txt
-.ipynb*
-# lib/svGPFA/docs/design/*bak*
-# lib/svGPFA/docs/Makefile*
-# lib/svGPFA/docs/build
-# lib/svGPFA/docs/make*
-# lib/svGPFA/docs/requirements.txt
-# lib/svGPFA/docs/source/*.bak
-# lib/svGPFA/docs/source/images
-docs/design/*
-docs/readthedocs/*
-!docs/readthedocs/source
-# !docs/readthedocs/source
-# !docs/design/svGPFA.vpp
-# !lib/svGPFA/docs/source/conf.py
-# !lib/svGPFA/docs/source/*.rst
-# !lib/svGPFA/docs/source/*.dic
-scripts/logs/*
+*.html
 .*lck*
-ci/Untitled*.ipynb
-ipynb/results
-/notes.txt
-# scripts/figures/*
-src/stats/gaussianProcesses/kernels.py
-old/
-gui/guiUtils-debug.py
-scripts/data/*
+slurm-*
+.nfs*
+.ipynb*
+
+# directories
+/docs/*
+!/docs/readthedocs/source
+!/docs/design/svGPFA.vpp
 results/
 !projects/svGPFA_simulations/results/32451751_simRes.pickle
 figures/
 data/
-notes/
-logs/
-scripts/notes/
-scripts/doEstimateSVGPFAPythonSimulationChol_021621.py
-scripts/doSearchBug?.py
-slurmOutputs/*
-slurmScripts/*
-gui/doRunGUI.log
-scripts/shenoy/data/*
-scripts/shenoy/figures/*
-scripts/shenoy/results/*
-lib/svGPFA.egg-info/
+scripts/
+slurm/
+svGPFA.egg-info/
