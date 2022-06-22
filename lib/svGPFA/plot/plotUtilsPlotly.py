@@ -1571,7 +1571,7 @@ def getPlotOrthonormalizedLatentAcrossTrials(
     # C = C.detach().numpy()
     nTimes = len(times)
     nTrials = len(latentsMeans)
-    oLatentsMeans = utils.svGPFA.miscUtils.orthonormalizeLatentsMeans(
+    oLatentsMeans = svGPFA.utils.miscUtils.orthonormalizeLatentsMeans(
         latentsMeans=latentsMeans, C=C)
 
     if ylim is None:
@@ -1689,7 +1689,7 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
                                 np.ones(marked_times.shape)*max_time,
                                 marked_times)
 
-    oLatentsMeans = utils.svGPFA.miscUtils.orthonormalizeLatentsMeans(
+    oLatentsMeans = svGPFA.utils.miscUtils.orthonormalizeLatentsMeans(
         latentsMeans=latentsMeans, C=C)
 
     if trials_annotations is not None and trials_labels is not None:
@@ -1759,7 +1759,7 @@ def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
     # creating latents orthonormalization matrix
     nTrials = len(latentsMeans)
     nTimes = len(times)
-    oLatentsMeans = utils.svGPFA.miscUtils.orthonormalizeLatentsMeans(
+    oLatentsMeans = svGPFA.utils.miscUtils.orthonormalizeLatentsMeans(
         latentsMeans=latentsMeans, C=C)
 
     if zlim is None:
@@ -2526,15 +2526,15 @@ def getPlotCIFsOneNeuronAllTrials(
             )
         fig.add_trace(traceMean)
 
-        if spikes_times is not None:
-            traceSpikes = go.Scatter(x=spikes_times[r][neuron_index],
-                                     y=torch.ones_like(spikes_times[r][neuron_index])*torch.mean(cifToPlot),
-                                     marker=dict(color=cif_color),
-                                     mode="markers",
-                                     name="trial {:s}".format(trials_labels[r]),
-                                     legendgroup="trial{:02d}".format(r),
-                                     showlegend=False)
-            fig.add_trace(traceSpikes)
+#         if spikes_times is not None:
+#             traceSpikes = go.Scatter(x=spikes_times[r][neuron_index],
+#                                      y=torch.ones_like(spikes_times[r][neuron_index])*torch.mean(cifToPlot),
+#                                      marker=dict(color=cif_color),
+#                                      mode="markers",
+#                                      name="trial {:s}".format(trials_labels[r]),
+#                                      legendgroup="trial{:02d}".format(r),
+#                                      showlegend=False)
+#             fig.add_trace(traceSpikes)
         if marked_events is not None and align_event is not None and \
            marked_colors is not None:
             for i in range(n_marked_events):
