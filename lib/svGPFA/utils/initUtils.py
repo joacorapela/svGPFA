@@ -239,25 +239,25 @@ def getInitialAndQuadParamsAndKernelsTypes(
         n_ind_points_dft=9, 
         ind_points_locs_layout_dft="equidistant"):
 
-    n_latents = getIntParam(section_name="other_params",
+    n_latents = getIntParam(section_name="model_structure_params",
                                param_name="n_latents",
                                args=args, config=config,
                                default_value=n_latents_dft)
-
-    n_quad = getIntParam(section_name="other_params",
+    n_quad = getIntParam(section_name="optim_params",
                          param_name="n_quad",
                          args=args, config=config,
                          default_value=n_quad_dft)
 
-    n_ind_points = getIntParam(section_name="other_params",
+    n_ind_points = getIntParam(section_name="ind_points_params",
                                param_name="n_ind_points",
                                args=args, config=config,
                                default_value=n_ind_points_dft)
 
-    ind_points_locs_layout = getIntParam(section_name="other_params",
-                                         param_name="ind_points_locs_layout",
-                                         args=args, config=config,
-                                         default_value=ind_points_locs_layout_dft)
+    ind_points_locs_layout = getStringParam(
+        section_name="ind_points_params",
+        param_name="ind_points_locs_layout",
+        args=args, config=config,
+        default_value=ind_points_locs_layout_dft)
 
     C0, d0 = getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents, args=args, config=config,
@@ -291,10 +291,10 @@ def getInitialAndQuadParamsAndKernelsTypes(
         trials_start_times=trials_start_times,
         trials_end_times=trials_end_times,
         args=args, config=config)
-
     var_mean0 = getVariationalMean0(
         n_latents=n_latents, n_trials=n_trials, args=args, config=config,
         n_ind_points=n_ind_points)
+
     var_cov0 = getVariationalCov0(
         n_latents=n_latents, n_trials=n_trials, args=args, config=config,
         n_ind_points=n_ind_points)
@@ -322,45 +322,54 @@ def getInitialAndQuadParamsAndKernelsTypes(
 def getIntParam(section_name, param_name, args, config, default_value):
     # command line
     if param_name in vars(args):
-        param = int(var(args)[param_name])
+        param = int(vars(args)[param_name])
+        print(f"Extracted {param_name}={param} from args")
     # config
     elif config is not None and \
             section_name in config.sections() and \
             param_name in dict(config.items(section_name)).keys():
         param = int(config[section_name][param_name])
+        print(f"Extracted {param_name}={param} from config[{section_name}]")
     # default
     else:
         param = default_value
+        print(f"Using default value {default_value} for {param_name}")
     return param
 
 
 def getFloatParam(section_name, param_name, args, config, default_value):
     # command line
     if param_name in vars(args):
-        param = float(var(args)[param_name])
+        param = float(vars(args)[param_name])
+        print(f"Extracted {param_name}={param} from args")
     # config
     elif config is not None and \
             section_name in config.sections() and \
             param_name in dict(config.items(section_name)).keys():
         param = float(config[section_name][param_name])
+        print(f"Extracted {param_name}={param} from config[{section_name}]")
     # default
     else:
         param = default_value
+        print(f"Using default value {default_value} for {param_name}")
     return param
 
 
 def getStringParam(section_name, param_name, args, config, default_value):
     # command line
     if param_name in vars(args):
-        param = var(args)[param_name]
+        param = vars(args)[param_name]
+        print(f"Extracted {param_name}={param} from args")
     # config
     elif config is not None and \
             section_name in config.sections() and \
             param_name in dict(config.items(section_name)).keys():
         param = config[section_name][param_name]
+        print(f"Extracted {param_name}={param} from config[{section_name}]")
     # default
     else:
         param = default_value
+        print(f"Using default value {default_value} for {param_name}")
     return param
 
 
@@ -390,15 +399,17 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols, args, config=None,
                              embedding_param_distribution_dft="Normal",
                              embedding_param_loc_dft=0.0,
                              embedding_param_scale_dft=1.0):
-    # Look for param_filename in command line or config
+    # Look for param_filename in args or config
     param_filename = None
     if f"{param_label}_filename" in vars(args).keys() and \
             len(vars(args)[f"{param_label}_filename"]) > 0:
         param_filename = vars(args)[f"{param_label}_filename"]
+        print(f"Extracted {param_label}={param_filename} from args")
     elif config is not None and \
             "embedding_params" in config.sections() and \
             f"{param_label}_filename" in dict(config.items("embedding_params")).keys():
         param_filename = config["embedding_params"][f"{param_label}_filename"]
+        print(f"Extracted {param_label}_filename={param_filename} from config[embedding_params]")
 
     # If param_filename was found either in the args or in the ini file read
     # param from this filename
@@ -413,16 +424,19 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols, args, config=None,
             param_distribution = vars(args)[f"{param_label}_distribution"]
             param_loc = float(vars(args)[f"{param_label}_loc"])
             param_scale = float(vars(args)[f"{param_label}_scale"])
+            print(f"Extracted {param_label}_distribution={param_distribution}, {param_label}_loc={param_loc}, {param_label}_scale={param_scale}, from args")
         elif config is not None and \
                 "embedding_params" in config.sections() and \
                 f"{param_label}_distribution" in dict(config.items("embedding_params")).keys():
             param_distribution = config["embedding_params"][f"{param_label}_distribution"]
             param_loc = float(config["embedding_params"][f"{param_label}_loc"])
             param_scale = float(config["embedding_params"][f"{param_label}_scale"])
+            print(f"Extracted {param_label}_distribution={param_distribution}, {param_label}_loc={param_loc}, {param_label}_scale={param_scale}, from config[embedding_params]")
         else:
             param_distribution = embedding_param_distribution_dft
             param_loc = embedding_param_loc_dft
             param_scale = embedding_param_scale_dft
+            print(f"Using defaults {param_label}_distribution={param_distribution}, {param_label}_loc={param_loc} from args, {param_label}_scale={param_scale} from config[embedding_params]")
         if param_distribution == "Normal":
             param = torch.distributions.normal.Normal(
                 param_loc, param_scale).sample(sample_shape=[n_rows, n_cols]).type(torch.double)
@@ -463,18 +477,23 @@ def getTrialsTimes(param_list_label, param_float_label, n_trials, args, config,
             len(vars(args)[param_list_label]) > 0:
         trials_times_list = buildFloatListFromStringRep(
             stringRep=vars(args)[param_list_label])
+        print(f"Extracted {param_list_label} from args")
     elif param_float_label in vars(args):
         trials_times_list = [float(vars(args)[param_float_label]) for r in range(n_trials)]
+        print(f"Extracted {param_float_label} from args")
     elif config is not None and trials_section_name in config.sections() and \
             param_list_label in dict(config.items(trials_section_name)).keys():
         trials_times_list = buildFloatListFromStringRep(
             stringRep=config[trials_section_name][param_list_label])
+        print(f"Extracted {param_list_label} from config[{trials_section_name}]")
     elif config is not None and trials_section_name in config.sections() and \
             param_float_label in dict(config.items(trials_section_name)).keys():
-        trials_times_list = [float(config[trials_section_name][param_float_label])
-                             for r in range(n_trials)]
+        param_value = float(config[trials_section_name][param_float_label])
+        trials_times_list = [param_value for r in range(n_trials)]
+        print(f"Extracted {param_float_label}={param_value} from config[{trials_section_name}]")
     elif trials_time_dft > 0:
         trials_times_list = [trials_time_dft for r in range(n_trials)]
+        print("Using default={trials_time_dft} for {param_float_label}")
     else:
         raise RuntimeError(f"If {param_list_label} is not provided as an "
                            "argument, and it is not present in the "
@@ -497,6 +516,7 @@ def getKernelsParams0AndTypes(n_latents, args, config=None,
                     len(vars(args)["k_lengthscale"]) > 0:
                 lengthscale = float(vars(args)["k_lengthscale"])
                 params0 = [torch.DoubleTensor([lengthscale]) for k in range(n_latents)]
+                print(f"Extracted k_type=exponentialQuadratic and k_lengthsale={k_lengthscale} from args")
             else:
                 raise ValueError("If k_type=exponentialQuadratic is specified "
                                  "in the command line, then k_lengthscale "
@@ -510,12 +530,14 @@ def getKernelsParams0AndTypes(n_latents, args, config=None,
                              for k in range(n_latents)]
             lengthscale = float(config["kernels_params"]["k_lengthscale"])
             params0 = [torch.DoubleTensor([lengthscale]) for k in range(n_latents)]
+            print(f"Extracted k_type=exponentialQuadratic and k_lengthsale={lengthscale} from config[kernels_params]")
         elif config["kernels_params"]["k_type"] == "periodic":
             kernels_types = ["periodic" for k in range(n_latents)]
-            lengthscale = float(config["kernels_params"]["k_engthscale"])
+            lengthscale = float(config["kernels_params"]["k_lengthscale"])
             period = float(config["kernels_params"]["k_period"])
             params0 = [torch.DoubleTensor([lengthscale, period])
                        for k in range(n_latents)]
+            print(f"Extracted k_type=periodic, k_lengthsale={lengthscale} and k_period={period} from config[kernels_params]")
         else:
             raise RuntimeError(
                 f"Invalid kTypeLatents={config['kernels_params']['kTypeLatents']}")
@@ -527,16 +549,18 @@ def getKernelsParams0AndTypes(n_latents, args, config=None,
         for k in range(n_latents):
             if config["kernels_params"][f"k_type_latent{k}"] == "exponentialQuadratic":
                 kernels_types.append("exponentialQuadratic")
-                lengthscaleValue = \
+                lengthscale = \
                     float(config["kernels_params"][f"k_lengthscale_latent{k}"])
-                params0.append(torch.DoubleTensor([lengthscaleValue]))
+                params0.append(torch.DoubleTensor([lengthscale]))
+                print(f"Extracted k_type_latent{k}=exponentialQuadratic and k_lengthsale_latent{k}={lengthscale} from config[kernels_params]")
             elif config["kernels_params"][f"k_type_latent{k}"] == "periodic":
                 kernels_types.append("periodic")
-                lengthscaleValue = \
+                lengthscale = \
                     float(config["kernels_params"][f"k_lengthscale_latent{k}"])
-                periodValue = \
+                period = \
                     float(config["kernels_params"][f"k_period_latent{k}"])
-                params0.append(torch.DoubleTensor([lengthscaleValue, periodValue]))
+                params0.append(torch.DoubleTensor([lengthscale, period]))
+                print(f"Extracted k_type_latent{k}=periodic, k_lengthsale_latent{k}={lengthscale} and k_period_latent{k}={period} from config[kernels_params]")
             else:
                 raise RuntimeError("Invalid kTypeLatent{:d}={:f}".format(
                     k, config['kernels_params']['kTypeLatent{:d}'.format(k)]))
@@ -544,6 +568,7 @@ def getKernelsParams0AndTypes(n_latents, args, config=None,
     else:
         kernels_types = [k_type_dft for k in range(n_latents)]
         params0 = [k_params0_dft for k in range(n_latents)]
+        print(f"Using defaults k_type_dft={k_type_dft} and k_params0_dft{k_params0_dft}")
 
     return params0, kernels_types
 
@@ -560,6 +585,7 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
         ind_points_locs0 = getSameAcrossLatentsAndTrialsIndPointsLocs0(
             n_latents=n_latents, n_trials=n_trials,
             ind_points_locs_filename=ind_points_locs_filename)
+        print(f"Extracted ind_points_locs_filename={ind_points_locs_filename} from args")
     # args ind_points_locs_layout
     elif "ind_points_locs_layout" in vars(args).keys() and \
             len(vars(args)["ind_points_locs_layout"]) > 0 and \
@@ -567,6 +593,7 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
             trials_start_times is not None and \
             trials_end_times is not None:
         layout = vars(args)["ind_points_locs_layout"]
+        print(f"Extracted ind_points_locs_layout={layout} from args")
         if layout == "equidistant":
             ind_points_locs0 = buildEquidistantIndPointsLocs0(
                 n_latents=n_latents, n_trials=n_trials,
@@ -579,6 +606,7 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
     elif config is not None and "ind_points_params" in config.sections() and \
             "ind_points_locs_filename" in dict(config.items("ind_points_params")).keys():
         ind_points_locs_filename = config["ind_points_params"]["ind_points_locs_filename"]
+        print(f"Extracted ind_points_locs_filename={ind_points_locs_filename} from config[ind_points_params]")
         ind_points_locs0 = getSameAcrossLatentsAndTrialsIndPointsLocs0(
             n_latents=n_latents, n_trials=n_trials,
             ind_points_locs_filename=ind_points_locs_filename)
@@ -587,13 +615,14 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
             "ind_points_locs_latent0_trial0_filename" in dict(config.items("ind_points_params")).keys():
         ind_points_locs0 = getDiffAcrossLatentsAndTrialsIndPointsLocs0(
             n_latents=n_latents, n_trials=n_trials, config=config)
-   # config ind_points_locs_layout
+    # config ind_points_locs_layout
     elif config is not None and "ind_points_params" in config.sections() and \
             "ind_points_locs_layout" in dict(config.items("ind_points_params")).keys() and \
             n_ind_points > 0 and  \
             trials_start_times is not None and \
             trials_end_times is not None:
         layout = config["ind_points_params"]["ind_points_locs_layout"]
+        print(f"Extracted ind_points_locs_layout={layout} from config[ind_points_params]")
         if layout == "equidistant":
             ind_points_locs0 = buildEquidistantIndPointsLocs0(
                 n_latents=n_latents, n_trials=n_trials,
@@ -624,6 +653,7 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
                 n_ind_points=n_ind_points,
                 trials_start_times=trials_start_times,
                 trials_end_times=trials_end_times)
+            print(f"Using default ind_points_locs_layout={ind_points_locs_layout}")
         else:
             raise RuntimeError(f"Invalid ind_points_locs_layout={layout}")
 
@@ -647,14 +677,18 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
         item_name_pattern="ind_points_locs_latent{:d}_trial{:d}_filename"):
     Z0 = [[] for k in range(n_latents)]
     for k in range(n_latents):
-        ind_points_locs_filename = config[section_name][item_name_pattern.format(k, 0)]
+        item_name = item_name_pattern.format(k, 0)
+        ind_points_locs_filename = config[section_name][item_name]
+        print("Extracted {item_name}={ind_points_locs_filename} from config[{section_name}]")
         Z0_k_r0 = torch.from_numpy(pd.read_csv(ind_points_locs_filename, header=None).to_numpy()).flatten()
         nIndPointsForLatent = len(Z0_k_r0)
         Z0[k] = torch.empty((n_trials, nIndPointsForLatent, 1),
                             dtype=torch.double)
         Z0[k][0, :, 0] = Z0_k_r0
         for r in range(1, n_trials):
-            ind_points_locs_filename = config[section_name][item_name_pattern.format(k, r)]
+            item_name = item_name_pattern.format(k, 4)
+            ind_points_locs_filename = config[section_name][item_name]
+            print("Extracted {item_name}={ind_points_locs_filename} from config[{section_name}]")
             Z0_k_r = torch.from_numpy(pd.read_csv(ind_points_locs_filename, header=None).to_numpy()).flatten()
             Z0[k][r, :, 0] = Z0_k_r
     return Z0
@@ -682,6 +716,7 @@ def getVariationalMean0(n_latents, n_trials, args, config=None,
     # args variational_means_filename
     if common_filename_item_name in vars(args):
         variational_mean0_filename =  args[common_filename_item_name]
+        print(f"Extracted {common_filename_item_name}={variational_mean0_filename} from args")
         a_variational_mean0 = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
@@ -689,6 +724,7 @@ def getVariationalMean0(n_latents, n_trials, args, config=None,
     # args constant_value
     elif constant_value_item_name in vars(args):
         constant_value = args[constant_value_item_name]
+        print(f"Extracted {constant_value_item_name}={constant_value} from args")
         a_variational_mean0 = constant_value * torch.ones(n_ind_points, dtype=torch.double)
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
@@ -696,7 +732,8 @@ def getVariationalMean0(n_latents, n_trials, args, config=None,
     # config variational_means_filename
     elif config is not None and section_name in config.sections() and \
             common_filename_item_name in dict(config.items(section_name)).keys():
-        variational_mean0_filename = config[section_name][item_name]
+        variational_mean0_filename = config[section_name][common_filename_item_name]
+        print(f"Extracted {common_filename_item_name}={variational_mean0_filename} from config[{section_name}]")
         a_variational_mean0 = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
@@ -712,6 +749,7 @@ def getVariationalMean0(n_latents, n_trials, args, config=None,
     elif config is not None and section_name in config.sections() and \
             constant_value_item_name in dict(config.items(section_name)):
         constant_value = config[section_name][constant_value_item_name]
+        print(f"Extracted {constant_value_item_name}={constant_value} from config[{section_name}]")
         a_variational_mean0 = constant_value * torch.ones(n_ind_points, dtype=torch.double)
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
@@ -720,6 +758,7 @@ def getVariationalMean0(n_latents, n_trials, args, config=None,
     else:
         constant_value = constant_value_dft
         a_variational_mean0 = constant_value * torch.ones(n_ind_points, dtype=torch.double)
+        print("Using default constant value value={constant_value_dft} for variational covariance")
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_mean0=a_variational_mean0)
@@ -744,12 +783,14 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
     variational_mean0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
         variational_mean0_filename = config[section_name][item_name_pattern.format(k, 0)]
+        print(f"Extracted {item_name_pattern.format(k, 0)}={variational_mean0_filename} from config[{section_name}]")
         variational_mean0_k0 = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
         nIndPointsK = len(variational_mean0_k0)
         variational_mean0[k] = torch.empty((n_trials, nIndPointsK, 1), dtype=torch.double)
         variational_mean0[k][0, :, 0] = variational_mean0_k0
         for r in range(1, n_trials):
             variational_mean0_filename = config[section_name][item_name_pattern.format(k, r)]
+            print(f"Extracted {item_name_pattern.format(k, r)}={variational_mean0_filename} from config[{section_name}]")
             variational_mean0_kr = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
             variational_mean0[k][r, :, 0] = variational_mean0_kr
     return variational_mean0
@@ -765,6 +806,7 @@ def getVariationalCov0(n_latents, n_trials, args, config=None,
     # args variational_covs_filename
     if common_filename_item_name in vars(args):
         variational_cov0_filename =  args[common_filename_item_name]
+        print(f"Extracted {common_filename_item_name}={variational_cov0_filename} from args")
         a_variational_cov0 = torch.from_numpy(pd.read_csv(variational_cov0_filename, header=None).to_numpy())
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
@@ -772,6 +814,7 @@ def getVariationalCov0(n_latents, n_trials, args, config=None,
     # args diag_value
     elif diag_value_item_name in vars(args):
         diag_value = args[diag_value_item_name]
+        print(f"Extracted {diag_value_item_name}={diag_value} from args")
         a_variational_cov0 = diag_value * torch.eye(n_ind_points, dtype=torch.double)
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
@@ -780,6 +823,7 @@ def getVariationalCov0(n_latents, n_trials, args, config=None,
     if config is not None and section_name in config.sections() and \
                        common_filename_item_name in dict(config.items(section_name)):
         variational_cov_filename = config[section_name][common_filename_item_name]
+        print(f"Extracted {common_filename_item_name}={variational_cov_filename} from config[{section_name}]")
         a_variational_cov0 = torch.from_numpy(pd.read_csv(variational_cov_filename, header=None).to_numpy())
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
@@ -793,6 +837,7 @@ def getVariationalCov0(n_latents, n_trials, args, config=None,
     else:
         diag_value = diag_value_dft
         a_variational_cov0 = diag_value * torch.eye(n_ind_points, dtype=torch.double)
+        print(f"Using default constnat diagonnal value of {diag_value_dft} for variational covariance")
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_cov0=a_variational_cov0)
@@ -819,13 +864,17 @@ def getDiffAcrossLatentsAndTrialsVariationalCov0(
         item_name_pattern="variational_cov_latent{:d}_trial{:d}_filename"):
     variational_cov0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
-        variational_cov_filename = config[section_name][item_name_pattern.format(k, 0)]
+        item_name = item_name_pattern.format(k, 0)
+        variational_cov_filename = config[section_name][item_name]
+        print(f"Extracted {item_name}={variational_cov_filename} from config[{section_name}]")
         variational_cov0_k0 = torch.from_numpy(pd.read_csv(variational_cov_filename, header=None).to_numpy())
         nIndPointsK = variational_cov0_k0.shape[0]
         variational_cov0[k] = torch.empty((n_trials, nIndPointsK, nIndPointsK), dtype=torch.double)
         variational_cov0[k][0, :, :] = variational_cov0_k0
         for r in range(1, n_trials):
-            variational_cov_filename = config[section_name][item_name_pattern.format(k, r)]
+            item_name = item_name_pattern.format(k, r)
+            variational_cov_filename = config[section_name][item_name]
+            print(f"Extracted {item_name}={variational_cov_filename} from config[{section_name}]")
             variational_cov0_kr = torch.from_numpy(pd.read_csv(variational_cov_filename, header=None).values)
             variational_cov0[k][r, :, :] = variational_cov0_kr
     return variational_cov0
