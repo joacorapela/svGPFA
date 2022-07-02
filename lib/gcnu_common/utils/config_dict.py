@@ -1,4 +1,4 @@
-''' Dumps a config file of the type readable by ConfigParser
+''' Dumps a config file of the type readable by configparser
 into a dictionary 
 Ref: http://docs.python.org/library/configparser.html
 
@@ -6,7 +6,7 @@ Downloaded from git@gist.github.com:c5607843dd7174b8d6828185a09584e7.git
 '''
 
 import sys
-import ConfigParser
+import configparser
 
 class GetDict:
     
@@ -14,7 +14,7 @@ class GetDict:
         self.config = config
     
     def get_dict(self):
-        config = ConfigParser.SafeConfigParser()
+        config = configparser.ConfigParser()
         config.read(self.config)
 
         sections_dict = {}
@@ -22,7 +22,7 @@ class GetDict:
         # get all defaults
         defaults = config.defaults()
         temp_dict = {}
-        for key in defaults.iterkeys():
+        for key in defaults.keys():
             temp_dict[key] = defaults[key]
 
         sections_dict['default'] = temp_dict
@@ -43,7 +43,7 @@ class GetDict:
 if __name__== '__main__':
 
     if len(sys.argv) == 1:
-        print 'Must provide the path to the config file as the argument'
+        print('Must provide the path to the config file as the argument')
         sys.exit(1)
         
     getdict = GetDict(sys.argv[1])
@@ -52,4 +52,4 @@ if __name__== '__main__':
     # print the entire dictionary
     # Trick from http://stackoverflow.com/a/3314411/59634
     import json
-    print json.dumps(config_dict, indent=2)            
+    print(json.dumps(config_dict, indent=2))
