@@ -53,3 +53,43 @@ section ``[optim_params]`` should contain items:
   search is performed using the strong_wolfe method. If
   `<step>_line_search_fn=None`` line search is not used.
 
+    .. code-block:: none
+       :caption: example section [optim_params] of the configuration file
+
+        [optim_params]
+        n_quad = 200
+        prior_cov_reg_param = 1e-5
+        #
+        optim_method = ECM
+        em_max_iter = 200
+        #
+        estep_estimate = True
+        estep_max_iter = 20
+        estep_lr = 1.0
+        estep_tolerance_grad = 1e-7
+        estep_tolerance_change = 1e-9
+        estep_line_search_fn = strong_wolfe
+        #
+        mstep_embedding_estimate = True
+        mstep_embedding_max_iter = 20
+        mstep_embedding_lr = 1.0
+        mstep_embedding_tolerance_grad = 1e-7
+        mstep_embedding_tolerance_change = 1e-9
+        mstep_embedding_line_search_fn = strong_wolfe
+        #
+        mstep_kernels_estimate = True
+        mstep_kernels_max_iter = 20
+        mstep_kernels_lr = 1.0
+        mstep_kernels_tolerance_grad = 1e-7
+        mstep_kernels_tolerance_change = 1e-9
+        mstep_kernels_line_search_fn = strong_wolfe
+        #
+        mstep_indpointslocs_estimate = True
+        mstep_indpointslocs_max_iter = 20
+        mstep_indpointslocs_lr = 1.0
+        mstep_indpointslocs_tolerance_grad = 1e-7
+        mstep_indpointslocs_tolerance_change = 1e-9
+        mstep_indpointslocs_line_search_fn = strong_wolfe
+        #
+        verbose = True
+        
