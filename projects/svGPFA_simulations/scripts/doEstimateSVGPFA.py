@@ -22,20 +22,18 @@ def main(argv):
                         type=int, default=32451751)
     parser.add_argument("--estInitNumber", help="estimation init number",
                         type=int, default=-1)
-#                         type=int, default=99999998)
-#                         type=int, default=99999999)
     args = parser.parse_args()
-
-    simResNumber = args.simResNumber
-    estInitNumber = args.estInitNumber
+    dynamic_params = svGPFA.utils.initUtils.get_params_dict_from_args(
+        n_trials=n_trials, n_latents=n_latents, args=args)
+    simResNumber = dynamic_params.simResNumber
+    estInitNumber = dynamic_params.estInitNumber
 
     if estInitNumber > 0:
         estInitConfigFilename = \
             "../data/{:08d}_estimation_metaData.ini".format(estInitNumber)
-        est_init_config = configparser.ConfigParser()
-        est_init_config.read(estInitConfigFilename)
+        config_file_params = gcnu_common.utils.config_dict.GetDict(config=estInitConfigFilename).get_dict()
     else:
-        est_init_config = None
+        config_file_params = None
 
     # load data
     simResConfigFilename = \
@@ -67,15 +65,16 @@ def main(argv):
     # get initial parameters
     initial_params, quad_params, kernels_types = \
         svGPFA.utils.initUtils.getInitialAndQuadParamsAndKernelsTypes(
-            n_trials=n_trials, n_neurons=n_neurons, args=args,
-            config=est_init_config,
-            trials_start_time_dft=min_spike_time,
-            trials_end_time_dft=max_spike_time)
+            n_trials=n_trials, n_neurons=n_neurons,
+            dynamic_params=dynamic_params,
+            config_file_params=config_file_params,
+            default_params=default_params)
     kernels_params0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["kernelsParams0"]
 
     # get optimization parameters
     optim_params = svGPFA.utils.initUtils.getOptimParams(
-        args=args, config=est_init_config)
+        dynamic_params=dynamic_params, config_file_params=config_file_params,
+        default_params)
     optim_method = optim_params["optim_method"]
     prior_cov_reg_param = optim_params["prior_cov_reg_param"]
 
@@ -99,8 +98,10 @@ def main(argv):
     Z0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["inducingPointsLocs0"]
     legQuadPoints = quad_params["legQuadPoints"]
     legQuadWeights = quad_params["legQuadWeights"]
+    est_init_config = configparser.ConfigParser()
+    est_init_config.read(estInitConfigFilename)
     trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials, args=args, config=est_init_config,
+        n_trials=n_trials, dynamic_params=dynamic_params, config=est_init_config,
         trials_start_time_dft=min_spike_time,
         trials_end_time_dft=max_spike_time)
     trials_lengths = [trials_end_times[r] - trials_start_times[r]
