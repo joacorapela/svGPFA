@@ -236,10 +236,10 @@ def getDefaultParamsDict(n_neurons, n_latents=3):
             "c": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents)),
             "d": torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1)),
         },
-        "kernels_params": {"k_types": "exponentialQuadratic",
-                           "k_lengthscales": 1.0},
-        "indPointsLocs_params": {"n_ind_points": 10,
-                                 "ind_points_locs0_layout": "equispaced"}
+        "kernels_params": {"k_type": "exponentialQuadratic",
+                           "k_lengthscale": 1.0},
+        "ind_points_params": {"n_ind_points": 10,
+                              "ind_points_locs0_layout": "equispaced"}
     }
     return params_dict
 
@@ -271,18 +271,18 @@ def getArgsInfo():
                                       "d": strTo2DDoubleTensor,
                                       "c_filename": str,
                                       "d_filename": str},
-                 "kernels_params": {"k_types": str,
-                                    "k_lengthscales": float,
-                                    "k_periods": float,
+                 "kernels_params": {"k_type": str,
+                                    "k_lengthscale": float,
+                                    "k_period": float,
                                     "k_type_latent{:d}": str,
-                                    "k_lengthscale{:d}": float,
-                                    "k_period{:d}]": float},
-                 "indPointsLocs_params": {"n_ind_points": int,
-                                          "ind_points_locs0_layout": str,
-                                          "indPointsLocs_filename": str,
-                                          "indPointsLocs_latent{:d}_trial{:d}_filename": str},
+                                    "k_lengthscale_latent{:d}": float,
+                                    "k_period_latent{:d}": float},
+                 "ind_points_params": {"n_ind_points": int,
+                                       "ind_points_locs0_layout": str,
+                                       "ind_points_locs_filename": str,
+                                       "ind_points_locs_filename_latent{:d}_trial{:d}": str},
                  "optim_params": {"optim_method": str,
-                                  "em_max_iter": int, 
+                                  "em_max_iter": int,
                                   #
                                   "estep_estimate": bool,
                                   "estep_max_iter": int,
@@ -320,19 +320,52 @@ def getParamsDictFromArgs(n_latents, n_trials, args, args_info):
         params_dict[key1] = {}
         for key2 in args_info[key1].keys():
             conversion_funct = args_info[key1][key2]
-            if "_latent{:d}" in args_info[key1][key2]:
-                for k in n_latents:
-                    if "_trial{:d}" in arg:
-                        for r in n_trials:
+            if "_latent{:d}" in key2:
+                for k in range(n_latents):
+                    if "_trial{:d}" in key2:
+                        for r in range(n_trials):
                             # latent{:d} should appear before _trial{:d} in the
                             # argument label
-                            arg_name = arg.format(k, r)
+                            arg_name = key2.format(k, r)
+                            if arg_name in args:
+                                params_dict[key1][arg_name] = conversion_funct(args[arg_name])
                     else:
-                        arg_name = arg.format(k)
+                        arg_name = key2.format(k)
+                        if arg_name in args:
+                            params_dict[key1][arg_name] = conversion_funct(args[arg_name])
             else:
                 arg_name = key2
-            if arg_name in args:
-                params_dict[key2][arg_name] = conversion_funct(args[arg_name])
+                if arg_name in args:
+                    params_dict[key1][arg_name] = conversion_funct(args[arg_name])
+    return params_dict
+
+
+def getParamsDictFromStringsDict(n_latents, n_trials, strings_dict, args_info):
+    params_dict = {}
+    for key1 in args_info.keys():
+        params_dict[key1] = {}
+        for key2 in args_info[key1].keys():
+            conversion_funct = args_info[key1][key2]
+            if "_latent{:d}" in key2:
+                for k in range(n_latents):
+                    if "_trial{:d}" in key2:
+                        for r in range(n_trials):
+                            # latent{:d} should appear before _trial{:d} in the
+                            # argument label
+                            arg_name = key2.format(k, r)
+                            if key1 in strings_dict.keys() and \
+                               arg_name in strings_dict[key1]:
+                                params_dict[key1][arg_name] = conversion_funct(strings_dict[key1][arg_name])
+                    else:
+                        arg_name = key2.format(k)
+                        if key1 in strings_dict.keys() and \
+                           arg_name in strings_dict[key1]:
+                            params_dict[key1][arg_name] = conversion_funct(strings_dict[key1][arg_name])
+            else:
+                arg_name = key2
+                if key1 in strings_dict.keys() and \
+                   arg_name in strings_dict[key1]:
+                    params_dict[key1][arg_name] = conversion_funct(strings_dict[key1][arg_name])
     return params_dict
 
 
@@ -588,8 +621,8 @@ def getTrialsTimesInDict(n_trials, param_list_label, param_float_label,
     return trials_times
 
 
-def getKernelsParams0AndTypes(n_latents, dynamic_params, config_file_params,
-                              default_params):
+def getKernelsParams0AndTypes(n_latents,
+                              dynamic_params, config_file_params, default_params):
     if dynamic_params is not None:
         params0, kernels_types = getKernelsParams0AndTypesInDict(
             n_latents=n_latents, params_dict=dynamic_params,
@@ -599,14 +632,14 @@ def getKernelsParams0AndTypes(n_latents, dynamic_params, config_file_params,
 
     if config_file_params is not None:
         params0, kernels_types = getKernelsParams0AndTypesInDict(
-            n_latents=n_latents, params_dict=dynamic_params,
+            n_latents=n_latents, params_dict=config_file_params,
             params_dict_type="config_file")
         if params0 is not None and kernels_types is not None:
             return params0, kernels_types
 
     if dynamic_params is not None:
         params0, kernels_types = getKernelsParams0AndTypesInDict(
-            n_latents=n_latents, params_dict=dynamic_params,
+            n_latents=n_latents, params_dict=default_params,
             params_dict_type="default")
         if params0 is not None and kernels_types is not None:
             return params0, kernels_types
@@ -619,7 +652,8 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
     params0 = None
     kernels_types = None
     # short format
-    if "k_type" in params_dict[section_name].keys():
+    if section_name in params_dict.keys() and \
+       "k_type" in params_dict[section_name].keys():
         if params_dict[section_name]["k_type"] == "exponentialQuadratic":
             kernels_types = ["exponentialQuadratic" for k in range(n_latents)]
             if "k_lengthscale" in params_dict[section_name]:
@@ -652,9 +686,10 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
             params0 = [torch.DoubleTensor([lengthscale, period])
                        for k in range(n_latents)]
             print(f"Extracted k_type=periodic, k_lengthsale={lengthscale} "
-                  "and  k_period={period} from {params_dict_type}")
+                  f"and  k_period={period} from {params_dict_type}")
     # long format
-    elif "k_type_latent0" in params_dict[section_name].keys():
+    elif section_name in params_dict and \
+            "k_type_latent0" in params_dict[section_name].keys():
         kernels_types = []
         params0 = []
         for k in range(n_latents):
@@ -703,15 +738,16 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
     return params0, kernels_types
 
 
-def getIndPointsLocs0(n_latents, n_trials, args, config=None,
+def getIndPointsLocs0(n_latents, n_trials,
+                      dynamic_params, config_file_params, default_params,
                       n_ind_points=-1,
-                      ind_points_locs_layout="",
                       trials_start_times=None,
                       trials_end_times=None):
     ind_points_locs0 = None
 
     if dynamic_params is not None:
-        param = getIndPointsLocs0InDict(params_dict=dynamic_params,
+        param = getIndPointsLocs0InDict(n_latents=n_latents, n_trials=n_trials,
+                                        params_dict=dynamic_params,
                                         params_dict_type="dynamic",
                                         n_ind_points=n_ind_points,
                                         trials_start_times=trials_start_times,
@@ -720,7 +756,8 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
             return param
 
     if config_file_params is not None:
-        param = getIndPointsLocs0InDict(params_dict=dynamic_params,
+        param = getIndPointsLocs0InDict(n_latents=n_latents, n_trials=n_trials,
+                                        params_dict=config_file_params,
                                         params_dict_type="config_file",
                                         n_ind_points=n_ind_points,
                                         trials_start_times=trials_start_times,
@@ -729,7 +766,8 @@ def getIndPointsLocs0(n_latents, n_trials, args, config=None,
             return param
 
     if default_params is not None:
-        param = getIndPointsLocs0InDict(params_dict=dynamic_params,
+        param = getIndPointsLocs0InDict(n_latents=n_latents, n_trials=n_trials,
+                                        params_dict=default_params,
                                         params_dict_type="default",
                                         n_ind_points=n_ind_points,
                                         trials_start_times=trials_start_times,
@@ -832,7 +870,7 @@ def getVariationalMean0(n_latents, n_trials, dynamic_params,
             return param
 
     if config_file_params is not None:
-        param = getIndPointsLocs0InDict(params_dict=dynamic_params,
+        param = getIndPointsLocs0InDict(params_dict=config_file_params,
                                         params_dict_type="config_file",
                                         n_ind_points=n_ind_points,
                                         trials_start_times=trials_start_times,
@@ -841,7 +879,7 @@ def getVariationalMean0(n_latents, n_trials, dynamic_params,
             return param
 
     if default_params is not None:
-        param = getIndPointsLocs0InDict(params_dict=dynamic_params,
+        param = getIndPointsLocs0InDict(params_dict=default_params,
                                         params_dict_type="default",
                                         n_ind_points=n_ind_points,
                                         trials_start_times=trials_start_times,
@@ -943,7 +981,7 @@ def getVariationalCov0(n_latents, n_trials,
         param = getVariationalCov0InDict(n_latents=n_latents,
                                           n_trials=n_trials,
                                           n_ind_points=n_ind_points,
-                                          params_dict=dynamic_params,
+                                          params_dict=config_file_params,
                                           params_dict_type="config_file",
                                           section_name=section_name,
                                           common_filename_item_name=common_filename_item_name,
@@ -956,7 +994,7 @@ def getVariationalCov0(n_latents, n_trials,
         param = getVariationalCov0InDict(n_latents=n_latents,
                                           n_trials=n_trials,
                                           n_ind_points=n_ind_points,
-                                          params_dict=dynamic_params,
+                                          params_dict=default_params,
                                           params_dict_type="default",
                                           section_name=section_name,
                                           common_filename_item_name=common_filename_item_name,
