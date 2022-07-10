@@ -528,38 +528,47 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols, dynamic_params,
 def getLinearEmbeddingParam0InDict(param_label, params_dict,
                                    params_dict_type, n_rows, n_cols,
                                    section_name="embedding_params"):
+    # binary
     if section_name in params_dict and \
        f"{param_label}" in params_dict[section_name]: 
         param = params_dict[section_name][param_label]
         print(f"Extracted {param_label}={param} from {params_dict_type}")
+    # filename
     elif section_name in params_dict and \
        f"{param_label}_filename" in params_dict[section_name]: 
         param_filename = params_dict[section_name][f"{param_label}_filename"]
         df = pd.read_csv(param_filename, header=None)
         param = torch.from_numpy(df.values).type(torch.double)
         print(f"Extracted {param_label}_filename={param} from {params_dict_type}")
+    # random
     elif section_name in params_dict and \
             f"{param_label}_distribution" in params_dict[section_name] and \
             f"{param_label}_loc" in params_dict[section_name] and \
-            f"{param_label}_scale" in params_dict[section_name] and \
-            f"{param_label}_random_seed" in params_dict[section_name]:
+            f"{param_label}_scale" in params_dict[section_name]:
         param_distribution = params_dict[section_name]\
                                         [f"{param_label}_distribution"]
         param_loc = params_dict[section_name][f"{param_label}_loc"]
         param_scale = params_dict[section_name][f"{param_label}_scale"]
-        param_random_seed = params_dict[section_name]\
-                                       [f"{param_label}_random_seed"]
+        if f"{param_label}_random_seed" in params_dict[section_name]:
+            param_random_seed = params_dict[section_name]\
+                                           [f"{param_label}_random_seed"]
+        else:
+            param_random_seed = None
         print(f"Extracted {param_label}_distribution={param_distribution}, "
               f"{param_label}_loc={param_loc}, "
               f"{param_label}_scale={param_scale}, "
               f"{param_label}_random_seed={param_random_seed} "
               f"from {params_dict_type}")
-        torch.random.manual_seed(param_random_seed)
+        # If param_random_seed was specified for replicability
+        if param_random_seed is not None:
+            torch.random.manual_seed(param_random_seed)
         if param_distribution == "Normal":
             param = torch.distributions.normal.Normal(param_loc, param_scale).sample(sample_shape=[n_rows, n_cols]).type(torch.double)
         else:
             raise ValueError(f"Invalid param_distribution={param_distribution}")
-        torch.random.seed()
+        # If param_random_seed was specified for replicability
+        if param_random_seed is not None:
+            torch.random.seed()
     else:
         param = None
 
@@ -651,7 +660,7 @@ def getKernelsParams0AndTypes(n_latents,
         if params0 is not None and kernels_types is not None:
             return params0, kernels_types
 
-    if dynamic_params is not None:
+    if default_params is not None:
         params0, kernels_types = getKernelsParams0AndTypesInDict(
             n_latents=n_latents, params_dict=default_params,
             params_dict_type="default")
@@ -662,9 +671,17 @@ def getKernelsParams0AndTypes(n_latents,
 
 
 def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
-                           section_name="kernels_params"):
-    # short format
+                                    section_name="kernels_params"):
+    # binary format
     if section_name in params_dict and \
+       "k_types" in params_dict[section_name] and \
+       "k_params0" in params_dict[section_name]:
+        kernels_types = params_dict[section_name]["k_types"]
+        params0 = params_dict[section_name]["k_params0"]
+        print(f"Extracted k_types={kernels_types} and "
+              f"k_params0={params0} from {params_dict_type}")
+    # short format
+    elif section_name in params_dict and \
        "k_type" in params_dict[section_name]:
         if params_dict[section_name]["k_type"] == "exponentialQuadratic":
             kernels_types = ["exponentialQuadratic" for k in range(n_latents)]
@@ -794,8 +811,13 @@ def getIndPointsLocs0(n_latents, n_trials,
 def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
                             n_ind_points, trials_start_times, trials_end_times,
                             section_name="ind_points_params"):
-    # args ind_points_locs_filename
+    # binary
     if section_name in params_dict and \
+       "ind_points_locs" in params_dict[section_name]:
+        ind_points_locs0 = params_dict[section_name]["ind_points_locs"]
+        print(f"Extracted ind_points_locs from {params_dict_type}")
+    # filename: same inducing points across all latents and trials
+    elif section_name in params_dict and \
        "ind_points_locs_filename" in params_dict[section_name]:
         ind_points_locs_filename = \
             params_dict[section_name]["ind_points_locs_filename"]
@@ -804,12 +826,14 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
             ind_points_locs_filename=ind_points_locs_filename)
         print(f"Extracted ind_points_locs_filename={ind_points_locs_filename}"
               f"from {params_dict_type}")
+    # filename: different inducing points across all latents and trials
     elif section_name in params_dict and \
             "ind_points_locs_filename_latent0_trial0" in \
             params_dict[section_name]:
         ind_points_locs0 = getDiffAcrossLatentsAndTrialsIndPointsLocs0(
             n_latents=n_latents, n_trials=n_trials, params_dict=params_dict,
             params_dict_type=params_dict_type)
+    # layout
     elif section_name in params_dict and \
             "ind_points_locs_layout" in params_dict[section_name] and \
             n_ind_points > 0 and  \

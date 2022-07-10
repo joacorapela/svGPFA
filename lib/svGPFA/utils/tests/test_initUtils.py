@@ -351,7 +351,7 @@ def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5):
 def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
                                      kernel_type = "exponentialQuadratic",
                                      lengthscale = 2.0):
-
+    # dynamic_params, short format, exponential quadratic kernel
     dynamic_params = {"kernels_params": {"k_type": kernel_type,
                                          "k_lengthscale": lengthscale}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -379,7 +379,7 @@ def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
                                      kernel_type = "periodic",
                                      lengthscale = 2.0,
                                      period=3.0):
-
+    # dynamic_params, short format, periodic kernel
     dynamic_params = {"kernels_params": {"k_type": kernel_type,
                                          "k_lengthscale": lengthscale,
                                          "k_period": period}}
@@ -409,7 +409,7 @@ def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
                                      section_name = "kernels_params",
                                      kernel_type_param_name = "k_type",
                                      lengthscale_param_name = "k_lengthscale"):
-
+    # config_params, short format
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -433,6 +433,38 @@ def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
     for k in range(n_latents):
         assert params0[k].item() == true_lengthscale
         assert kernels_types[k] == true_kernel_type
+
+
+def test_getKernelsParams0AndTypes_3(
+    n_neurons=20, n_latents=3, n_trials=50,
+    true_kernels_types=["exponentialQuadratic",
+                        "exponentialQuadratic",
+                        "periodic"],
+    true_params0=[torch.DoubleTensor([1.0]),
+                  torch.DoubleTensor([2.3]),
+                  torch.DoubleTensor([1.7, 0.25])]):
+    # dynamic_params, binary format
+    dynamic_params = {"kernels_params": {"k_types": true_kernels_types,
+                                         "k_params0": true_params0}}
+    estInitConfigFilename = "data/99999999_estimation_metaData.ini"
+    config = configparser.ConfigParser()
+    config.read(estInitConfigFilename)
+    strings_dict = gcnu_common.utils.config_dict.GetDict(
+        config=config).get_dict()
+    args_info = svGPFA.utils.initUtils.getArgsInfo()
+    config_file_params = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+        n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
+        args_info=args_info)
+    default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
+        n_neurons=n_neurons, n_latents=n_latents)
+    params0, kernels_types = svGPFA.utils.initUtils.getKernelsParams0AndTypes(
+        n_latents=n_latents,
+        dynamic_params=dynamic_params,
+        config_file_params=config_file_params,
+        default_params=default_params)
+    for k in range(n_latents):
+        assert kernels_types[k] == true_kernels_types[k]
+        assert torch.all(params0[k] == true_params0[k])
 
 
 def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
@@ -601,13 +633,14 @@ if __name__ == "__main__":
     # test_getParam_1()
     # test_getLinearEmbeddingParams_0()
     # test_getLinearEmbeddingParams_1()
-    test_getLinearEmbeddingParams_2()
+    # test_getLinearEmbeddingParams_2()
     # test_getTrialsStartEndTimes_0()
     # test_getTrialsStartEndTimes_1()
     # test_getTrialsStartEndTimes_2()
     # test_getKernelsParams0AndTypes_0()
     # test_getKernelsParams0AndTypes_1()
     # test_getKernelsParams0AndTypes_2()
+    test_getKernelsParams0AndTypes_3()
     # test_getIndPointsLocs0_0()
     # test_getIndPointsLocs0_1()
     # test_variationalMean0_0() 
