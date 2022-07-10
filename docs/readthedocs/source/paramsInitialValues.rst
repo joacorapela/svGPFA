@@ -13,7 +13,7 @@ in a non-binary shorter or longer formats. In the binary format parameters are
 given as Pytorch tensors. The shorter format provides the same initial value
 for all latents and trials, whereas the longer format allows to specify
 different initial values for each latent and trial. If both shorter nad longer
-format are specified, the longer format is used.
+format are specified, the longer format take precedence.
 
 .. _variational_params:
 
