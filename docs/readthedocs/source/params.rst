@@ -116,13 +116,13 @@ Binary format
 Two items need to be specified:
 
 * ``variatiopnal_mean`` should be a list of size **n_latents**. The kth
-  element of this list should be a **torch.Tensor** of type double and
+  element of this list should be a **torch.DoubleTensor** of
   dimension (**n_trials**, **n_indPoints[k]**, 1), where
   **variatiopnal_mean[k][r, :, 0]** gives the initial variational mean for
   latent **k** and trial **r**.
 
 * ``variatiopnal_cov`` should be a list of size **n_latents**. The kth element
-  of this list should be a **torch.Tensor** of type double and dimension
+  of this list should be a **torch.DoubleTensor** of dimension
   (**n_trials**, **n_indPoints[k]**, **n_indPoints[k]**), where
   **variatiopnal_cov[k][r, :, :]** gives the initial variational covariance
   for latent **k** and trial **r**.
@@ -204,22 +204,19 @@ Binary format
 ^^^^^^^^^^^^^
 Two items need to be specified:
 
-* ``c`` should be a **torch.Tensor** of type double and size (n_neurons, n_latents)
+* ``c`` should be a **torch.DoubleTensor** of size (n_neurons, n_latents)
 
-* ``d`` should be a **torch.Tensor** of type double and size (n_neurons, 1)
+* ``d`` should be a **torch.DoubleTensor** of size (n_neurons, 1)
 
     .. code-block:: python
        :caption: adding standard random **embedding_params** in the binary format to **params_spec**
 
         n_neurons = 100
         n_latents = 3
-        n_ind_points = [20, 10, 15]
-        variational_mean = [torch.normal(mean=0, std=1, size=(n_neurons, n_ind_points[k], 1)) for k in range(n_latents)]
-        variational_cov = [torch.normal(mean=0, std=1, size=(n_neurons, n_ind_points[k], n_ind_points[k])) for k in range(n_latents)]
 
         params_spec["embedding_params"] = {
             "c": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents)),
-            "variational_cov":  torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1)),
+            "d":  torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1)),
         }
 
 Filename format
@@ -249,7 +246,7 @@ Eight items need to be specified:
 
 * ``C_scale`` float value giving the scale of the distribution of the loading matrix C (e.g., 1.0).
 
-* ``C_random_seed`` integer value giving the value of the random seed to be set prior to generating the random transition matrix **C**.
+* ``C_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **C**. This value can be specified for replicability. If not given, the random seed is not changed prior to genereating **C**.
 
 * ``d_distribution`` string value giving the name of the distribution of the offset vector **d** (e.g., Normal).
 
@@ -257,7 +254,7 @@ Eight items need to be specified:
 
 * ``d_scale`` float value giving the scale of the distribution of the offset vector **d** (e.g., 1.0).
 
-* ``d_random_seed`` integer value giving the value of the random seed to be set prior to generating the offset vector **d**.
+* ``d_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **d**. This value can be specified for replicability. If not given, the random seed is not changed prior to genereating **d**.
 
     .. code-block:: python
        :caption: adding **embedding_params** in the random format to **params_spec**
@@ -278,35 +275,55 @@ Eight items need to be specified:
 Kernel parameters
 -----------------
 
-The kernel parameters are the parameters of a Gaussian process covariance function (:math:`\kappa_k(\cdot,\cdot)`, Duncker and Sahani, p. 2). Their initial values should be  given in section ``[kernel_params]`` of the ``*.ini`` file.
+The kernel parameters of latent k are those of the Gaussian process covariance
+function (:math:`\kappa_k(\cdot,\cdot)`, :cite:t:`dunckerAndSahani18`, p. 2). The data
+structures for these parameters are described in the next section.
+
+Binary format
+^^^^^^^^^^^^^
+
+Two items need to be specified:
+
+* ``k_types`` should be a list of size **n_latents**. The kth element of this list should be a string with the type of kernel for the kth latent (e.g., **k_types[k]=exponentialQuadratic**).
+
+* ``k_params0`` should be a list of size **n_latents**. The kth element of this list should be a **torch.DoubleTensor** containing the parameters of the kth kernel (e.g., **k_params0[k]=torch.DoubleTensor([3.2])**).
+
+    .. code-block:: python
+       :caption: adding **kernel_params** in binary format (2 latents) to **params_spec**
+
+       params_spec["kernels_params"] = {
+            "k_types": ["exponentialQuadratic", "periodic"],
+            "k_params0": [torch.DoubleTensor([2.9]), torch.DoubleTensor([3.1, 1.2])],
+       }
 
 Longer format
 ^^^^^^^^^^^^^
 
-For each latent k, section ``[kernel_params]`` should contain item
-``k_type_latent<k>`` giving the name of the kernel for latent k.  Other items
-required in this section depend on the value of item ``k_type_latent<k>``. For
-example, for ``k_type_latent<k>=exponentialQuadratiicKernel``, item
+For each latent k, item ``k_type_latent<k>`` needs to be specified, giving the
+name of the kernel for latent k. Other items required in this section depend on
+the value of item ``k_type_latent<k>``. For example, for
+``k_type_latent<k>=exponentialQuadratiicKernel``, item
 ``k_lengthscale_latent<k>`` should specify the lengthscale parameter, and for
 ``k_type_latent<k>=periodicKernel`` items ``k_lengthscale_latent<k>`` and
 ``k_period_latent<k>`` should specify the lengthscale and period parameter of
 the periodic kernel, respectively.
 
     .. code-block:: python
-       :caption: example section [kernel_params] of the configuration file in the longer format (2 latents)
+       :caption: adding **kernel_params** in the longer format (2 latents) to **params_spec**
 
-       [kernels_params]
-        k_type_latent0 = exponentialQuadratic
-        k_lengthscale_latent0 = 2.0
-
-        k_type_latent1 = exponentialQuadratic
-        k_lengthscale_latent1 = 1.0
+       params_spec["kernels_params"] = {
+            "k_type_latent0": "exponentialQuadratic",
+            "k_lengthscale_latent0": 2.0,
+            "k_type_latent1": "periodic",
+            "k_lengthscale_latent1": 1.0,
+            "k_period_latent1": 0.75,
+       }
 
 Shorter format
 ^^^^^^^^^^^^^^
 
-For all types of kernels section ``[kernel_params]`` should contain
-item ``k_types``, giving the name name of the kernel for all latent variables.
+Section ``[kernel_params]`` should contain
+item ``k_types``, giving the name name of the kernel to be used for all latent variables.
 Other items required in this section depend on the value of
 item ``k_types``. For example, for ``k_types=exponentialQuadratiicKernel``,
 item ``k_lengthscales`` should specify the lengthscale parameter, and for
@@ -315,11 +332,12 @@ specify the lengthscale and period parameter of the periodic kernel,
 respectively.
 
     .. code-block:: python
-       :caption: example section [kernel_params] of the configuration file in the shorter format
+       :caption: adding **kernel_params** in the shorter format to **params_spec**
 
-       [kernels_params]
-       k_types = exponentialQuadratic
-       k_lengthscales = 1.0
+       params_spec["kernels_params"] = {
+           "k_types": "exponentialQuadratic",
+           "k_lengthscales": 1.0,
+       }
 
 .. _indPointsLocs_params:
 
@@ -327,61 +345,84 @@ Inducing points locations parameters
 ------------------------------------
 
 The inducing points locations, or input locations, are the points
-(:math:`\mathbf{z}_k^{(r)}`, :cite:t:`dunckerAndSahani18`, p.3) where the Gaussian
-process are evaluated to obtain the inducing points. Their initial values are
-given in section ``[indPointsLocs_params]`` of the ``*.ini`` file.
+(:math:`\mathbf{z}_k^{(r)}`, :cite:t:`dunckerAndSahani18`, p.3) where the
+Gaussian process are evaluated to obtain the inducing points. The data
+structures for these parameters are described in the next section.
+
+Binary format
+^^^^^^^^^^^^^
+
+One item needs to be specified:
+
+* ``indPointsLocs`` should be a list of size **n_latents**. The kth element of
+  this list should be a **torch.DoubleTensor** of size (**n_trials**,
+  **n_indPoints[k]**, 1), where **indPointsLocs[k][r, :, 0]** gives the
+  initial inducing points locations for latent k and trial r.
+
+    .. code-block:: python
+       :caption: adding **indPointsLocs_params** in binary format with uniformaly distributed inducing points locations to **params_spec**
+
+       n_latents = 3
+       n_ind_points = (10, 20, 15)
+       n_trials = 50
+       trials_start_time = 0.0
+       trials_end_time = 7.0
+       params_spec["indPointsLocs_params"] = {
+            "indPointsLocs": [trials_start_time + (trials_end_time-trials_start_time) * torch.rand(n_trials, n_ind_points[k], 1) for k in n_latents]
+       }
 
 Longer format
 ^^^^^^^^^^^^^
 
-For each latent k and trial r, section ``[indPointsLocs_params]`` should
-contain item
-``indPointsLocs_latent<k>_trial<r>_filename=indPointsLocs_latentk_trialr.csv``
-giving the name of the file (csv format readable by pandas *read_csv* function)
-containing the initial inducing points locations for latent k and trial r.
+For each latent k and trial r one item needs to be specified:
+
+* ``indPointsLocs_latent<k>_trial<r>_filename`` giving the name of the file
+  (csv format readable by pandas *read_csv* function) containing the initial
+  inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: example section [indPointsLocs_params] of the configuration file in the longer format (2 latents, 2 trials)
+       :caption: adding **indPointsLocs_params** in the longer format to **params_spec** (2 latents, 2 trials)
 
-       [indPointsLocs_params]
-       indPointsLocs_latent0_trial0_filename = indPointsLocs_latent0_trial0.csv
-       indPointsLocs_latent0_trial1_filename = indPointsLocs_latent0_trial1.csv
-       indPointsLocs_latent1_trial0_filename = indPointsLocs_latent1_trial0.csv
-       indPointsLocs_latent1_trial1_filename = indPointsLocs_latent1_trial1.csv
+       params_spec["indPointsLocs_params"] = {
+           "indPointsLocs_latent0_trial0_filename": "indPointsLocs_latent0_trial0.csv",
+           "indPointsLocs_latent0_trial1_filename": "indPointsLocs_latent0_trial1.csv",
+           "indPointsLocs_latent1_trial0_filename": "indPointsLocs_latent1_trial0.csv",
+           "indPointsLocs_latent1_trial1_filename": "indPointsLocs_latent1_trial1.csv",
+       }
 
-Shorter format 1
-^^^^^^^^^^^^^^^^
+Shorter format: layout
+^^^^^^^^^^^^^^^^^^^^^^
 
-The shorter format 1 requires the specification of the number of inducing points
+This shorter format requires the specification of the number of inducing points
 in the item ``n_ind_points``. The layout of the initial inducing points
 locations is given by the item ``ind_points_locs0_layout``. If
-``ind_points_locs0_layout = equidistant`` the initial location of the inducing
-points is equidistant between the trial start and trial end. If
-``ind_points_locs0_layout = uniform`` the inducing points are uniformly
+``ind_points_locs0_layout = equidistant`` the initial locations of the inducing
+points are equidistant between the trial start and trial end. If
+``ind_points_locs0_layout = uniform`` the initial inducing points are uniformly
 positioned between the start and end of the trial.
 
     .. code-block:: python
-       :caption: example section [indPointsLocs_params] of the configuration file in the shorter format 1
+       :caption: adding **indPointsLocs_params** in the layout shorter format to **params_spec**
 
-       [indPointsLocs_params]
-       n_ind_points = 9
-       ind_points_locs0_layout = equidistant
+       params_spec["indPointsLocs_params"] = {
+           "n_ind_points": 9,
+           "ind_points_locs0_layout": "equidistant",
+       }
 
-Shorter format 2
-^^^^^^^^^^^^^^^^
+Shorter format: one filename for all latents and trials
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The shorter format 2 requires the specification, in section
-``[indPointsLocs_params],``  of the item
-``indPointsLocs_filename=indPointsLocs.csv`` giving the name of the file (csv
-format readable by pandas *read_csv* function) containing the initial inducing points
-locations for all latents and trials.
+This shorter format requires the specification of the item
+``indPointsLocs_filename`` giving the name of the file (csv format readable by
+pandas *read_csv* function) containing the initial inducing points locations
+for all latents and trials.
 
     .. code-block:: python
-       :caption: example section [indPointsLocs_params] of the configuration file in the shorter format 2
+       :caption: adding **indPointsLocs_params** in the one filename shorter format to **params_spec**
 
-       [indPointsLocs_params]
-       indPointsLocs_filename=indPointsLocs.csv
-
+       params_spec["indPointsLocs_params"] = {
+           "indPointsLocs_filename": "indPointsLocs.csv",
+       }
 
 Optimization parameters
 =======================
