@@ -17,7 +17,6 @@ results/
 !projects/svGPFA_simulations/results/32451751_simRes.pickle
 figures/
 data/
-scripts/
 slurm/
 svGPFA.egg-info/
 old/
