@@ -91,16 +91,16 @@ class SVEM_PyTorch(SVEM):
             lowerBoundLock.unlock()
         iter += 1
         logStream = io.StringIO()
-        if method=="ECM":
+        if method.lower()=="ecm":
             steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
             functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
-        elif method=="mECM":
+        elif method.lower()=="mecm":
             # see McLachlan, G. J., & Krishnan, T. (2007). The EM algorithm and
             # extensions (Vol. 382). John Wiley & Sons) Chapter 5
             steps = ["estep", "mstep_embedding", "estep", "mstep_kernels", "estep", "mstep_indpointslocs"]
             functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
         else:
-            raise ValueError("Invalid method={:s}. Supported values are EM and mECM".format(method))
+            raise ValueError("Invalid method={:s}. Supported values are ECM and mECM".format(method))
         if getIterationModelParamsFn is not None:
             initialModelsParams = getIterationModelParamsFn(model=model)
             iterationsModelParams = torch.empty((optim_params["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
