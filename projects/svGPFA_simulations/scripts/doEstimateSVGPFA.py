@@ -8,6 +8,7 @@ import pickle
 import argparse
 import configparser
 
+import gcnu_common.utils.config_dict
 import svGPFA.stats.svGPFAModelFactory
 import svGPFA.stats.svEM
 import svGPFA.utils.configUtils
@@ -18,30 +19,22 @@ import svGPFA.utils.initUtils
 def main(argv):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--simResNumber", help="simuluation result number",
+    parser.add_argument("est_init_number", help="estimation init number",
+                        type=int)
+    parser.add_argument("--sim_res_number", help="simuluation result number",
                         type=int, default=32451751)
-    parser.add_argument("--estInitNumber", help="estimation init number",
-                        type=int, default=-1)
     args = parser.parse_args()
-    dynamic_params = svGPFA.utils.initUtils.get_params_dict_from_args(
-        n_trials=n_trials, n_latents=n_latents, args=args)
-    simResNumber = dynamic_params.simResNumber
-    estInitNumber = dynamic_params.estInitNumber
-
-    if estInitNumber > 0:
-        estInitConfigFilename = \
-            "../data/{:08d}_estimation_metaData.ini".format(estInitNumber)
-        config_file_params = gcnu_common.utils.config_dict.GetDict(config=estInitConfigFilename).get_dict()
-    else:
-        config_file_params = None
+    sim_res_number = args.sim_res_number
+    est_init_number = args.est_init_number
 
     # load data
-    simResConfigFilename = \
-        "../results/{:08d}_simulation_metaData.ini".format(simResNumber)
-    simResConfig = configparser.ConfigParser()
-    simResConfig.read(simResConfigFilename)
-    simResFilename = simResConfig["simulation_results"]["simResFilename"]
-    with open(simResFilename, "rb") as f:
+    sim_res_config_filename = \
+        "../results/{:08d}_simulation_metaData.ini".format(sim_res_number)
+    sim_res_config = configparser.ConfigParser()
+    sim_res_config.read(sim_res_config_filename)
+
+    sim_res_filename = sim_res_config["simulation_results"]["simResFilename"]
+    with open(sim_res_filename, "rb") as f:
         simRes = pickle.load(f)
     spikes_times = simRes["spikes"]
     n_trials = len(spikes_times)
@@ -63,18 +56,32 @@ def main(argv):
                     min_spike_time = kr_min_spike_time
 
     # get initial parameters
-    initial_params, quad_params, kernels_types = \
-        svGPFA.utils.initUtils.getInitialAndQuadParamsAndKernelsTypes(
+    est_init_config_filename = \
+        "../data/{:08d}_estimation_metaData.ini".format(est_init_number)
+    est_init_config = configparser.ConfigParser()
+    est_init_config.read(est_init_config_filename)
+    n_latents = int(est_init_config["model_structure_params"]["n_latents"])
+
+    args_info = svGPFA.utils.initUtils.getArgsInfo()
+    dynamic_params = svGPFA.utils.initUtils.getParamsDictFromArgs(
+        n_latents=n_latents, n_trials=n_trials, args=args, args_info=args_info)
+
+    strings_dict = gcnu_common.utils.config_dict.GetDict(
+        config=est_init_config).get_dict()
+    config_file_params = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+        n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
+        args_info=args_info)
+
+    default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
+        n_neurons=n_neurons, n_latents=n_latents)
+
+    initial_params, quad_params, kernels_types, optim_params = \
+        svGPFA.utils.initUtils.getParams(
             n_trials=n_trials, n_neurons=n_neurons,
             dynamic_params=dynamic_params,
             config_file_params=config_file_params,
             default_params=default_params)
     kernels_params0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["kernelsParams0"]
-
-    # get optimization parameters
-    optim_params = svGPFA.utils.initUtils.getOptimParams(
-        dynamic_params=dynamic_params, config_file_params=config_file_params,
-        default_params)
     optim_method = optim_params["optim_method"]
     prior_cov_reg_param = optim_params["prior_cov_reg_param"]
 
@@ -98,12 +105,10 @@ def main(argv):
     Z0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["inducingPointsLocs0"]
     legQuadPoints = quad_params["legQuadPoints"]
     legQuadWeights = quad_params["legQuadWeights"]
-    est_init_config = configparser.ConfigParser()
-    est_init_config.read(estInitConfigFilename)
     trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials, dynamic_params=dynamic_params, config=est_init_config,
-        trials_start_time_dft=min_spike_time,
-        trials_end_time_dft=max_spike_time)
+        n_trials=n_trials, dynamic_params=dynamic_params,
+        config_file_params=config_file_params,
+        default_params=default_params)
     trials_lengths = [trials_end_times[r] - trials_start_times[r]
                       for r in range(n_trials)]
     if "latentsTrialsTimes" in simRes.keys():
@@ -111,7 +116,8 @@ def main(argv):
     elif "times" in simRes.keys():
         latentsTrialsTimes = simRes["times"]
     else:
-        raise ValueError("latentsTrialsTimes or times cannot be found in {:s}".format(simResFilename))
+        raise ValueError("latentsTrialsTimes or times cannot be found in "
+                         f"{sim_res_filename}")
 
     estimationDataForMatlabFilename = "../results/{:08d}_estimationDataForMatlab.mat".format(estResNumber)
     svGPFA.utils.miscUtils.saveDataForMatlabEstimations(
@@ -165,10 +171,10 @@ def main(argv):
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
-    estimResConfig["simulation_params"] = {"simResNumber": simResNumber}
+    estimResConfig["simulation_params"] = {"sim_res_number": sim_res_number}
     estimResConfig["optim_params"] = optim_params
     estimResConfig["estimation_params"] = {
-        "estInitNumber": estInitNumber,
+        "est_init_number": est_init_number,
     }
     with open(estimResMetaDataFilename, "w") as f:
         estimResConfig.write(f)
