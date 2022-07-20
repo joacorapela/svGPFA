@@ -1,47 +1,24 @@
+# files
+*~
 *.pyc
 *.swp
-*~
-slurm-*
-# *.html
-.nfs*
-toRsync*
-fromRsync*
-toSyncData
-fromSyncData
-nextRefractoring.txt
-todo.txt
-.ipynb*
-docs/design/*bak*
-scripts/logs/*
-# docs/Makefile*
-# docs/build
-# docs/make*
-# docs/requirements.txt
-docs/source/*.bak
-# docs/source/images
-# docs/*
-# !docs/design/svGPFA.vpp
-# !docs/source/*.rst
-# !docs/source/*.dic
+*.bak
+*.html
 .*lck*
-ci/Untitled*.ipynb
-ipynb/results
-/notes.txt
-# scripts/figures/*
-src/stats/gaussianProcesses/kernels.py
-old/
-gui/guiUtils-debug.py
-scripts/data/*
-scripts/results/*
-!scripts/results/32451751_simRes.pickle
-scripts/figures/
-scripts/notes/
-scripts/doEstimateSVGPFAPythonSimulationChol_021621.py
-scripts/doSearchBug?.py
-slurmOutputs/*
-slurmScripts/*
-gui/doRunGUI.log
-scripts/shenoy/data/*
-scripts/shenoy/figures/*
-scripts/shenoy/results/*
+slurm-*
+.nfs*
+.ipynb*
 
+# directories
+/docs/*
+!/docs/readthedocs/source
+!/docs/design/svGPFA.vpp
+results/
+!projects/svGPFA_simulations/results/32451751_simRes.pickle
+figures/
+data/
+slurm/
+svGPFA.egg-info/
+old/
+notes/
+log/
