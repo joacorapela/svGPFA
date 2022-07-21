@@ -1,4 +1,0 @@
-rsync -ruv scripts/results/* ssh.swc.ucl.ac.uk:dev/research/gatsby-swc/gatsby/svGPFA/pythonCode/scripts/results
-rsync -ruv scripts/data/* ssh.swc.ucl.ac.uk:dev/research/gatsby-swc/gatsby/svGPFA/pythonCode/scripts/data
-rsync -ruv scripts/figures/* ssh.swc.ucl.ac.uk:dev/research/gatsby-swc/gatsby/svGPFA/pythonCode/scripts/figures
-rsync -ruv scripts/notes/* ssh.swc.ucl.ac.uk:dev/research/gatsby-swc/gatsby/svGPFA/pythonCode/scripts/notes
