@@ -5,3 +5,4 @@ plotly
 scipy
 scikit-learn
 torch
+gcnu_common
