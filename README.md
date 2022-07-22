@@ -13,9 +13,30 @@
 
 1. clone this repo
 
-2. in the root directory of the cloned repo type
+2. if you will *not* test the svGPFA installation with the example below (see section *Verify installation* below) and will not run the example notebooks (see above), in the root directory of the cloned repo type
 
-```
+    ```
     pip install -e .
-```
+    ```
+    But if you will test the application with the example script provided below, or will run the example notebooks (see above), in the root directory of the cloned repo type
+
+     ```
+     pip install -e .[examples]
+     ```
+
+# Testing the installation
+
+1. From the root directory of the cloned svGPFA directory, change the current directory to *examples/scripts*.
+
+    ```
+    cd examples/scripts
+    ```
+
+2. run the estimation of svGPFA parameters (for only two EM iterations)
+
+    ```
+    python doEstimateSVGPFA --max_iter=2
+    ```
+
+3. if everything went well you should see a newly created estimation result file *../results/xxxxxxxx_etimationRes.pickle*.
 
