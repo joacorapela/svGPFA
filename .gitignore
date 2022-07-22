@@ -13,12 +13,8 @@ slurm-*
 /docs/*
 !/docs/readthedocs/source
 !/docs/design/svGPFA.vpp
-results/
-!projects/svGPFA_simulations/results/32451751_simRes.pickle
-figures/
-data/
-slurm/
+examples/results/
+!examples/results/.gitkeep
+examples/figures/
+!examples/figures/.gitkeep
 svGPFA.egg-info/
-old/
-notes/
-log/
