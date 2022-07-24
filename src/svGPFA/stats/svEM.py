@@ -108,7 +108,7 @@ class SVEM_PyTorch(SVEM):
         else:
             iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
-        while iter<optim_params["em_max_iter"]:
+        while iter<=optim_params["em_max_iter"]:
             for step in steps:
                 if optim_params["{:s}_estimate".format(step)]:
                     message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
