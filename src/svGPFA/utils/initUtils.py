@@ -220,7 +220,7 @@ def getParamsDictFromArgs(n_latents, n_trials, args, args_info):
             else:
                 arg_name = key2
                 if arg_name in args:
-                    params_dict[key1][arg_name] = conversion_func(args[arg_name])
+                    params_dict[key1][arg_name] = conversion_func(vars(args)[arg_name])
     return params_dict
 
 
