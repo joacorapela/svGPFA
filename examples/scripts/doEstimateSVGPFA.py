@@ -9,6 +9,7 @@ import argparse
 import configparser
 
 import gcnu_common.utils.config_dict
+import gcnu_common.utils.argparse
 import svGPFA.stats.svGPFAModelFactory
 import svGPFA.stats.svEM
 import svGPFA.utils.configUtils
@@ -31,7 +32,9 @@ def main(argv):
                         type=str,
                         default="../params/{:08d}_estimation_metaData.ini")
 
-    args = parser.parse_args()
+    args, remaining = parser.parse_known_args()
+    gcnu_common.utils.argparse.add_remaining_to_populated_args(
+        populated=args, remaining=remaining)
     sim_res_number = args.sim_res_number
     est_init_number = args.est_init_number
     sim_res_filename_pattern = args.sim_res_filename_pattern
