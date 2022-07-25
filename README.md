@@ -19,15 +19,15 @@
     cd svGPFA
     ```
 
-3. if you will *not* test the svGPFA installation with the example below (see section *Verify installation* below) and will not run the example notebooks (see above), in the root directory of the cloned repo type
+3. if you will *not* run the example notebooks (see above), in the root directory of the cloned repo type
 
     ```
     pip install -e .
     ```
-    If you will test the application with the example script provided below, or you will run the example notebooks (see above), in the root directory of the cloned repo type
+    If you will run the example notebooks (see above), in the root directory of the cloned repo type
 
      ```
-     pip install -e .[examples]
+     pip install -e .[notebook]
      ```
 
 # Testing the installation
