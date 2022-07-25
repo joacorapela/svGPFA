@@ -1,7 +1,6 @@
 
 import numpy as np
 import torch
-import pandas as pd
 import svGPFA.stats.kernelsMatricesStore
 import svGPFA.utils.miscUtils
 
@@ -27,9 +26,10 @@ def getOptimParams(dynamic_params, config_file_params, default_params,
                                conversion_func=param_conv_func)
         tmp_optim_params[param_name] = param_value
     optim_params = {
-        "em_max_iter": tmp_optim_params["em_max_iter"],
-        "optim_method": tmp_optim_params["optim_method"],
+        "n_quad": tmp_optim_params["n_quad"],
         "prior_cov_reg_param": tmp_optim_params["prior_cov_reg_param"],
+        "optim_method": tmp_optim_params["optim_method"],
+        "em_max_iter": tmp_optim_params["em_max_iter"],
         # estep_
         "estep_estimate": tmp_optim_params["estep_estimate"],
         "estep_optim_params": {
@@ -416,7 +416,8 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols, dynamic_params,
 
 def getLinearEmbeddingParam0InDict(param_label, params_dict,
                                    params_dict_type, n_rows, n_cols,
-                                   section_name="embedding_params0"):
+                                   section_name="embedding_params0",
+                                   delimiter=","):
     # binary
     if section_name in params_dict and \
        f"{param_label}" in params_dict[section_name]: 
@@ -426,8 +427,8 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
     elif section_name in params_dict and \
        f"{param_label}_filename" in params_dict[section_name]: 
         param_filename = params_dict[section_name][f"{param_label}_filename"]
-        df = pd.read_csv(param_filename, header=None)
-        param = torch.from_numpy(df.values).type(torch.double)
+        param_np = np.genfromtxt(param_filename, delimiter=delimiter)
+        param = torch.from_numpy(param_np).type(torch.double)
         print(f"Extracted {param_label}_filename from {params_dict_type}")
     # random
     elif section_name in params_dict and \
@@ -746,9 +747,10 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
 
 
 def getSameAcrossLatentsAndTrialsIndPointsLocs0(
-        n_latents, n_trials, ind_points_locs0_filename):
-    Z0 = torch.from_numpy(pd.read_csv(ind_points_locs0_filename,
-                                      header=None).to_numpy()).flatten()
+        n_latents, n_trials, ind_points_locs0_filename, delimiter=","):
+    Z0_np = np.genfromtxt(ind_points_locs0_filename,
+                          delimiter=delimiter).flatten()
+    Z0 = torch.from_numpy(Z0_np)
     Z0s = [[] for k in range(n_latents)]
     nIndPointsForLatent = len(Z0)
     for k in range(n_latents):
@@ -761,14 +763,17 @@ def getSameAcrossLatentsAndTrialsIndPointsLocs0(
 def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
         n_latents, n_trials, params_dict, params_dict_type,
         section_name="ind_points_params0",
-        item_name_pattern="ind_points_locs0_filename_latent{:d}_trial{:d}"):
+        item_name_pattern="ind_points_locs0_filename_latent{:d}_trial{:d}",
+        delimiter=","):
     Z0 = [[] for k in range(n_latents)]
     for k in range(n_latents):
         item_name = item_name_pattern.format(k, 0)
         ind_points_locs0_filename = params_dict[section_name][item_name]
         print(f"Extracted {item_name}={ind_points_locs0_filename} from "
               f"{params_dict_type}")
-        Z0_k_r0 = torch.from_numpy(pd.read_csv(ind_points_locs0_filename, header=None).to_numpy()).flatten()
+        Z0_k_r0_np = np.genfromtxt(ind_points_locs0_filename,
+                                   delimiter=delimiter)
+        Z0_k_r0 = torch.from_numpy(Z0_k_r0_np).flatten()
         nIndPointsForLatent = len(Z0_k_r0)
         Z0[k] = torch.empty((n_trials, nIndPointsForLatent, 1),
                             dtype=torch.double)
@@ -778,7 +783,9 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
             ind_points_locs0_filename = params_dict[section_name][item_name]
             print(f"Extracted {item_name}={ind_points_locs0_filename} from "
                   f"{params_dict_type}")
-            Z0_k_r = torch.from_numpy(pd.read_csv(ind_points_locs0_filename, header=None).to_numpy()).flatten()
+            Z0_k_r_np = np.genfromtxt(ind_points_locs0_filename,
+                                      delimiter=delimiter)
+            Z0_k_r = torch.from_numpy(Z0_k_r_np).flatten()
             Z0[k][r, :, 0] = Z0_k_r
     return Z0
 
