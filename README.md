@@ -13,12 +13,18 @@
 
 1. clone this repo
 
-2. if you will *not* test the svGPFA installation with the example below (see section *Verify installation* below) and will not run the example notebooks (see above), in the root directory of the cloned repo type
+2. change the current directory to that of the cloned repo
+
+    ```
+    cd svGPFA
+    ```
+
+3. if you will *not* test the svGPFA installation with the example below (see section *Verify installation* below) and will not run the example notebooks (see above), in the root directory of the cloned repo type
 
     ```
     pip install -e .
     ```
-    But if you will test the application with the example script provided below, or will run the example notebooks (see above), in the root directory of the cloned repo type
+    If you will test the application with the example script provided below, or you will run the example notebooks (see above), in the root directory of the cloned repo type
 
      ```
      pip install -e .[examples]
