@@ -136,7 +136,7 @@ def test_getParam_0(true_n_latents = 3, n_trials=15, n_neurons=100):
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
         default_params=default_params,
-        conversion_funct=int)
+        conversion_func=int)
     assert true_n_latents == n_latents
 
 
@@ -162,7 +162,7 @@ def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100):
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
         default_params=default_params,
-        conversion_funct=float)
+        conversion_func=float)
     assert true_trials_end_time == trials_end_time
 
 
@@ -206,11 +206,9 @@ def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20):
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     true_C0_filename = config["embedding_params0"]["c0_filename"]
-    # true_C0_df = pd.read_csv(true_C0_filename, header=None)
     true_C0_np = np.genfromtxt(true_C0_filename, delimiter=",")
     true_C0 = torch.from_numpy(true_C0_np).type(torch.double)
     true_d0_filename = config["embedding_params0"]["d0_filename"]
-    # true_d0_df = pd.read_csv(true_d0_filename, header=None)
     true_d0_np = np.genfromtxt(true_d0_filename, delimiter=",")
     true_d0 = torch.from_numpy(true_d0_np).type(torch.double)
     C0, d0 = svGPFA.utils.initUtils.getLinearEmbeddingParams0(
@@ -574,10 +572,11 @@ def test_getVariationalMean0_0(n_neurons=20, n_latents=3, n_ind_points=9,
 
 
 def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=None,
-                            n_trials=15,
-                            section_name="variational_params0",
-                            variational_mean0_filename_param_name_pattern="variational_mean0_filename_latent{:d}_trial{:d}",
-                            estInitConfigFilename="data/99999998_estimation_metaData.ini"):
+                               n_trials=15,
+                               section_name="variational_params0",
+                               variational_mean0_filename_param_name_pattern="variational_mean0_filename_latent{:d}_trial{:d}",
+                               estInitConfigFilename="data/99999998_estimation_metaData.ini",
+                               delimiter=","):
     # config_params, long format
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -599,7 +598,10 @@ def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=None,
     for k in range(n_latents):
         for r in range(n_trials):
             true_variational_mean0_filename_kr = config_file_params[section_name][variational_mean0_filename_param_name_pattern.format(k, r)]
-            true_variational_mean0_kr = torch.from_numpy(pd.read_csv(true_variational_mean0_filename_kr, header=None).to_numpy()).flatten()
+            true_variational_mean0_kr_np = np.genfromtxt(
+                true_variational_mean0_filename_kr, delimiter=delimiter)
+            true_variational_mean0_kr = \
+                torch.from_numpy(true_variational_mean0_kr_np).flatten()
             assert torch.all(variational_mean0[k][r, :, 0] ==
                              true_variational_mean0_kr)
 
@@ -637,7 +639,8 @@ def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=None,
                               n_trials=15,
                               section_name="variational_params0",
                               variational_cov0_filename_param_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
-                              estInitConfigFilename="data/99999998_estimation_metaData.ini"):
+                              estInitConfigFilename="data/99999998_estimation_metaData.ini",
+                              delimiter=","):
     # config_params, long format
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -659,7 +662,11 @@ def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=None,
     for k in range(n_latents):
         for r in range(n_trials):
             true_variational_cov0_filename_kr = config_file_params[section_name][variational_cov0_filename_param_name_pattern.format(k, r)]
-            true_variational_cov0_kr = torch.from_numpy(pd.read_csv(true_variational_cov0_filename_kr, header=None).to_numpy())
+            true_variational_cov0_kr_np = \
+                np.genfromtxt(true_variational_cov0_filename_kr,
+                              delimiter=delimiter)
+            true_variational_cov0_kr = torch.from_numpy(
+                true_variational_cov0_kr_np)
             assert torch.all(variational_cov0[k][r, :, :] ==
                              true_variational_cov0_kr)
 
@@ -667,15 +674,20 @@ def test_getOptimParams_0(n_neurons=100, n_latents=8):
     # extracting all optim params from default_params
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
         n_neurons=n_neurons, n_latents=n_latents)
-    true_optim_params = default_params["optim_params"]
-    optim_params = svGPFA.utils.initUtils.getOptimParams(
+    flat_true_optim_params = default_params["optim_params"]
+    hier_true_optim_params = \
+        svGPFA.utils.initUtils.flatToHierarchicalOptimParams(
+            flat_optim_params=flat_true_optim_params)
+    hier_optim_params = svGPFA.utils.initUtils.getOptimParams(
         dynamic_params=None, config_file_params=None,
         default_params=default_params)
-    for true_param_name in true_optim_params:
-        assert true_optim_params[true_param_name] == \
-                optim_params[true_param_name]
-    for param_name in optim_params:
-        assert true_optim_params[param_name] == optim_params[param_name]
+    for true_param_name in hier_true_optim_params:
+        if not type(hier_true_optim_params[true_param_name]).__name__ == "dict":
+            assert hier_true_optim_params[true_param_name] == \
+                hier_optim_params[true_param_name]
+        else:
+            for true_param2_name in hier_true_optim_params[true_param_name]:
+                assert hier_true_optim_params[true_param_name][true_param2_name] == hier_optim_params[true_param_name][true_param2_name]
 
 
 def test_getOptimParams_1(n_neurons=100, n_latents=8):
@@ -684,23 +696,22 @@ def test_getOptimParams_1(n_neurons=100, n_latents=8):
     dynamic_params = {"optim_params": {"em_max_iter": 1000}}
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
         n_neurons=n_neurons, n_latents=n_latents)
-    true_optim_params = default_params["optim_params"]
-    optim_params = svGPFA.utils.initUtils.getOptimParams(
+    flat_true_optim_params = default_params["optim_params"]
+    flat_true_optim_params["em_max_iter"] = \
+        dynamic_params["optim_params"]["em_max_iter"]
+    hier_true_optim_params = \
+        svGPFA.utils.initUtils.flatToHierarchicalOptimParams(
+            flat_optim_params=flat_true_optim_params)
+    hier_optim_params = svGPFA.utils.initUtils.getOptimParams(
         dynamic_params=dynamic_params, config_file_params=None,
         default_params=default_params)
-    for true_param_name in true_optim_params:
-        if true_param_name != "em_max_iter":
-            assert true_optim_params[true_param_name] == \
-                    optim_params[true_param_name]
+    for true_param_name in hier_true_optim_params:
+        if not type(hier_true_optim_params[true_param_name]).__name__ == "dict":
+            assert hier_true_optim_params[true_param_name] == \
+                hier_optim_params[true_param_name]
         else:
-            assert dynamic_params["optim_params"][true_param_name] == \
-                    optim_params[true_param_name]
-    for param_name in optim_params:
-        if param_name != "em_max_iter":
-            assert true_optim_params[param_name] == optim_params[param_name]
-        else:
-            assert dynamic_params["optim_params"][param_name] == \
-                    optim_params[param_name]
+            for true_param2_name in hier_true_optim_params[true_param_name]:
+                assert hier_true_optim_params[true_param_name][true_param2_name] == hier_optim_params[true_param_name][true_param2_name]
 
 
 def test_getOptimParams_2(n_neurons=100, n_latents=8, n_trials=15,
@@ -718,41 +729,47 @@ def test_getOptimParams_2(n_neurons=100, n_latents=8, n_trials=15,
     config_file_params = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
-    true_optim_params = config_file_params["optim_params"]
-    true_optim_params["em_max_iter"] = dynamic_params["optim_params"]["em_max_iter"]
-    import pdb; pdb.set_trace()
-    optim_params = svGPFA.utils.initUtils.getOptimParams(
+    flat_true_optim_params = config_file_params["optim_params"]
+    flat_true_optim_params["em_max_iter"] = dynamic_params["optim_params"]["em_max_iter"]
+    hier_true_optim_params = \
+        svGPFA.utils.initUtils.flatToHierarchicalOptimParams(
+            flat_optim_params=flat_true_optim_params)
+    hier_optim_params = svGPFA.utils.initUtils.getOptimParams(
         dynamic_params=dynamic_params, config_file_params=config_file_params,
         default_params=default_params)
-    for true_param_name in true_optim_params:
-        assert true_optim_params[true_param_name] == \
-                optim_params[true_param_name]
+    for true_param_name in hier_true_optim_params:
+        if not type(hier_true_optim_params[true_param_name]).__name__ == "dict":
+            assert hier_true_optim_params[true_param_name] == \
+                hier_optim_params[true_param_name]
+        else:
+            for true_param2_name in hier_true_optim_params[true_param_name]:
+                assert hier_true_optim_params[true_param_name][true_param2_name] == hier_optim_params[true_param_name][true_param2_name]
 
 
 if __name__ == "__main__":
-    # test_getParamsDictFromArgs_0()
-    # test_getParamsDictFromArgs_1()
-    # test_getParamsDictFromArgs_2()
-    # test_getParamsDictFromStringsDict_1()
-    # test_getParamsDictFromStringsDict_2()
-    # test_getParam_0()
-    # test_getParam_1()
+    test_getParamsDictFromArgs_0()
+    test_getParamsDictFromArgs_1()
+    test_getParamsDictFromArgs_2()
+    test_getParamsDictFromStringsDict_1()
+    test_getParamsDictFromStringsDict_2()
+    test_getParam_0()
+    test_getParam_1()
     test_getLinearEmbeddingParams0_0()
     test_getLinearEmbeddingParams0_1()
     test_getLinearEmbeddingParams0_2()
-    # test_getTrialsStartEndTimes_0()
-    # test_getTrialsStartEndTimes_1()
-    # test_getTrialsStartEndTimes_2()
-    # test_getKernelsParams0AndTypes_0()
-    # test_getKernelsParams0AndTypes_1()
-    # test_getKernelsParams0AndTypes_2()
-    # test_getKernelsParams0AndTypes_3()
+    test_getTrialsStartEndTimes_0()
+    test_getTrialsStartEndTimes_1()
+    test_getTrialsStartEndTimes_2()
+    test_getKernelsParams0AndTypes_0()
+    test_getKernelsParams0AndTypes_1()
+    test_getKernelsParams0AndTypes_2()
+    test_getKernelsParams0AndTypes_3()
     test_getIndPointsLocs0_0()
     test_getIndPointsLocs0_1()
-    # test_getVariationalMean0_0()
-    # test_getVariationalMean0_1()
-    # test_getVariationalCov0_0()
-    # test_getVariationalCov0_1()
-    # test_getOptimParams_0()
-    # test_getOptimParams_1()
+    test_getVariationalMean0_0()
+    test_getVariationalMean0_1()
+    test_getVariationalCov0_0()
+    test_getVariationalCov0_1()
+    test_getOptimParams_0()
+    test_getOptimParams_1()
     test_getOptimParams_2()
