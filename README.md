@@ -35,7 +35,7 @@
 2. run the estimation of svGPFA parameters (for only two EM iterations)
 
     ```
-    python doEstimateSVGPFA --max_iter=2
+    python doEstimateSVGPFA --em_max_iter=2
     ```
 
 3. if everything went well you should see a newly created estimation result file *../results/xxxxxxxx_etimationRes.pickle*.
