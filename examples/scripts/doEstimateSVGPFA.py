@@ -1,7 +1,5 @@
 import sys
 import os
-import pdb
-import math
 import random
 import torch
 import pickle
@@ -131,8 +129,6 @@ def main(argv):
     with open(modelSaveFilename, "wb") as f:
         pickle.dump(resultsToSave, f)
     print("Saved results to {:s}".format(modelSaveFilename))
-
-    pdb.set_trace()
 
 
 if __name__ == "__main__":
