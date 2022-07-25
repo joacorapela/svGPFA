@@ -1,7 +1,6 @@
 import sys
 import os
 import random
-import torch
 import pickle
 import argparse
 import configparser
@@ -26,7 +25,8 @@ def main(argv):
     parser.add_argument("--est_init_number", help="estimation init number",
                         type=int, default=545)
     parser.add_argument("--est_init_config_filename_pattern",
-                        help="estimation initialization configuration filename pattern",
+                        help="estimation initialization configuration "
+                             "filename pattern",
                         type=str,
                         default="../params/{:08d}_estimation_metaData.ini")
 
@@ -36,7 +36,7 @@ def main(argv):
     sim_res_number = args.sim_res_number
     est_init_number = args.est_init_number
     sim_res_filename_pattern = args.sim_res_filename_pattern
-    est_init_config_filename_pattern  = args.est_init_config_filename_pattern
+    est_init_config_filename_pattern = args.est_init_config_filename_pattern
 
     # load data
     sim_res_filename = sim_res_filename_pattern.format(sim_res_number)
@@ -55,7 +55,8 @@ def main(argv):
     #    build dynamic parameters
     args_info = svGPFA.utils.initUtils.getArgsInfo()
     dynamic_params = svGPFA.utils.initUtils.getParamsDictFromArgs(
-        n_latents=n_latents, n_trials=n_trials, args=args, args_info=args_info)
+        n_latents=n_latents, n_trials=n_trials, args=vars(args),
+        args_info=args_info)
     #    build configuration file parameters
     strings_dict = gcnu_common.utils.config_dict.GetDict(
         config=est_init_config).get_dict()
@@ -80,14 +81,16 @@ def main(argv):
     estPrefixUsed = True
     while estPrefixUsed:
         estResNumber = random.randint(0, 10**8)
-        estimResMetaDataFilename = "../results/{:08d}_estimation_metaData.ini".format(estResNumber)
+        estimResMetaDataFilename = \
+            "../results/{:08d}_estimation_metaData.ini".format(estResNumber)
         if not os.path.exists(estimResMetaDataFilename):
             estPrefixUsed = False
-    modelSaveFilename = "../results/{:08d}_estimatedModel.pickle".format(estResNumber)
+    modelSaveFilename = "../results/{:08d}_estimatedModel.pickle".\
+        format(estResNumber)
 
     # build kernels
-    kernels = svGPFA.utils.miscUtils.buildKernels(kernels_types=kernels_types,
-                                                  kernels_params=kernels_params0)
+    kernels = svGPFA.utils.miscUtils.buildKernels(
+        kernels_types=kernels_types, kernels_params=kernels_params0)
 
     # create model
     kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
