@@ -1,6 +1,7 @@
 
 import configparser
-import pandas as pd
+# import pandas as pd
+import numpy as np
 import torch
 
 import svGPFA.utils.initUtils
@@ -205,11 +206,13 @@ def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20):
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     true_C0_filename = config["embedding_params0"]["c0_filename"]
-    true_C0_df = pd.read_csv(true_C0_filename, header=None)
-    true_C0 = torch.from_numpy(true_C0_df.values).type(torch.double)
+    # true_C0_df = pd.read_csv(true_C0_filename, header=None)
+    true_C0_np = np.genfromtxt(true_C0_filename, delimiter=",")
+    true_C0 = torch.from_numpy(true_C0_np).type(torch.double)
     true_d0_filename = config["embedding_params0"]["d0_filename"]
-    true_d0_df = pd.read_csv(true_d0_filename, header=None)
-    true_d0 = torch.from_numpy(true_d0_df.values).type(torch.double)
+    # true_d0_df = pd.read_csv(true_d0_filename, header=None)
+    true_d0_np = np.genfromtxt(true_d0_filename, delimiter=",")
+    true_d0 = torch.from_numpy(true_d0_np).type(torch.double)
     C0, d0 = svGPFA.utils.initUtils.getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params=dynamic_params,
@@ -472,6 +475,7 @@ def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
                              ind_points_locs_filename="data/equispacedValuesBtw0and1_len09.csv",
                              ind_points_locs_filename_param_name="ind_points_locs0_filename",
                              estInitConfigFilename="data/99999999_estimation_metaData.ini",
+                             delimiter=",",
                              ):
 
     dynamic_params = {section_name: {ind_points_locs_filename_param_name:
@@ -486,8 +490,9 @@ def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
         n_neurons=n_neurons, n_latents=n_latents)
-    true_ind_points_locs0 = torch.from_numpy(pd.read_csv(
-        ind_points_locs_filename, header=None).to_numpy()).flatten()
+    true_ind_points_locs0_np = np.genfromtxt(ind_points_locs_filename,
+                                             delimiter=delimiter)
+    true_ind_points_locs0 = torch.from_numpy(true_ind_points_locs0_np).flatten()
     ind_points_locs0 = svGPFA.utils.initUtils.getIndPointsLocs0(
         n_latents=n_latents, n_trials=n_trials,
         n_ind_points=None,
@@ -507,6 +512,7 @@ def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
                              section_name="ind_points_params0",
                              ind_points_locs0_filename="data/equispacedValuesBtw0and1_len09.csv",
                              estInitConfigFilename="data/99999998_estimation_metaData.ini",
+                             delimiter=",",
                              ):
 
     dynamic_params = {"model_structure_params":
@@ -521,8 +527,9 @@ def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
         n_neurons=n_neurons, n_latents=n_latents)
-    true_ind_points_locs0 = torch.from_numpy(pd.read_csv(
-        ind_points_locs0_filename, header=None).to_numpy()).flatten()
+    true_ind_points_locs0_np = np.genfromtxt(
+        ind_points_locs0_filename, delimiter=delimiter)
+    true_ind_points_locs0 = torch.from_numpy(true_ind_points_locs0_np).flatten()
     ind_points_locs0 = svGPFA.utils.initUtils.getIndPointsLocs0(
         n_latents=n_latents, n_trials=n_trials,
         n_ind_points=None,
@@ -713,6 +720,7 @@ def test_getOptimParams_2(n_neurons=100, n_latents=8, n_trials=15,
         args_info=args_info)
     true_optim_params = config_file_params["optim_params"]
     true_optim_params["em_max_iter"] = dynamic_params["optim_params"]["em_max_iter"]
+    import pdb; pdb.set_trace()
     optim_params = svGPFA.utils.initUtils.getOptimParams(
         dynamic_params=dynamic_params, config_file_params=config_file_params,
         default_params=default_params)
@@ -729,9 +737,9 @@ if __name__ == "__main__":
     # test_getParamsDictFromStringsDict_2()
     # test_getParam_0()
     # test_getParam_1()
-    # test_getLinearEmbeddingParams0_0()
-    # test_getLinearEmbeddingParams0_1()
-    # test_getLinearEmbeddingParams0_2()
+    test_getLinearEmbeddingParams0_0()
+    test_getLinearEmbeddingParams0_1()
+    test_getLinearEmbeddingParams0_2()
     # test_getTrialsStartEndTimes_0()
     # test_getTrialsStartEndTimes_1()
     # test_getTrialsStartEndTimes_2()
@@ -739,8 +747,8 @@ if __name__ == "__main__":
     # test_getKernelsParams0AndTypes_1()
     # test_getKernelsParams0AndTypes_2()
     # test_getKernelsParams0AndTypes_3()
-    # test_getIndPointsLocs0_0()
-    # test_getIndPointsLocs0_1()
+    test_getIndPointsLocs0_0()
+    test_getIndPointsLocs0_1()
     # test_getVariationalMean0_0()
     # test_getVariationalMean0_1()
     # test_getVariationalCov0_0()
