@@ -10,12 +10,59 @@ def buildFloatListFromStringRep(stringRep):
     return float_list
 
 
+def flatToHierarchicalOptimParams(flat_optim_params):
+    hierarchical_optim_params = {
+        "n_quad": flat_optim_params["n_quad"],
+        "prior_cov_reg_param": flat_optim_params["prior_cov_reg_param"],
+        "optim_method": flat_optim_params["optim_method"],
+        "em_max_iter": flat_optim_params["em_max_iter"],
+        "verbose": flat_optim_params["verbose"],
+        # estep_
+        "estep_estimate": flat_optim_params["estep_estimate"],
+        "estep_optim_params": {
+            "max_iter": flat_optim_params["estep_max_iter"],
+            "lr": flat_optim_params["estep_lr"],
+            "tolerance_grad": flat_optim_params["estep_tolerance_grad"],
+            "tolerance_change": flat_optim_params["estep_tolerance_change"],
+            "line_search_fn": flat_optim_params["estep_line_search_fn"],
+        },
+        # mstep_embedding_
+        "mstep_embedding_estimate": flat_optim_params["mstep_embedding_estimate"],
+        "mstep_embedding_optim_params": {
+            "max_iter": flat_optim_params["mstep_embedding_max_iter"],
+            "lr": flat_optim_params["mstep_embedding_lr"],
+            "tolerance_grad": flat_optim_params["mstep_embedding_tolerance_grad"],
+            "tolerance_change": flat_optim_params["mstep_embedding_tolerance_change"],
+            "line_search_fn": flat_optim_params["mstep_embedding_line_search_fn"],
+        },
+        # mstep_kernels_
+        "mstep_kernels_estimate": flat_optim_params["mstep_kernels_estimate"],
+        "mstep_kernels_optim_params": {
+            "max_iter": flat_optim_params["mstep_kernels_max_iter"],
+            "lr": flat_optim_params["mstep_kernels_lr"],
+            "tolerance_grad": flat_optim_params["mstep_kernels_tolerance_grad"],
+            "tolerance_change": flat_optim_params["mstep_kernels_tolerance_change"],
+            "line_search_fn": flat_optim_params["mstep_kernels_line_search_fn"],
+        },
+        # mstep_indpointslocs_
+        "mstep_indpointslocs_estimate": flat_optim_params["mstep_indpointslocs_estimate"],
+        "mstep_indpointslocs_optim_params": {
+            "max_iter": flat_optim_params["mstep_indpointslocs_max_iter"],
+            "lr": flat_optim_params["mstep_indpointslocs_lr"],
+            "tolerance_grad": flat_optim_params["mstep_indpointslocs_tolerance_grad"],
+            "tolerance_change": flat_optim_params["mstep_indpointslocs_tolerance_change"],
+            "line_search_fn": flat_optim_params["mstep_indpointslocs_line_search_fn"],
+        },
+    }
+    return hierarchical_optim_params
+
+
 def getOptimParams(dynamic_params, config_file_params, default_params,
                    optim_params_info=None, section_name="optim_params"):
     if optim_params_info is None:
         optim_params_info = getArgsInfo()["optim_params"]
 
-    tmp_optim_params = {}
+    flat_optim_params = {}
     for param_name in optim_params_info:
         param_conv_func = optim_params_info[param_name]
         param_value = getParam(section_name=section_name,
@@ -24,50 +71,10 @@ def getOptimParams(dynamic_params, config_file_params, default_params,
                                config_file_params=config_file_params,
                                default_params=default_params,
                                conversion_func=param_conv_func)
-        tmp_optim_params[param_name] = param_value
-    optim_params = {
-        "n_quad": tmp_optim_params["n_quad"],
-        "prior_cov_reg_param": tmp_optim_params["prior_cov_reg_param"],
-        "optim_method": tmp_optim_params["optim_method"],
-        "em_max_iter": tmp_optim_params["em_max_iter"],
-        # estep_
-        "estep_estimate": tmp_optim_params["estep_estimate"],
-        "estep_optim_params": {
-            "max_iter": tmp_optim_params["estep_max_iter"],
-            "lr": tmp_optim_params["estep_lr"],
-            "tolerance_grad": tmp_optim_params["estep_tolerance_grad"],
-            "tolerance_change": tmp_optim_params["estep_tolerance_change"],
-            "line_search_fn": tmp_optim_params["estep_line_search_fn"],
-        },
-        # mstep_embedding_
-        "mstep_embedding_estimate": tmp_optim_params["mstep_embedding_estimate"],
-        "mstep_embedding_optim_params": {
-            "max_iter": tmp_optim_params["mstep_embedding_max_iter"],
-            "lr": tmp_optim_params["mstep_embedding_lr"],
-            "tolerance_grad": tmp_optim_params["mstep_embedding_tolerance_grad"],
-            "tolerance_change": tmp_optim_params["mstep_embedding_tolerance_change"],
-            "line_search_fn": tmp_optim_params["mstep_embedding_line_search_fn"],
-        },
-        # mstep_kernels_
-        "mstep_kernels_estimate": tmp_optim_params["mstep_kernels_estimate"],
-        "mstep_kernels_optim_params": {
-            "max_iter": tmp_optim_params["mstep_kernels_max_iter"],
-            "lr": tmp_optim_params["mstep_kernels_lr"],
-            "tolerance_grad": tmp_optim_params["mstep_kernels_tolerance_grad"],
-            "tolerance_change": tmp_optim_params["mstep_kernels_tolerance_change"],
-            "line_search_fn": tmp_optim_params["mstep_kernels_line_search_fn"],
-        },
-        # mstep_indpointslocs_
-        "mstep_indpointslocs_estimate": tmp_optim_params["mstep_indpointslocs_estimate"],
-        "mstep_indpointslocs_optim_params": {
-            "max_iter": tmp_optim_params["mstep_indpointslocs_max_iter"],
-            "lr": tmp_optim_params["mstep_indpointslocs_lr"],
-            "tolerance_grad": tmp_optim_params["mstep_indpointslocs_tolerance_grad"],
-            "tolerance_change": tmp_optim_params["mstep_indpointslocs_tolerance_change"],
-            "line_search_fn": tmp_optim_params["mstep_indpointslocs_line_search_fn"],
-        },
-    }
-    return optim_params
+        flat_optim_params[param_name] = param_value
+    hierarchical_optim_params = flatToHierarchicalOptimParams(
+        flat_optim_params=flat_optim_params)
+    return hierarchical_optim_params
 
 
 def getDefaultParamsDict(n_neurons, n_latents=3):
@@ -220,7 +227,7 @@ def getParamsDictFromArgs(n_latents, n_trials, args, args_info):
             else:
                 arg_name = key2
                 if arg_name in args:
-                    params_dict[key1][arg_name] = conversion_func(vars(args)[arg_name])
+                    params_dict[key1][arg_name] = conversion_func(args[arg_name])
     return params_dict
 
 
@@ -843,7 +850,8 @@ def getVariationalMean0InDict(n_latents, n_trials, n_ind_points,
                               different_filename_item_name_pattern=
                                "variational_mean0_filename_latent{:d}_trial{:d}",
                               constant_value_item_name=
-                               "variational_mean0_constant_value"):
+                               "variational_mean0_constant_value",
+                              delimiter=","):
     # binary
     if section_name in params_dict and \
        binary_item_name in params_dict[section_name]:
@@ -859,7 +867,9 @@ def getVariationalMean0InDict(n_latents, n_trials, n_ind_points,
         print("Extracted "
               f"{common_filename_item_name}={variational_mean0_filename} from "
               f"{params_dict_type}")
-        a_variational_mean0 = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
+        a_variational_mean0_np = np.genfromtxt(variational_mean0_filename,
+                                               delimiter=delimiter)
+        a_variational_mean0 = torch.from_numpy(a_variational_mean0_np).flatten()
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_mean0=a_variational_mean0)
@@ -899,19 +909,24 @@ def getSameAcrossLatentsAndTrialsVariationalMean0(n_latents, n_trials,
 def getDiffAcrossLatentsAndTrialsVariationalMean0(
         n_latents, n_trials, params_dict, params_dict_type,
         section_name="variational_params0",
-        item_name_pattern="variational_mean_latent{:d}_trial{:d}_filename"):
+        item_name_pattern="variational_mean_latent{:d}_trial{:d}_filename",
+        delimiter=","):
     variational_mean0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
         variational_mean0_filename = params_dict[section_name][item_name_pattern.format(k, 0)]
         print(f"Extracted {item_name_pattern.format(k, 0)}={variational_mean0_filename} from {params_dict_type}")
-        variational_mean0_k0 = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
+        variational_mean0_k0_np = np.genfromtxt(variational_mean0_filename,
+                                                delimiter=delimiter)
+        variational_mean0_k0 = torch.from_numpy(variational_mean0_k0_np).flatten()
         nIndPointsK = len(variational_mean0_k0)
         variational_mean0[k] = torch.empty((n_trials, nIndPointsK, 1), dtype=torch.double)
         variational_mean0[k][0, :, 0] = variational_mean0_k0
         for r in range(1, n_trials):
             variational_mean0_filename = params_dict[section_name][item_name_pattern.format(k, r)]
             print(f"Extracted {item_name_pattern.format(k, r)}={variational_mean0_filename} from {params_dict_type}")
-            variational_mean0_kr = torch.from_numpy(pd.read_csv(variational_mean0_filename, header=None).to_numpy()).flatten()
+            variational_mean0_kr = np.genfromtxt(variational_mean0_filename,
+                                                 delimiter=delimiter)
+            variational_mean0_kr = torch.from_numpy(variational_mean0_kr).flatten()
             variational_mean0[k][r, :, 0] = variational_mean0_kr
     return variational_mean0
 
@@ -956,7 +971,8 @@ def getVariationalCov0InDict(n_latents, n_trials, params_dict,
                              binary_item_name="variational_cov0",
                              common_filename_item_name="variational_covs0_filename",
                              different_filename_item_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
-                             diag_value_item_name="variational_cov0_diag_value"):
+                             diag_value_item_name="variational_cov0_diag_value",
+                             delimiter=","):
     # binary variational mean and cov
     if section_name in params_dict and \
        binary_item_name in params_dict[section_name]:
@@ -976,7 +992,9 @@ def getVariationalCov0InDict(n_latents, n_trials, params_dict,
         print("Extracted "
               f"{common_filename_item_name}={variational_cov0_filename} from "
               f"{params_dict_type}")
-        a_variational_cov0 = torch.from_numpy(pd.read_csv(variational_cov0_filename, header=None).to_numpy())
+        a_variational_cov0_np = np.genfromtxt(variational_cov0_filename,
+                                              delimiter=delimiter)
+        a_variational_cov0 = torch.from_numpy(a_variational_cov0_np)
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_cov0=a_variational_cov0,
@@ -1007,14 +1025,17 @@ def getSameAcrossLatentsAndTrialsVariationalCov0(
 def getDiffAcrossLatentsAndTrialsVariationalCov0(
         n_latents, n_trials, params_dict, params_dict_type,
         section_name="variational_params0",
-        item_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}"):
+        item_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
+        delimiter=","):
     variational_cov0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
         item_name = item_name_pattern.format(k, 0)
         variational_cov_filename = params_dict[section_name][item_name]
         print(f"Extracted {item_name}={variational_cov_filename} "
               f"from config[{section_name}]")
-        variational_cov0_k0 = torch.from_numpy(pd.read_csv(variational_cov_filename, header=None).to_numpy())
+        variational_cov0_k0_np = np.genfromtxt(variational_cov_filename,
+                                               delimiter=delimiter)
+        variational_cov0_k0 = torch.from_numpy(variational_cov0_k0_np)
         nIndPointsK = variational_cov0_k0.shape[0]
         variational_cov0[k] = torch.empty((n_trials, nIndPointsK, nIndPointsK), dtype=torch.double)
         variational_cov0[k][0, :, :] = variational_cov0_k0
@@ -1022,7 +1043,9 @@ def getDiffAcrossLatentsAndTrialsVariationalCov0(
             item_name = item_name_pattern.format(k, r)
             variational_cov_filename = params_dict[section_name][item_name]
             print(f"Extracted {item_name}={variational_cov_filename} from config[{section_name}]")
-            variational_cov0_kr = torch.from_numpy(pd.read_csv(variational_cov_filename, header=None).values)
+            variational_cov0_kr_np = np.genfromtxt(variational_cov_filename,
+                                                   delimiter=delimiter)
+            variational_cov0_kr = torch.from_numpy(variational_cov0_kr_np)
             variational_cov0[k][r, :, :] = variational_cov0_kr
     return variational_cov0
 
