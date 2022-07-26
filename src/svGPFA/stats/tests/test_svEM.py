@@ -7,7 +7,6 @@ from scipy.io import loadmat
 import torch
 import numpy as np
 import time
-sys.path.append("../src")
 import svGPFA.utils.miscUtils
 import svGPFA.stats.kernels
 import svGPFA.stats.kernelsMatricesStore
