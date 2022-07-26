@@ -6,9 +6,8 @@ import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-sys.path.append("../src")
-import stats.kernels
-import stats.svGPFA.kernelsMatricesStore
+import svGPFA.stats.kernels
+import svGPFA.stats.kernelsMatricesStore
 
 def test_eval_IndPointsLocsKMS():
     tol = 1e-5
@@ -30,12 +29,12 @@ def test_eval_IndPointsLocsKMS():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
                                               float(hprs[k,0][1])], 
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
@@ -50,10 +49,10 @@ def test_eval_IndPointsLocsKMS():
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
 
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
-    indPointsLocsKMS.setEpsilon(epsilon=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    indPointsLocsKMS.setRegParam(regParam=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
 
     Kzz = indPointsLocsKMS.getKzz()
@@ -89,12 +88,12 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
@@ -109,7 +108,7 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
 
-    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
     indPointsLocsAndAllTimesKMS.setTimes(times=t)
     indPointsLocsAndAllTimesKMS.setInitialParams(initialParams=kmsParams0)
@@ -145,12 +144,12 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]), 
                                               float(hprs[k,0][1])], 
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
@@ -165,7 +164,7 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
 
-    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     indPointsLocsAndAssocTimesKMS.setKernels(kernels=kernels)
     indPointsLocsAndAssocTimesKMS.setTimes(times=Y)
     indPointsLocsAndAssocTimesKMS.setInitialParams(initialParams=kmsParams0)

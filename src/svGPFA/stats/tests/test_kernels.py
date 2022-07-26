@@ -1,12 +1,10 @@
 import sys
-import pdb
 import os
 import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-sys.path.append("../src")
-from stats.kernels import ExponentialQuadraticKernel, PeriodicKernel
+import svGPFA.stats.kernels
 
 def test_exponentialQuadraticKernel():
     tol = 1e-6
@@ -19,7 +17,7 @@ def test_exponentialQuadraticKernel():
     scale = 1.0
     params = torch.tensor([lengthScale])
 
-    kernel = ExponentialQuadraticKernel(scale=scale) 
+    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale) 
     kernel.setParams(params=params)
 
     K = kernel.buildKernelMatrix(X1=Z)
@@ -39,7 +37,7 @@ def test_exponentialQuadraticKernelDiag():
     scale = float(mat['variance'][0,0])
     params = torch.tensor([lengthScale])
 
-    kernel = ExponentialQuadraticKernel(scale=scale)
+    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale)
     kernel.setParams(params=params)
 
     KDiag = kernel.buildKernelMatrixDiag(X=t)
@@ -60,7 +58,7 @@ def test_periodicKernel():
     scale = 1.0
     params = torch.tensor([lengthScale, period])
 
-    kernel = PeriodicKernel(scale=scale)
+    kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
     kernel.setParams(params=params)
 
     K = kernel.buildKernelMatrix(X1=Z)
@@ -81,7 +79,7 @@ def test_periodicKernelDiag():
     scale = float(mat['variance'][0,0])
     params = torch.tensor([lengthScale, period])
 
-    kernel = PeriodicKernel(scale=scale)
+    kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
     kernel.setParams(params=params)
 
     KDiag = kernel.buildKernelMatrixDiag(X=t)

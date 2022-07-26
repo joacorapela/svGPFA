@@ -1,21 +1,19 @@
 
 import sys
 import os
-import pdb
 import math
 from scipy.io import loadmat
 import numpy as np
 import torch
-sys.path.append("../src")
-import utils.svGPFA.miscUtils
-import stats.kernels
-import stats.svGPFA.kernelsMatricesStore
-import stats.svGPFA.svPosteriorOnIndPoints
-import stats.svGPFA.svPosteriorOnLatents
-import stats.svGPFA.svEmbedding
-import stats.svGPFA.expectedLogLikelihood
-import stats.svGPFA.klDivergence
-import stats.svGPFA.svLowerBound
+import svGPFA.utils.miscUtils
+import svGPFA.stats.kernels
+import svGPFA.stats.kernelsMatricesStore
+import svGPFA.stats.svPosteriorOnIndPoints
+import svGPFA.stats.svPosteriorOnLatents
+import svGPFA.stats.svEmbedding
+import svGPFA.stats.expectedLogLikelihood
+import svGPFA.stats.klDivergence
+import svGPFA.stats.svLowerBound
 
 def test_eval_pointProcess():
     tol = 3e-4
@@ -28,7 +26,7 @@ def test_eval_pointProcess():
     qMu0 = [torch.from_numpy(mat['q_mu'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSVec0 = [torch.from_numpy(mat['q_sqrt'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     qSDiag0 = [torch.from_numpy(mat['q_diag'][(0,i)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
-    srQSigma0Vecs = utils.svGPFA.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
+    srQSigma0Vecs = svGPFA.utils.miscUtils.getSRQSigmaVec(qSVec=qSVec0, qSDiag=qSDiag0)
     Z0 = [torch.from_numpy(mat['Z'][(i,0)]).type(torch.DoubleTensor).permute(2,0,1) for i in range(nLatents)]
     C0 = torch.from_numpy(mat["C"]).type(torch.DoubleTensor)
     b0 = torch.from_numpy(mat["b"]).type(torch.DoubleTensor).squeeze()
@@ -52,39 +50,39 @@ def test_eval_pointProcess():
     kernelsParams0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if np.char.equal(kernelNames[0,k][0], "PeriodicKernel"):
-            kernels[k] = stats.kernels.PeriodicKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0]),
                                               float(hprs[k,0][1])],
                                              dtype=torch.double)
         elif np.char.equal(kernelNames[0,k][0], "rbfKernel"):
-            kernels[k] = stats.kernels.ExponentialQuadraticKernel(scale=1.0)
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=1.0)
             kernelsParams0[k] = torch.tensor([float(hprs[k,0][0])],
                                              dtype=torch.double)
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
-    indPointsLocsKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    indPointsLocsAndAllTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = stats.svGPFA.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
+    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
+    indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
+    indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
+    qKAllTimes = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = stats.svGPFA.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
+    qKAssocTimes = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
         svPosteriorOnIndPoints=qU,
         indPointsLocsKMS=indPointsLocsKMS,
         indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = stats.svGPFA.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
+    qHAllTimes = svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
+    qHAssocTimes = svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
                                                qKAssocTimes)
-    eLL = stats.svGPFA.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
+    eLL = svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
                                  svEmbeddingAssocTimes=qHAssocTimes)
-    klDiv = stats.svGPFA.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
+    klDiv = svGPFA.stats.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
-    svlb = stats.svGPFA.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
+    svlb = svGPFA.stats.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
 
-    qUParams0 = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
+    qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
     kmsParams0 = {"kernelsParams0": kernelsParams0,
                   "inducingPointsLocs0": Z0}
     qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
@@ -99,14 +97,13 @@ def test_eval_pointProcess():
     svlb.setInitialParams(initialParams=initialParams)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
-    svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
+    # svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
+    svlb.setPriorCovRegParam(priorCovRegParam=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     svlb.buildKernelsMatrices()
 
     lbEval = svlb.eval()
 
     assert(abs(lbEval+obj)<tol)
-
-    # pdb.set_trace()
 
 # def test_eval_poisson():
 #     tol = 1e-5
