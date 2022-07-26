@@ -5,8 +5,7 @@ import pdb
 import math
 from scipy.io import loadmat
 import torch
-sys.path.append("../src")
-import utils.svGPFA.miscUtils
+import svGPFA.utils.miscUtils
 
 def test_getPropSamplesCovered():
     N = 100
@@ -15,7 +14,7 @@ def test_getPropSamplesCovered():
     mean = torch.rand(size=(N,))*2-1
     std = torch.rand(size=(N,))*0.3
     sample = torch.normal(mean=mean, std=std)
-    propSamplesCovered = utils.svGPFA.miscUtils.getPropSamplesCovered(sample=sample, mean=mean, std=std, percent=.95)
+    propSamplesCovered = svGPFA.utils.miscUtils.getPropSamplesCovered(sample=sample, mean=mean, std=std, percent=.95)
     assert(.95-tol<propSamplesCovered and propSamplesCovered<tol+.95)
 
 def test_getDiagIndicesIn3DArray():
@@ -23,14 +22,14 @@ def test_getDiagIndicesIn3DArray():
     M = 2
     trueDiagIndices = torch.tensor([0, 4, 8, 9, 13, 17])
 
-    diagIndices = utils.svGPFA.miscUtils.getDiagIndicesIn3DArray(N=N, M=M)
+    diagIndices = svGPFA.utils.miscUtils.getDiagIndicesIn3DArray(N=N, M=M)
     assert(((trueDiagIndices-diagIndices)**2).sum()==0)
 
 def test_build3DdiagFromDiagVector():
     N = 3
     M = 2
     v = torch.arange(M*N, dtype=torch.double)
-    D = utils.svGPFA.miscUtils.build3DdiagFromDiagVector(v=v, N=N, M=M)
+    D = svGPFA.utils.miscUtils.build3DdiagFromDiagVector(v=v, N=N, M=M)
     trueD = torch.tensor([[[0,0,0],[0,1,0],[0,0,2]],[[3,0,0],[0,4,0],[0,0,5]]], dtype=torch.double)
     assert(((trueD-D)**2).sum()==0)
 
@@ -48,7 +47,7 @@ def test_build3DdiagFromDiagVector():
 #     assert(error<tol)
 # 
 if __name__=="__main__":
-    # test_getDiagIndicesIn3DArray()
-    # test_build3DdiagFromDiagVector()
+    test_getDiagIndicesIn3DArray()
+    test_build3DdiagFromDiagVector()
     # test_j_cholesky()
     test_getPropSamplesCovered()
