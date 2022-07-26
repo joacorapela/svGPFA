@@ -6,8 +6,7 @@ an svGPFA model and an instance of the class :class:`~svGPFA.stats.svEM.SVEM`
 optimizes its parameters.  Please refer to the svGPFA `class 
 <https://github.com/joacorapela/svGPFA/blob/master/docs/design/Classes.pdf>`_ and `interaction <https://github.com/joacorapela/svGPFA/blob/master/docs/design/Interactions.pdf>`_ diagrams.
 
-There is a one-to-one mapping between classes in the svGPFA.stats package and
-equations in :cite:t:`dunckerAndSahani18`.
+There is a one-to-one mapping between classes in the :mod:`svGPFA.stats` package and equations in :cite:t:`dunckerAndSahani18`.
 
 * Class :class:`~svGPFA.stats.svLowerBound.SVLowerBound` corresponds to the right-hand-side of ``Eq.4``. This class uses the :class:`~svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood` and :class:`~svGPFA.stats.klDivergence.KLDivergence` classes, described next.
 
