@@ -3,9 +3,15 @@ import configparser
 # import pandas as pd
 import numpy as np
 import torch
+import pytest
 
 import svGPFA.utils.initUtils
 import gcnu_common.utils.config_dict
+
+
+@pytest.fixture(autouse=True)
+def change_test_dir(request, monkeypatch):
+    monkeypatch.chdir(request.fspath.dirname)
 
 
 def test_getParamsDictFromArgs_0(n_latents=7, n_trials=10,
