@@ -10,9 +10,9 @@ slurm-*
 .ipynb*
 
 # directories
-/docs/*
-!/docs/readthedocs/source
-!/docs/design/svGPFA.vpp
+/doc/*
+!/doc/readthedocs/source
+!/doc/design/svGPFA.vpp
 examples/results/
 !examples/results/.gitkeep
 examples/figures/
