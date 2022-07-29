@@ -1,5 +1,4 @@
 # Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA, [Duncker and Sahani, 2018](https://papers.nips.cc/paper/2018/file/d1ff1ec86b62cd5f3903ff19c3a326b2-Paper.pdf)) ![tests](https://github.com/joacorapela/svGPFA/actions/workflows/tests.yml/badge.svg?branch=master) ![docs](https://github.com/joacorapela/svGPFA/actions/workflows/documentation.yml/badge.svg?branch=master)
-)
 
 * Documentation can be found [here](https://joacorapela.github.io/svGPFA/)
 * A Colab notebook can be found [here](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv?usp=sharing) and a Jupyter notebook [here](docs/ipynb/doEstimateAndPlot.ipynb)
