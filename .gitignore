@@ -7,7 +7,6 @@
 .*lck*
 slurm-*
 .nfs*
-.ipynb*
 
 # directories
 /doc/*
