@@ -3,11 +3,12 @@ Parameters and their specification
 ##################################
 
 svGPFA uses different groups of parameters. We provide a utility function
-**builParams** that builds them from parameter specifications. Parameters
-specification contain short descriptions on how to build a parameter. For
-example, a parameter specification for the inducing points locations can be
-**equidistant**, indicating that the inducing points locations should be set to
-equidistant values between the start and en of a trial.
+:meth:`svGPFA.utils.initUtils.getParams` that builds them from parameter
+specifications. Parameters specification contain short descriptions on how to
+build a parameter. For example, a parameter specification for the inducing
+points locations can be **equidistant**, indicating that the inducing points
+locations should be set to equidistant values between the start and en of a
+trial.
 
 Parameter specifications are nested lists (e.g.,
 **param_spec[group_name][param_name]**) containing the specification of a
@@ -133,12 +134,19 @@ Two items need to be specified:
         n_latents = 3
         n_trials = 10
         n_ind_points = [20, 10, 15]
-        variational_mean0 = [torch.normal(mean=0, std=1, size=(n_trials, n_ind_points[k], 1)) for k in range(n_latents)]
-        variational_cov0 = [torch.normal(mean=0, std=1, size=(n_trials, n_ind_points[k], n_ind_points[k])) for k in range(n_latents)]
+
+        var_mean0 = [torch.normal(mean=0, std=1, size=(n_trials, n_ind_points[k], 1)) for k in range(n_latents)]
+
+        diag_value = 1e-2
+        var_cov0 = [[] for r in range(n_latents)]
+        for k in range(n_latents):
+            var_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points), dtype=torch.double)
+            for r in range(n_trials):
+                var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_value
 
         params_spec["variational_params0"] = {
-            "variational_mean0": variational_mean0,
-            "variational_cov0":  variational_cov0,
+            "variational_mean0": var_mean0,
+            "variational_cov0":  var_cov0,
         }
 
 Longer format
