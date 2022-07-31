@@ -7,14 +7,28 @@
 .*lck*
 slurm-*
 .nfs*
+*egg-info
 
 # directories
-doc/
+# see https://stackoverflow.com/questions/3203228/git-ignore-exception/72380673#72380673
+doc/*
+
+!doc/ipynb/
+doc/ipynb/*
 !doc/ipynb/doEstimateAndPlot.ipynb
+
+!/doc/readthedocs/
+/doc/readthedocs/*
 !/doc/readthedocs/source
+
+!/doc/design/
+/doc/design/*
 !/doc/design/svGPFA.vpp
-examples/results/
+
+examples/results/*
 !examples/results/.gitkeep
-examples/figures/
+
+examples/figures/*
 !examples/figures/.gitkeep
-svGPFA.egg-info/
+
+svGPFA.egg-info/*
