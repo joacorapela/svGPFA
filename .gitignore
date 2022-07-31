@@ -9,7 +9,7 @@ slurm-*
 .nfs*
 
 # directories
-/doc/*
+doc/
 !/doc/readthedocs/source
 !/doc/design/svGPFA.vpp
 examples/results/
