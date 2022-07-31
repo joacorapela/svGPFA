@@ -87,7 +87,7 @@ def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3):
             var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_var_cov0_value
 
     params_dict = {
-        "model_structure_params": {"n_latents", n_latents},
+        "model_structure_params": {"n_latents": n_latents},
         "data_structure_params": {"trials_start_time": 0.0,
                                   "trials_end_time": 1.0},
         "variational_params0": {
@@ -306,7 +306,7 @@ def getParams(n_neurons, n_trials, default_params, config_file_params=None,
 
     legQuadPoints, legQuadWeights = \
         svGPFA.utils.miscUtils.getLegQuadPointsAndWeights(
-            nQuad=n_quad, trials_start_times=trials_start_times,
+            n_quad=n_quad, trials_start_times=trials_start_times,
             trials_end_times=trials_end_times)
 
     kernels_params0, kernels_types = \
@@ -749,7 +749,7 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
         layout = params_dict[section_name]["ind_points_locs0_layout"]
         print(f"Extracted ind_points_locs0_layout={layout} from "
               f"{params_dict_type}")
-        if layout == "equidistant":
+        if layout == "equispaced":
             ind_points_locs0 = buildEquidistantIndPointsLocs0(
                 n_latents=n_latents, n_trials=n_trials,
                 n_ind_points=n_ind_points,
@@ -854,7 +854,7 @@ def getVariationalMean0(n_latents, n_trials, n_ind_points,
 def getVariationalMean0InDict(n_latents, n_trials, n_ind_points,
                               params_dict, params_dict_type,
                               section_name="variational_params0",
-                              binary_item_name="variational_mean0",
+                              binary_item_name="variational_means0",
                               common_filename_item_name=
                                "variational_means0_filename",
                               different_filename_item_name_pattern=
@@ -978,7 +978,7 @@ def getVariationalCov0InDict(n_latents, n_trials, params_dict,
                              params_dict_type,
                              n_ind_points=-1,
                              section_name="variational_params0",
-                             binary_item_name="variational_cov0",
+                             binary_item_name="variational_covs0",
                              common_filename_item_name="variational_covs0_filename",
                              different_filename_item_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
                              diag_value_item_name="variational_cov0_diag_value",
