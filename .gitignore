@@ -10,6 +10,7 @@ slurm-*
 
 # directories
 doc/
+!doc/ipynb/doEstimateAndPlot.ipynb
 !/doc/readthedocs/source
 !/doc/design/svGPFA.vpp
 examples/results/
