@@ -17,11 +17,11 @@ Sparse Variational Gaussian Processes Factor Analysis
 
    highLevelInterface
    lowLevelInterface
-   params
 
 .. toctree::
    :caption: Appendix:
 
+   params
    references
 
 .. toctree::
