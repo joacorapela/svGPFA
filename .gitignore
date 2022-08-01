@@ -8,6 +8,8 @@
 slurm-*
 .nfs*
 *egg-info
+checkSpelling.csh
+svGPFA.dic
 
 # directories
 # see https://stackoverflow.com/questions/3203228/git-ignore-exception/72380673#72380673
