@@ -2,14 +2,13 @@
 
 svGPFA identifies common latent structure in neural population spike-trains.
 It uses shared latent Gaussian processes, which are combined linearly as in
-Gaussian Process Factor Analysis (GPFA, [Yu et
-al](https://journals.physiology.org/doi/full/10.1152/jn.90941.2008?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org)).
+Gaussian Process Factor Analysis (GPFA, [Yu et al., 2009](https://journals.physiology.org/doi/full/10.1152/jn.90941.2008?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org)).
 svGPFA extends GPFA to handle unbinned spike-train data by using a continuous
 time point-process likelihood model and achieving scalability using a sparse
 variational approximation.
 
 You can run svGPFA on sample data, plot its estimates and perform goodness-of-fit tests (without installing anything in your computer) by just running [this](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) Google Colab notebook.
-You can also do this by installing svGPFA (intructions [below](#installation)) and running this [notebook](doc/ipynb/doEstimateAndPlot.ipynb).
+You can also do this by installing svGPFA (intructions [below](#installation)) and running [this](doc/ipynb/doEstimateAndPlot.ipynb) Jupyter notebok.
 In addition, you can run svGPFA using a script, as indicated [below](#testing-the-installation).
 
 Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
