@@ -29,7 +29,9 @@ To estimate a sparse variational Gaussian process factor analysis model we:
 
 3. Plot estimated model parameters and perform goodness-of-fit tests.
 
-Please refer to the following `notebook
-<https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv>`_
-for an example of using this interface.
-
+Please refer to the following
+`Google Colab notebook
+<https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv>`_,
+`Jupyter notebook
+<https://github.com/joacorapela/svGPFA/blob/master/doc/ipynb/do  EstimateAndPlot.ipynb>`_, or `Python script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_
+for examples of using this interface.
