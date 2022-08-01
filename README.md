@@ -9,8 +9,8 @@ time point-process likelihood model and achieving scalability using a sparse
 variational approximation.
 
 You can run svGPFA on sample data, plot its estimates and perform goodness-of-fit tests (without installing anything in your computer) by running [this](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) Google Colab notebook.
-You can also do this by installing svGPFA (intructions [below](#Instructions)) and running this [notebook](doc/ipynb/doEstimateAndPlot.ipynb).
-In addition, you can run svGPFA using a script, as indicated [below](#Testin the isntallation).
+You can also do this by installing svGPFA (intructions [below](#Installation)) and running this [notebook](doc/ipynb/doEstimateAndPlot.ipynb).
+In addition, you can run svGPFA using a script, as indicated [below](#Testing the installation).
 
 Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
 
