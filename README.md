@@ -1,7 +1,21 @@
 # Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA, [Duncker and Sahani, 2018](https://papers.nips.cc/paper/2018/file/d1ff1ec86b62cd5f3903ff19c3a326b2-Paper.pdf)) ![tests](https://github.com/joacorapela/svGPFA/actions/workflows/tests.yml/badge.svg?branch=master) ![docs](https://github.com/joacorapela/svGPFA/actions/workflows/documentation.yml/badge.svg?branch=master)
 
-* Documentation can be found [here](https://joacorapela.github.io/svGPFA/)
-* A Colab notebook can be found [here](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) and a Jupyter notebook [here](docs/ipynb/doEstimateAndPlot.ipynb)
+svGPFA identifies common latent structure in neural population spike-trains.
+It uses shared latent Gaussian processes, which are combined linearly as in
+Gaussian Process Factor Analysis (GPFA, [Yu et
+al](https://journals.physiology.org/doi/full/10.1152/jn.90941.2008?rfr_dat=cr_pub++0pubmed&url_ver=Z39.88-2003&rfr_id=ori%3Arid%3Acrossref.org).
+svGPFA extends GPFA to handle unbinned spike-train data by using a continuous
+time point-process likelihood model and achieving scalability using a sparse
+variational approximation.
+
+You can run svGPFA on sample data, plot its estimates and perform goodness-of-fit tests (without installing anything in your computer) by running [this] (https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) Google Colab notebook.
+#
+You can also do this by installing svGPFA (intructions [below](#Instructions)) and running this [notebook](doc/ipynb/doEstimateAndPlot.ipynb).
+#
+In addition, you can run svGPFA using a script, as indicated [below](#Testin the isntallation).
+
+Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
+
 <!---
 * A script running svGPFA on simulated data can be found here [here](scripts/demoPointProcessLeasSimulation-noGPU.py)
 * A Dash/Plotly GUI can be found [here](gui/doRunGUI.py)
