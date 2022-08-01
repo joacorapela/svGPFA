@@ -13,7 +13,7 @@ trial.
 Parameter specifications are nested lists (e.g.,
 **param_spec[group_name][param_name]**) containing the specification of a
 parameter with a given name in a given group name Parameter specifications can
-be built manually, from the comand line with the utility function
+be built manually, from the command line with the utility function
 **buildParamsSpecsFromArgs**, or from a configuration file with the utility
 function **buildParamsSpecsFromConfig**.
 
@@ -95,7 +95,7 @@ Initial values for four types of model parameters need to be specified:
 
 For most parameters types initial values can be specified in a binary format or
 in a non-binary shorter or longer formats. In the binary format parameters are
-given as Pytorch tensors. The shorter format provides the same initial value
+given as PyTorch tensors. The shorter format provides the same initial value
 for all latents and trials, whereas the longer format gives
 different initial values for each latent and trial. If both shorter and longer
 format are specified, the longer format take precedence.
@@ -255,7 +255,7 @@ Eight items need to be specified:
 
 * ``c0_scale`` float value giving the scale of the distribution of the loading matrix C (e.g., 1.0).
 
-* ``c0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **C**. This value can be specified for replicability. If not given, the random seed is not changed prior to genereating **C**.
+* ``c0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **C**. This value can be specified for replicability. If not given, the random seed is not changed prior to generating **C**.
 
 * ``d0_distribution`` string value giving the name of the distribution of the offset vector **d** (e.g., Normal).
 
@@ -263,7 +263,7 @@ Eight items need to be specified:
 
 * ``d0_scale`` float value giving the scale of the distribution of the offset vector **d** (e.g., 1.0).
 
-* ``d0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **d**. This value can be specified for replicability. If not given, the random seed is not changed prior to genereating **d**.
+* ``d0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **d**. This value can be specified for replicability. If not given, the random seed is not changed prior to generating **d**.
 
     .. code-block:: python
        :caption: adding **embedding_params0** in the random format to **params_spec**
@@ -369,7 +369,7 @@ One item needs to be specified:
   initial inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in binary format with uniformaly distributed inducing points locations to **params_spec**
+       :caption: adding **indPointsLocs_params0** in binary format with uniformly distributed inducing points locations to **params_spec**
 
        n_latents = 3
        n_ind_points = (10, 20, 15)
@@ -433,32 +433,32 @@ for all latents and trials.
            "indPointsLocs0_filename": "indPointsLocs0.csv",
        }
 
-Optimization parameters
+Optimisation parameters
 =======================
 
-Parameters values that control the optimization should be specified
+Parameters values that control the optimisation should be specified
 in section ``[optim_params]``.
 
-* ``optim_method`` specifies the method used for for parameter optimization. 
+* ``optim_method`` specifies the method used for for parameter optimisation. 
   
-  If ``optim_method = ECM`` then the Expectation Conditional Maximization
+  If ``optim_method = ECM`` then the Expectation Conditional Maximisation
   method is used (:cite:t:`mcLachlanAndKrishnan08`, section 5.2).  Here the
-  M-step is broken into three conditional maximization steps: maximization of
+  M-step is broken into three conditional maximisation steps: maximisation of
   the lower bound wrt the embedding parameters (mstep-embedding), wrt the
   kernels parameters (mstep-kernels) and wrt the inducing points locations
   (mstep-indPointsLocs). Thus, one ECM iteration comprises one E-step (i.e.,
-  maximiziation of the lower bound wrt the embedding parameters) followed by
-  the three previous M-step conditional maximizations.
+  maximisation of the lower bound wrt the embedding parameters) followed by
+  the three previous M-step conditional maximisation's.
 
   If ``optim_method = mECM`` then the Multicycle ECM is used
   (:cite:t:`mcLachlanAndKrishnan08`, section 5.3). Here
-  one E-step maximization is performed before each of the M-step conditional
-  maximizations. Thus, one mECM iteration comprises estep, mstep-embedding,
+  one E-step maximisation is performed before each of the M-step conditional
+  maximisation's. Thus, one mECM iteration comprises estep, mstep-embedding,
   estep,  mstep-kernels, estep, mstep-indPointsLocs.
 
 * ``em_max_iter`` integer value specifying the maximum number of EM iterations.
 
-* ``verbose`` boolean value indicating whether the optimization should be
+* ``verbose`` boolean value indicating whether the optimisation should be
   verbose or silent.
 
 For each ``<step> in {estep,mstep_embedding,mstep_kernels,mstep_indPointsLocs}``
@@ -468,20 +468,20 @@ section ``[optim_params]`` should contain items:
   estimated or not.
 
 * ``<step>_max_iter`` integer value indicating the maximum number of iterations
-  used by ``torch.optim.LBFGS`` for the optimization of the ``<step>`` within
+  used by ``torch.optim.LBFGS`` for the optimisation of the ``<step>`` within
   one EM iteration.
 
 * ``<step>_lr`` float value indicating the learning rate used by
-  ``torch.optim.LBFGS`` for the optimization of the ``<step>`` within one EM
+  ``torch.optim.LBFGS`` for the optimisation of the ``<step>`` within one EM
   iteration.
   
 * ``<step>_tolerance_grad`` float value indicating the termination tolerance on
-  first-order optimality used by ``torch.optim.LBFGS`` for the optimization of
+  first-order optimality used by ``torch.optim.LBFGS`` for the optimisation of
   the ``<step>`` within one EM iteration.
   
 * ``<step>_tolerance_change`` float value indicating the termination tolerance
   on function value per parameter changes used by ``torch.optim.LBFGS`` for the
-  optimization of the ``<step>`` within one EM iteration.
+  optimisation of the ``<step>`` within one EM iteration.
   
 * ``<step>_line_search_fn`` string value indicating the line search method used
   by ``torch.optim.LBFGS``. If ``<step>_line_search_fn=strong_wolfe`` line

@@ -10,7 +10,7 @@ variational approximation.
 ## Examples and Documentation
 
 You can run svGPFA on sample data, plot its estimates and perform goodness-of-fit tests (without installing anything in your computer) by just running [this](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) Google Colab notebook.
-You can also do this by installing svGPFA (intructions [below](#installation)) and running [this](doc/ipynb/doEstimateAndPlot.ipynb) Jupyter notebok.
+You can also do this by installing svGPFA (instructions [below](#installation)) and running [this](doc/ipynb/doEstimateAndPlot.ipynb) Jupyter notebook.
 In addition, after installing svGPFA, you can estimate models using a script, as shown in section [Testing the installation](#testing-the-installation) below.
 
 Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
@@ -60,14 +60,14 @@ Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
 3. if everything went well the previous script should terminate after showing the following line in the standard output:
 
     ```
-    Saved results to results/xxxxxxxx_etimationRes.pickle*.
+    Saved results to results/xxxxxxxx_etimationRes.pickle
     ```
 
 # Citing us
 
 If you use svGPFA, please cite the following paper:
 
-> [Lea Duncker and Maneesh Sahani (2018). Temporal alignment and latent Gaussian process factor inference in population spike trains (2018). 32nd Conference on Neural Information Processing Systems (NeurIPS 2018), Montréal, Canada](https://papers.nips.cc/paper/2018/file/d1ff1ec86b62cd5f3903ff19c3a326b2-Paper.pdf)
+> [Lea Duncker and Maneesh Sahani (2018). Temporal alignment and latent Gaussian process factor inference in population spike trains. 32nd Conference on Neural Information Processing Systems, Montréal, Canada](https://papers.nips.cc/paper/2018/file/d1ff1ec86b62cd5f3903ff19c3a326b2-Paper.pdf)
 ```
 @article{duncker2018temporal,
   title={Temporal alignment and latent Gaussian process factor inference in population spike trains},
@@ -82,6 +82,6 @@ If you use svGPFA, please cite the following paper:
 
 - [Joaquin Rapela](http://www.gatsby.ucl.ac.uk/~rapela) (Gatsby Computational Neuroscience Unit, University College London)
 
-# Acknowledgments
+# Acknowledgements
 The research and development for svGPFA is supported by funding from the [Gatsby Charitable Foundation](https://www.gatsby.org.uk/) and the [Wellcome Trust](https://wellcome.org/).
 
