@@ -120,7 +120,8 @@ def test_getParamsDictFromStringsDict_2(n_latents=2, n_trials=15,
             assert true_ind_points_locs_filename == params_ind_points_locs_filename
 
 
-def test_getParam_0(true_n_latents = 3, n_trials=15, n_neurons=100):
+def test_getParam_0(true_n_latents=3, n_trials=15, n_neurons=100,
+                    n_ind_points=10, diag_var_cov0_value=1e-2):
     ''' test get param from dynamic params'''
 
     dynamic_params = {"model_structure_params":
@@ -135,7 +136,8 @@ def test_getParam_0(true_n_latents = 3, n_trials=15, n_neurons=100):
         n_latents=true_n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=true_n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=true_n_latents, diag_var_cov0_value=diag_var_cov0_value)
     n_latents = svGPFA.utils.initUtils.getParam(
         section_name="model_structure_params",
         param_name="n_latents",
@@ -146,7 +148,8 @@ def test_getParam_0(true_n_latents = 3, n_trials=15, n_neurons=100):
     assert true_n_latents == n_latents
 
 
-def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100):
+def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100, n_ind_points=10,
+                    diag_var_cov0_value=1e-2):
     ''' test get param from config_file params'''
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -160,7 +163,8 @@ def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100):
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_trials_end_time = float(strings_dict["data_structure_params"]["trials_end_time"])
     trials_end_time = svGPFA.utils.initUtils.getParam(
         section_name="data_structure_params",
@@ -172,7 +176,8 @@ def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100):
     assert true_trials_end_time == trials_end_time
 
 
-def test_getLinearEmbeddingParams0_0(n_neurons=20, n_latents=7, n_trials=10):
+def test_getLinearEmbeddingParams0_0(n_neurons=20, n_latents=7, n_trials=10,
+                                     n_ind_points=10, diag_var_cov0_value=1e-2):
     true_C0 = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
                           dtype=torch.double)
     true_d0 = torch.tensor([[1.0], [2.0], [3.0]], dtype=torch.double)
@@ -187,7 +192,8 @@ def test_getLinearEmbeddingParams0_0(n_neurons=20, n_latents=7, n_trials=10):
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     C0, d0 = svGPFA.utils.initUtils.getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params=dynamic_params,
@@ -197,14 +203,16 @@ def test_getLinearEmbeddingParams0_0(n_neurons=20, n_latents=7, n_trials=10):
     assert torch.all(true_d0 == d0)
 
 
-def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20):
+def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20,
+                                     n_ind_points=10, diag_var_cov0_value=1e-2):
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     strings_dict = gcnu_common.utils.config_dict.GetDict(
         config=config).get_dict()
     args_info = svGPFA.utils.initUtils.getArgsInfo()
@@ -226,7 +234,8 @@ def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20):
     assert torch.all(true_d0 == d0)
 
 
-def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10):
+def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10,
+                                     n_ind_points=10, diag_var_cov0_value=1e-2):
     c_random_seed = 102030
     d_random_seed = 203040
 
@@ -254,7 +263,8 @@ def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10):
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     C0, d0 = svGPFA.utils.initUtils.getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params=dynamic_params,
@@ -265,11 +275,11 @@ def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10):
 
 
 def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
+                                  n_ind_points=10, diag_var_cov0_value=1e-2,
                                   trials_start_time=3.0, trials_end_time=12.0):
     dynamic_params = {"data_structure_params":
                       {"trials_start_time": trials_start_time,
-                       "trials_end_time": trials_end_time}
-                     }
+                       "trials_end_time": trials_end_time}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -280,7 +290,8 @@ def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_trials_start_times = torch.Tensor(
         [dynamic_params["data_structure_params"]["trials_start_time"] 
          for r in range(n_trials)])
@@ -296,7 +307,8 @@ def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
     assert torch.all(true_trials_end_times == trials_end_times)
 
 
-def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5):
+def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5,
+                                  n_ind_points=10, diag_var_cov0_value=1e-2):
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -309,7 +321,8 @@ def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5):
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_trials_start_times = torch.Tensor(
         [float(config_file_params["data_structure_params"]["trials_start_time"])
          for r in range(n_trials)])
@@ -325,7 +338,8 @@ def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5):
     assert torch.all(true_trials_end_times == trials_end_times)
 
 
-def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5):
+def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5,
+                                  n_ind_points=10, diag_var_cov0_value=1e-2):
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -339,7 +353,8 @@ def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5):
         args_info=args_info)
     del config_file_params["data_structure_params"]
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_trials_start_times = torch.Tensor(
         [float(default_params["data_structure_params"]["trials_start_time"])
          for r in range(n_trials)])
@@ -356,8 +371,11 @@ def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5):
 
 
 def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
+                                     n_ind_points=10,
+                                     diag_var_cov0_value=1e-2,
                                      kernel_type = "exponentialQuadratic",
-                                     lengthscale0 = 2.0):
+                                     lengthscale0 = 2.0,
+                                    ):
     # dynamic_params, short format, exponential quadratic kernel
     dynamic_params = {"kernels_params0": {"k_type": kernel_type,
                                          "k_lengthscale0": lengthscale0}}
@@ -371,7 +389,8 @@ def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     params0, kernels_types = svGPFA.utils.initUtils.getKernelsParams0AndTypes(
         n_latents=n_latents,
         dynamic_params=dynamic_params,
@@ -383,9 +402,12 @@ def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
 
 
 def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
+                                     n_ind_points=10,
+                                     diag_var_cov0_value=1e-2,
                                      kernel_type = "periodic",
                                      lengthscale0 = 2.0,
-                                     period0=3.0):
+                                     period0=3.0,
+                                    ):
     # dynamic_params, short format, periodic kernel
     dynamic_params = {"kernels_params0": {"k_type": kernel_type,
                                          "k_lengthscale0": lengthscale0,
@@ -400,7 +422,8 @@ def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     params0, kernels_types = svGPFA.utils.initUtils.getKernelsParams0AndTypes(
         n_latents=n_latents,
         dynamic_params=dynamic_params,
@@ -413,9 +436,11 @@ def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
 
 
 def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
+                                     n_ind_points=10, diag_var_cov0_value=1e-2,
                                      section_name = "kernels_params0",
                                      kernel_type_param_name = "k_type",
-                                     lengthscale_param_name = "k_lengthscale0"):
+                                     lengthscale_param_name = "k_lengthscale0",
+                                    ):
     # config_params, short format
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -429,7 +454,8 @@ def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_lengthscale0 = config_file_params[section_name][lengthscale_param_name]
     true_kernel_type = config_file_params[section_name][kernel_type_param_name]
     params0, kernels_types = svGPFA.utils.initUtils.getKernelsParams0AndTypes(
@@ -444,6 +470,7 @@ def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
 
 def test_getKernelsParams0AndTypes_3(
     n_neurons=20, n_latents=3, n_trials=50,
+    n_ind_points=10, diag_var_cov0_value=1e-2,
     true_kernels_types=["exponentialQuadratic",
                         "exponentialQuadratic",
                         "periodic"],
@@ -463,7 +490,8 @@ def test_getKernelsParams0AndTypes_3(
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     params0, kernels_types = svGPFA.utils.initUtils.getKernelsParams0AndTypes(
         n_latents=n_latents,
         dynamic_params=dynamic_params,
@@ -475,12 +503,13 @@ def test_getKernelsParams0AndTypes_3(
 
 
 def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
+                             n_ind_points=10, diag_var_cov0_value=1e-2,
                              section_name="ind_points_params0",
                              ind_points_locs_filename="data/equispacedValuesBtw0and1_len09.csv",
                              ind_points_locs_filename_param_name="ind_points_locs0_filename",
                              estInitConfigFilename="data/99999999_estimation_metaData.ini",
                              delimiter=",",
-                             ):
+                            ):
 
     dynamic_params = {section_name: {ind_points_locs_filename_param_name:
                                      ind_points_locs_filename}}
@@ -493,7 +522,8 @@ def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_ind_points_locs0_np = np.genfromtxt(ind_points_locs_filename,
                                              delimiter=delimiter)
     true_ind_points_locs0 = torch.from_numpy(true_ind_points_locs0_np).flatten()
@@ -513,11 +543,12 @@ def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
 
 
 def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
+                             n_ind_points=10, diag_var_cov0_value=1e-2,
                              section_name="ind_points_params0",
                              ind_points_locs0_filename="data/equispacedValuesBtw0and1_len09.csv",
                              estInitConfigFilename="data/99999998_estimation_metaData.ini",
                              delimiter=",",
-                             ):
+                            ):
 
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -530,7 +561,8 @@ def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     true_ind_points_locs0_np = np.genfromtxt(
         ind_points_locs0_filename, delimiter=delimiter)
     true_ind_points_locs0 = torch.from_numpy(true_ind_points_locs0_np).flatten()
@@ -550,10 +582,11 @@ def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
 
 
 def test_getVariationalMean0_0(n_neurons=20, n_latents=3, n_ind_points=9,
-                               n_trials=15,
+                               n_trials=15, diag_var_cov0_value=1e-2,
                                section_name="variational_params0",
                                param_name="variational_mean0",
-                               estInitConfigFilename="data/99999999_estimation_metaData.ini"):
+                               estInitConfigFilename="data/99999999_estimation_metaData.ini",
+                              ):
     # dynamic_params, binary format
     variational_mean0_k = torch.normal(mean=0.0, std=1.0,  size=(n_trials, n_ind_points, 1))
     true_variational_mean0 = [variational_mean0_k for k in range(n_latents)]
@@ -567,7 +600,8 @@ def test_getVariationalMean0_0(n_neurons=20, n_latents=3, n_ind_points=9,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     variational_mean0 = svGPFA.utils.initUtils.getVariationalMean0(
         n_latents=n_latents, n_trials=n_trials, n_ind_points=n_ind_points,
         dynamic_params=dynamic_params, config_file_params=config_file_params,
@@ -577,12 +611,13 @@ def test_getVariationalMean0_0(n_neurons=20, n_latents=3, n_ind_points=9,
         assert torch.all(true_variational_mean0[k] == variational_mean0[k])
 
 
-def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=None,
-                               n_trials=15,
+def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=10,
+                               n_trials=15, diag_var_cov0_value=1e-2,
                                section_name="variational_params0",
                                variational_mean0_filename_param_name_pattern="variational_mean0_filename_latent{:d}_trial{:d}",
                                estInitConfigFilename="data/99999998_estimation_metaData.ini",
-                               delimiter=","):
+                               delimiter=",",
+                              ):
     # config_params, long format
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -595,7 +630,8 @@ def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=None,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     variational_mean0 = svGPFA.utils.initUtils.getVariationalMean0(
         n_latents=n_latents, n_trials=n_trials, n_ind_points=n_ind_points,
         dynamic_params=dynamic_params, config_file_params=config_file_params,
@@ -613,10 +649,11 @@ def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=None,
 
 
 def test_getVariationalCov0_0(n_neurons=20, n_latents=3, n_ind_points=9,
-                              n_trials=15,
+                              n_trials=15, diag_var_cov0_value=1e-2,
                               section_name="variational_params0",
                               param_name="variational_cov0",
-                              estInitConfigFilename="data/99999999_estimation_metaData.ini"):
+                              estInitConfigFilename="data/99999999_estimation_metaData.ini",
+                             ):
     variational_cov0_k = torch.normal(mean=0.0, std=1.0,
                                       size=(n_trials, n_ind_points,
                                             n_ind_points))
@@ -631,7 +668,8 @@ def test_getVariationalCov0_0(n_neurons=20, n_latents=3, n_ind_points=9,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     variational_cov0 = svGPFA.utils.initUtils.getVariationalCov0(
         n_latents=n_latents, n_trials=n_trials, n_ind_points=n_ind_points,
         dynamic_params=dynamic_params, config_file_params=config_file_params,
@@ -641,12 +679,13 @@ def test_getVariationalCov0_0(n_neurons=20, n_latents=3, n_ind_points=9,
         assert torch.all(true_variational_cov0[k] == variational_cov0[k])
 
 
-def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=None,
-                              n_trials=15,
+def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=10,
+                              n_trials=15, diag_var_cov0_value=1e-2,
                               section_name="variational_params0",
                               variational_cov0_filename_param_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
                               estInitConfigFilename="data/99999998_estimation_metaData.ini",
-                              delimiter=","):
+                              delimiter=",",
+                             ):
     # config_params, long format
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -659,7 +698,8 @@ def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=None,
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     variational_cov0 = svGPFA.utils.initUtils.getVariationalCov0(
         n_latents=n_latents, n_trials=n_trials, n_ind_points=n_ind_points,
         dynamic_params=dynamic_params, config_file_params=config_file_params,
@@ -676,10 +716,12 @@ def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=None,
             assert torch.all(variational_cov0[k][r, :, :] ==
                              true_variational_cov0_kr)
 
-def test_getOptimParams_0(n_neurons=100, n_latents=8):
+def test_getOptimParams_0(n_neurons=100, n_trials=15, n_latents=8,
+                          n_ind_points=10, diag_var_cov0_value=1e-2):
     # extracting all optim params from default_params
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     flat_true_optim_params = default_params["optim_params"]
     hier_true_optim_params = \
         svGPFA.utils.initUtils.flatToHierarchicalOptimParams(
@@ -696,12 +738,14 @@ def test_getOptimParams_0(n_neurons=100, n_latents=8):
                 assert hier_true_optim_params[true_param_name][true_param2_name] == hier_optim_params[true_param_name][true_param2_name]
 
 
-def test_getOptimParams_1(n_neurons=100, n_latents=8):
+def test_getOptimParams_1(n_neurons=100, n_trials=15, n_latents=8,
+                          n_ind_points=10, diag_var_cov0_value=1e-2):
     # extracting all optim params from default_params except max_iter that
     # comes from dynamic params
     dynamic_params = {"optim_params": {"em_max_iter": 1000}}
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     flat_true_optim_params = default_params["optim_params"]
     flat_true_optim_params["em_max_iter"] = \
         dynamic_params["optim_params"]["em_max_iter"]
@@ -721,13 +765,15 @@ def test_getOptimParams_1(n_neurons=100, n_latents=8):
 
 
 def test_getOptimParams_2(n_neurons=100, n_latents=8, n_trials=15,
+                          n_ind_points=10, diag_var_cov0_value=1e-2,
                           estInitConfigFilename="data/99999998_estimation_metaData.ini",
                          ):
     # extracting all optim params from default_params except max_iter that
     # comes from dynamic params
     dynamic_params = {"optim_params": {"em_max_iter": 1000}}
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
     args_info = svGPFA.utils.initUtils.getArgsInfo()
