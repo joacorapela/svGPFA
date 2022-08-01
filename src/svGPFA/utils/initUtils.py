@@ -77,8 +77,10 @@ def getOptimParams(dynamic_params, config_file_params, default_params,
     return hierarchical_optim_params
 
 
-def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3):
-    diag_var_cov0_value = 1e-2
+def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3,
+                         diag_var_cov0_value=1e-2):
+    var_mean0 = [torch.zeros((n_trials, n_ind_points, 1), dtype=torch.double)
+                 for k in range(n_latents)]
     var_cov0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
         var_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points),
@@ -91,12 +93,14 @@ def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3):
         "data_structure_params": {"trials_start_time": 0.0,
                                   "trials_end_time": 1.0},
         "variational_params0": {
-            "variational_means0": torch.zeros(n_latents, dtype=torch.double),
+            "variational_means0": var_mean0,
             "variational_covs0": var_cov0,
         },
         "embedding_params0": {
-            "c0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents)),
-            "d0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1)),
+            "c0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents),
+                              dtype=torch.double),
+            "d0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1),
+                              dtype=torch.double),
         },
         "kernels_params0": {"k_type": "exponentialQuadratic",
                             "k_lengthscale0": 1.0},
@@ -134,8 +138,7 @@ def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3):
                          "mstep_indpointslocs_lr": 1.0,
                          "mstep_indpointslocs_tolerance_grad": 1e-7,
                          "mstep_indpointslocs_tolerance_change": 1e-9,
-                         "mstep_indpointslocs_line_search_fn": "strong_wolfe",
-                        }
+                         "mstep_indpointslocs_line_search_fn": "strong_wolfe"}
     }
     return params_dict
 
