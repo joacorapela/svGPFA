@@ -9,7 +9,7 @@ variational approximation.
 
 You can run svGPFA on sample data, plot its estimates and perform goodness-of-fit tests (without installing anything in your computer) by just running [this](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) Google Colab notebook.
 You can also do this by installing svGPFA (intructions [below](#installation)) and running [this](doc/ipynb/doEstimateAndPlot.ipynb) Jupyter notebok.
-In addition, you can run svGPFA using a script, as indicated [below](#testing-the-installation).
+In addition, after installing svGPFA, you can estimate models using a script, as shown [below](#testing-the-installation).
 
 Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
 
