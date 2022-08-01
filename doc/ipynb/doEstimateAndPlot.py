@@ -13,7 +13,6 @@
 # In[1]:
 
 
-import sys
 import time
 import torch
 import pickle
@@ -23,7 +22,7 @@ import svGPFA.stats.svGPFAModelFactory
 import svGPFA.stats.svEM
 import svGPFA.utils.miscUtils
 import svGPFA.utils.initUtils
-import gcnu_common.stats.point_processes.tests                                                  
+import gcnu_common.stats.point_processes.tests
 
 
 # ## 1.2 Set parameters
@@ -49,7 +48,7 @@ em_max_iter = 30                                   # maximum number of EM iterat
 # spikesTimes[r][n] is the list of spikes times of neuron n in trial r
 simResFilename = "../../examples/data/32451751_simRes.pickle" # simulation results filename
 with open(simResFilename, "rb") as f:
-    simRes = pickle.load(f)                                                 
+    simRes = pickle.load(f)
 spikes_times = simRes["spikes"]
 
 
@@ -62,7 +61,7 @@ spikes_times = simRes["spikes"]
 # of different ways of specify svGPFA parameters
 
 # get default params
-default_params = svGPFA.utils.initUtils.getDefaultParamsDict(                                                                      
+default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
     n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents)
 
 # over write some default params with dynamic params
@@ -193,7 +192,7 @@ fig.show()
 
 with torch.no_grad():
     ePosCIFValues = model.computeExpectedPosteriorCIFs(times=trial_times)
-fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(times=trial_times, cif_values=ePosCIFValues, neuron_index=neuronToPlot)                                                                                                                                      
+fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(times=trial_times, cif_values=ePosCIFValues, neuron_index=neuronToPlot)
 fig.show()
 
 
@@ -236,10 +235,10 @@ neuronForGOF = 0
 
 
 ksTest_gamma = 20                                 # number of simulations for the KS test numerical correction
-with torch.no_grad():                                                                                                                                                                                                                                                             
+with torch.no_grad():
     epmcifValues = model.computeExpectedPosteriorCIFs(times=trial_times)
 cifValuesKS = epmcifValues[trialForGOF][neuronForGOF]
-spikesTimesKS = spikesTimes[trialForGOF][neuronForGOF]
+spikesTimesKS = spikes_times[trialForGOF][neuronForGOF]
 diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.point_processes.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikesTimesKS, cifTimes=trial_times, cifValues=cifValuesKS, gamma=ksTest_gamma)
 title = "Trial {:d}, Neuron {:d}".format(trialForGOF, neuronForGOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
@@ -264,7 +263,3 @@ fig.show()
 
 
 # In[ ]:
-
-
-
-
