@@ -17,9 +17,9 @@ doc/*
 doc/ipynb/*
 !doc/ipynb/doEstimateAndPlot.ipynb
 
-!/doc/readthedocs/
-/doc/readthedocs/*
-!/doc/readthedocs/source
+!/doc/sphinx/
+/doc/sphinx/*
+!/doc/sphinx/source
 
 !/doc/design/
 /doc/design/*
