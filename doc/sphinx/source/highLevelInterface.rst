@@ -27,24 +27,9 @@ To estimate a sparse variational Gaussian process factor analysis model we:
 
     by providing a set of measurements, ``spikeTimes``, initial parameters, ``initialParams``, quadrature parameters, ``quadParams`` and optimisation parameters, ``optimParams``.
 
-3. Plot the lower bound history of the estimated model
-
-    .. code-block:: python
-
-       plot.svGPFA.plotUtils.plotLowerBoundHist(lowerBoundHist=lowerBoundHist)
-
-    .. image:: images/77594376_lowerBoundHist.png
-
-and model parameters (e.g., latents).
-
-    .. code-block:: python
-
-       plot.svGPFA.plotUtils.plotTrueAndEstimatedLatents(times=testTimes, muK=testMuK, varK=testVarK, indPointsLocs=indPointsLocs, trueLatents=trueLatentsSamples, trialToPlot=trialToPlot)
-
-   .. image:: images/77594376_trial0_estimatedLatents.png
-
+3. Plot estimated model parameters and perform goodness-of-fit tests.
 
 Please refer to the following `notebook
-<https://github.com/joacorapela/svGPFA/blob/master/ipynb/doEstimateAndPlot_jupyter.ipynb>`_
-for a full piece of code running svGPFA and plotting its estimates.
+<https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv>`_
+for an example of using this interface.
 
