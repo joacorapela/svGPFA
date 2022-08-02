@@ -105,7 +105,7 @@ def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3,
         "kernels_params0": {"k_type": "exponentialQuadratic",
                             "k_lengthscale0": 1.0},
         "ind_points_params0": {"n_ind_points": 10,
-                               "ind_points_locs0_layout": "equispaced"},
+                               "ind_points_locs0_layout": "equidistant"},
         "optim_params": {"n_quad": 200,
                          "prior_cov_reg_param": 1e-3,
                          "optim_method": "ecm",
@@ -752,7 +752,7 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
         layout = params_dict[section_name]["ind_points_locs0_layout"]
         print(f"Extracted ind_points_locs0_layout={layout} from "
               f"{params_dict_type}")
-        if layout == "equispaced":
+        if layout == "equidistant":
             ind_points_locs0 = buildEquidistantIndPointsLocs0(
                 n_latents=n_latents, n_trials=n_trials,
                 n_ind_points=n_ind_points,
