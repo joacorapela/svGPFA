@@ -47,8 +47,9 @@ and end times of each trial; i.e., :math:`\tau_i` in Eq 7 in
 These parameters can be specified in a longer or shorter format. If both are
 specified, the longer format takes precedence.
 
-Longer format
--------------
+Trial-specific Python variable format
+-------------------------------------
+
 Two items need to be specified:
 
 * ``trials_start_times`` should provide a list of length **n_trials**, with float values indicating seconds, such that **trials_start_times[i]** gives the start time of the ith trial.
@@ -56,15 +57,15 @@ Two items need to be specified:
 * ``trials_end_times`` should provide a list of length **n_trials**, with float values indicating seconds, such that **trials_end_times[i]** gives the end time of the ith trial.
 
     .. code-block:: python
-       :caption: adding **data_structure_params** in the longer format to **params_spec** (3 trials)
+       :caption: adding **data_structure_params** in the trial-specific Python variable format to **params_spec** (3 trials)
 
         params_spec["data_structure_params"] = {
             "trials_start_times": [0.0, 0.4, 0.7],
             "trials_end_times":   [0.2, 0.5, 0.9],
         }
 
-Shorter format
---------------
+Trial-common Python variable format
+-----------------------------------
 
 Two items need to be specified:
 
@@ -73,7 +74,7 @@ Two items need to be specified:
 * ``trials_end_time`` should provide the end time (float value, secs) of all trials.
 
     .. code-block:: python
-       :caption: adding **data_structure_params** in the shorter format to **params_spec**
+       :caption: adding **data_structure_params** in the trial-common Python variable format to **params_spec**
 
         params_spec["data_structure_params"] = {
             "trials_start_time": 0.0,
@@ -111,8 +112,8 @@ The variational parameters are the means (:math:`\mathbf{m}_k^{(r)}`,
 (:math:`\mathbf{u}_k^{(r)}`, :cite:t:`dunckerAndSahani18`, p.3). The data
 structures for these parameters are described in the next section.
 
-Binary format
-^^^^^^^^^^^^^^
+Python variable format
+^^^^^^^^^^^^^^^^^^^^^^
 
 Two items need to be specified:
 
@@ -129,7 +130,7 @@ Two items need to be specified:
   for latent **k** and trial **r**.
 
     .. code-block:: python
-       :caption: adding random **variational_params0** in the binary format to **params_spec**
+       :caption: adding random **variational_params0** in the Python variable format to **params_spec**
 
         n_latents = 3
         n_trials = 10
@@ -149,8 +150,8 @@ Two items need to be specified:
             "variational_cov0":  var_cov0,
         }
 
-Longer format
-^^^^^^^^^^^^^
+Latent-trial-specific filename format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For every latent, k, and every trial, r, two items need to be specified:
 
@@ -166,7 +167,7 @@ For every latent, k, and every trial, r, two items need to be specified:
   *number_of_inducing_points*.
 
     .. code-block:: python
-       :caption: adding **variational_params0** in the longer format to **params_spec** (2 trials and 2 latents)
+       :caption: adding **variational_params0** in the latent-trial-specific filename format to **params_spec** (2 trials and 2 latents)
 
         params_spec["variational_params0"] = {
             "variational_mean0_latent0_trial0_filename": "../data/uniform_0.00_1.00_len09.csv",
@@ -179,8 +180,9 @@ For every latent, k, and every trial, r, two items need to be specified:
             "variational_cov0_latent1_trial1_filename": "../data/identity_scaled1e-4_09x09.csv",
         }
 
-Shorter format
-^^^^^^^^^^^^^^
+Latent-trial-common filename format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Two items need to be specified:
 
 * ``variational_means0_filename`` should provide the filename (csv format readable
@@ -194,7 +196,7 @@ Two items need to be specified:
   matrix of size *number_of_inducing_points* x *number_of_inducing_points*.
 
     .. code-block:: python
-       :caption: adding **variational_params0** in the shorter format to **params_spec**
+       :caption: adding **variational_params0** in the latent-trial-common filename format to **params_spec**
 
         params_spec["variational_params0"] = {
             "variational_means0_filename": "../data/uniform_0.00_1.00_len09.csv",
@@ -208,8 +210,8 @@ Embedding parameters
 
 The embedding parameters are the loading matrix (:math:`C`, :cite:t:`dunckerAndSahani18`, Eq. 1, middle) and offset vector (:math:`\mathbf{d}`, :cite:t:`dunckerAndSahani18`, Eq. 1 middle). The data structures for these parameters are described in the next section.
 
-Binary format
-^^^^^^^^^^^^^
+Python variable format
+^^^^^^^^^^^^^^^^^^^^^^
 Two items need to be specified:
 
 * ``c0`` should be a **torch.DoubleTensor** of size (n_neurons, n_latents)
@@ -217,7 +219,7 @@ Two items need to be specified:
 * ``d0`` should be a **torch.DoubleTensor** of size (n_neurons, 1)
 
     .. code-block:: python
-       :caption: adding standard random **embedding_params0** in the binary format to **params_spec**
+       :caption: adding standard random **embedding_params0** in the Python variable format to **params_spec**
 
         n_neurons = 100
         n_latents = 3
@@ -288,8 +290,8 @@ The kernel parameters of latent k are those of the Gaussian process covariance
 function (:math:`\kappa_k(\cdot,\cdot)`, :cite:t:`dunckerAndSahani18`, p. 2). The data
 structures for these parameters are described in the next section.
 
-Binary format
-^^^^^^^^^^^^^
+Python variable format
+^^^^^^^^^^^^^^^^^^^^^^
 
 Two items need to be specified:
 
@@ -298,15 +300,15 @@ Two items need to be specified:
 * ``k_params0`` should be a list of size **n_latents**. The kth element of this list should be a **torch.DoubleTensor** containing the parameters of the kth kernel (e.g., **k_params0[k]=torch.DoubleTensor([3.2])**).
 
     .. code-block:: python
-       :caption: adding **kernel_params** in binary format (2 latents) to **params_spec**
+       :caption: adding **kernel_params** in Python variable format (2 latents) to **params_spec**
 
        params_spec["kernels_params0"] = {
             "k_types": ["exponentialQuadratic", "periodic"],
             "k_params0": [torch.DoubleTensor([2.9]), torch.DoubleTensor([3.1, 1.2])],
        }
 
-Longer format
-^^^^^^^^^^^^^
+Latent-specific textual format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For each latent k, item ``k_type_latent<k>`` needs to be specified, giving the
 name of the kernel for latent k. Other items required depend on
@@ -318,7 +320,7 @@ the value of item ``k_type_latent<k>``. For example, for
 the periodic kernel, respectively.
 
     .. code-block:: python
-       :caption: adding **kernel_params** in the longer format (2 latents) to **params_spec**
+       :caption: adding **kernel_params** in the latent-specific textual format (2 latents) to **params_spec**
 
        params_spec["kernels_params0"] = {
             "k_type_latent0": "exponentialQuadratic",
@@ -328,8 +330,8 @@ the periodic kernel, respectively.
             "k_period0_latent1": 0.75,
        }
 
-Shorter format
-^^^^^^^^^^^^^^
+Latent-common textual format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The shorter format requires
 item ``k_types``, giving the name name of the kernel to be used for all latent variables.
@@ -341,7 +343,7 @@ specify the lengthscale and period parameter of the periodic kernel,
 respectively.
 
     .. code-block:: python
-       :caption: adding **kernel_params** in the shorter format to **params_spec**
+       :caption: adding **kernel_params** in the latent-common textual format to **params_spec**
 
        params_spec["kernels_params0"] = {
            "k_types": "exponentialQuadratic",
@@ -358,8 +360,8 @@ The inducing points locations, or input locations, are the points
 Gaussian process are evaluated to obtain the inducing points. The data
 structures for these parameters are described in the next section.
 
-Binary format
-^^^^^^^^^^^^^
+Python variable format
+^^^^^^^^^^^^^^^^^^^^^^
 
 One item needs to be specified:
 
@@ -369,7 +371,7 @@ One item needs to be specified:
   initial inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in binary format with uniformly distributed inducing points locations to **params_spec**
+       :caption: adding **indPointsLocs_params0** in Python variable format with uniformly distributed inducing points locations to **params_spec**
 
        n_latents = 3
        n_ind_points = (10, 20, 15)
@@ -380,8 +382,8 @@ One item needs to be specified:
             "indPointsLocs0": [trials_start_time + (trials_end_time-trials_start_time) * torch.rand(n_trials, n_ind_points[k], 1) for k in n_latents]
        }
 
-Longer format
-^^^^^^^^^^^^^
+Latent-trial-specific filename format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 For each latent k and trial r one item needs to be specified:
 
@@ -390,7 +392,7 @@ For each latent k and trial r one item needs to be specified:
   inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in the longer format to **params_spec** (2 latents, 2 trials)
+       :caption: adding **indPointsLocs_params0** in the latent-trial-specific filename format to **params_spec** (2 latents, 2 trials)
 
        params_spec["indPointsLocs_params0"] = {
            "indPointsLocs0_latent0_trial0_filename": "indPointsLocs0_latent0_trial0.csv",
@@ -399,10 +401,25 @@ For each latent k and trial r one item needs to be specified:
            "indPointsLocs0_latent1_trial1_filename": "indPointsLocs0_latent1_trial1.csv",
        }
 
-Shorter format: layout
-^^^^^^^^^^^^^^^^^^^^^^
+Latent-trial-common filename format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This shorter format requires the specification of the number of inducing points
+This shorter format requires the specification of the item
+``indPointsLocs0_filename`` giving the name of the file (csv format readable by
+pandas *read_csv* function) containing the initial inducing points locations
+for all latents and trials.
+
+    .. code-block:: python
+       :caption: adding **indPointsLocs_params0** in the latent-trial-common filename format to **params_spec**
+
+       params_spec["indPointsLocs_params0"] = {
+           "indPointsLocs0_filename": "indPointsLocs0.csv",
+       }
+
+Layout format
+^^^^^^^^^^^^^
+
+The layout format requires the specification of the number of inducing points
 in the item ``n_ind_points``. The layout of the initial inducing points
 locations is given by the item ``ind_points_locs0_layout``. If
 ``ind_points_locs0_layout = equidistant`` the initial locations of the inducing
@@ -411,26 +428,11 @@ points are equidistant between the trial start and trial end. If
 positioned between the start and end of the trial.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in the layout shorter format to **params_spec**
+       :caption: adding **indPointsLocs_params0** in the layout format to **params_spec**
 
        params_spec["indPointsLocs_params0"] = {
            "n_ind_points": 9,
            "ind_points_locs0_layout": "equidistant",
-       }
-
-Shorter format: one filename for all latents and trials
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This shorter format requires the specification of the item
-``indPointsLocs0_filename`` giving the name of the file (csv format readable by
-pandas *read_csv* function) containing the initial inducing points locations
-for all latents and trials.
-
-    .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in the one filename shorter format to **params_spec**
-
-       params_spec["indPointsLocs_params0"] = {
-           "indPointsLocs0_filename": "indPointsLocs0.csv",
        }
 
 Optimisation parameters
@@ -488,7 +490,7 @@ section ``[optim_params]`` should contain items:
   search is performed using the strong_wolfe method. If
   `<step>_line_search_fn=None`` line search is not used.
 
-    .. code-block:: none
+    .. code-block:: python
        :caption: example section [optim_params] of the configuration file
 
         [optim_params]
