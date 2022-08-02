@@ -83,5 +83,5 @@ If you use svGPFA, please cite the following paper:
 - [Joaquin Rapela](http://www.gatsby.ucl.ac.uk/~rapela) (Gatsby Computational Neuroscience Unit, University College London)
 
 # Acknowledgements
-The research and development for svGPFA is supported by funding from the [Gatsby Charitable Foundation](https://www.gatsby.org.uk/) and the [Wellcome Trust](https://wellcome.org/).
+The research and development for svGPFA is supported by funding from the [Gatsby Charitable Foundation](https://www.gatsby.org.uk/).
 
