@@ -7,7 +7,7 @@ svGPFA extends GPFA to handle unbinned spike-train data by using a continuous
 time point-process likelihood model and achieving scalability using a sparse
 variational approximation.
 
-## Examples and Documentation
+# Examples and Documentation
 
 You can run svGPFA on sample data, plot its estimates and perform goodness-of-fit tests (without installing anything in your computer) by just running [this](https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv) Google Colab notebook.
 You can also do this by installing svGPFA (instructions [below](#installation)) and running [this](doc/ipynb/doEstimateAndPlot.ipynb) Jupyter notebook.
