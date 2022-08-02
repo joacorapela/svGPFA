@@ -93,8 +93,8 @@ def getDefaultParamsDict(n_neurons, n_trials, n_ind_points=10, n_latents=3,
         "data_structure_params": {"trials_start_time": 0.0,
                                   "trials_end_time": 1.0},
         "variational_params0": {
-            "variational_means0": var_mean0,
-            "variational_covs0": var_cov0,
+            "variational_mean0": var_mean0,
+            "variational_cov0": var_cov0,
         },
         "embedding_params0": {
             "c0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents),
