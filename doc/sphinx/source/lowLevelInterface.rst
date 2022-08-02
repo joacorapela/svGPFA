@@ -4,7 +4,7 @@ Low-level interface
 The class :class:`~svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory` creates
 an svGPFA model and an instance of the class :class:`~svGPFA.stats.svEM.SVEM`
 optimises its parameters.  Please refer to the svGPFA `class 
-<https://github.com/joacorapela/svGPFA/blob/master/docs/design/Classes.pdf>`_ and `interaction <https://github.com/joacorapela/svGPFA/blob/master/docs/design/Interactions.pdf>`_ diagrams.
+<https://github.com/joacorapela/svGPFA/blob/master/doc/design/Classes.pdf>`_ and `interaction <https://github.com/joacorapela/svGPFA/blob/master/doc/design/Interactions.pdf>`_ diagrams.
 
 There is a one-to-one mapping between classes in the :mod:`svGPFA.stats` package and equations in :cite:t:`dunckerAndSahani18`.
 
