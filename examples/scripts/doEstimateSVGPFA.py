@@ -65,7 +65,7 @@ def main(argv):
         args_info=args_info)
     #    build configuration default parameters
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_latents=n_latents)
+        n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents)
     #    finally, extract initial parameters from the dynamic
     initial_params, quad_params, kernels_types, optim_params = \
         svGPFA.utils.initUtils.getParams(
