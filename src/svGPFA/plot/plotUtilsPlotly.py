@@ -115,7 +115,7 @@ def getSpikesTimesPlotOneTrial(spikes_times, title,
 
 
 def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
-                                title, align_event, marked_events,
+                                title, marked_events=None, align_event=None, 
                                 xlabel="Time (sec)", ylabel="Trial",
                                 event_line_color="rgba(0, 0, 255, 0.2)", event_line_width=5):
     nTrials = len(trials_indices)
@@ -142,22 +142,23 @@ def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
             # hoverinfo="skip",
         )
         fig.add_trace(trace)
-    trials_indices = np.arange(0, nTrials)
-    n_marked_events = marked_events.shape[1]
-    for i in range(n_marked_events):
-        marked_times = marked_events[:, i]-align_event
-        marked_times = np.where(marked_times<min_time,
-                                np.ones(marked_times.shape)*min_time,
-                                marked_times)
-        marked_times = np.where(marked_times>max_time,
-                                np.ones(marked_times.shape)*max_time,
-                                marked_times)
-        trace_event = go.Scatter(x=marked_times,
-                                 y=trials_indices,
-                                 line=dict(color=event_line_color,
-                                           width=event_line_width),
-                                 showlegend=False)
-        fig.add_trace(trace_event)
+    if marked_events is not None:
+        trials_indices = np.arange(0, nTrials)
+        n_marked_events = marked_events.shape[1]
+        for i in range(n_marked_events):
+            marked_times = marked_events[:, i]-align_event
+            marked_times = np.where(marked_times<min_time,
+                                    np.ones(marked_times.shape)*min_time,
+                                    marked_times)
+            marked_times = np.where(marked_times>max_time,
+                                    np.ones(marked_times.shape)*max_time,
+                                    marked_times)
+            trace_event = go.Scatter(x=marked_times,
+                                     y=trials_indices,
+                                     line=dict(color=event_line_color,
+                                               width=event_line_width),
+                                     showlegend=False)
+            fig.add_trace(trace_event)
 
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
