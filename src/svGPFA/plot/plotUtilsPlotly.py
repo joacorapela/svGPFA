@@ -316,7 +316,7 @@ def getPlotOrthonormalizedEmbeddingParams(C, d, linestyle="solid", marker="aster
 def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
                             cbAlpha = 0.2,
                             indPointsLocsColor="rgba(255,0,0,0.5)",
-                            colorsList=plotly.colors.qualitative.Plotly,
+                            trials_colors=None, default_trial_color="gray",
                             xlabel="Time (msec)",
                             ylabel="Value",
                             title=""):
@@ -331,8 +331,12 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
         meanToPlot = embeddingsMeans[r,:]
         stdToPlot = embeddingsSTDs[r,:]
         ciToPlot = 1.96*stdToPlot
-        color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
-        color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
+        # color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
+        # color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
+        if trials_colors is not None:
+            embedding_color = trials_colors[r]
+        else:
+            embedding_color = default_trial_color
 
         # pdb.set_trace()
 #         import matplotlib
@@ -351,8 +355,8 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
             x=np.concatenate((x, x[::-1])),
             y=np.concatenate((y_upper, y_lower[::-1])),
             fill="toself",
-            fillcolor=color_rgba_pattern.format(0.5),
-            line=dict(color=color_rgba_pattern.format(0.0)),
+            fillcolor=embedding_color,
+            line=dict(color=embedding_color),
             showlegend=False,
             # name="trial CB {:d}".format(r),
             legendgroup="trial{:02d}".format(r)
@@ -360,7 +364,7 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
         traceMean = go.Scatter(
             x=x,
             y=y,
-            line=dict(color=color_rgba_pattern.format(1.0)),
+            line=dict(color=embedding_color),
             mode="lines",
             name="trial {:d}".format(r),
             legendgroup="trial{:02d}".format(r)
@@ -1481,7 +1485,7 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
                               indPointsLocs=None,
                               cbAlpha = 0.2,
                               indPointsLocsColor="rgba(255,0,0,0.5)",
-                              colorsList=plotly.colors.qualitative.Plotly,
+                              trials_colors=None, default_trial_color="gray",
                               xlabel="Time (sec)",
                               ylabel="Value",
                               titlePattern="Latent {:d}"):
@@ -1499,8 +1503,10 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
         meanToPlot = latentsMeans[r,:,latentToPlot]
         stdToPlot = latentsSTDs[r,:,latentToPlot]
         ciToPlot = 1.96*stdToPlot
-        color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
-        color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
+        if trials_colors is not None:
+            latent_color = trials_colors[r]
+        else:
+            latent_color = default_trial_color
 
         # pdb.set_trace()
 #         import matplotlib
@@ -1521,15 +1527,15 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
             x=np.concatenate((x, x[::-1])),
             y=np.concatenate((y_upper, y_lower[::-1])),
             fill="toself",
-            fillcolor=color_rgba_pattern.format(cbAlpha),
-            line=dict(color=color_rgba_pattern.format(0.0)),
+            fillcolor=latent_color,
+            line=dict(color=latent_color),
             showlegend=False,
             legendgroup="trial{:02d}".format(r)
         )
         traceMean = go.Scatter(
             x=x,
             y=y,
-            line=dict(color=color_rgba_pattern.format(1.0)),
+            line=dict(color=latent_color),
             mode="lines",
             name="trial {:d}".format(r),
             legendgroup="trial{:02d}".format(r)
@@ -1559,13 +1565,13 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
 
 
 def getPlotOrthonormalizedLatentAcrossTrials(
-        times, latentsMeans, latentToPlot, C,
+        times, latentsMeans, latentToPlot, C, trials_labels,
         align_event=None, marked_events=None, marked_colors=None, 
-        marked_color_size=10,
-        trials_labels=None, trials_annotations=None, ylim=None,
+        marked_size=10,
+        trials_colors=None, default_trial_color="gray",
+        trials_annotations=None, ylim=None,
         xlabel="Time (sec)", ylabel="Value",
-        titlePattern="Orthonormalized latent {:d}",
-        choice1Col="red", choiceM1Col="blue"):
+        titlePattern="Orthonormalized latent {:d}"):
     # times = times.detach().numpy()
     # latentsMeans = latentsMeans.detach().numpy()
     # C = C.detach().numpy()
@@ -1593,10 +1599,10 @@ def getPlotOrthonormalizedLatentAcrossTrials(
 
     min_time = times.min()
     max_time = times.max()
-    if trials_annotations is not None and trials_labels is not None:
-        hover_texts = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
-                       for i, time in enumerate(times)]
-                      for r, trial_label in enumerate(trials_labels)]
+    hover_texts = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
+                    for i, time in enumerate(times)]
+                   for r, trial_label in enumerate(trials_labels)]
+    if trials_annotations is not None:
         for r in range(nTrials):
             an_annotation = ""
             for trial_annotation_key in trials_annotations:
@@ -1604,20 +1610,13 @@ def getPlotOrthonormalizedLatentAcrossTrials(
                                                        trials_annotations[trial_annotation_key][r])
             for i in range(nTimes):
                 hover_texts[r][i] = hover_texts[r][i] + an_annotation
-    else:
-        hover_texts = [["" for r in range(nTrials)] for r in range(nTimes)]
 
     for r in range(nTrials):
         meanToPlot = oLatentsMeans[r][:, latentToPlot]
-        if trials_annotations is not None:
-            if trials_annotations["choice"][r] == 1.0:
-                latent_color = choice1Col
-            elif trials_annotations["choice"][r] == -1.0:
-                latent_color = choiceM1Col
-            else:
-                raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
+        if trials_colors is not None:
+            latent_color = trials_colors[r]
         else:
-            latent_color = "gray"
+            latent_color = default_trial_color
 
         if trials_labels is not None:
             trial_label = trials_labels[r]
@@ -1666,7 +1665,7 @@ def getPlotOrthonormalizedLatentAcrossTrials(
                 trace_marker = go.Scatter(
                     x=[times[marked_index]],
                     y=[meanToPlot[marked_index]],
-                    marker=dict(color=marked_colors[i], size=marked_color_size),
+                    marker=dict(color=marked_colors[i], size=marked_size),
                     mode="markers",
                     legendgroup="trial{:02d}".format(r),
                     showlegend=False)
@@ -1682,6 +1681,7 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
         times, latentsMeans, C, latentsToPlot=[0, 1, 2],
         align_event=None, marked_events=None, marked_colors=None,
         trials_labels=None, trials_annotations=None,
+        trials_colors=None, default_trial_color="gray",
         xyzLabelsPattern="Latent {:d}", title="",
         choice1Col="red", choiceM1Col="blue"):
     nTimes = len(times)
@@ -1702,10 +1702,11 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
     oLatentsMeans = svGPFA.utils.miscUtils.orthonormalizeLatentsMeans(
         latentsMeans=latentsMeans, C=C)
 
-    if trials_annotations is not None and trials_labels is not None:
+    if trials_labels is not None:
         hover_text = [["Trial: {:s}<br>Time: {:f}".format(trial_label, time)
                        for i, time in enumerate(times)]
                       for r, trial_label in enumerate(trials_labels)]
+    if trials_annotations is not None:
         for r in range(nTrials):
             an_annotation = ""
             for trial_annotation_key in trials_annotations:
@@ -1715,12 +1716,11 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
                 hover_text[r][i] = hover_text[r][i] + an_annotation
     fig = go.Figure()
     for r in range(nTrials):
-        if trials_annotations["choice"][r] == 1.0:
-            latent_color = choice1Col
-        elif trials_annotations["choice"][r] == -1.0:
-            latent_color = choiceM1Col
+        if trials_colors is not None:
+            latent_color = trials_colors[r]
         else:
-            raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
+            latent_color = default_trial_color
+
         trace_latent_mean = go.Scatter3d(
             x=oLatentsMeans[r][:, latentsToPlot[0]],
             y=oLatentsMeans[r][:, latentsToPlot[1]],
@@ -1829,7 +1829,10 @@ def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
 
     fig = go.Figure()
     fig.add_trace(trace_hm)
-    n_marked_events = marked_events.shape[1]
+    if marked_events is not None:
+        n_marked_events = marked_events.shape[1]
+    else:
+        n_marked_events = 0
     min_time = times.min()
     max_time = times.max()
     for i in range(n_marked_events):
@@ -2446,9 +2449,10 @@ def getPlotCIFsOneNeuronAllTrials(
         times, cif_values, neuron_index,
         spikes_times=None,
         align_event=None, marked_events=None, marked_colors=None, 
-        marked_color_size=10,
+        marked_size=10,
         trials_labels=None, trials_annotations=None, ylim=None,
-        xlabel="Time (sec)", ylabel="Value", titlePattern="Neuron {:d}",
+        trials_colors=None, default_trial_color="gray",
+        xlabel="Time (sec)", ylabel="Value", title="",
         choice1Col="red", choiceM1Col="blue", no_trial_annotation_color="gray"):
     # civ_values[trialIndex][neuron_index]
     nTimes = len(times)
@@ -2470,7 +2474,7 @@ def getPlotCIFsOneNeuronAllTrials(
     if trials_labels is None:
         trials_labels = [str(r) for r in range(nTrials)]
     fig = go.Figure()
-    title = titlePattern.format(neuron_index)
+    # title = titlePattern.format(neuron_index)
 
     if marked_events is not None:
         n_marked_events = marked_events.shape[1]
@@ -2498,19 +2502,12 @@ def getPlotCIFsOneNeuronAllTrials(
                                                        trials_annotations[trial_annotation_key][r])
             for i in range(nTimes):
                 hover_text[r][i] = hover_text[r][i] + an_annotation
-    if trials_annotations is None:
-        colorsList = plotly.colors.qualitative.Plotly
     for r in range(nTrials):
         cifToPlot = cif_values[r][neuron_index]
-        if trials_annotations is not None:
-            if trials_annotations["choice"][r] == 1.0:
-                cif_color = choice1Col
-            elif trials_annotations["choice"][r] == -1.0:
-                cif_color = choiceM1Col
-            else:
-                raise ValueError("choice value should be either 1.0 or -1.0. Found choice={:f}".format(trials_annotations["choice"][r]))
+        if trials_colors is not None:
+            cif_color = trials_colors[r]
         else:
-            cif_color = colorsList[r%len(colorsList)]
+            cif_color = default_trial_color
 
         if trials_annotations is not None and trials_labels is not None:
             traceMean = go.Scatter(
@@ -2553,7 +2550,7 @@ def getPlotCIFsOneNeuronAllTrials(
                 trace_marker = go.Scatter(
                     x=[times[marked_index]],
                     y=[cifToPlot[marked_index]],
-                    marker=dict(color=marked_colors[i], size=marked_color_size),
+                    marker=dict(color=marked_colors[i], size=marked_size),
                     mode="markers",
                     legendgroup="trial{:02d}".format(r),
                     showlegend=False)
