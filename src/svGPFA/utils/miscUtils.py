@@ -8,7 +8,7 @@ import scipy.stats
 
 import svGPFA.stats.kernels
 import gcnu_common.numerical_methods.utils
-import gcnu_common.stats.gaussian_processes.eval
+import gcnu_common.stats.gaussianProcesses.eval
 
 
 def buildKernels(kernels_types, kernels_params):
@@ -235,7 +235,7 @@ def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
         latentsMeans[r] = torch.empty((nLatents, len(trialsTimes[r])))
         latentsSTDs[r] = torch.empty((nLatents, len(trialsTimes[r])))
         for k in range(nLatents):
-            gp = gcnu_common.stats.gaussian_processes.eval.GaussianProcess(mean=meansFuncs[k], kernel=kernels[k])
+            gp = gcnu_common.stats.gaussianProcesses.eval.GaussianProcess(mean=meansFuncs[k], kernel=kernels[k])
             latentsMeans[r][k,:] = gp.mean(t=trialsTimes[r])
             latentsSTDs[r][k,:] = gp.std(t=trialsTimes[r])
     return latentsMeans, latentsSTDs
