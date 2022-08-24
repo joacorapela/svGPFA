@@ -4,6 +4,7 @@ import math
 import torch
 # import matplotlib.pyplot as plt
 import numpy as np
+import scipy.ndimage
 import pandas as pd
 import plotly.graph_objs as go
 import plotly.subplots
@@ -12,6 +13,8 @@ import plotly
 # import plotly.express as px
 
 import svGPFA.utils.miscUtils
+import gcnu_common.utils.neuralDataAnalysis
+
 # spike rates and times
 def getPlotSpikeRatesForAllTrialsAndAllNeurons(spikesRates, xlabel="Neuron", ylabel="Average Spike Rate (Hz)", legendLabelPattern = "Trial {:d}"):
     nTrials = spikesRates.shape[0]
@@ -115,9 +118,11 @@ def getSpikesTimesPlotOneTrial(spikes_times, title,
 
 
 def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
-                                title, marked_events=None, align_event=None, 
+                                title, marked_events=None, align_event=None,
+                                trials_colors=None, default_trial_color="black",
                                 xlabel="Time (sec)", ylabel="Trial",
-                                event_line_color="rgba(0, 0, 255, 0.2)", event_line_width=5):
+                                event_line_color="rgba(0, 0, 255, 0.2)",
+                                event_line_width=5):
     nTrials = len(trials_indices)
     min_time = np.Inf
     max_time = -np.Inf
@@ -133,11 +138,15 @@ def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
         if len(x)>0:
             min_time = min(min_time, min(x))
             max_time = max(max_time, max(x))
+        if trials_colors is not None:
+            spikes_color = trials_colors[r]
+        else:
+            spikes_color = default_trial_color
         trace = go.Scatter(
             x=x,
             y=r*np.ones(len(x)),
             mode="markers",
-            marker=dict(size=3, color="black"),
+            marker=dict(size=spikes_marker_size, color=spikes_color),
             showlegend=False,
             # hoverinfo="skip",
         )
@@ -357,7 +366,7 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
             y=np.concatenate((y_upper, y_lower[::-1])),
             fill="toself",
             fillcolor=embedding_color,
-            line=dict(color=embedding_color),
+            line=dict(color='rgba(255,255,255,0)'),
             showlegend=False,
             # name="trial CB {:d}".format(r),
             legendgroup="trial{:02d}".format(r)
@@ -368,7 +377,8 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
             line=dict(color=embedding_color),
             mode="lines",
             name="trial {:d}".format(r),
-            legendgroup="trial{:02d}".format(r)
+            legendgroup="trial{:02d}".format(r),
+            showlegend=True,
         )
         fig.add_trace(traceCB)
         fig.add_trace(traceMean)
@@ -2754,3 +2764,45 @@ def getPlotResROCAnalysis(fpr, tpr, auc, title="", colorROC="red",
     fig.update_yaxes(title_text=ylabel, range=(0.0, 1.05))
     fig.update_layout(title_text=title)
     return fig
+
+
+def getPlotSmoothedSpikes(spikes_times, gf_std_secs,
+                          epoch_start_offset, epoch_end_offset, bin_size_secs,
+                          neuron_to_plot_index, trials_to_plot, trials_colors,
+                          title):
+    n_trials = len(spikes_times)
+    n_neurons = len(spikes_times[0])
+    bins_edges = np.arange(epoch_start_offset, epoch_end_offset, bin_size_secs)
+    bins_centers = (bins_edges[:-1] + bins_edges[1:])/2
+    binned_spikes_times = \
+            gcnu_common.utils.neuralDataAnalysis.binNeuronsAndTrialsSpikesTimes(
+                spikes_times=spikes_times, bins_edges=bins_edges,
+                time_unit="sec")
+
+    gf_std_samples = int(gf_std_secs / bin_size_secs)
+    gf_binned_spikes_times = \
+        [[scipy.ndimage.gaussian_filter1d(binned_spikes_times[r][n],
+                                          gf_std_samples)
+          for n in range(n_neurons)]
+         for r in range(n_trials)]
+
+    fig = go.Figure()
+    for r in trials_to_plot:
+        trace_color = trials_colors[r]
+        trace_bar = go.Bar(x=bins_centers,
+                           y=binned_spikes_times[r][neuron_to_plot_index],
+                           marker_color=trace_color,
+                           name="trial {:d}".format(r),
+                           legendgroup="trial{:02d}".format(r),
+                           showlegend=False)
+        fig.add_trace(trace_bar)
+        trace_line = go.Scatter(x=bins_centers,
+                                y=gf_binned_spikes_times[r][neuron_to_plot_index],
+                                line=dict(color=trace_color),
+                                name="trial {:d}".format(r),
+                                legendgroup="trial{:02d}".format(r),
+                                showlegend=True)
+        fig.add_trace(trace_line)
+    fig.update_layout(title=title)
+    return fig
+
