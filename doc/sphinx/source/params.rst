@@ -7,7 +7,7 @@ svGPFA uses different groups of parameters. We provide a utility function
 specifications. Parameters specification contain short descriptions on how to
 build a parameter. For example, a parameter specification for the inducing
 points locations can be **equidistant**, indicating that the inducing points
-locations should be set to equidistant values between the start and en of a
+locations should be set to equidistant values between the start and end of a
 trial.
 
 Parameter specifications are nested lists (e.g.,
