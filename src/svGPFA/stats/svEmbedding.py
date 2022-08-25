@@ -59,10 +59,10 @@ class SVEmbedding(abc.ABC):
 class LinearSVEmbedding(SVEmbedding):
 
     def setInitialParams(self, initialParams):
-        svEmbeddingInitialParams = initialParams["svEmbedding"]
+        svEmbeddingInitialParams = initialParams["embedding"]
         self._C = svEmbeddingInitialParams["C0"]
         self._d = svEmbeddingInitialParams["d0"]
-        svPosteriorOnLatentsInitialParams = initialParams["svPosteriorOnLatents"]
+        svPosteriorOnLatentsInitialParams = initialParams["posterior_on_latents"]
         self._svPosteriorOnLatents.setInitialParams(
             initialParams=svPosteriorOnLatentsInitialParams)
 

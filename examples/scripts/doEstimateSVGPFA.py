@@ -73,9 +73,6 @@ def main(argv):
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
         default_params=default_params)
-    kernels_params0 = params.initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["kernelsParams0"]
-    optim_method = params.optim_params["optim_method"]
-    prior_cov_reg_param = params.optim_params["prior_cov_reg_param"]
 
     # build modelSaveFilename
     estPrefixUsed = True
@@ -89,35 +86,30 @@ def main(argv):
         format(estResNumber)
 
     # build kernels
+    kernels_params0 = params["initial_params"]["posterior_on_latents"]["kernels_matrices_store"]["kernels_params0"]
     kernels = svGPFA.utils.miscUtils.buildKernels(
         kernels_types=kernels_types, kernels_params=kernels_params0)
 
     # create model
-    kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
-    indPointsCovRep = svGPFA.stats.svGPFAModelFactory.indPointsCovChol
-    model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
-        conditionalDist=svGPFA.stats.svGPFAModelFactory.PointProcess,
-        linkFunction=svGPFA.stats.svGPFAModelFactory.ExponentialLink,
-        embeddingType=svGPFA.stats.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
-        indPointsCovRep=indPointsCovRep)
+    model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.\
+        buildModelPyTorch(kernels=kernels)
 
     model.setInitialParamsAndData(
         measurements=spikes_times,
-        initialParams=params.initial_params,
-        eLLCalculationParams=params.quad_params,
-        priorCovRegParam=prior_cov_reg_param)
+        initialParams=params["initial_params"],
+        eLLCalculationParams=params["quad_params"],
+        priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
     # maximize lower bound
     svEM = svGPFA.stats.svEM.SVEM_PyTorch()
     lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-        svEM.maximize(model=model, optim_params=params.optim_params,
-                      method=optim_method)
+        svEM.maximize(model=model, optim_params=params["optim_params"],
+                      method=params["optim_params"]["optim_method"])
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
     estimResConfig["simulation_params"] = {"sim_res_number": sim_res_number}
-    estimResConfig["optim_params"] = params.optim_params
+    estimResConfig["optim_params"] = params["optim_params"]
     estimResConfig["estimation_params"] = {
         "est_init_number": est_init_number,
     }

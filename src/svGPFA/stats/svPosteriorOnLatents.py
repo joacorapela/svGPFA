@@ -231,9 +231,9 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         self._indPointsLocsAndTimesKMS.setKernels(kernels=kernels)
 
     def setInitialParams(self, initialParams):
-        self._svPosteriorOnIndPoints.setInitialParams(initialParams=initialParams["svPosteriorOnIndPoints"])
-        self._indPointsLocsKMS.setInitialParams(initialParams=initialParams["kernelsMatricesStore"])
-        self._indPointsLocsAndTimesKMS.setInitialParams(initialParams=initialParams["kernelsMatricesStore"])
+        self._svPosteriorOnIndPoints.setInitialParams(initialParams=initialParams["posterior_on_ind_points"])
+        self._indPointsLocsKMS.setInitialParams(initialParams=initialParams["kernels_matrices_store"])
+        self._indPointsLocsAndTimesKMS.setInitialParams(initialParams=initialParams["kernels_matrices_store"])
 
     def setIndPointsLocs(self, indPointsLocs):
         self._indPointsLocsKMS.setIndPointsLocs(indPointsLocs=indPointsLocs)
@@ -291,7 +291,7 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
         self._indPointsLocsAndTimesKMS.setKernels(kernels=kernels)
 
     def setInitialParams(self, initialParams):
-        self._indPointsLocsAndTimesKMS.setInitialParams(initialParams=initialParams["kernelsMatricesStore"])
+        self._indPointsLocsAndTimesKMS.setInitialParams(initialParams=initialParams["kernels_matrices_store"])
 
     def setIndPointsLocs(self, indPointsLocs):
         # not asking _indPointsLocsKMS to setIndPointsLocs becasue

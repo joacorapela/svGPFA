@@ -184,8 +184,8 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._svEmbeddingAssocTimes.setInitialParams(initialParams=initialParams)
 
     def setELLCalculationParams(self, eLLCalculationParams):
-        self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["legQuadPoints"])
-        self._legQuadWeights = eLLCalculationParams["legQuadWeights"]
+        self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
+        self._legQuadWeights = eLLCalculationParams["leg_quad_weights"]
 
     @abstractmethod
     def _getELinkValues(self, eMean, eVar):

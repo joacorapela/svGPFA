@@ -14,8 +14,8 @@ class KernelsMatricesStore(abc.ABC):
         self._kernels = kernels
 
     def setInitialParams(self, initialParams):
-        self.setIndPointsLocs(indPointsLocs=initialParams["inducingPointsLocs0"])
-        self.setKernelsParams(kernelsParams=initialParams["kernelsParams0"])
+        self.setIndPointsLocs(indPointsLocs=initialParams["inducing_points_locs0"])
+        self.setKernelsParams(kernelsParams=initialParams["kernels_params0"])
 
     def setKernelsParams(self, kernelsParams):
         for k in range(len(self._kernels)):

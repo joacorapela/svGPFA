@@ -310,7 +310,7 @@ def getParams(n_neurons, n_trials, default_params, config_file_params=None,
         config_file_params=config_file_params,
         default_params=default_params)
 
-    legQuadPoints, legQuadWeights = \
+    leg_quad_points, leg_quad_weights = \
         svGPFA.utils.miscUtils.getLegQuadPointsAndWeights(
             n_quad=n_quad, trials_start_times=trials_start_times,
             trials_end_times=trials_end_times)
@@ -353,17 +353,18 @@ def getParams(n_neurons, n_trials, default_params, config_file_params=None,
     )
     variational_params0 = {"mean": var_mean0,
                            "cholVecs": var_cov0_chol_vecs}
-    kmsParams0 = {"kernelsParams0": kernels_params0,
-                  "inducingPointsLocs0": ind_points_locs0}
-    posteriorLatentsParams0 = {"svPosteriorOnIndPoints": variational_params0,
-                               "kernelsMatricesStore": kmsParams0}
+    kms_params0 = {"kernels_params0": kernels_params0,
+                   "inducing_points_locs0": ind_points_locs0}
+    posteriorLatentsParams0 = {"posterior_on_ind_points": variational_params0,
+                               "kernels_matrices_store": kms_params0}
     embeddingParams0 = {"C0": C0, "d0": d0}
-    initialParams = {"svPosteriorOnLatents": posteriorLatentsParams0,
-                     "svEmbedding": embeddingParams0}
-    quadParams = {"legQuadPoints": legQuadPoints,
-                  "legQuadWeights": legQuadWeights}
-
-    return initialParams, quadParams, kernels_types, optim_params
+    initial_params = {"posterior_on_latents": posteriorLatentsParams0,
+                      "embedding": embeddingParams0}
+    quad_params = {"leg_quad_points": leg_quad_points,
+                   "leg_quad_weights": leg_quad_weights}
+    params = {"initial_params": initial_params, "quad_params": quad_params,
+              "optim_params": optim_params}
+    return params, kernels_types
 
 
 def getParam(section_name, param_name,
