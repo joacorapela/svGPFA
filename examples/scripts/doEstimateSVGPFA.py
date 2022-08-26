@@ -68,7 +68,7 @@ def main(argv):
         n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents)
     #    finally, get the parameters from the dynamic,
     #    configuration file and default parameter specifications
-    params, kernels_types = svGPFA.utils.initUtils.getParams(
+    params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
         n_trials=n_trials, n_neurons=n_neurons,
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
