@@ -1,5 +1,7 @@
-#!/bin/csh
+#!/bin/bash
 
-aspell --personal=./svGPFA_doc.dic check introduction.rst 
-aspell --personal=./svGPFA_doc.dic check highLevelInterface.rst 
-aspell --personal=./svGPFA_doc.dic check lowLevelInterface.dic
+rstFiles="highLevelInterface.rst  index.rst introduction.rst lowLevelInterface.rst params.rst references.rst svGPFA.plot.rst svGPFA.rst svGPFA.stats.rst svGPFA.utils.rst"
+
+for rstFile in $rstFiles; do
+    aspell -p ./svGPFA_doc.dic check $rstFile
+done
