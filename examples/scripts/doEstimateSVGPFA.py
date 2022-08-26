@@ -19,11 +19,13 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--sim_res_number", help="simuluation result number",
                         type=int, default=32451751)
+    parser.add_argument("--est_init_number", help="estimation init number",
+                        type=int, default=545)
+    parser.add_argument("--n_latents", help="number of latents", type=int,
+                        default=3)
     parser.add_argument("--sim_res_filename_pattern",
                         help="simuluation result filename pattern",
                         type=str, default="../data/{:08d}_simRes.pickle")
-    parser.add_argument("--est_init_number", help="estimation init number",
-                        type=int, default=545)
     parser.add_argument("--est_init_config_filename_pattern",
                         help="estimation initialization configuration "
                              "filename pattern",
@@ -35,6 +37,7 @@ def main(argv):
         populated=args, remaining=remaining)
     sim_res_number = args.sim_res_number
     est_init_number = args.est_init_number
+    n_latents = args.n_latents
     sim_res_filename_pattern = args.sim_res_filename_pattern
     est_init_config_filename_pattern = args.est_init_config_filename_pattern
 
@@ -46,18 +49,16 @@ def main(argv):
     n_trials = len(spikes_times)
     n_neurons = len(spikes_times[0])
 
-    # get initial parameters
-    est_init_config_filename = est_init_config_filename_pattern.format(
-        est_init_number)
-    est_init_config = configparser.ConfigParser()
-    est_init_config.read(est_init_config_filename)
-    n_latents = int(est_init_config["model_structure_params"]["n_latents"])
     #    build dynamic parameter specifications
     args_info = svGPFA.utils.initUtils.getArgsInfo()
     dynamic_params = svGPFA.utils.initUtils.getParamsDictFromArgs(
         n_latents=n_latents, n_trials=n_trials, args=vars(args),
         args_info=args_info)
     #    build configuration file parameter spefications
+    est_init_config_filename = est_init_config_filename_pattern.format(
+        est_init_number)
+    est_init_config = configparser.ConfigParser()
+    est_init_config.read(est_init_config_filename)
     strings_dict = gcnu_common.utils.config_dict.GetDict(
         config=est_init_config).get_dict()
     config_file_params = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
