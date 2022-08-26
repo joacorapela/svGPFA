@@ -31,7 +31,7 @@ To estimate a sparse variational Gaussian process factor analysis model we:
 
 Please refer to the following
 `Google Colab notebook
-<https://colab.research.google.com/drive/1Ze60RlX65-Yx8oG1EdKYm2mSvVCMaJgv>`_,
+<https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`_,
 `Jupyter notebook
-<https://github.com/joacorapela/svGPFA/blob/master/doc/ipynb/do  EstimateAndPlot.ipynb>`_, or `Python script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_
+<https://github.com/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot.ipynb>`_, or `Python script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_
 for examples of using this interface.
