@@ -276,15 +276,10 @@ def getParamsDictFromStringsDict(n_latents, n_trials, strings_dict, args_info):
     return params_dict
 
 
-def getParamsAndKernelsTypes(n_neurons, n_trials, default_params,
+def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
+                             default_params=None,
                              config_file_params=None,
                              dynamic_params=None):
-    n_latents = getParam(section_name="model_structure_params",
-                         param_name="n_latents",
-                         dynamic_params=dynamic_params,
-                         config_file_params=config_file_params,
-                         default_params=default_params,
-                         conversion_func=int)
     n_quad = getParam(section_name="optim_params",
                       param_name="n_quad",
                       dynamic_params=dynamic_params,
