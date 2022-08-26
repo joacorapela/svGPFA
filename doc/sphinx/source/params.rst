@@ -3,21 +3,28 @@ Parameters and their specification
 ##################################
 
 svGPFA uses different groups of parameters. We provide a utility function
-:meth:`svGPFA.utils.initUtils.getParams` that builds them from parameter
-specifications. Parameters specification contain short descriptions on how to
-build a parameter. For example, a parameter specification for the inducing
+:meth:`svGPFA.utils.initUtils.getParamsAndKernelsTypes` that builds them from
+parameter specifications. These specifications contain short descriptions on how
+to build a parameter. For example, a parameter specification for the inducing
 points locations can be **equidistant**, indicating that the inducing points
 locations should be set to equidistant values between the start and end of a
 trial.
 
-Parameter specifications are nested lists (e.g.,
-**param_spec[group_name][param_name]**) containing the specification of a
-parameter with a given name in a given group name Parameter specifications can
-be built manually, from the command line with the utility function
-**buildParamsSpecsFromArgs**, or from a configuration file with the utility
-function **buildParamsSpecsFromConfig**.
+A parameter specification is a nested list (e.g.,
+**param_spec[group_name][param_name]**) containing the specification of
+parameter **param_name** in group **group_name**. It can be built:
 
-Below we describe the svGPFA parameters and their specifications. Refer to the
+    1. manually, by specifying all parameters of all groups of the parameter specification list,
+
+    2. automatically, using default values, with the utility function :meth:`svGPFA.utils.initUtils.getDefaultParamsDict`,
+           
+    3. from the command line, with the utility function :meth:`svGPFA.utils.initUtils.getParamsDictFromArgs`,
+
+    4. from a configuration file, with the utility function :meth:`svGPFA.utils.initUtils.getParamsDictFromStringsDict`.
+
+This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py>`_ demonstrates the manual construction of the parameters specification list (1). The `Colab <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`_ and `Jupyter <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_ notebooks automatically build this list (2). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_ builds the parameters specification list from the command line and from this `configuration file <https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini>`_ (3, 4).
+
+Below we describe all svGPFA parameters and their specifications. Refer to the
 documentation of the above utility functions for details on how to use them.
 
 .. _module_structure_params:
