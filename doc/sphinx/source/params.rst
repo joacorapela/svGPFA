@@ -386,7 +386,7 @@ One item needs to be specified:
        trials_start_time = 0.0
        trials_end_time = 7.0
        params_spec["indPointsLocs_params0"] = {
-            "indPointsLocs0": [trials_start_time + (trials_end_time-trials_start_time) * torch.rand(n_trials, n_ind_points[k], 1) for k in n_latents]
+            "indPointsLocs0": [trials_start_time + (trials_end_time-trials_start_time) * torch.rand(n_trials, n_ind_points[k], 1) for k in range(n_latents)]
        }
 
 Latent-trial-specific filename format
