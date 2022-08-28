@@ -148,7 +148,7 @@ Two items need to be specified:
         diag_value = 1e-2
         var_cov0 = [[] for r in range(n_latents)]
         for k in range(n_latents):
-            var_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points), dtype=torch.double)
+            var_cov0[k] = torch.empty((n_trials, n_ind_points[k], n_ind_points[k]), dtype=torch.double)
             for r in range(n_trials):
                 var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_value
 
