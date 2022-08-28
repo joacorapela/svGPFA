@@ -150,7 +150,7 @@ Two items need to be specified:
         for k in range(n_latents):
             var_cov0[k] = torch.empty((n_trials, n_ind_points[k], n_ind_points[k]), dtype=torch.double)
             for r in range(n_trials):
-                var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_value
+                var_cov0[k][r, :, :] = torch.eye(n_ind_points[k])*diag_value
 
         params_spec["variational_params0"] = {
             "variational_mean0": var_mean0,
