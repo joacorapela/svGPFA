@@ -4,7 +4,7 @@ Parameters and their specification
 
 svGPFA uses different groups of parameters. We provide a utility function
 :meth:`svGPFA.utils.initUtils.getParamsAndKernelsTypes` that builds them from
-parameter specifications. These specifications contain short descriptions on how
+parameter specifications. These specifications are short descriptions on how
 to build a parameter. For example, a parameter specification for the inducing
 points locations can be **equidistant**, indicating that the inducing points
 locations should be set to equidistant values between the start and end of a
@@ -14,32 +14,18 @@ A parameter specification is a nested list (e.g.,
 **param_spec[group_name][param_name]**) containing the specification of
 parameter **param_name** in group **group_name**. It can be built:
 
-    1. manually, by specifying all parameters of all groups of the parameter specification list,
-
-    2. automatically, using default values, with the utility function :meth:`svGPFA.utils.initUtils.getDefaultParamsDict`,
+    1. automatically, using default values, with the utility function :meth:`svGPFA.utils.initUtils.getDefaultParamsDict`,
            
+    2. manually, by setting parameter specifications in the Python code,
+
     3. from the command line, with the utility function :meth:`svGPFA.utils.initUtils.getParamsDictFromArgs`,
 
     4. from a configuration file, with the utility function :meth:`svGPFA.utils.initUtils.getParamsDictFromStringsDict`.
-
-This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py>`_ demonstrates the manual construction of the parameters specification list (1). The `Colab <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`_ and `Jupyter <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_ notebooks automatically build this list (2). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_ builds the parameters specification list from the command line and from this `configuration file <https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini>`_ (3, 4).
+          
+    The `Colab <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`__ and `Jupyter <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ notebooks automatically build this list (1). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py>`__ demonstrates the manual construction of all parameters specifications (2). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ builds the parameters specification list from the command line and from this `configuration file <https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini>`__ (3, 4).
 
 Below we describe all svGPFA parameters and their specifications. Refer to the
 documentation of the above utility functions for details on how to use them.
-
-.. _module_structure_params:
-
-Model structure parameters
-==========================
-
-The only model structure parameter is ``n_latents``, an integer representing the
-number of latents variables in the svGPFA model; i.e., :math:`K` in Eq. 1 in
-:cite:t:`dunckerAndSahani18`.
-
-    .. code-block:: python
-       :caption: adding **model_structure_params** to **params_spec**
-
-        params_spec["model_structure_params"] = {"n_latents": 7}
 
 .. _data_structure_params:
 
@@ -88,6 +74,19 @@ Two items need to be specified:
             "trials_end_time":   1.0,
         }
 
+
+Defaults
+--------
+
+All trials start at 0.0 sec and end at 1.0 sec.
+
+    .. code-block:: python
+       :caption: default **data_structure_params** 
+
+        params_spec["data_structure_params"] = {
+            "trials_start_time": 0.0,
+            "trials_end_time":   1.0,
+        }
 
 .. _initial_value_params:
 
@@ -140,18 +139,14 @@ Two items need to be specified:
        :caption: adding random **variational_params0** in the Python variable format to **params_spec**
 
         n_latents = 3
-        n_trials = 10
         n_ind_points = [20, 10, 15]
-
-        var_mean0 = [torch.normal(mean=0, std=1, size=(n_trials, n_ind_points[k], 1)) for k in range(n_latents)]
-
-        diag_value = 1e-2
+        var_mean0 = [torch.normal(mean=0, std=1, size=(n_trials, n_ind_points[k], 1), dtype=torch.double) for k in range(n_latents)]
+        diag_value = 1e-2 
         var_cov0 = [[] for r in range(n_latents)]
         for k in range(n_latents):
             var_cov0[k] = torch.empty((n_trials, n_ind_points[k], n_ind_points[k]), dtype=torch.double)
             for r in range(n_trials):
-                var_cov0[k][r, :, :] = torch.eye(n_ind_points[k])*diag_value
-
+                var_cov0[k][r, :, :] = torch.eye(n_ind_points[k], dtype=torch.double)*diag_value
         params_spec["variational_params0"] = {
             "variational_mean0": var_mean0,
             "variational_cov0":  var_cov0,
@@ -210,6 +205,29 @@ Two items need to be specified:
             "variational_covs0_filename": "../data/identity_scaled1e-2_09x09.csv",
         }
 
+Defaults
+^^^^^^^^
+
+For any latent k and trial r,  the default variational mean is a zero tensor of length number of inducing points for latent k, and the default variational covariance is a diagonal matrix, with diagonal value 0.01.
+
+    .. code-block:: python
+       :caption: default **variational_params0**
+
+        var_mean0 = [torch.zeros((n_trials, n_ind_points, 1), dtype=torch.double)
+                     for k in range(n_latents)]
+        diag_var_cov0_value = 0.01
+        var_cov0 = [[] for r in range(n_latents)]
+        for k in range(n_latents):
+            var_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points),
+                                    dtype=torch.double)
+            for r in range(n_trials):
+                var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_var_cov0_value
+
+        params_spec["variational_params0"] = {
+            "variational_mean0": var_mean0,
+            "variational_cov0": var_cov0,
+        }
+
 .. _embedding_params0:
 
 Embedding parameters
@@ -232,8 +250,8 @@ Two items need to be specified:
         n_latents = 3
 
         params_spec["embedding_params0"] = {
-            "c0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents)),
-            "d0":  torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1)),
+            "c0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents), dtype=torch.double),
+            "d0":  torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1), dtype=torch.double),
         }
 
 Filename format
@@ -288,6 +306,22 @@ Eight items need to be specified:
             "d0_random_seed": 203040,
         }
 
+Defaults
+^^^^^^^^
+The default loading matrix C0/offset vector d0 is a zero mean standard normal random  matrix/vector.
+
+    .. code-block:: python
+       :caption: default **embedding_params0**
+
+        params_spec["embedding_params0"] = {
+            "c0_distribution": "Normal",
+            "c0_loc": 0.0,
+            "c0_scale": 1.0,
+            "d0_distribution": "Normal",
+            "d0_loc": 0.0,
+            "d0_scale": 1.0,
+        }
+
 .. _kernels_params0:
 
 Kernel parameters
@@ -309,9 +343,16 @@ Two items need to be specified:
     .. code-block:: python
        :caption: adding **kernel_params** in Python variable format (2 latents) to **params_spec**
 
+       expQuadK1_lengthscale = 2.9
+       expQuadK2_lengthscale = 0.5
+       periodK1_lengthscale = 3.1
+       periodK1_period = 1.2
        params_spec["kernels_params0"] = {
-            "k_types": ["exponentialQuadratic", "periodic"],
-            "k_params0": [torch.DoubleTensor([2.9]), torch.DoubleTensor([3.1, 1.2])],
+            "k_types": ["exponentialQuadratic", "exponentialQuadratic", "periodic"],
+            "k_params0": [torch.DoubleTensor([expQuadK1_lengthscale]),
+                          torch.DoubleTensor([expQuadK2_lengthscale]),
+                          torch.DoubleTensor([periodK1_lengthscale, periodK1_lengthscale]),
+                         ],
        }
 
 Latent-specific textual format
@@ -357,6 +398,18 @@ respectively.
            "k_lengthscales0": 1.0,
        }
 
+Defaults
+^^^^^^^^
+For all latents, the default kernel is an exponential quadratic kernel with lengthscale 1.0.
+
+    .. code-block:: python
+       :caption: default **kernel_params**
+
+        params_spec["kernels_params0"] =  {
+            "k_type": "exponentialQuadratic",
+            "k_lengthscale0": 1.0,
+        }
+
 .. _indPointsLocs_params0:
 
 Inducing points locations parameters
@@ -372,21 +425,21 @@ Python variable format
 
 One item needs to be specified:
 
-* ``indPointsLocs0`` should be a list of size **n_latents**. The kth element of
+* ``ind_points_locs0`` should be a list of size **n_latents**. The kth element of
   this list should be a **torch.DoubleTensor** of size (**n_trials**,
   **n_indPoints[k]**, 1), where **indPointsLocs0[k][r, :, 0]** gives the
   initial inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in Python variable format with uniformly distributed inducing points locations to **params_spec**
+       :caption: adding **ind_points_locs_params0** in Python variable format with uniformly distributed inducing points locations to **params_spec**
 
        n_latents = 3
        n_ind_points = (10, 20, 15)
        n_trials = 50
        trials_start_time = 0.0
        trials_end_time = 7.0
-       params_spec["indPointsLocs_params0"] = {
-            "indPointsLocs0": [trials_start_time + (trials_end_time-trials_start_time) * torch.rand(n_trials, n_ind_points[k], 1) for k in range(n_latents)]
+       params_spec["ind_points_locs_params0"] = {
+            "ind_points_locs0": [trials_start_time + (trials_end_time-trials_start_time) * torch.rand(n_trials, n_ind_points[k], 1, dtype=torch.double) for k in range(n_latents)]
        }
 
 Latent-trial-specific filename format
@@ -394,33 +447,33 @@ Latent-trial-specific filename format
 
 For each latent k and trial r one item needs to be specified:
 
-* ``indPointsLocs0_latent<k>_trial<r>_filename`` giving the name of the file
+* ``ind_points_locs0_latent<k>_trial<r>_filename`` giving the name of the file
   (csv format readable by pandas *read_csv* function) containing the initial
   inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in the latent-trial-specific filename format to **params_spec** (2 latents, 2 trials)
+       :caption: adding **ind_points_locs_params0** in the latent-trial-specific filename format to **params_spec** (2 latents, 2 trials)
 
-       params_spec["indPointsLocs_params0"] = {
-           "indPointsLocs0_latent0_trial0_filename": "indPointsLocs0_latent0_trial0.csv",
-           "indPointsLocs0_latent0_trial1_filename": "indPointsLocs0_latent0_trial1.csv",
-           "indPointsLocs0_latent1_trial0_filename": "indPointsLocs0_latent1_trial0.csv",
-           "indPointsLocs0_latent1_trial1_filename": "indPointsLocs0_latent1_trial1.csv",
+       params_spec["ind_points_locs_params0"] = {
+           "ind_points_locs0_latent0_trial0_filename": "ind_points_locs0_latent0_trial0.csv",
+           "ind_points_locs0_latent0_trial1_filename": "ind_points_locs0_latent0_trial1.csv",
+           "ind_points_locs0_latent1_trial0_filename": "ind_points_locs0_latent1_trial0.csv",
+           "ind_points_locs0_latent1_trial1_filename": "ind_points_locs0_latent1_trial1.csv",
        }
 
 Latent-trial-common filename format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This shorter format requires the specification of the item
-``indPointsLocs0_filename`` giving the name of the file (csv format readable by
+``ind_points_locs0_filename`` giving the name of the file (csv format readable by
 pandas *read_csv* function) containing the initial inducing points locations
 for all latents and trials.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in the latent-trial-common filename format to **params_spec**
+       :caption: adding **ind_points_locs_params0** in the latent-trial-common filename format to **params_spec**
 
-       params_spec["indPointsLocs_params0"] = {
-           "indPointsLocs0_filename": "indPointsLocs0.csv",
+       params_spec["ind_points_locs_params0"] = {
+           "ind_points_locs0_filename": "ind_points_locs0.csv",
        }
 
 Layout format
@@ -435,12 +488,21 @@ points are equidistant between the trial start and trial end. If
 positioned between the start and end of the trial.
 
     .. code-block:: python
-       :caption: adding **indPointsLocs_params0** in the layout format to **params_spec**
+       :caption: adding **ind_points_locs_params0** in the layout format to **params_spec**
 
-       params_spec["indPointsLocs_params0"] = {
+       params_spec["ind_points_params0"] = {
            "n_ind_points": 9,
            "ind_points_locs0_layout": "equidistant",
        }
+
+Defaults
+^^^^^^^^
+For all latents, the default kernel is an exponential quadratic kernel with lengthscale 1.0.
+
+        "ind_points_params0": {
+            "n_ind_points": n_ind_points,
+            "ind_points_locs0_layout": "equidistant",
+        },
 
 Optimisation parameters
 =======================
@@ -498,42 +560,42 @@ section ``[optim_params]`` should contain items:
   `<step>_line_search_fn=None`` line search is not used.
 
     .. code-block:: python
-       :caption: example section [optim_params] of the configuration file
+       :caption: adding **optimisation_params** to **params_spec**
 
-        [optim_params]
-        n_quad = 200
-        prior_cov_reg_param = 1e-5
-        #
-        optim_method = ECM
-        em_max_iter = 200
-        #
-        estep_estimate = True
-        estep_max_iter = 20
-        estep_lr = 1.0
-        estep_tolerance_grad = 1e-7
-        estep_tolerance_change = 1e-9
-        estep_line_search_fn = strong_wolfe
-        #
-        mstep_embedding_estimate = True
-        mstep_embedding_max_iter = 20
-        mstep_embedding_lr = 1.0
-        mstep_embedding_tolerance_grad = 1e-7
-        mstep_embedding_tolerance_change = 1e-9
-        mstep_embedding_line_search_fn = strong_wolfe
-        #
-        mstep_kernels_estimate = True
-        mstep_kernels_max_iter = 20
-        mstep_kernels_lr = 1.0
-        mstep_kernels_tolerance_grad = 1e-7
-        mstep_kernels_tolerance_change = 1e-9
-        mstep_kernels_line_search_fn = strong_wolfe
-        #
-        mstep_indpointslocs_estimate = True
-        mstep_indpointslocs_max_iter = 20
-        mstep_indpointslocs_lr = 1.0
-        mstep_indpointslocs_tolerance_grad = 1e-7
-        mstep_indpointslocs_tolerance_change = 1e-9
-        mstep_indpointslocs_line_search_fn = strong_wolfe
-        #
-        verbose = True
-        
+        params_spec["optim_params"] = {
+            "n_quad": 200,
+            "prior_cov_reg_param": 1e-5,
+            #
+            "optim_method": "ECM",
+            "em_max_iter": 200,
+            #
+            "estep_estimate": True,
+            "estep_max_iter": 20,
+            "estep_lr": 1.0,
+            "estep_tolerance_grad": 1e-7,
+            "estep_tolerance_change": 1e-9,
+            "estep_line_search_fn": "strong_wolfe",
+            #
+            "mstep_embedding_estimate": True,
+            "mstep_embedding_max_iter": 20,
+            "mstep_embedding_lr": 1.0,
+            "mstep_embedding_tolerance_grad": 1e-7,
+            "mstep_embedding_tolerance_change": 1e-9,
+            "mstep_embedding_line_search_fn": "strong_wolfe",
+            #
+            "mstep_kernels_estimate": True,
+            "mstep_kernels_max_iter": 20,
+            "mstep_kernels_lr": 1.0,
+            "mstep_kernels_tolerance_grad": 1e-7,
+            "mstep_kernels_tolerance_change": 1e-9,
+            "mstep_kernels_line_search_fn": "strong_wolfe",
+            #
+            "mstep_indpointslocs_estimate": True,
+            "mstep_indpointslocs_max_iter": 20,
+            "mstep_indpointslocs_lr": 1.0,
+            "mstep_indpointslocs_tolerance_grad": 1e-7,
+            "mstep_indpointslocs_tolerance_change": 1e-9,
+            "mstep_indpointslocs_line_search_fn": "strong_wolfe",
+            #
+            "verbose": True,
+       } 
