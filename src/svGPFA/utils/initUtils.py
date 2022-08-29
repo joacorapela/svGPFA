@@ -77,22 +77,21 @@ def getOptimParams(dynamic_params, config_file_params, default_params,
     return hierarchical_optim_params
 
 
-def getDefaultParamsDict(n_neurons, n_trials, n_latents=3, n_ind_points=10,
-                         n_quad=200,
+def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
+                         n_ind_points=(10, 10, 10), n_quad=200,
                          trials_start_time=0.0, trials_end_time=1.0,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
-                         em_max_iter=50):
-    var_mean0 = [torch.zeros((n_trials, n_ind_points, 1), dtype=torch.double)
+                         lengthscale=1.0, em_max_iter=50):
+    var_mean0 = [torch.zeros((n_trials, n_ind_points[k], 1), dtype=torch.double)
                  for k in range(n_latents)]
     var_cov0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
-        var_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points),
+        var_cov0[k] = torch.empty((n_trials, n_ind_points[k], n_ind_points[k]),
                                   dtype=torch.double)
         for r in range(n_trials):
-            var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_var_cov0_value
+            var_cov0[k][r, :, :] = torch.eye(n_ind_points[k])*diag_var_cov0_value
 
     params_dict = {
-        "model_structure_params": {"n_latents": n_latents},
         "data_structure_params": {"trials_start_time": trials_start_time,
                                   "trials_end_time": trials_end_time},
         "variational_params0": {
@@ -100,62 +99,95 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3, n_ind_points=10,
             "variational_cov0": var_cov0,
         },
         "embedding_params0": {
-            "c0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, n_latents),
-                              dtype=torch.double),
-            "d0": torch.normal(mean=0.0, std=1.0, size=(n_neurons, 1),
-                              dtype=torch.double),
+            "c0_distribution": "Normal",
+            "c0_loc": 0.0,
+            "c0_scale": 1.0,
+            "d0_distribution": "Normal",
+            "d0_loc": 0.0,
+            "d0_scale": 1.0,
         },
-        "kernels_params0": {"k_type": "exponentialQuadratic",
-                            "k_lengthscale0": 1.0},
-        "ind_points_params0": {"n_ind_points": n_ind_points,
-                               "ind_points_locs0_layout": "equidistant"},
-        "optim_params": {"n_quad": n_quad,
-                         "prior_cov_reg_param": prior_cov_reg_param,
-                         "optim_method": "ecm",
-                         "em_max_iter": em_max_iter,
-                         "verbose": True,
-                         #
-                         "estep_estimate": True,
-                         "estep_max_iter": 20,
-                         "estep_lr": 1.0,
-                         "estep_tolerance_grad": 1e-7,
-                         "estep_tolerance_change": 1e-9,
-                         "estep_line_search_fn": "strong_wolfe",
-                         #
-                         "mstep_embedding_estimate": True,
-                         "mstep_embedding_max_iter": 20,
-                         "mstep_embedding_lr": 1.0,
-                         "mstep_embedding_tolerance_grad": 1e-7,
-                         "mstep_embedding_tolerance_change": 1e-9,
-                         "mstep_embedding_line_search_fn": "strong_wolfe",
-                         #
-                         "mstep_kernels_estimate": True,
-                         "mstep_kernels_max_iter": 20,
-                         "mstep_kernels_lr": 1.0,
-                         "mstep_kernels_tolerance_grad": 1e-7,
-                         "mstep_kernels_tolerance_change": 1e-9,
-                         "mstep_kernels_line_search_fn": "strong_wolfe",
-                         #
-                         "mstep_indpointslocs_estimate": True,
-                         "mstep_indpointslocs_max_iter": 20,
-                         "mstep_indpointslocs_lr": 1.0,
-                         "mstep_indpointslocs_tolerance_grad": 1e-7,
-                         "mstep_indpointslocs_tolerance_change": 1e-9,
-                         "mstep_indpointslocs_line_search_fn": "strong_wolfe"}
+        "kernels_params0": {
+            "k_type": "exponentialQuadratic",
+            "k_lengthscale0": legthscale,
+        },
+        "ind_points_params0": {
+            "n_ind_points": n_ind_points,
+            "ind_points_locs0_layout": "equidistant",
+        },
+        "optim_params": {
+            "n_quad": n_quad,
+            "prior_cov_reg_param": prior_cov_reg_param,
+            "optim_method": "ecm",
+            "em_max_iter": em_max_iter,
+            "verbose": True,
+            #
+            "estep_estimate": True,
+            "estep_max_iter": 20,
+            "estep_lr": 1.0,
+            "estep_tolerance_grad": 1e-7,
+            "estep_tolerance_change": 1e-9,
+            "estep_line_search_fn": "strong_wolfe",
+            #
+            "mstep_embedding_estimate": True,
+            "mstep_embedding_max_iter": 20,
+            "mstep_embedding_lr": 1.0,
+            "mstep_embedding_tolerance_grad": 1e-7,
+            "mstep_embedding_tolerance_change": 1e-9,
+            "mstep_embedding_line_search_fn": "strong_wolfe",
+            #
+            "mstep_kernels_estimate": True,
+            "mstep_kernels_max_iter": 20,
+            "mstep_kernels_lr": 1.0,
+            "mstep_kernels_tolerance_grad": 1e-7,
+            "mstep_kernels_tolerance_change": 1e-9,
+            "mstep_kernels_line_search_fn": "strong_wolfe",
+            #
+            "mstep_indpointslocs_estimate": True,
+            "mstep_indpointslocs_max_iter": 20,
+            "mstep_indpointslocs_lr": 1.0,
+            "mstep_indpointslocs_tolerance_grad": 1e-7,
+            "mstep_indpointslocs_tolerance_change": 1e-9,
+            "mstep_indpointslocs_line_search_fn": "strong_wolfe"}
     }
     return params_dict
 
 
-def strTo1DDoubleTensor(aString, sep=" ", dtype=float):
+def strTo1DTensor(aString, dtype=torch.double, sep=" "):
     an_np_array = np.fromstring(aString, sep=sep, dtype=dtype)
     a_tensor = torch.from_numpy(an_np_array)
     return a_tensor
 
 
-def strTo2DDoubleTensor(aString):
-    an_np_matrix = np.matrix(aString)
+def strTo2DTensor(aString, dtype=torch.double):
+    if dtype==torch.double:
+        dtype_np = np.float64
+    elif dtype==torch.int:
+        dtype_np = np.int32
+    els:
+        raise ValueError(f"Invalid dtype={dtype}")
+
+    an_np_matrix = np.matrix(aString, dtype=dtype_np)
     a_tensor = torch.from_numpy(an_np_matrix)
     return a_tensor
+
+
+def strTo2DDoubleTensor(aString):
+    return strTo2DTensor(aString=aString, dtype=torch.double)
+
+
+def strTo2DIntTensor(aString):
+    return strTo2DTensor(aString=aString, dtype=torch.int)
+)
+
+
+def strTo1DDoubleTensor(aString):
+    return strTo1DTensor(aString=aString, dtype=torch.double)
+
+
+def strTo1DIntTensor(aString):
+    return strTo1DTensor(aString=aString, dtype=torch.int)
+)
+
 
 def getArgsInfo():
     args_info = {"model_structure_params": {"n_latents": int},
@@ -179,7 +211,7 @@ def getArgsInfo():
                                      "k_type_latent{:d}": str,
                                      "k_lengthscale0_latent{:d}": float,
                                      "k_period0_latent{:d}": float},
-                 "ind_points_params0": {"n_ind_points": int,
+                 "ind_points_params0": {"n_ind_points": strTo1DIntTensor,
                                         "ind_points_locs0_layout": str,
                                         "ind_points_locs0_filename": str,
                                         "ind_points_locs0_filename_latent{:d}_trial{:d}": str},
@@ -541,7 +573,7 @@ def getTrialsTimesInDict(n_trials, param_list_label, param_float_label,
                          section_name="data_structure_params"):
     if section_name in params_dict and \
        param_list_label in params_dict[section_name]:
-        trials_times = strTo1DDoubleTensor(aString=params_dict[section_name][param_list_label])
+        trials_times = params_dict[section_name][param_list_label]
         print(f"Extracted {param_list_label} from {params_dict_type}")
     elif section_name in params_dict and \
        param_float_label in params_dict[section_name]:
@@ -681,7 +713,7 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
 
 def getIndPointsLocs0(n_latents, n_trials,
                       dynamic_params, config_file_params, default_params,
-                      n_ind_points=-1,
+                      n_ind_points=None,
                       trials_start_times=None,
                       trials_end_times=None):
     if dynamic_params is not None:
@@ -714,12 +746,12 @@ def getIndPointsLocs0(n_latents, n_trials,
         if param is not None:
             return param
 
-    raise ValueError("ind_points_loc0 not found")
+    raise ValueError("ind_points_locs0 not found")
 
 
 def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
                             n_ind_points, trials_start_times, trials_end_times,
-                            section_name="ind_points_params0"):
+                            section_name="ind_points_locs_params0"):
     # binary
     if section_name in params_dict and \
        "ind_points_locs0" in params_dict[section_name]:
@@ -745,7 +777,7 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
     # layout
     elif section_name in params_dict and \
             "ind_points_locs0_layout" in params_dict[section_name] and \
-            n_ind_points > 0 and  \
+            n_ind_points is not None and  \
             trials_start_times is not None and \
             trials_end_times is not None:
         layout = params_dict[section_name]["ind_points_locs0_layout"]
@@ -813,10 +845,10 @@ def buildEquidistantIndPointsLocs0(n_latents, n_trials, n_ind_points,
                                    trials_start_times, trials_end_times):
     Z0s = [[] for k in range(n_latents)]
     for k in range(n_latents):
-        Z0s[k] = torch.empty((n_trials, n_ind_points, 1), dtype=torch.double)
+        Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1), dtype=torch.double)
         for r in range(n_trials):
             Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
-                                n_ind_points)
+                                n_ind_points[k])
             Z0s[k][r, :, 0] = Z0
     return Z0s
 
@@ -899,22 +931,20 @@ def getVariationalMean0InDict(n_latents, n_trials, n_ind_points,
         constant_value = params_dict[section_name][constant_value_item_name]
         print(f"Extracted {constant_value_item_name}={constant_value} from "
               f"{params_dict_type}")
-        a_variational_mean0 = constant_value * torch.ones(n_ind_points, dtype=torch.double)
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
-            n_latents=n_latents, n_trials=n_trials,
-            a_variational_mean0=a_variational_mean0)
+            n_latents=n_latents, n_trials=n_trials, n_ind_points=n_ind_points,
+            constant_value=constant_value)
     else:
         variational_mean0 = None
     return variational_mean0
 
 
 def getSameAcrossLatentsAndTrialsVariationalMean0(n_latents, n_trials,
-                                                  a_variational_mean0):
+                                                  n_ind_points, constant_value):
     variational_mean0 = [[] for r in range(n_latents)]
-    nIndPoints = len(a_variational_mean0)
     for k in range(n_latents):
-        variational_mean0[k] = torch.empty((n_trials, nIndPoints, 1), dtype=torch.double)
-        variational_mean0[k][:, :, 0] = a_variational_mean0
+        variational_mean0[k] = torch.empty((n_trials, n_ind_points[k], 1), dtype=torch.double)
+        variational_mean0[k][:, :, 0] = constant_value * torch.ones(n_ind_points[k], dtype=torch.double)
     return variational_mean0
 
 
@@ -945,7 +975,7 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
 
 def getVariationalCov0(n_latents, n_trials,
                        dynamic_params, config_file_params, default_params,
-                       n_ind_points=-1):
+                       n_ind_points=None):
     if dynamic_params is not None:
         param = getVariationalCov0InDict(n_latents=n_latents,
                                          n_trials=n_trials,
@@ -978,7 +1008,7 @@ def getVariationalCov0(n_latents, n_trials,
 
 def getVariationalCov0InDict(n_latents, n_trials, params_dict,
                              params_dict_type,
-                             n_ind_points=-1,
+                             n_ind_points=None,
                              section_name="variational_params0",
                              binary_item_name="variational_cov0",
                              common_filename_item_name="variational_covs0_filename",
@@ -993,10 +1023,14 @@ def getVariationalCov0InDict(n_latents, n_trials, params_dict,
     # diag_value
     elif section_name in params_dict and \
        diag_value_item_name in params_dict[section_name]:
-        diag_value = params_dict[section_name][common_filename_item_name]
+        diag_value = params_dict[section_name][diag_value_item_name]
         print(f"Extracted {diag_value_item_name}={diag_value} from "
               f"{params_dict_type}")
-        variational_cov0 = diag_value * torch.eye(n_ind_points, dtype=torch.double)
+        a_variational_cov0 = diag_value * torch.eye(n_ind_points, dtype=torch.double)
+        variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
+            n_latents=n_latents, n_trials=n_trials,
+            a_variational_cov0=a_variational_cov0,
+            section_name=section_name)
     # common_filename
     elif section_name in params_dict and \
             common_filename_item_name in params_dict[section_name]:
@@ -1026,9 +1060,9 @@ def getSameAcrossLatentsAndTrialsVariationalCov0(
         n_latents, n_trials, a_variational_cov0,
         section_name="variational_params0"):
     variational_cov0 = [[] for r in range(n_latents)]
-    nIndPoints = a_variational_cov0.shape[0]
+    n_ind_points = a_variational_cov0.shape[0]
     for k in range(n_latents):
-        variational_cov0[k] = torch.empty((n_trials, nIndPoints, nIndPoints),
+        variational_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points),
                                           dtype=torch.double)
         variational_cov0[k][:, :, :] = a_variational_cov0
     return variational_cov0
