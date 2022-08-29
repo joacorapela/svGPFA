@@ -54,7 +54,7 @@ def main(argv):
     dynamic_params = svGPFA.utils.initUtils.getParamsDictFromArgs(
         n_latents=n_latents, n_trials=n_trials, args=vars(args),
         args_info=args_info)
-    #    build configuration file parameter spefications
+    #    build configuration file parameter specifications
     est_init_config_filename = est_init_config_filename_pattern.format(
         est_init_number)
     est_init_config = configparser.ConfigParser()
