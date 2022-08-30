@@ -42,8 +42,8 @@ def test_evalSumAcrossLatentsTrials():
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()

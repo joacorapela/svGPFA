@@ -63,15 +63,15 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
-    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
-                 "kernelsMatricesStore": kmsParams0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
+    qKParams0 = {"posterior_on_ind_points": qUParams0,
+                 "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"svPosteriorOnLatents": qKParams0,
-                     "svEmbedding": qHParams0}
-    eLLCalculationParams = {"legQuadPoints": legQuadPoints,
-                  "legQuadWeights": legQuadWeights}
+    initialParams = {"posterior_on_latents": qKParams0,
+                     "embedding": qHParams0}
+    eLLCalculationParams = {"leg_quad_points": legQuadPoints,
+                            "leg_quad_weights": legQuadWeights}
 
     qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
@@ -153,17 +153,17 @@ def test_evalSumAcrossTrialsAndNeurons_pointProcessQuad():
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
-    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
-                 "kernelsMatricesStore": kmsParams0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
+    qKParams0 = {"posterior_on_ind_points": qUParams0,
+                 "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"svPosteriorOnLatents": qKParams0,
-                     "svEmbedding": qHParams0}
+    initialParams = {"posterior_on_latents": qKParams0,
+                     "embedding": qHParams0}
     eLLCalculationParams = {"hermQuadPoints": hermQuadPoints,
-                  "hermQuadWeights": hermQuadWeights,
-                  "legQuadPoints": legQuadPoints,
-                  "legQuadWeights": legQuadWeights}
+                            "hermQuadWeights": hermQuadWeights,
+                            "leg_quad_points": legQuadPoints,
+                            "leg_quad_weights": legQuadWeights}
 
 
     qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()

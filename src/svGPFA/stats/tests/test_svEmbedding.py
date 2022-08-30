@@ -59,13 +59,13 @@ def test_computeMeansAndVars_allTimes():
     qH.setKernels(kernels=kernels)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
-    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
-                 "kernelsMatricesStore": kmsParams0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
+    qKParams0 = {"posterior_on_ind_points": qUParams0,
+                 "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"svPosteriorOnLatents": qKParams0,
-                     "svEmbedding": qHParams0}
+    initialParams = {"posterior_on_latents": qKParams0,
+                     "embedding": qHParams0}
     qH.setInitialParams(initialParams=initialParams)
     qH.setTimes(times=t)
     qH.setPriorCovRegParam(priorCovRegParam=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
@@ -125,13 +125,13 @@ def test_computeMeansAndVars_assocTimes():
     qH.setKernels(kernels=kernels)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
-    qKParams0 = {"svPosteriorOnIndPoints": qUParams0,
-                 "kernelsMatricesStore": kmsParams0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
+    qKParams0 = {"posterior_on_ind_points": qUParams0,
+                 "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"svPosteriorOnLatents": qKParams0,
-                     "svEmbedding": qHParams0}
+    initialParams = {"posterior_on_latents": qKParams0,
+                     "embedding": qHParams0}
     qH.setInitialParams(initialParams=initialParams)
     qH.setKernels(kernels=kernels)
     qH.setTimes(times=Y)

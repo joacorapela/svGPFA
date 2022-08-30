@@ -54,8 +54,8 @@ def test_computeMeansAndVars_allTimes():
                                        indPointsLocsAndTimesKMS)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     qU.setInitialParams(initialParams=qUParams0)
 
@@ -119,8 +119,8 @@ def test_computeMeansAndVars_assocTimes():
 
     # qSigma0[k] \in nTrials x nInd[k] x nInd[k]
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
     qU.setInitialParams(initialParams=qUParams0)
 
     indPointsLocsKMS.setKernels(kernels=kernels)

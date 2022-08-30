@@ -46,8 +46,8 @@ def test_eval_IndPointsLocsKMS():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsKMS.setKernels(kernels=kernels)
@@ -105,8 +105,8 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
@@ -161,8 +161,8 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     indPointsLocsAndAssocTimesKMS.setKernels(kernels=kernels)
