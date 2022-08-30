@@ -108,9 +108,9 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
         },
         "kernels_params0": {
             "k_type": "exponentialQuadratic",
-            "k_lengthscale0": legthscale,
+            "k_lengthscale0": lengthscale,
         },
-        "ind_points_params0": {
+        "ind_points_locs_params0": {
             "n_ind_points": n_ind_points,
             "ind_points_locs0_layout": "equidistant",
         },
@@ -152,7 +152,7 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
     return params_dict
 
 
-def strTo1DTensor(aString, dtype=torch.double, sep=" "):
+def strTo1DTensor(aString, dtype=np.float64, sep=" "):
     an_np_array = np.fromstring(aString, sep=sep, dtype=dtype)
     a_tensor = torch.from_numpy(an_np_array)
     return a_tensor
@@ -163,7 +163,7 @@ def strTo2DTensor(aString, dtype=torch.double):
         dtype_np = np.float64
     elif dtype==torch.int:
         dtype_np = np.int32
-    els:
+    else:
         raise ValueError(f"Invalid dtype={dtype}")
 
     an_np_matrix = np.matrix(aString, dtype=dtype_np)
@@ -177,16 +177,14 @@ def strTo2DDoubleTensor(aString):
 
 def strTo2DIntTensor(aString):
     return strTo2DTensor(aString=aString, dtype=torch.int)
-)
 
 
 def strTo1DDoubleTensor(aString):
-    return strTo1DTensor(aString=aString, dtype=torch.double)
+    return strTo1DTensor(aString=aString, dtype=np.float64)
 
 
 def strTo1DIntTensor(aString):
-    return strTo1DTensor(aString=aString, dtype=torch.int)
-)
+    return strTo1DTensor(aString=aString, dtype=np.int32)
 
 
 def getArgsInfo():
@@ -211,10 +209,10 @@ def getArgsInfo():
                                      "k_type_latent{:d}": str,
                                      "k_lengthscale0_latent{:d}": float,
                                      "k_period0_latent{:d}": float},
-                 "ind_points_params0": {"n_ind_points": strTo1DIntTensor,
-                                        "ind_points_locs0_layout": str,
-                                        "ind_points_locs0_filename": str,
-                                        "ind_points_locs0_filename_latent{:d}_trial{:d}": str},
+                 "ind_points_locs_params0": {"n_ind_points": strTo1DIntTensor,
+                                             "ind_points_locs0_layout": str,
+                                             "ind_points_locs0_filename": str,
+                                             "ind_points_locs0_filename_latent{:d}_trial{:d}": str},
                  "optim_params": {"n_quad": int,
                                   "prior_cov_reg_param": float,
                                   "optim_method": str,
@@ -318,7 +316,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                       config_file_params=config_file_params,
                       default_params=default_params,
                       conversion_func=int)
-    n_ind_points = getParam(section_name="ind_points_params0",
+    n_ind_points = getParam(section_name="ind_points_locs_params0",
                             param_name="n_ind_points",
                             dynamic_params=dynamic_params,
                             config_file_params=config_file_params,
@@ -813,7 +811,7 @@ def getSameAcrossLatentsAndTrialsIndPointsLocs0(
 
 def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
         n_latents, n_trials, params_dict, params_dict_type,
-        section_name="ind_points_params0",
+        section_name="ind_points_locs_params0",
         item_name_pattern="ind_points_locs0_filename_latent{:d}_trial{:d}",
         delimiter=","):
     Z0 = [[] for k in range(n_latents)]
