@@ -55,7 +55,7 @@ def test_getParamsDictFromArgs_1(n_latents=3, n_trials=10,
 
 
 def test_getParamsDictFromArgs_2(n_latents=3, n_trials=2,
-                                 true_variational_means_str="1.0 2,0 3.0",
+                                 true_variational_means_str="1.0 2.0 3.0",
                                  true_variational_covs_str="1.0 0.0 0.0; "
                                                            "0.0 1.0 0.0; "
                                                            "0.0 0.0 1.0"
@@ -115,13 +115,13 @@ def test_getParamsDictFromStringsDict_2(n_latents=2, n_trials=15,
         args_info=args_info)
     for k in range(n_latents):
         for r in range(n_trials):
-            true_ind_points_locs_filename = strings_dict["ind_points_params0"][f"ind_points_locs0_filename_latent{k}_trial{r}"]
-            params_ind_points_locs_filename = params_dict["ind_points_params0"][f"ind_points_locs0_filename_latent{k}_trial{r}"]
+            true_ind_points_locs_filename = strings_dict["ind_points_locs_params0"][f"ind_points_locs0_filename_latent{k}_trial{r}"]
+            params_ind_points_locs_filename = params_dict["ind_points_locs_params0"][f"ind_points_locs0_filename_latent{k}_trial{r}"]
             assert true_ind_points_locs_filename == params_ind_points_locs_filename
 
 
 def test_getParam_0(true_n_latents=3, n_trials=15, n_neurons=100,
-                    n_ind_points=10, diag_var_cov0_value=1e-2):
+                    n_ind_points=(10, 10, 10), diag_var_cov0_value=1e-2):
     ''' test get param from dynamic params'''
 
     dynamic_params = {"model_structure_params":
@@ -148,8 +148,8 @@ def test_getParam_0(true_n_latents=3, n_trials=15, n_neurons=100,
     assert true_n_latents == n_latents
 
 
-def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100, n_ind_points=10,
-                    diag_var_cov0_value=1e-2):
+def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100,
+                    n_ind_points=(10, 10, 10), diag_var_cov0_value=1e-2):
     ''' test get param from config_file params'''
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
@@ -177,7 +177,8 @@ def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100, n_ind_points=10,
 
 
 def test_getLinearEmbeddingParams0_0(n_neurons=20, n_latents=7, n_trials=10,
-                                     n_ind_points=10, diag_var_cov0_value=1e-2):
+                                     n_ind_points=(10, 10, 10, 10, 10, 10, 10),
+                                     diag_var_cov0_value=1e-2):
     true_C0 = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
                           dtype=torch.double)
     true_d0 = torch.tensor([[1.0], [2.0], [3.0]], dtype=torch.double)
@@ -204,7 +205,8 @@ def test_getLinearEmbeddingParams0_0(n_neurons=20, n_latents=7, n_trials=10,
 
 
 def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20,
-                                     n_ind_points=10, diag_var_cov0_value=1e-2):
+                                     n_ind_points=(10, 10, 10, 10, 10, 10, 10),
+                                     diag_var_cov0_value=1e-2):
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -235,7 +237,8 @@ def test_getLinearEmbeddingParams0_1(n_neurons=20, n_latents=7, n_trials=20,
 
 
 def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10,
-                                     n_ind_points=10, diag_var_cov0_value=1e-2):
+                                     n_ind_points=(10, 10, 10, 10, 10, 10, 10),
+                                     diag_var_cov0_value=1e-2):
     c_random_seed = 102030
     d_random_seed = 203040
 
@@ -275,7 +278,8 @@ def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10,
 
 
 def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
-                                  n_ind_points=10, diag_var_cov0_value=1e-2,
+                                  n_ind_points=(10, 10, 10, 10, 10),
+                                  diag_var_cov0_value=1e-2,
                                   trials_start_time=3.0, trials_end_time=12.0):
     dynamic_params = {"data_structure_params":
                       {"trials_start_time": trials_start_time,
@@ -308,7 +312,8 @@ def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
 
 
 def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5,
-                                  n_ind_points=10, diag_var_cov0_value=1e-2):
+                                  n_ind_points=(10, 10, 10, 10, 10),
+                                  diag_var_cov0_value=1e-2):
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -339,7 +344,8 @@ def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5,
 
 
 def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5,
-                                  n_ind_points=10, diag_var_cov0_value=1e-2):
+                                  n_ind_points=(10, 10, 10, 10, 10),
+                                  diag_var_cov0_value=1e-2):
     dynamic_params = {"model_structure_params":
                       {"n_latents": str(n_latents)}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
@@ -371,7 +377,7 @@ def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5,
 
 
 def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
-                                     n_ind_points=10,
+                                     n_ind_points=(10, 10, 10),
                                      diag_var_cov0_value=1e-2,
                                      kernel_type = "exponentialQuadratic",
                                      lengthscale0 = 2.0,
@@ -402,7 +408,7 @@ def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
 
 
 def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
-                                     n_ind_points=10,
+                                     n_ind_points=(10, 10, 10),
                                      diag_var_cov0_value=1e-2,
                                      kernel_type = "periodic",
                                      lengthscale0 = 2.0,
@@ -436,7 +442,8 @@ def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
 
 
 def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
-                                     n_ind_points=10, diag_var_cov0_value=1e-2,
+                                     n_ind_points=(10, 10, 10), 
+                                     diag_var_cov0_value=1e-2,
                                      section_name = "kernels_params0",
                                      kernel_type_param_name = "k_type",
                                      lengthscale_param_name = "k_lengthscale0",
@@ -470,7 +477,8 @@ def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
 
 def test_getKernelsParams0AndTypes_3(
     n_neurons=20, n_latents=3, n_trials=50,
-    n_ind_points=10, diag_var_cov0_value=1e-2,
+    n_ind_points=(10, 10, 10),
+    diag_var_cov0_value=1e-2,
     true_kernels_types=["exponentialQuadratic",
                         "exponentialQuadratic",
                         "periodic"],
@@ -503,7 +511,8 @@ def test_getKernelsParams0AndTypes_3(
 
 
 def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
-                             n_ind_points=10, diag_var_cov0_value=1e-2,
+                             n_ind_points=(10, 10, 10),
+                             diag_var_cov0_value=1e-2,
                              section_name="ind_points_params0",
                              ind_points_locs_filename="data/equispacedValuesBtw0and1_len09.csv",
                              ind_points_locs_filename_param_name="ind_points_locs0_filename",
@@ -543,7 +552,8 @@ def test_getIndPointsLocs0_0(n_neurons=20, n_latents=3, n_trials=50,
 
 
 def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
-                             n_ind_points=10, diag_var_cov0_value=1e-2,
+                             n_ind_points=(10, 10),
+                             diag_var_cov0_value=1e-2,
                              section_name="ind_points_params0",
                              ind_points_locs0_filename="data/equispacedValuesBtw0and1_len09.csv",
                              estInitConfigFilename="data/99999998_estimation_metaData.ini",
@@ -581,15 +591,17 @@ def test_getIndPointsLocs0_1(n_neurons=20, n_latents=2, n_trials=15,
                              true_ind_points_locs0)
 
 
-def test_getVariationalMean0_0(n_neurons=20, n_latents=3, n_ind_points=9,
+def test_getVariationalMean0_0(n_neurons=20, n_latents=3,
+                               n_ind_points=(9, 9, 9),
                                n_trials=15, diag_var_cov0_value=1e-2,
                                section_name="variational_params0",
                                param_name="variational_mean0",
                                estInitConfigFilename="data/99999999_estimation_metaData.ini",
                               ):
     # dynamic_params, binary format
-    variational_mean0_k = torch.normal(mean=0.0, std=1.0,  size=(n_trials, n_ind_points, 1))
-    true_variational_mean0 = [variational_mean0_k for k in range(n_latents)]
+    true_variational_mean0 = [torch.normal(mean=0.0, std=1.0,
+                                           size=(n_trials, n_ind_points[k], 1))
+                              for k in range(n_latents)]
     dynamic_params = {section_name: {param_name: true_variational_mean0}}
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -611,7 +623,8 @@ def test_getVariationalMean0_0(n_neurons=20, n_latents=3, n_ind_points=9,
         assert torch.all(true_variational_mean0[k] == variational_mean0[k])
 
 
-def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=10,
+def test_getVariationalMean0_1(n_neurons=20, n_latents=2,
+                               n_ind_points=(10, 10),
                                n_trials=15, diag_var_cov0_value=1e-2,
                                section_name="variational_params0",
                                variational_mean0_filename_param_name_pattern="variational_mean0_filename_latent{:d}_trial{:d}",
@@ -648,16 +661,17 @@ def test_getVariationalMean0_1(n_neurons=20, n_latents=2, n_ind_points=10,
                              true_variational_mean0_kr)
 
 
-def test_getVariationalCov0_0(n_neurons=20, n_latents=3, n_ind_points=9,
+def test_getVariationalCov0_0(n_neurons=20, n_latents=3,
+                              n_ind_points=(9, 9, 9),
                               n_trials=15, diag_var_cov0_value=1e-2,
                               section_name="variational_params0",
                               param_name="variational_cov0",
                               estInitConfigFilename="data/99999999_estimation_metaData.ini",
                              ):
-    variational_cov0_k = torch.normal(mean=0.0, std=1.0,
-                                      size=(n_trials, n_ind_points,
-                                            n_ind_points))
-    true_variational_cov0 = [variational_cov0_k for k in range(n_latents)]
+    true_variational_cov0 = [torch.normal(mean=0.0, std=1.0,
+                                          size=(n_trials, n_ind_points[k],
+                                                n_ind_points[k]))
+                             for k in range(n_latents)]
     dynamic_params = {section_name: {param_name: true_variational_cov0}}
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -679,7 +693,7 @@ def test_getVariationalCov0_0(n_neurons=20, n_latents=3, n_ind_points=9,
         assert torch.all(true_variational_cov0[k] == variational_cov0[k])
 
 
-def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=10,
+def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=(10, 10),
                               n_trials=15, diag_var_cov0_value=1e-2,
                               section_name="variational_params0",
                               variational_cov0_filename_param_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
@@ -717,7 +731,8 @@ def test_getVariationalCov0_1(n_neurons=20, n_latents=2, n_ind_points=10,
                              true_variational_cov0_kr)
 
 def test_getOptimParams_0(n_neurons=100, n_trials=15, n_latents=8,
-                          n_ind_points=10, diag_var_cov0_value=1e-2):
+                          n_ind_points=[10]*8,
+                          diag_var_cov0_value=1e-2):
     # extracting all optim params from default_params
     default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
         n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
@@ -739,7 +754,7 @@ def test_getOptimParams_0(n_neurons=100, n_trials=15, n_latents=8,
 
 
 def test_getOptimParams_1(n_neurons=100, n_trials=15, n_latents=8,
-                          n_ind_points=10, diag_var_cov0_value=1e-2):
+                          n_ind_points=[10]*8, diag_var_cov0_value=1e-2):
     # extracting all optim params from default_params except max_iter that
     # comes from dynamic params
     dynamic_params = {"optim_params": {"em_max_iter": 1000}}
@@ -765,7 +780,7 @@ def test_getOptimParams_1(n_neurons=100, n_trials=15, n_latents=8,
 
 
 def test_getOptimParams_2(n_neurons=100, n_latents=8, n_trials=15,
-                          n_ind_points=10, diag_var_cov0_value=1e-2,
+                          n_ind_points=[10]*8, diag_var_cov0_value=1e-2,
                           estInitConfigFilename="data/99999998_estimation_metaData.ini",
                          ):
     # extracting all optim params from default_params except max_iter that
