@@ -490,19 +490,25 @@ positioned between the start and end of the trial.
     .. code-block:: python
        :caption: adding **ind_points_locs_params0** in the layout format to **params_spec**
 
-       params_spec["ind_points_params0"] = {
-           "n_ind_points": 9,
+       n_ind_points = (10, 20, 15)
+       params_spec["ind_points_locs_params0"] = {
+            "n_ind_points": n_ind_points,
            "ind_points_locs0_layout": "equidistant",
        }
 
 Defaults
 ^^^^^^^^
-For all latents, the default kernel is an exponential quadratic kernel with lengthscale 1.0.
 
-        "ind_points_params0": {
+The default inducing points locations for trial r and latent k are equdistant n_ind_points[k] between the start and end of trial r.
+
+    .. code-block:: python
+       :caption: default **ind_points_locs_params0**
+
+       n_ind_points = (10, 20, 15)
+        params_spec["ind_points_locs_params0"] = {
             "n_ind_points": n_ind_points,
             "ind_points_locs0_layout": "equidistant",
-        },
+        }
 
 Optimisation parameters
 =======================
