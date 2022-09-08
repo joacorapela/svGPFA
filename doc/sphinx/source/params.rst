@@ -218,7 +218,7 @@ Two items need to be specified:
 Defaults
 ^^^^^^^^
 
-The devault variational mean and covariance have constant values. For the variational mean the constant value is zero and for the variational covariance the constant diagonal value is 0.01.
+The default variational mean and covariance have constant values. For the variational mean the constant value is zero and for the variational covariance the constant diagonal value is 0.01.
 
     .. code-block:: python
        :caption: default **variational_params0**
