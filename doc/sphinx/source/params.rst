@@ -205,27 +205,27 @@ Two items need to be specified:
             "variational_covs0_filename": "../data/identity_scaled1e-2_09x09.csv",
         }
 
+Constant value format
+^^^^^^^^^^^^^^^^^^^^^
+
+This initialization option sets the same variational mean and covariance across all latents and trials. The common variational mean has all elements equal to a constant value, and the common variational covariance is a scaled identity matrix.
+
+Two items need to be specified:
+
+* ``variational_mean0_constant_value`` should provide a float value giving the constant value of all elements of the common variational mean.
+* ``variational_cov0_diag_value``  should provide a float value giving the diagonal value of the common variational covariance.
+
 Defaults
 ^^^^^^^^
 
-For any latent k and trial r,  the default variational mean is a zero tensor of length number of inducing points for latent k, and the default variational covariance is a diagonal matrix, with diagonal value 0.01.
+The devault variational mean and covariance have constant values. For the variational mean the constant value is zero and for the variational covariance the constant diagonal value is 0.01.
 
     .. code-block:: python
        :caption: default **variational_params0**
 
-        var_mean0 = [torch.zeros((n_trials, n_ind_points, 1), dtype=torch.double)
-                     for k in range(n_latents)]
-        diag_var_cov0_value = 0.01
-        var_cov0 = [[] for r in range(n_latents)]
-        for k in range(n_latents):
-            var_cov0[k] = torch.empty((n_trials, n_ind_points, n_ind_points),
-                                    dtype=torch.double)
-            for r in range(n_trials):
-                var_cov0[k][r, :, :] = torch.eye(n_ind_points)*diag_var_cov0_value
-
         params_spec["variational_params0"] = {
-            "variational_mean0": var_mean0,
-            "variational_cov0": var_cov0,
+            "variational_mean0_constant_value": 0.0,
+            "variational_cov0_diag_value": 0.01,
         }
 
 .. _embedding_params0:
@@ -504,7 +504,7 @@ The default inducing points locations for trial r and latent k are equdistant n_
     .. code-block:: python
        :caption: default **ind_points_locs_params0**
 
-       n_ind_points = (10, 20, 15)
+       n_ind_points = (10, 10, 10)
         params_spec["ind_points_locs_params0"] = {
             "n_ind_points": n_ind_points,
             "ind_points_locs0_layout": "equidistant",
@@ -604,4 +604,54 @@ section ``[optim_params]`` should contain items:
             "mstep_indpointslocs_line_search_fn": "strong_wolfe",
             #
             "verbose": True,
-       } 
+       }
+
+
+Defaults
+--------
+
+The default optimization paramateters are shown below.
+
+    .. code-block:: python
+       :caption: default **optimisation_params**
+
+        n_quad = 200
+        prior_cov_reg_param = 1e-3
+        em_max_iter = 50
+
+        params_spec["optim_params"] = {
+            "n_quad": n_quad,
+            "prior_cov_reg_param": prior_cov_reg_param,
+            "optim_method": "ecm",
+            "em_max_iter": em_max_iter,
+            "verbose": True,
+            #
+            "estep_estimate": True,
+            "estep_max_iter": 20,
+            "estep_lr": 1.0,
+            "estep_tolerance_grad": 1e-7,
+            "estep_tolerance_change": 1e-9,
+            "estep_line_search_fn": "strong_wolfe",
+            #
+            "mstep_embedding_estimate": True,
+            "mstep_embedding_max_iter": 20,
+            "mstep_embedding_lr": 1.0,
+            "mstep_embedding_tolerance_grad": 1e-7,
+            "mstep_embedding_tolerance_change": 1e-9,
+            "mstep_embedding_line_search_fn": "strong_wolfe",
+            #
+            "mstep_kernels_estimate": True,
+            "mstep_kernels_max_iter": 20,
+            "mstep_kernels_lr": 1.0,
+            "mstep_kernels_tolerance_grad": 1e-7,
+            "mstep_kernels_tolerance_change": 1e-9,
+            "mstep_kernels_line_search_fn": "strong_wolfe",
+            #
+            "mstep_indpointslocs_estimate": True,
+            "mstep_indpointslocs_max_iter": 20,
+            "mstep_indpointslocs_lr": 1.0,
+            "mstep_indpointslocs_tolerance_grad": 1e-7,
+            "mstep_indpointslocs_tolerance_change": 1e-9,
+            "mstep_indpointslocs_line_search_fn": "strong_wolfe"
+        }
+
