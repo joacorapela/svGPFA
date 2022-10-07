@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+:github_url: https://github.com/joacorapela/svGPFA
+
 Sparse Variational Gaussian Processes Factor Analysis
 =====================================================
 
@@ -17,6 +19,22 @@ Sparse Variational Gaussian Processes Factor Analysis
 
    highLevelInterface
    lowLevelInterface
+
+.. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Examples:
+
+   ipynb/doEstimateAndPlot.ipynb
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Development notes:
+
+   dataStructures
+   objectOrientedDesign
+   implementationNotes
+   derivations
 
 .. toctree::
    :caption: Appendix:

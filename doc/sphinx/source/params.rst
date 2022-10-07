@@ -98,7 +98,7 @@ Initial values for four types of model parameters need to be specified:
 * :ref:`variational_params0`,
 * :ref:`embedding_params0`,
 * :ref:`kernels_params0`,
-* :ref:`indPointsLocs_params0`.
+* :ref:`ind_points_locs_params0`.
 
 For most parameters types initial values can be specified in a binary format or
 in a non-binary shorter or longer formats. In the binary format parameters are
@@ -157,12 +157,12 @@ Latent-trial-specific filename format
 
 For every latent, k, and every trial, r, two items need to be specified:
 
-* ``variational_mean0_latent<k>_trial<r>_filename`` should provide the filename
+* ``variational_mean0_filename_latent<k>_trial<r>`` should provide the filename
   (csv format readable by pandas *read_csv* function) containing the initial
   values of the variational mean for latent k and trial r. This file should
   contain a vector of size *number_of_inducing_points*.
 
-* ``variational_cov0_latent<k>_trial<r>_filename`` should provide the filename
+* ``variational_cov0_filename_latent<k>_trial<r>`` should provide the filename
   (csv format readable by pandas *read_csv* function) containing the initial
   values of the variational covariance for latent k and trial r. This file
   should contain a matrix of size *number_of_inducing_points* x
@@ -172,14 +172,14 @@ For every latent, k, and every trial, r, two items need to be specified:
        :caption: adding **variational_params0** in the latent-trial-specific filename format to **params_spec** (2 trials and 2 latents)
 
         params_spec["variational_params0"] = {
-            "variational_mean0_latent0_trial0_filename": "../data/uniform_0.00_1.00_len09.csv",
-            "variational_cov0_latent0_trial0_filename": "../data/identity_scaled1e-2_09x09.csv",
-            "variational_mean0_latent0_trial1_filename": "../data/gaussian_0.00_1.00_len09.csv",
-            "variational_cov0_latent0_trial1_filename": "../data/identity_scaled1e-4_09x09.csv",
-            "variational_mean0_latent1_trial0_filename": "../data/uniform_0.00_1.00_len09.csv",
-            "variational_cov0_latent1_trial0_filename": "../data/identity_scaled1e-2_09x09.csv",
-            "variational_mean0_latent1_trial1_filename": "../data/gaussian_0.00_1.00_len09.csv",
-            "variational_cov0_latent1_trial1_filename": "../data/identity_scaled1e-4_09x09.csv",
+            "variational_mean0_filename_latent0_trial0": "../data/uniform_0.00_1.00_len09.csv",
+            "variational_cov0_filename_latent0_trial0": "../data/identity_scaled1e-2_09x09.csv",
+            "variational_mean0_filename_latent0_trial1": "../data/gaussian_0.00_1.00_len09.csv",
+            "variational_cov0_filename_latent0_trial1": "../data/identity_scaled1e-4_09x09.csv",
+            "variational_mean0_filename_latent1_trial0": "../data/uniform_0.00_1.00_len09.csv",
+            "variational_cov0_filename_latent1_trial0": "../data/identity_scaled1e-2_09x09.csv",
+            "variational_mean0_filename_latent1_trial1": "../data/gaussian_0.00_1.00_len09.csv",
+            "variational_cov0_filename_latent1_trial1": "../data/identity_scaled1e-4_09x09.csv",
         }
 
 Latent-trial-common filename format
@@ -214,6 +214,14 @@ Two items need to be specified:
 
 * ``variational_mean0_constant_value`` should provide a float value giving the constant value of all elements of the common variational mean.
 * ``variational_cov0_diag_value``  should provide a float value giving the diagonal value of the common variational covariance.
+
+    .. code-block:: python
+       :caption: adding **variational_params0** in the constant value format
+
+        params_spec["variational_params0"] = {
+            "variational_mean0_constant_value": 0.0,
+            "variational_cov0_diag_value": 0.01,
+        }
 
 Defaults
 ^^^^^^^^
@@ -406,11 +414,11 @@ For all latents, the default kernel is an exponential quadratic kernel with leng
        :caption: default **kernel_params**
 
         params_spec["kernels_params0"] =  {
-            "k_type": "exponentialQuadratic",
-            "k_lengthscale0": 1.0,
+            "k_types": "exponentialQuadratic",
+            "k_lengthscales0": 1.0,
         }
 
-.. _indPointsLocs_params0:
+.. _ind_points_locs_params0:
 
 Inducing points locations parameters
 ------------------------------------
@@ -427,7 +435,7 @@ One item needs to be specified:
 
 * ``ind_points_locs0`` should be a list of size **n_latents**. The kth element of
   this list should be a **torch.DoubleTensor** of size (**n_trials**,
-  **n_indPoints[k]**, 1), where **indPointsLocs0[k][r, :, 0]** gives the
+  **n_indPoints[k]**, 1), where **ind_points_locs0[k][r, :, 0]** gives the
   initial inducing points locations for latent k and trial r.
 
     .. code-block:: python
@@ -509,6 +517,8 @@ The default inducing points locations for trial r and latent k are equdistant n_
             "n_ind_points": n_ind_points,
             "ind_points_locs0_layout": "equidistant",
         }
+
+.. _optim_params:
 
 Optimisation parameters
 =======================

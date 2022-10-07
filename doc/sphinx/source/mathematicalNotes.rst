@@ -1,3 +1,0 @@
-Mathematical notes
-==================
-
