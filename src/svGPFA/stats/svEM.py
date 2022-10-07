@@ -20,6 +20,19 @@ class SVEM(abc.ABC):
                  savePartial=False,
                  savePartialFilenamePattern="results/00000000_{:s}_estimatedModel.pickle",
                 ):
+        """Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
+        Sahani, 2018.
+
+        .. note::
+            Only parameters **model**, **optim_params** and **method** should
+            be set by users.
+
+        :param model: svGPFA model used to calculate the lower bound
+        :type  model: :class:`svGPFA.stats.svLowerBound.SVLowerBound`
+        :param optim_params: optimization parameters. The format of this dictionary is identical to the one described in :any:`optim_params`
+        :type  optim_params: dictionary
+        :param method: either ECM for Expectation Conditional Maximization or mECM for multicycle expectation conditional maximization. Refer to :cite:t:`mcLachlanAndKrishnan08` for details on these algorithms.
+        """
         pass
 
 
@@ -27,17 +40,21 @@ class SVEM(abc.ABC):
     def _eStep(self, model, optim_params):
         pass
 
+
     @abc.abstractmethod
     def _mStepEmbedding(self, model, optim_params):
         pass
+
 
     @abc.abstractmethod
     def _mStepKernels(self, model, optim_params):
         pass
 
+
     @abc.abstractmethod
     def _mStepIndPointsLocs(self, model, optim_params):
         pass
+
 
     def _writeToLockedLog(self, message, logLock, logStream, logStreamFN):
         logStream.write(message)
@@ -48,6 +65,7 @@ class SVEM(abc.ABC):
             logLock.unlock()
             logStream.truncate(0)
             logStream.seek(0)
+
 
 class SVEM_PyTorch(SVEM):
 
