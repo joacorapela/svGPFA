@@ -42,6 +42,15 @@ class SVGPFAModelFactory:
                           embeddingType=LinearEmbedding,
                           kernelMatrixInvMethod=kernelMatrixInvChol,
                           indPointsCovRep=indPointsCovChol):
+        """Creates an svGPFA model. :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setInitialDataAndParams` should be invoked before using the created model as argument to :meth:`svGPFA.stats.svEM.SVEM.maximize`.
+
+        :param kernels: list of kernels (:mod:`svGPFA.stats.kernel`) to be used in the model
+        :type kernels: list of instances from subclass of (:class:`svGPFA.stats.kernel.Kernel`)
+        :param conditionalDist: likelihood distribution (e.g., svGPFA.stats.SVGPFAModelFactory.PointProcess or svGPFA.stats.SVGPFAModelFactory.Gaussian)
+        :type conditionalDist: int
+        :param embeddingType: type of embedding (e.g., svGPFA.stats.SVGPFAModelFactory.LinearEmbedding)
+        :type embeddingType: int
+        """
 
         if conditionalDist == PointProcess:
             if embeddingType == LinearEmbedding:
