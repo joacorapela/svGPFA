@@ -57,7 +57,7 @@ def flatToHierarchicalOptimParams(flat_optim_params):
     return hierarchical_optim_params
 
 
-def getOptimParams(dynamic_params, config_file_params, default_params,
+def getOptimParams(dynamic_params, config_file_params, default_params=None,
                    optim_params_info=None, section_name="optim_params"):
     if optim_params_info is None:
         optim_params_info = getArgsInfo()["optim_params"]
@@ -69,8 +69,7 @@ def getOptimParams(dynamic_params, config_file_params, default_params,
                                param_name=param_name,
                                dynamic_params=dynamic_params,
                                config_file_params=config_file_params,
-                               default_params=default_params,
-                               conversion_func=param_conv_func)
+                               default_params=default_params)
         flat_optim_params[param_name] = param_value
     hierarchical_optim_params = flatToHierarchicalOptimParams(
         flat_optim_params=flat_optim_params)
@@ -78,11 +77,14 @@ def getOptimParams(dynamic_params, config_file_params, default_params,
 
 
 def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
-                         n_ind_points=(10, 10, 10), n_quad=200,
+                         n_ind_points=None, a_n_ind_points=10, n_quad=200,
                          trials_start_time=0.0, trials_end_time=1.0,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
                          lengthscale=1.0, em_max_iter=50):
-    var_mean0 = [torch.zeros((n_trials, n_ind_points[k], 1), dtype=torch.double)
+    if n_ind_points is None:
+        n_ind_points = [a_n_ind_points] * n_latents
+    var_mean0 = [torch.zeros((n_trials, n_ind_points[k], 1),
+                             dtype=torch.double)
                  for k in range(n_latents)]
     var_cov0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
@@ -107,8 +109,8 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
             "d0_scale": 1.0,
         },
         "kernels_params0": {
-            "k_type": "exponentialQuadratic",
-            "k_lengthscale0": lengthscale,
+            "k_types": "exponentialQuadratic",
+            "k_lengthscales0": lengthscale,
         },
         "ind_points_locs_params0": {
             "n_ind_points": n_ind_points,
@@ -152,16 +154,18 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
     return params_dict
 
 
-def strTo1DTensor(aString, dtype=np.float64, sep=" "):
+def strTo1DTensor(aString, dtype=np.float64, sep=","):
+    if aString[0] in "[(" and aString[-1] in "])":
+        aString = aString[1:-1]
     an_np_array = np.fromstring(aString, sep=sep, dtype=dtype)
     a_tensor = torch.from_numpy(an_np_array)
     return a_tensor
 
 
 def strTo2DTensor(aString, dtype=torch.double):
-    if dtype==torch.double:
+    if dtype == torch.double:
         dtype_np = np.float64
-    elif dtype==torch.int:
+    elif dtype == torch.int:
         dtype_np = np.int32
     else:
         raise ValueError(f"Invalid dtype={dtype}")
@@ -197,15 +201,29 @@ def getArgsInfo():
                                          "variational_covs0": strTo2DDoubleTensor,
                                          "variational_means0_filename": str,
                                          "variational_covs0_filename": str,
+                                         "variational_mean0_constant_value": float,
+                                         "variational_cov0_diag_value": float,
                                          "variational_mean0_filename_latent{:d}_trial{:d}": str,
                                          "variational_cov0_filename_latent{:d}_trial{:d}": str},
                  "embedding_params0": {"c0": strTo2DDoubleTensor,
                                        "d0": strTo2DDoubleTensor,
                                        "c0_filename": str,
-                                       "d0_filename": str},
+                                       "d0_filename": str,
+                                       "c0_distribution": str,
+                                       "c0_loc": float,
+                                       "c0_scale": float,
+                                       "c0_random_seed": int,
+                                       "d0_distribution": str,
+                                       "d0_loc": float,
+                                       "d0_scale": float,
+                                       "d0_random_seed": int,
+                                      },
                  "kernels_params0": {"k_type": str,
                                      "k_lengthscale0": float,
                                      "k_period0": float,
+                                     "k_types": str,
+                                     "k_lengthscales0": float,
+                                     "k_period0s": float,
                                      "k_type_latent{:d}": str,
                                      "k_lengthscale0_latent{:d}": float,
                                      "k_period0_latent{:d}": float},
@@ -314,14 +332,12 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                       param_name="n_quad",
                       dynamic_params=dynamic_params,
                       config_file_params=config_file_params,
-                      default_params=default_params,
-                      conversion_func=int)
+                      default_params=default_params)
     n_ind_points = getParam(section_name="ind_points_locs_params0",
                             param_name="n_ind_points",
                             dynamic_params=dynamic_params,
                             config_file_params=config_file_params,
-                            default_params=default_params,
-                            conversion_func=int)
+                            default_params=default_params)
 
     C0, d0 = getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
@@ -393,33 +409,36 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
 
 
 def getParam(section_name, param_name,
-             dynamic_params, config_file_params, default_params,
-             conversion_func):
+             dynamic_params=None,
+             config_file_params=None,
+             default_params=None):
     # dynamic_params
     if dynamic_params is not None and \
             section_name in dynamic_params and \
             param_name in dynamic_params[section_name]:
-        param = conversion_func(dynamic_params[section_name][param_name])
-        print(f"Extracted dynamic_params[{section_name}][{param_name}]={param}")
+        param = dynamic_params[section_name][param_name]
+        print(f"Extracted dynamic_params[{section_name}][{param_name}]="
+              f"{param}")
     # config_file_params
     elif config_file_params is not None and \
             section_name in config_file_params and \
             param_name in config_file_params[section_name]:
-        param = conversion_func(config_file_params[section_name][param_name])
-        print(f"Extracted config_file_params[{section_name}][{param_name}]={param}")
+        param = config_file_params[section_name][param_name]
+        print(f"Extracted config_file_params[{section_name}][{param_name}]="
+              f"{param}")
     # default_params
     elif default_params is not None and \
             section_name in default_params and \
             param_name in default_params[section_name]:
-        param = conversion_func(default_params[section_name][param_name])
+        param = default_params[section_name][param_name]
         print(f"Extracted default_params[{section_name}][{param_name}]={param}")
     else:
         param = None
     return param
 
 
-def getLinearEmbeddingParams0(n_neurons, n_latents, dynamic_params,
-                              config_file_params, default_params):
+def getLinearEmbeddingParams0(n_neurons, n_latents, dynamic_params=None,
+                              config_file_params=None, default_params=None):
     C = getLinearEmbeddingParam0(param_label="c0", n_rows=n_neurons,
                                  n_cols=n_latents,
                                  dynamic_params=dynamic_params,
@@ -434,8 +453,8 @@ def getLinearEmbeddingParams0(n_neurons, n_latents, dynamic_params,
     return C, d
 
 
-def getLinearEmbeddingParam0(param_label, n_rows, n_cols, dynamic_params,
-                             config_file_params, default_params):
+def getLinearEmbeddingParam0(param_label, n_rows, n_cols, dynamic_params=None,
+                             config_file_params=None, default_params=None):
     if dynamic_params is not None:
         param = getLinearEmbeddingParam0InDict(param_label=param_label,
                                                params_dict=dynamic_params,
@@ -460,7 +479,7 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols, dynamic_params,
         if param is not None:
             return param
 
-    raise ValueError("embedding_params not found")
+    raise ValueError("embedding_params0 not found")
 
 
 def getLinearEmbeddingParam0InDict(param_label, params_dict,
@@ -471,14 +490,14 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
     if section_name in params_dict and \
        f"{param_label}" in params_dict[section_name]: 
         param = params_dict[section_name][param_label]
-        print(f"Extracted {param_label} from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} {param_label}")
     # filename
     elif section_name in params_dict and \
        f"{param_label}_filename" in params_dict[section_name]: 
         param_filename = params_dict[section_name][f"{param_label}_filename"]
         param_np = np.genfromtxt(param_filename, delimiter=delimiter)
         param = torch.from_numpy(param_np).type(torch.double)
-        print(f"Extracted {param_label}_filename from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} {param_label}_filename")
     # random
     elif section_name in params_dict and \
             f"{param_label}_distribution" in params_dict[section_name] and \
@@ -493,11 +512,11 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
                                            [f"{param_label}_random_seed"]
         else:
             param_random_seed = None
-        print(f"Extracted {param_label}_distribution={param_distribution}, "
+        print(f"Extracted from {params_dict_type} "
+              f"{param_label}_distribution={param_distribution}, "
               f"{param_label}_loc={param_loc}, "
               f"{param_label}_scale={param_scale}, "
-              f"{param_label}_random_seed={param_random_seed} "
-              f"from {params_dict_type}")
+              f"{param_label}_random_seed={param_random_seed}")
         # If param_random_seed was specified for replicability
         if param_random_seed is not None:
             torch.random.manual_seed(param_random_seed)
@@ -514,8 +533,9 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
     return param
 
 
-def getTrialsStartEndTimes(n_trials, dynamic_params, config_file_params,
-                           default_params):
+def getTrialsStartEndTimes(n_trials, dynamic_params=None,
+                           config_file_params=None,
+                           default_params=None):
     trials_start_times = getTrialsTimes(
         param_float_label="trials_start_time",
         param_list_label="trials_start_times",
@@ -534,7 +554,8 @@ def getTrialsStartEndTimes(n_trials, dynamic_params, config_file_params,
 
 
 def getTrialsTimes(param_list_label, param_float_label, n_trials,
-                   dynamic_params, config_file_params, default_params,
+                   dynamic_params=None, config_file_params=None,
+                   default_params=None,
                    trials_section_name="data_structure_params"):
     if dynamic_params is not None:
         param = getTrialsTimesInDict(n_trials=n_trials,
@@ -572,19 +593,19 @@ def getTrialsTimesInDict(n_trials, param_list_label, param_float_label,
     if section_name in params_dict and \
        param_list_label in params_dict[section_name]:
         trials_times = params_dict[section_name][param_list_label]
-        print(f"Extracted {param_list_label} from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} {param_list_label}")
     elif section_name in params_dict and \
        param_float_label in params_dict[section_name]:
         trials_times_list = [float(params_dict[section_name][param_float_label]) for r in range(n_trials)]
         trials_times = torch.DoubleTensor(trials_times_list)
-        print(f"Extracted {param_list_label} from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} {param_list_label}")
     else:
         trials_times = None
     return trials_times
 
 
-def getKernelsParams0AndTypes(n_latents,
-                              dynamic_params, config_file_params, default_params):
+def getKernelsParams0AndTypes(n_latents, dynamic_params=None,
+                              config_file_params=None, default_params=None):
     if dynamic_params is not None:
         params0, kernels_types = getKernelsParams0AndTypesInDict(
             n_latents=n_latents, params_dict=dynamic_params,
@@ -617,44 +638,46 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
        "k_params0" in params_dict[section_name]:
         kernels_types = params_dict[section_name]["k_types"]
         params0 = params_dict[section_name]["k_params0"]
-        print(f"Extracted k_types={kernels_types} and "
-              f"k_params0={params0} from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} k_types={kernels_types} and "
+              f"k_params0={params0}")
     # short format
     elif section_name in params_dict and \
-       "k_type" in params_dict[section_name]:
-        if params_dict[section_name]["k_type"] == "exponentialQuadratic":
+       "k_types" in params_dict[section_name]:
+        if params_dict[section_name]["k_types"] == "exponentialQuadratic":
             kernels_types = ["exponentialQuadratic" for k in range(n_latents)]
-            if "k_lengthscale0" in params_dict[section_name]:
-                lengthscale0 = float(params_dict[section_name]["k_lengthscale0"])
+            if "k_lengthscales0" in params_dict[section_name]:
+                lengthscales0 = float(params_dict[section_name]["k_lengthscales0"])
             else:
                 raise ValueError("If k_type=exponentialQuadratic is specified "
-                                 f"in {params_dict_type}, then k_lengthscale0 "
+                                 f"in {params_dict_type}, then k_lengthscales0 "
                                  "should also be specified in "
                                  f"{params_dict_type}")
-            params0 = [torch.DoubleTensor([lengthscale0])
+            params0 = [torch.DoubleTensor([lengthscales0])
                        for k in range(n_latents)]
-            print("Extracted k_type=exponentialQuadratic and "
-                  f"k_lengthsale0={lengthscale0} from {params_dict_type}")
-        elif params_dict[section_name]["k_type"] == "periodic":
+            print(f"Extracted from {params_dict_type} "
+                  "k_type=exponentialQuadratic and "
+                  f"k_lengthsales0={lengthscales0}")
+        elif params_dict[section_name]["k_types"] == "periodic":
             kernels_types = ["periodic" for k in range(n_latents)]
-            if "k_lengthscale0" in params_dict[section_name]:
-                lengthscale0 = float(params_dict[section_name]["k_lengthscale0"])
+            if "k_lengthscales0" in params_dict[section_name]:
+                lengthscales0 = float(params_dict[section_name]["k_lengthscales0"])
             else:
-                raise ValueError("If k_type=periodic is specified "
-                                 f"in {params_dict_type}, then k_lengthscale0 "
+                raise ValueError("If k_types=periodic is specified "
+                                 f"in {params_dict_type}, then k_lengthscales0 "
                                  "should also be specified in "
                                  f"{params_dict_type}")
-            if "k_period0" in params_dict[section_name]:
-                period0 = float(params_dict[section_name]["k_period0"])
+            if "k_periods0" in params_dict[section_name]:
+                periods0 = float(params_dict[section_name]["k_periods0"])
             else:
-                raise ValueError("If k_type=periodic is specified "
-                                 f"in {params_dict_type}, then k_period0 "
+                raise ValueError("If k_types=periodic is specified "
+                                 f"in {params_dict_type}, then k_periods0 "
                                  "should also be specified in "
                                  f"{params_dict_type}")
-            params0 = [torch.DoubleTensor([lengthscale0, period0])
+            params0 = [torch.DoubleTensor([lengthscales0, periods0])
                        for k in range(n_latents)]
-            print(f"Extracted k_type=periodic, k_lengthsale0={lengthscale0} "
-                  f"and  k_period={period0} from {params_dict_type}")
+            print(f"Extracted from {params_dict_type} "
+                  f"k_types=periodic, k_lengthsales0={lengthscales0} "
+                  f"and  k_periods={periods0}")
     # long format
     elif section_name in params_dict and \
             "k_type_latent0" in params_dict[section_name]:
@@ -673,8 +696,9 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
                                      "should also be specified in "
                                      f"{params_dict_type}")
                 params0.append(torch.DoubleTensor([lengthscale0]))
-                print(f"Extracted k_type_latent{k}=exponentialQuadratic and "
-                      f"k_lengthsale0_latent0{k}={lengthscale0} {params_dict_type}")
+                print(f"Extracted from  {params_dict_type} "
+                      f"k_type_latent{k}=exponentialQuadratic and "
+                      f"k_lengthsale0_latent0{k}={lengthscale0}")
             elif params_dict[section_name][f"k_type_latent{k}"] == "periodic":
                 kernels_types.append("periodic")
                 if "k_lengthscale0_latent{k}" in params_dict[section_name]:
@@ -696,10 +720,10 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
                                      "should also be specified in "
                                      f"{params_dict_type}")
                 params0.append(torch.DoubleTensor([lengthscale0, period0]))
-                print(f"Extracted k_type_latent{k}=periodic, "
+                print(f"Extracted from {params_dict_type} "
+                      f"k_type_latent{k}=periodic, "
                       f"k_lengthsale0_latent{k}={lengthscale0} and "
-                      f"k_period0_latent{k}={period0} from "
-                      f"{params_dict_type}")
+                      f"k_period0_latent{k}={period0}")
             else:
                 raise RuntimeError("Invalid k_type_latent{:d}={:s}".format(
                     k, params_dict[section_name][f"k_type_latent{k}"]))
@@ -710,10 +734,9 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
 
 
 def getIndPointsLocs0(n_latents, n_trials,
-                      dynamic_params, config_file_params, default_params,
-                      n_ind_points=None,
-                      trials_start_times=None,
-                      trials_end_times=None):
+                      dynamic_params=None, config_file_params=None,
+                      default_params=None, n_ind_points=None,
+                      trials_start_times=None, trials_end_times=None):
     if dynamic_params is not None:
         param = getIndPointsLocs0InDict(n_latents=n_latents, n_trials=n_trials,
                                         params_dict=dynamic_params,
@@ -754,7 +777,7 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
     if section_name in params_dict and \
        "ind_points_locs0" in params_dict[section_name]:
         ind_points_locs0 = params_dict[section_name]["ind_points_locs0"]
-        print(f"Extracted ind_points_locs from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} ind_points_locs ")
     # filename: same inducing points across all latents and trials
     elif section_name in params_dict and \
        "ind_points_locs0_filename" in params_dict[section_name]:
@@ -763,8 +786,8 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
         ind_points_locs0 = getSameAcrossLatentsAndTrialsIndPointsLocs0(
             n_latents=n_latents, n_trials=n_trials,
             ind_points_locs0_filename=ind_points_locs0_filename)
-        print(f"Extracted ind_points_locs0_filename={ind_points_locs0_filename}"
-              f"from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} "
+              f"ind_points_locs0_filename={ind_points_locs0_filename}")
     # filename: different inducing points across all latents and trials
     elif section_name in params_dict and \
             "ind_points_locs0_filename_latent0_trial0" in \
@@ -779,10 +802,16 @@ def getIndPointsLocs0InDict(n_latents, n_trials, params_dict, params_dict_type,
             trials_start_times is not None and \
             trials_end_times is not None:
         layout = params_dict[section_name]["ind_points_locs0_layout"]
-        print(f"Extracted ind_points_locs0_layout={layout} from "
-              f"{params_dict_type}")
+        print(f"Extracted from {params_dict_type} "
+              f"ind_points_locs0_layout={layout}")
         if layout == "equidistant":
             ind_points_locs0 = buildEquidistantIndPointsLocs0(
+                n_latents=n_latents, n_trials=n_trials,
+                n_ind_points=n_ind_points,
+                trials_start_times=trials_start_times,
+                trials_end_times=trials_end_times)
+        elif layout == "uniform":
+            ind_points_locs0 = buildUniformIndPointsLocs0(
                 n_latents=n_latents, n_trials=n_trials,
                 n_ind_points=n_ind_points,
                 trials_start_times=trials_start_times,
@@ -818,8 +847,8 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
     for k in range(n_latents):
         item_name = item_name_pattern.format(k, 0)
         ind_points_locs0_filename = params_dict[section_name][item_name]
-        print(f"Extracted {item_name}={ind_points_locs0_filename} from "
-              f"{params_dict_type}")
+        print(f"Extracted from {params_dict_type} "
+              f"{item_name}={ind_points_locs0_filename}")
         Z0_k_r0_np = np.genfromtxt(ind_points_locs0_filename,
                                    delimiter=delimiter)
         Z0_k_r0 = torch.from_numpy(Z0_k_r0_np).flatten()
@@ -830,8 +859,8 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
         for r in range(1, n_trials):
             item_name = item_name_pattern.format(k, r)
             ind_points_locs0_filename = params_dict[section_name][item_name]
-            print(f"Extracted {item_name}={ind_points_locs0_filename} from "
-                  f"{params_dict_type}")
+            print(f"Extracted from {params_dict_type} "
+                  f"{item_name}={ind_points_locs0_filename}")
             Z0_k_r_np = np.genfromtxt(ind_points_locs0_filename,
                                       delimiter=delimiter)
             Z0_k_r = torch.from_numpy(Z0_k_r_np).flatten()
@@ -845,14 +874,29 @@ def buildEquidistantIndPointsLocs0(n_latents, n_trials, n_ind_points,
     for k in range(n_latents):
         Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1), dtype=torch.double)
         for r in range(n_trials):
+            Z0 = trials_start_times[r] + \
+                 torch.rand(n_ind_points[k]) * \
+                 (trials_end_times[r]-trials_start_times[r])
+            Z0_sorted, _ = Z0.sort()
+            Z0s[k][r, :, 0] = Z0_sorted
+    return Z0s
+
+
+def buildUniformIndPointsLocs0(n_latents, n_trials, n_ind_points,
+                               trials_start_times, trials_end_times):
+    Z0s = [[] for k in range(n_latents)]
+    for k in range(n_latents):
+        Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1), dtype=torch.double)
+        for r in range(n_trials):
             Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
                                 n_ind_points[k])
             Z0s[k][r, :, 0] = Z0
     return Z0s
 
 
-def getVariationalMean0(n_latents, n_trials, n_ind_points,
-                        dynamic_params, config_file_params, default_params):
+def getVariationalMean0(n_latents, n_trials, n_ind_points=None,
+                        dynamic_params=None, config_file_params=None,
+                        default_params=None):
     if dynamic_params is not None:
         param = getVariationalMean0InDict(n_latents=n_latents,
                                           n_trials=n_trials,
@@ -898,20 +942,32 @@ def getVariationalMean0InDict(n_latents, n_trials, n_ind_points,
     if section_name in params_dict and \
        binary_item_name in params_dict[section_name]:
         variational_mean0 = params_dict[section_name][binary_item_name]
-        print("Extracted "
-              f"{binary_item_name} from "
-              f"{params_dict_type}")
+        print(f"Extracted from {params_dict_type} {binary_item_name}")
+    # constant_value
+    elif section_name in params_dict and \
+            constant_value_item_name in params_dict[section_name]:
+        constant_value = params_dict[section_name][constant_value_item_name]
+        # make sure all latents have the same number of inducing points
+        for k in range(1, len(n_ind_points)):
+            assert(n_ind_points[0] == n_ind_points[k])
+        a_variational_mean0 = torch.ones(n_ind_points[0],
+                                         dtype=torch.double) * constant_value
+        print(f"Extracted from {params_dict_type} "
+              f"{constant_value_item_name}={constant_value}")
+        variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
+            n_latents=n_latents, n_trials=n_trials,
+            a_variational_mean0=a_variational_mean0)
     # variational_means_filename
     elif section_name in params_dict and \
             common_filename_item_name in params_dict[section_name]:
         variational_mean0_filename = \
             params_dict[section_name][common_filename_item_name]
-        print("Extracted "
-              f"{common_filename_item_name}={variational_mean0_filename} from "
-              f"{params_dict_type}")
+        print(f"Extracted from {params_dict_type} "
+              f"{common_filename_item_name}={variational_mean0_filename}")
         a_variational_mean0_np = np.genfromtxt(variational_mean0_filename,
                                                delimiter=delimiter)
-        a_variational_mean0 = torch.from_numpy(a_variational_mean0_np).flatten()
+        a_variational_mean0 = \
+            torch.from_numpy(a_variational_mean0_np).flatten()
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_mean0=a_variational_mean0)
@@ -923,26 +979,19 @@ def getVariationalMean0InDict(n_latents, n_trials, n_ind_points,
             params_dict_type=params_dict_type,
             section_name=section_name,
             item_name_pattern=different_filename_item_name_pattern)
-    # constant_value
-    elif section_name in params_dict and \
-            constant_value_item_name in params_dict[section_name]:
-        constant_value = params_dict[section_name][constant_value_item_name]
-        print(f"Extracted {constant_value_item_name}={constant_value} from "
-              f"{params_dict_type}")
-        variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
-            n_latents=n_latents, n_trials=n_trials, n_ind_points=n_ind_points,
-            constant_value=constant_value)
     else:
         variational_mean0 = None
     return variational_mean0
 
 
 def getSameAcrossLatentsAndTrialsVariationalMean0(n_latents, n_trials,
-                                                  n_ind_points, constant_value):
+                                                  a_variational_mean0):
+    n_ind_points = len(a_variational_mean0)
     variational_mean0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
-        variational_mean0[k] = torch.empty((n_trials, n_ind_points[k], 1), dtype=torch.double)
-        variational_mean0[k][:, :, 0] = constant_value * torch.ones(n_ind_points[k], dtype=torch.double)
+        variational_mean0[k] = torch.empty((n_trials, n_ind_points, 1),
+                                           dtype=torch.double)
+        variational_mean0[k][:, :, 0] = a_variational_mean0
     return variational_mean0
 
 
@@ -954,7 +1003,8 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
     variational_mean0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
         variational_mean0_filename = params_dict[section_name][item_name_pattern.format(k, 0)]
-        print(f"Extracted {item_name_pattern.format(k, 0)}={variational_mean0_filename} from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} "
+              f"{item_name_pattern.format(k, 0)}={variational_mean0_filename}")
         variational_mean0_k0_np = np.genfromtxt(variational_mean0_filename,
                                                 delimiter=delimiter)
         variational_mean0_k0 = torch.from_numpy(variational_mean0_k0_np).flatten()
@@ -963,7 +1013,9 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
         variational_mean0[k][0, :, 0] = variational_mean0_k0
         for r in range(1, n_trials):
             variational_mean0_filename = params_dict[section_name][item_name_pattern.format(k, r)]
-            print(f"Extracted {item_name_pattern.format(k, r)}={variational_mean0_filename} from {params_dict_type}")
+            print(f"Extracted from {params_dict_type} "
+                  f"{item_name_pattern.format(k, r)}="
+                  f"{variational_mean0_filename}")
             variational_mean0_kr = np.genfromtxt(variational_mean0_filename,
                                                  delimiter=delimiter)
             variational_mean0_kr = torch.from_numpy(variational_mean0_kr).flatten()
@@ -972,8 +1024,8 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
 
 
 def getVariationalCov0(n_latents, n_trials,
-                       dynamic_params, config_file_params, default_params,
-                       n_ind_points=None):
+                       dynamic_params=None, config_file_params=None,
+                       default_params=None, n_ind_points=None):
     if dynamic_params is not None:
         param = getVariationalCov0InDict(n_latents=n_latents,
                                          n_trials=n_trials,
@@ -1017,14 +1069,18 @@ def getVariationalCov0InDict(n_latents, n_trials, params_dict,
     if section_name in params_dict and \
        binary_item_name in params_dict[section_name]:
         variational_cov0 = params_dict[section_name][binary_item_name]
-        print(f"Extracted {binary_item_name} from {params_dict_type}")
+        print(f"Extracted from {params_dict_type} {binary_item_name}")
     # diag_value
     elif section_name in params_dict and \
-       diag_value_item_name in params_dict[section_name]:
+            diag_value_item_name in params_dict[section_name]:
         diag_value = params_dict[section_name][diag_value_item_name]
-        print(f"Extracted {diag_value_item_name}={diag_value} from "
-              f"{params_dict_type}")
-        a_variational_cov0 = diag_value * torch.eye(n_ind_points, dtype=torch.double)
+        print(f"Extracted from {params_dict_type} "
+              f"{diag_value_item_name}={diag_value}")
+        # make sure all latents have the same number of inducing points
+        for k in range(1, len(n_ind_points)):
+            assert(n_ind_points[0] == n_ind_points[k])
+        a_variational_cov0 = diag_value * torch.eye(n_ind_points[0],
+                                                    dtype=torch.double)
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_cov0=a_variational_cov0,
@@ -1033,9 +1089,8 @@ def getVariationalCov0InDict(n_latents, n_trials, params_dict,
     elif section_name in params_dict and \
             common_filename_item_name in params_dict[section_name]:
         variational_cov0_filename =  params_dict[section_name][common_filename_item_name]
-        print("Extracted "
-              f"{common_filename_item_name}={variational_cov0_filename} from "
-              f"{params_dict_type}")
+        print(f"Extracted from {params_dict_type} "
+              f"{common_filename_item_name}={variational_cov0_filename}")
         a_variational_cov0_np = np.genfromtxt(variational_cov0_filename,
                                               delimiter=delimiter)
         a_variational_cov0 = torch.from_numpy(a_variational_cov0_np)
@@ -1075,8 +1130,8 @@ def getDiffAcrossLatentsAndTrialsVariationalCov0(
     for k in range(n_latents):
         item_name = item_name_pattern.format(k, 0)
         variational_cov_filename = params_dict[section_name][item_name]
-        print(f"Extracted {item_name}={variational_cov_filename} "
-              f"from config[{section_name}]")
+        print(f"Extracted from config[{section_name}] "
+              f"{item_name}={variational_cov_filename}")
         variational_cov0_k0_np = np.genfromtxt(variational_cov_filename,
                                                delimiter=delimiter)
         variational_cov0_k0 = torch.from_numpy(variational_cov0_k0_np)
@@ -1086,7 +1141,8 @@ def getDiffAcrossLatentsAndTrialsVariationalCov0(
         for r in range(1, n_trials):
             item_name = item_name_pattern.format(k, r)
             variational_cov_filename = params_dict[section_name][item_name]
-            print(f"Extracted {item_name}={variational_cov_filename} from config[{section_name}]")
+            print(f"Extracted from config[{section_name}] "
+                  f"{item_name}={variational_cov_filename}")
             variational_cov0_kr_np = np.genfromtxt(variational_cov_filename,
                                                    delimiter=delimiter)
             variational_cov0_kr = torch.from_numpy(variational_cov0_kr_np)
