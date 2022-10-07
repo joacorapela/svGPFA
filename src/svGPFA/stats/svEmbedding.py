@@ -78,10 +78,10 @@ class LinearSVEmbedding(SVEmbedding):
 class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
     def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
-        # qHMu, qHVar \in nTrials x nQuad x nNeurons
-        qHMu = torch.matmul(means, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
-        qHVar = torch.matmul(vars, (torch.t(self._C))**2)
-        return qHMu, qHVar
+        # emb_post_mean, emb_post_var \in nTrials x nQuad x nNeurons
+        emb_post_mean = torch.matmul(means, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
+        emb_post_var = torch.matmul(vars, (torch.t(self._C))**2)
+        return emb_post_mean, emb_post_var
 
     def predictLatents(self, times):
         return self._svPosteriorOnLatents.predict(times=times)
@@ -93,8 +93,8 @@ class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 
 #     def computeMeans(self, times):
 #         qKMu = self._svPosteriorOnLatents.computeMeans(times=times)
-#         qHMu = torch.matmul(qKMu, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
-#         return qHMu
+#         emb_post_mean = torch.matmul(qKMu, torch.t(self._C)) + torch.reshape(input=self._d, shape=(1, 1, len(self._d))) # using broadcasting
+#         return emb_post_mean
 # 
     def computeMeansAndVarsAtTimes(self, times):
         qKMu, qKVar = self._svPosteriorOnLatents.computeMeansAndVarsAtTimes(times=times)
@@ -136,10 +136,10 @@ class LinearSVEmbeddingAssocTimes(LinearSVEmbedding):
 
     def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
         nTrials = len(self._neuronForSpikeIndex)
-        qHMu = [[None] for tr in range(nTrials)]
-        qHVar = [[None] for tr in range(nTrials)]
+        emb_post_mean = [[None] for tr in range(nTrials)]
+        emb_post_var = [[None] for tr in range(nTrials)]
         for trialIndex in range(nTrials):
-            qHMu[trialIndex] = torch.sum(means[trialIndex]*self._C[(self._neuronForSpikeIndex[trialIndex]).tolist(),:], dim=1)+self._d[(self._neuronForSpikeIndex[trialIndex]).tolist()].squeeze()
-            qHVar[trialIndex] = torch.sum(vars[trialIndex]*(self._C[(self._neuronForSpikeIndex[trialIndex]).tolist(),:])**2, dim=1)
-        return qHMu, qHVar
+            emb_post_mean[trialIndex] = torch.sum(means[trialIndex]*self._C[(self._neuronForSpikeIndex[trialIndex]).tolist(),:], dim=1)+self._d[(self._neuronForSpikeIndex[trialIndex]).tolist()].squeeze()
+            emb_post_var[trialIndex] = torch.sum(vars[trialIndex]*(self._C[(self._neuronForSpikeIndex[trialIndex]).tolist(),:])**2, dim=1)
+        return emb_post_mean, emb_post_var
 
