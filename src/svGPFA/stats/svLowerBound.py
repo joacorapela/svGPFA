@@ -22,8 +22,6 @@ class SVLowerBound:
         eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
         klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
         theEval = eLLEval-klDivEval
-#         if torch.abs(theEval)>1e30:
-#             import pdb; pdb.set_trace()
         if torch.isinf(theEval):
             # raise RuntimeError("infinity lower bound detected")
             warnings.warn("infinity lower bound detected")
