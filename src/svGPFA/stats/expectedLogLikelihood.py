@@ -68,7 +68,8 @@ class ExpectedLogLikelihood(ABC):
         eMean, eVar = self._svEmbeddingAllTimes.predict(times=times)
         nTrials = eMean.shape[0]
         nNeurons = eMean.shape[2]
-        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+        answer = [[self._linkFunction(eMean[r, :, n]+0.5*eVar[r, :, n])
+                   for n in range(nNeurons)] for r in range(nTrials)]
         return answer
 
     def getSVPosteriorOnIndPointsParams(self):
