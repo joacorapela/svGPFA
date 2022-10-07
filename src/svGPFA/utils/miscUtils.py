@@ -1,10 +1,12 @@
-import pdb
 import scipy.io
 import math
 import numpy as np
+import pandas as pd
+import scipy
+import sklearn.metrics
 import torch
-import scipy.stats
 # import matplotlib.pyplot as plt
+import warnings
 
 import svGPFA.stats.kernels
 import gcnu_common.numerical_methods.utils
@@ -15,24 +17,24 @@ def buildKernels(kernels_types, kernels_params):
     n_latents = len(kernels_types)
     kernels = [None for k in range(n_latents)]
 
-    for i, kernel_type in enumerate(kernels_types):
-        if kernels_types[i] == "exponentialQuadratic":
-            kernels[i] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
-        elif kernels_types[i] == "periodic":
-            kernels[i] = svGPFA.stats.kernels.PeriodicKernel()
+    for k, kernel_type in enumerate(kernels_types):
+        if kernels_types[k] == "exponentialQuadratic":
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+        elif kernels_types[k] == "periodic":
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
         else:
-            raise ValueError(f"Invalid kernels type: {kernels_types[i]}")
-        kernels[i].setParams(kernels_params[i])
+            raise ValueError(f"Invalid kernels type: {kernels_types[k]}")
+        kernels[k].setParams(kernels_params[k])
     return kernels
 
 
-def orthonormalizeLatentsMeans(latentsMeans, C):
+def orthonormalizeLatentsMeans(latents_means, C):
     U, S, Vh = np.linalg.svd(C)
     orthoMatrix = Vh.T*S
-    nTrials = len(latentsMeans)
-    oLatentsMeans = [[] for r in range(nTrials)]
-    for r in range(nTrials):
-        oLatentsMeans[r] = np.matmul(latentsMeans[r], orthoMatrix)
+    n_trials = len(latents_means)
+    oLatentsMeans = [[] for r in range(n_trials)]
+    for r in range(n_trials):
+        oLatentsMeans[r] = np.matmul(latents_means[r], orthoMatrix)
     return oLatentsMeans
 
 
@@ -46,25 +48,27 @@ def getPropSamplesCovered(sample, mean, std, percent=.95):
     return coverage
 
 def getCIFs(C, d, latents):
-    nTrials = latents.shape[0]
+    n_trials = latents.shape[0]
     nLatents = latents.shape[2]
     nSamples = latents.shape[1]
     nNeurons = C.shape[0]
-    embeddings = torch.empty((nTrials, nSamples, nNeurons))
-    for r in range(nTrials):
+    embeddings = torch.empty((n_trials, nSamples, nNeurons))
+    for r in range(n_trials):
         embeddings[r,:,:] = torch.matmul(latents[r,:,:], torch.transpose(C, 0, 1))+d[:,0]
     CIFs = torch.exp(embeddings)
     return CIFs
 
-def computeSpikeRates(trialsTimes, spikesTimes):
-    nTrials = len(spikesTimes)
-    nNeurons = len(spikesTimes[0])
-    spikesRates = torch.empty((nTrials,nNeurons))
-    for r in range(nTrials):
-        trialDuration = torch.max(trialsTimes[r])-torch.min(trialsTimes[r])
-        for n in range(nNeurons):
-            spikesRates[r,n] = len(spikesTimes[r][n])/trialDuration
-    return spikesRates
+
+def computeSpikeRates(trials_times, spikes_times):
+    n_trials = len(spikes_times)
+    n_neurons = len(spikes_times[0])
+    spikes_rates = torch.empty((n_trials, n_neurons))
+    for r in range(n_trials):
+        trial_duration = torch.max(trials_times[r])-torch.min(trials_times[r])
+        for n in range(n_neurons):
+            spikes_rates[r, n] = len(spikes_times[r][n])/trial_duration
+    return spikes_rates
+
 
 def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
                                  indPointsLocs,
@@ -76,11 +80,11 @@ def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
                                  emMaxIter, eStepMaxIter, mStepEmbeddingMaxIter,
                                  mStepKernelsMaxIter, mStepIndPointsMaxIter,
                                  saveFilename):
-    nTrials = len(spikesTimes)
+    n_trials = len(spikesTimes)
     nNeurons = len(spikesTimes[0])
     nLatents = len(qMu)
     # indPointsLocsKMSEpsilon = np.array(indPointsLocsKMSEpsilon)
-    mdict = dict(nTrials=nTrials, nNeurons=nNeurons, nLatents=nLatents,
+    mdict = dict(n_trials=n_trials, nNeurons=nNeurons, nLatents=nLatents,
                  C=C.numpy(), d=torch.reshape(input=d, shape=(-1,1)).numpy(),
                  legQuadPoints=legQuadPoints.numpy(),
                  legQuadWeights=legQuadWeights.numpy(),
@@ -101,7 +105,7 @@ def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
         mdict.update({"qSVec_{:d}".format(k): qSVec[k].numpy().astype(np.float64)})
         mdict.update({"qSDiag_{:d}".format(k): qSDiag[k].numpy().astype(np.float64)})
         mdict.update({"latentsTrialsTimes_{:d}".format(k): latentsTrialsTimes[k].numpy().astype(np.float64)})
-    for r in range(nTrials):
+    for r in range(n_trials):
         for n in range(nNeurons):
             mdict.update({"spikesTimes_{:d}_{:d}".format(r, n): spikesTimes[r][n].numpy().astype(np.float64)})
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
@@ -117,7 +121,7 @@ def buildCovsFromCholVecs(cholVecs):
     R = cholVecs[0].shape[0]
     covs = [[None] for k in range(K)]
     for k in range(K):
-        # cholVecs[k] \in nTrials x Pk x 1
+        # cholVecs[k] \in n_trials x Pk x 1
         # Pk = ((nIndPointsK+1)*nIndPointsK)/2
         # nIndPointsK = (-1+sqrt(1+8*Pk))/2
         Pk = cholVecs[k].shape[1]
@@ -132,15 +136,15 @@ def buildCovsFromCholVecs(cholVecs):
 def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
     # qsCholVecs[k] \in nTrial x Pk
     nLatents = len(qsCholVecs)
-    nTrials = qsCholVecs[0].shape[0]
+    n_trials = qsCholVecs[0].shape[0]
     qSVec = [[] for k in range(nLatents)]
     qSDiag = [[] for k in range(nLatents)]
     for k in range(nLatents):
         Pk = qsCholVecs[k].shape[1]
         nIndPointsK = int((-1.0+math.sqrt(1+8*Pk))/2.0)
-        qSVec[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
-        qSDiag[k] = torch.empty(nTrials, nIndPointsK, 1, dtype=torch.double)
-        for r in range(nTrials):
+        qSVec[k] = torch.empty(n_trials, nIndPointsK, 1, dtype=torch.double)
+        qSDiag[k] = torch.empty(n_trials, nIndPointsK, 1, dtype=torch.double)
+        for r in range(n_trials):
             qSRSigmaKR = getCholFromVec(vec=qsCholVecs[k][r, :, 0], nIndPoints=nIndPointsK)
             qSigmaKR = torch.matmul(qSRSigmaKR, torch.transpose(qSRSigmaKR, 0, 1))
             qSDiagKR = torch.diag(qSigmaKR)
@@ -181,16 +185,6 @@ def clock(func):
     return clocked
 
 def chol3D(K):
-    # begin debug
-#     print("Waning: debug code on in miscUtils.py:chol3D")
-#     nTrial = K.shape[0]
-#     for r in range(nTrial):
-#         Kr = torch.matmul(K[r,:,:], torch.transpose(K[r,:,:], 0, 1))
-#         eigRes = torch.eig(Kr)
-#         cNum = eigRes.eigenvalues[0,0]/eigRes.eigenvalues[-1,0]
-#         print("Condition number for trial {:d}: {:f}".format(r, cNum))
-    # pdb.set_trace()
-    # end debug
     Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
     nTrial = K.shape[0]
     for i in range(nTrial):
@@ -218,59 +212,83 @@ def getLegQuadPointsAndWeights(n_quad, trials_start_times, trials_end_times,
     return leg_quad_points, leg_quad_weights
 
 
-def getTrialsTimes(trialsLengths, dt):
-    nTrials = len(trialsLengths)
-    trialsTimes = [[] for r in range(nTrials)]
-    for r in range(nTrials):
-        trialsTimes[r] = torch.linspace(0, trialsLengths[r], round(trialsLengths[r]/dt))
-    return trialsTimes
+def getTrialsTimes(start_times, end_times, n_steps):
+    assert(len(start_times) == len(end_times))
+    n_trials = len(start_times)
+    trials_times = torch.empty((n_trials, n_steps, 1), dtype=torch.double)
+    for r in range(n_trials):
+        trials_times[r, :, 0] = torch.linspace(start_times[r], end_times[r],
+                                               n_steps)
+    return trials_times
+
+
+def computeSpikeClassificationROC(spikes_times, cif_times, cif_values,
+                                  highres_bin_size=1e-3):
+    f = scipy.interpolate.interp1d(cif_times, cif_values)
+    cif_times_highres = np.arange(cif_times[0], cif_times[-1],
+                                  highres_bin_size)
+    cif_values_highres = f(cif_times_highres)
+    bins = pd.interval_range(start=cif_times[0].item(),
+                             end=cif_times[-1].item(),
+                             periods=len(cif_times_highres))
+    cut_res = pd.cut(spikes_times, bins=bins, retbins=False)
+    Y = cut_res.value_counts().values
+    indicesMoreThanOneSpikes = (Y > 1).nonzero()
+    if len(indicesMoreThanOneSpikes) > 0:
+        warnings.warn("Found more than one spike in {:d} bins".format(
+            len(indicesMoreThanOneSpikes)))
+        Y[indicesMoreThanOneSpikes] = 1.0
+    fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, cif_values_highres,
+                                                     pos_label=1)
+    roc_auc = sklearn.metrics.auc(fpr, tpr)
+    return fpr, tpr, roc_auc
+
 
 def getLatentsMeansAndSTDs(meansFuncs, kernels, trialsTimes):
-    nTrials = len(trialsTimes)
+    n_trials = len(trialsTimes)
     nLatents = len(kernels)
-    latentsMeans = [[] for r in range(nTrials)]
-    latentsSTDs = [[] for r in range(nTrials)]
+    latents_means = [[] for r in range(n_trials)]
+    latents_STDs = [[] for r in range(n_trials)]
 
-    for r in range(nTrials):
-        latentsMeans[r] = torch.empty((nLatents, len(trialsTimes[r])))
-        latentsSTDs[r] = torch.empty((nLatents, len(trialsTimes[r])))
+    for r in range(n_trials):
+        latents_means[r] = torch.empty((nLatents, len(trialsTimes[r])))
+        latents_STDs[r] = torch.empty((nLatents, len(trialsTimes[r])))
         for k in range(nLatents):
             gp = gcnu_common.stats.gaussianProcesses.eval.GaussianProcess(mean=meansFuncs[k], kernel=kernels[k])
-            latentsMeans[r][k,:] = gp.mean(t=trialsTimes[r])
-            latentsSTDs[r][k,:] = gp.std(t=trialsTimes[r])
-    return latentsMeans, latentsSTDs
+            latents_means[r][k,:] = gp.mean(t=trialsTimes[r])
+            latents_STDs[r][k,:] = gp.std(t=trialsTimes[r])
+    return latents_means, latents_STDs
 
 def getLatentsSTDs(kernels, trialsTimes):
-    nTrials = len(trialsTimes)
+    n_trials = len(trialsTimes)
     nLatents = len(kernels)
-    latentsSTDs = [[] for r in range(nTrials)]
+    latents_STDs = [[] for r in range(n_trials)]
 
-    for r in range(nTrials):
-        latentsSTDs[r] = torch.empty((nLatents, len(trialsTimes[r])))
+    for r in range(n_trials):
+        latents_STDs[r] = torch.empty((nLatents, len(trialsTimes[r])))
         for k in range(nLatents):
-            latentsSTDs[r][k,:] = kernels[k].buildKernelMatrixDiag(X=trialsTimes[r]).sqrt()
-            pdb.set_trace()
-    return latentsSTDs
+            latents_STDs[r][k,:] = kernels[k].buildKernelMatrixDiag(X=trialsTimes[r]).sqrt()
+    return latents_STDs
 
-# def getLatentsMeanFuncsSamples(latentsMeansFuncs, trialsTimes, dtype):
-#     nTrials = len(latentsMeansFuncs)
-#     nLatents = len(latentsMeansFuncs[0])
-#     latentsMeansFuncsSamples = [[] for r in range(nTrials)]
-#     for r in range(nTrials):
-#         latentsMeansFuncsSamples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
+# def getLatentsMeanFuncsSamples(latents_meansFuncs, trialsTimes, dtype):
+#     n_trials = len(latents_meansFuncs)
+#     nLatents = len(latents_meansFuncs[0])
+#     latents_meansFuncsSamples = [[] for r in range(n_trials)]
+#     for r in range(n_trials):
+#         latents_meansFuncsSamples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
 #         for k in range(nLatents):
-#             latentsMeansFuncsSamples[r][k,:] = latentsMeansFuncs[r][k](t=trialsTimes[r])
+#             latents_meansFuncsSamples[r][k,:] = latents_meansFuncs[r][k](t=trialsTimes[r])
 
-def getLatentsSamplesMeansAndSTDsFromSampledMeans(nTrials, sampledMeans, kernels, trialsTimes, latentsGPRegularizationEpsilon, dtype):
+def getLatentsSamplesMeansAndSTDsFromSampledMeans(n_trials, sampledMeans, kernels, trialsTimes, latentsGPRegularizationEpsilon, dtype):
     nLatents = len(kernels)
-    latentsSamples = [[] for r in range(nTrials)]
-    latentsMeans = [[] for r in range(nTrials)]
-    latentsSTDs = [[] for r in range(nTrials)]
+    latents_samples = [[] for r in range(n_trials)]
+    latents_means = [[] for r in range(n_trials)]
+    latents_STDs = [[] for r in range(n_trials)]
 
-    for r in range(nTrials):
-        latentsSamples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
-        latentsMeans[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
-        latentsSTDs[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
+    for r in range(n_trials):
+        latents_samples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
+        latents_means[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
+        latents_STDs[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)
         for k in range(nLatents):
             print("Procesing trial {:d} and latent {:d}".format(r+1, k+1))
             mean = sampledMeans[r,:,k]
@@ -279,9 +297,9 @@ def getLatentsSamplesMeansAndSTDsFromSampledMeans(nTrials, sampledMeans, kernels
             std = torch.diag(cov).sqrt()
             mn = scipy.stats.multivariate_normal(mean=mean, cov=cov)
             sample = torch.from_numpy(mn.rvs())
-            latentsSamples[r][k,:] = sample
-            latentsMeans[r][k,:] = mean
-            latentsSTDs[r][k,:] = std
+            latents_samples[r][k,:] = sample
+            latents_means[r][k,:] = mean
+            latents_STDs[r][k,:] = std
             # plt.plot(trialsTimes[r], mean, label="mean")
             # plt.plot(trialsTimes[r], sample, label="sample")
             # plt.xlabel("Time (sec)")
@@ -289,7 +307,7 @@ def getLatentsSamplesMeansAndSTDsFromSampledMeans(nTrials, sampledMeans, kernels
             # plt.title("Latent {:d}".format(k))
             # plt.legend()
             # plt.show()
-    return latentsSamples, latentsMeans, latentsSTDs
+    return latents_samples, latents_means, latents_STDs
 
 def getDiagIndicesIn3DArray(N, M, device=torch.device("cpu")):
     frameDiagIndices = torch.arange(end=N, device=device)*(N+1)
@@ -309,29 +327,29 @@ def build3DdiagFromDiagVector(v, N, M):
 
 def buildQSigmaFromQSVecAndQSDiag(qSVec, qSDiag):
     nLatents = len(qSVec)
-    nTrials = qSVec[0].shape[0]
+    n_trials = qSVec[0].shape[0]
     qSigma = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         nIndK = qSDiag[k].shape[1]
-        # qq \in nTrials x nInd[k] x 1
-        qq = qSVec[k].reshape(shape=(nTrials, nIndK, 1))
-        # dd \in nTrials x nInd[k] x 1
+        # qq \in n_trials x nInd[k] x 1
+        qq = qSVec[k].reshape(shape=(n_trials, nIndK, 1))
+        # dd \in n_trials x nInd[k] x 1
         nIndKVarRnkK = qSVec[k].shape[1]
-        dd = build3DdiagFromDiagVector(v=(qSDiag[k].flatten())**2, M=nTrials, N=nIndKVarRnkK)
-        # qSigma[k] \in nTrials x nInd[k] x nInd[k]
+        dd = build3DdiagFromDiagVector(v=(qSDiag[k].flatten())**2, M=n_trials, N=nIndKVarRnkK)
+        # qSigma[k] \in n_trials x nInd[k] x nInd[k]
         qSigma[k] = torch.matmul(qq, torch.transpose(a=qq, dim0=1, dim1=2)) + dd
     return qSigma
 
 def getSRQSigmaVec(qSVec, qSDiag):
     nLatents = len(qSVec)
-    nTrials = qSVec[0].shape[0]
+    n_trials = qSVec[0].shape[0]
     qSigma = buildQSigmaFromQSVecAndQSDiag(qSVec=qSVec, qSDiag=qSDiag)
     srQSigmaVec = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         nIndPointsK = qSigma[k].shape[1]
         Pk = int((nIndPointsK+1)*nIndPointsK/2)
-        srQSigmaVec[k] = torch.empty((nTrials, Pk, 1), dtype=torch.double)
-        for r in range(nTrials):
+        srQSigmaVec[k] = torch.empty((n_trials, Pk, 1), dtype=torch.double)
+        for r in range(n_trials):
             cholKR = torch.linalg.cholesky(qSigma[k][r,:,:])
             trilIndices = torch.tril_indices(nIndPointsK, nIndPointsK)
             cholKRVec = cholKR[trilIndices[0,:], trilIndices[1,:]]
@@ -340,28 +358,32 @@ def getSRQSigmaVec(qSVec, qSDiag):
 
 # def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPointLoc):
 #     nLatents = len(nIndPointsPerLatent)
-#     nTrials = len(trialsLengths)
+#     n_trials = len(trialsLengths)
 #
 #     Z0 = [[] for k in range(nLatents)]
 #     for k in range(nLatents):
-#         Z0[k] = torch.empty((nTrials, nIndPointsPerLatent[k], 1), dtype=torch.double)
-#         for r in range(nTrials):
+#         Z0[k] = torch.empty((n_trials, nIndPointsPerLatent[k], 1), dtype=torch.double)
+#         for r in range(n_trials):
 #             Z0[k][r,:,0] = torch.linspace(firstIndPointLoc, trialsLengths[r], nIndPointsPerLatent[k])
 #     return Z0
 
-def getEmbeddingSamples(C, d, latentsSamples):
-    nTrials = len(latentsSamples)
-    answer = [torch.matmul(C, latentsSamples[r])+d for r in range(nTrials)]
+
+def getEmbeddingSamples(C, d, latents_samples):
+    n_trials = len(latents_samples)
+    answer = [torch.matmul(C, latents_samples[r])+d for r in range(n_trials)]
     return answer
 
-def getEmbeddingMeans(C, d, latentsMeans):
-    nTrials = len(latentsMeans)
-    answer = [torch.matmul(C, latentsMeans[r])+d for r in range(nTrials)]
+
+def getEmbeddingMeans(C, d, latents_means):
+    n_trials = len(latents_means)
+    answer = [torch.matmul(C, latents_means[r])+d for r in range(n_trials)]
     return answer
 
-def getEmbeddingSTDs(C, latentsSTDs):
-    nTrials = len(latentsSTDs)
-    answer = [torch.matmul(C**2, latentsSTDs[r]**2).sqrt() for r in range(nTrials)]
+
+def getEmbeddingSTDs(C, latents_STDs):
+    n_trials = len(latents_STDs)
+    answer = [torch.matmul(C**2, latents_STDs[r]**2).sqrt()
+              for r in range(n_trials)]
     return answer
 
 
@@ -376,10 +398,11 @@ def getSRQSigmaVecsFromKzz(Kzz):
 def getVectorRepOfLowerTrianMatrices(lt_matrices):
     """Returns vectors containing the lower-triangular elements of the input lower-triangular matrices.
 
-    :parameter lt_matrices: a list of length n_latents, with lt_matrices[k] a tensor of dimension n_trials x nIndPoints x nIndPoints, where lt_matrices[k][r, :, :] is a lower-triangular matrix.
+    :parameter lt_matrices: a list of length n_latents, with lt_matrices[k] a tensor of dimension n_trials x n_ind_points x n_ind_points, where lt_matrices[k][r, :, :] is a lower-triangular matrix.
     :type lt_matrices: list
 
-    :return: a list srQSigmaVec of length n_latents, whith srQSigmaVec[k] a tensor of dimension n_trials x (nIndPoints+1)*nIndPoints/2 x 0, where srQSigmaVec[k][r, :, 0] contains the lower-triangular elements of lt_matrices[k][r, :, :]
+    :return: a list vec_lt_matrices of length n_latents, whith vec_lt_matrices[k] a tensor of dimension (n_trials, n_ind_points*(n_ind_points+1)/2, 0), where vec_lt_matrices[k][r, :, 0] contains the vectorized lower-triangular elements of lt_matrices[k][r, :, :].
+
     """
 
     n_latents = len(lt_matrices)
