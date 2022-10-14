@@ -91,12 +91,12 @@ def getOptimParams(dynamic_params_spec, config_file_params_spec,
 
 
 def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
-                         n_ind_points=None, a_n_ind_points=10, n_quad=200,
+                         n_ind_points=None, common_n_ind_points=10, n_quad=200,
                          trials_start_time=0.0, trials_end_time=1.0,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
                          lengthscale=1.0, em_max_iter=50):
     if n_ind_points is None:
-        n_ind_points = [a_n_ind_points] * n_latents
+        n_ind_points = [common_n_ind_points] * n_latents
     var_mean0 = [torch.zeros((n_trials, n_ind_points[k], 1),
                              dtype=torch.double)
                  for k in range(n_latents)]
