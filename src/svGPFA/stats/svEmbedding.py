@@ -24,7 +24,7 @@ class SVEmbedding(abc.ABC):
         self._svPosteriorOnLatents.buildKernelsMatrices()
 
     @abc.abstractmethod
-    def setInitialParams(self, initialParams):
+    def setInitialParams(self, initial_params):
         pass
 
     def setIndPointsLocs(self, indPointsLocs):
@@ -58,13 +58,13 @@ class SVEmbedding(abc.ABC):
 
 class LinearSVEmbedding(SVEmbedding):
 
-    def setInitialParams(self, initialParams):
-        svEmbeddingInitialParams = initialParams["embedding"]
+    def setInitialParams(self, initial_params):
+        svEmbeddingInitialParams = initial_params["embedding"]
         self._C = svEmbeddingInitialParams["C0"]
         self._d = svEmbeddingInitialParams["d0"]
-        svPosteriorOnLatentsInitialParams = initialParams["posterior_on_latents"]
+        svPosteriorOnLatentsInitialParams = initial_params["posterior_on_latents"]
         self._svPosteriorOnLatents.setInitialParams(
-            initialParams=svPosteriorOnLatentsInitialParams)
+            initial_params=svPosteriorOnLatentsInitialParams)
 
     def sample(self, times, nudget=1e-3):
         latentsSamples, _, _ = self._svPosteriorOnLatents.sample(times=times,
