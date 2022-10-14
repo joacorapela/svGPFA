@@ -25,11 +25,12 @@ class SVEM(abc.ABC):
 
         .. note::
             Only parameters **model**, **optim_params** and **method** should
-            be set by users.
+            be set by users. The remaining parameters are used to interface
+            :meth:`svGPFA.stats.svEM.SVEM.maximize` with the dashboard.
 
         :param model: svGPFA model used to calculate the lower bound
         :type  model: :class:`svGPFA.stats.svLowerBound.SVLowerBound`
-        :param optim_params: optimization parameters. The format of this dictionary is identical to the one described in :any:`optim_params`
+        :param optim_params: optimization parameters. The format of this dictionary is identical to the one described in :any:`optim_params`. It can be obtained at the key ``optim_params`` of the dictionary returned by :func:`svGPFA.utils.initUtils.getParamsAndKernelsTypes`.
         :type  optim_params: dictionary
         :param method: either ECM for Expectation Conditional Maximization or mECM for multicycle expectation conditional maximization. Refer to :cite:t:`mcLachlanAndKrishnan08` for details on these algorithms.
         """
