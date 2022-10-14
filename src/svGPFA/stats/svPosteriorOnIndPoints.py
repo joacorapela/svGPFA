@@ -9,7 +9,7 @@ import svGPFA.utils.miscUtils
 class SVPosteriorOnIndPoints(ABC):
 
     @abstractmethod
-    def setInitialParams(self, initialParams):
+    def setInitialParams(self, initial_params):
         pass
 
     @abstractmethod
@@ -29,10 +29,10 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
     def __init__(self):
         super(SVPosteriorOnIndPoints, self).__init__()
 
-    def setInitialParams(self, initialParams):
-        nLatents = len(initialParams["mean"])
-        self._mean = [initialParams["mean"][k] for k in range(nLatents)]
-        self._cholVecs = [initialParams["cholVecs"][k] for k in range(nLatents)]
+    def setInitialParams(self, initial_params):
+        nLatents = len(initial_params["mean"])
+        self._mean = [initial_params["mean"][k] for k in range(nLatents)]
+        self._cholVecs = [initial_params["cholVecs"][k] for k in range(nLatents)]
 
     def getParams(self):
         listOfTensors = []
@@ -82,21 +82,23 @@ class SVPosteriorOnIndPointsCholWithGettersAndSetters(SVPosteriorOnIndPointsChol
         for k in range(len(self._cholVecs)):
             self._cholVecs[k].requires_grad = requires_grad
 
+
 class SVPosteriorOnIndPointsRank1PlusDiag(SVPosteriorOnIndPoints):
 
     def __init__(self):
         super(SVPosteriorOnIndPoints, self).__init__()
 
-    def setInitialParams(self, initialParams):
-        self._mean = initialParams["mean"]
-        self._qSVec = initialParams["qSVec0"]
-        self._qSDiag = initialParams["qSDiag0"]
+    def setInitialParams(self, initial_params):
+        self._mean = initial_params["mean"]
+        self._qSVec = initial_params["qSVec0"]
+        self._qSDiag = initial_params["qSDiag0"]
 
     def getParams(self):
         listOfTensors = []
         listOfTensors.extend([self._mean[k] for k in range(len(self._mean))])
         listOfTensors.extend([self._qSVec[k] for k in range(len(self._qSVec))])
-        listOfTensors.extend([self._qSDiag[k] for k in range(len(self._qSDiag))])
+        listOfTensors.extend([self._qSDiag[k]
+                              for k in range(len(self._qSDiag))])
         return listOfTensors
 
     def getMean(self):
