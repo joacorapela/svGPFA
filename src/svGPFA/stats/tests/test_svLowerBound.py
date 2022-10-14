@@ -88,13 +88,13 @@ def test_eval_pointProcess():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
     eLLCalculationParams = {"leg_quad_points": legQuadPoints,
                             "leg_quad_weights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
-    svlb.setInitialParams(initialParams=initialParams)
+    svlb.setInitialParams(initial_params=initial_params)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     # svlb.setIndPointsLocsKMSRegEpsilon(indPointsLocsKMSRegEpsilon=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
