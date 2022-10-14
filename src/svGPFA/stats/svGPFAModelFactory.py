@@ -50,6 +50,10 @@ class SVGPFAModelFactory:
         :type conditionalDist: int
         :param embeddingType: type of embedding (e.g., svGPFA.stats.SVGPFAModelFactory.LinearEmbedding)
         :type embeddingType: int
+
+        :return: an unitialized model. Parameters and data need to be set (by calling :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData`) before invoking :meth:`svGPFA.stats.svEM.SVEM.maximize`.
+        :rtype: an instance of :class:`svGPFA.stats.svLowerBound.SVLowerBound`.
+
         """
 
         if conditionalDist == PointProcess:
