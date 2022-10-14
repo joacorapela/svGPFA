@@ -17,7 +17,8 @@ doc/*
 
 !doc/ipynb/
 doc/ipynb/*
-!doc/ipynb/doEstimateAndPlot.ipynb
+!doc/ipynb/doEstimateAndPlot_defaulInitialParams.ipynb
+!doc/ipynb/doEstimateAndPlot_customIntialParams.ipynb
 
 !/doc/sphinx/
 /doc/sphinx/*
