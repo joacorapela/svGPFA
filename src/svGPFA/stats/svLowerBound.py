@@ -10,7 +10,7 @@ class SVLowerBound:
         self._eLL = eLL
         self._klDiv = klDiv
 
-    def setParamsAndData(self, measurements, initialParams,
+    def setParamsAndData(self, measurements, initial_params,
                          eLLCalculationParams, priorCovRegParam):
         """Sets model parameters and data.
 
@@ -22,9 +22,9 @@ class SVLowerBound:
 
         :type  measurements: nested list
 
-        :param initialParams: initial parameters as returned by :func:`svGPFA.utils.initUtils.getParamsAndKernelsTypes`.
+        :param initial_params: initial parameters as returned by :func:`svGPFA.utils.initUtils.getParamsAndKernelsTypes`.
 
-        :type  initialParams: dictionary
+        :type  initial_params: dictionary
 
         :param eLLCalculationParams: parameters used to calculate the expected log likelighood.
 
@@ -39,7 +39,7 @@ class SVLowerBound:
         :type priorCovRegParam: float
         """
         self.setMeasurements(measurements=measurements)
-        self.setInitialParams(initialParams=initialParams)
+        self.setInitialParams(initial_params=initial_params)
         self.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
         self.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
         self.buildKernelsMatrices()
@@ -80,8 +80,8 @@ class SVLowerBound:
     def computeSVPosteriorOnLatentsStats(self):
         return self._eLL.computeSVPosteriorOnLatentsStats()
 
-    def setInitialParams(self, initialParams):
-        self._eLL.setInitialParams(initialParams=initialParams)
+    def setInitialParams(self, initial_params):
+        self._eLL.setInitialParams(initial_params=initial_params)
 
     def setKernels(self, kernels):
         self._eLL.setKernels(kernels=kernels)
