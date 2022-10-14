@@ -25,7 +25,7 @@ Sparse Variational Gaussian Processes Factor Analysis
    :maxdepth: 1
    :caption: Examples:
 
-   ipynb/doEstimateAndPlot_defaulInitialParams.ipynb
+   ipynb/doEstimateAndPlot_defaultInitialParams.ipynb
 
 .. toctree::
    :maxdepth: 4
