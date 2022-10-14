@@ -70,7 +70,7 @@ def main(argv):
     #    finally, get the parameters from the dynamic,
     #    configuration file and default parameter specifications
     params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
-        n_trials=n_trials, n_neurons=n_neurons,
+        n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
         default_params=default_params)
@@ -95,10 +95,10 @@ def main(argv):
     model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.\
         buildModelPyTorch(kernels=kernels)
 
-    model.setInitialParamsAndData(
+    model.setParamsAndData(
         measurements=spikes_times,
         initialParams=params["initial_params"],
-        eLLCalculationParams=params["quad_params"],
+        eLLCalculationParams=params["ell_calculation_params"],
         priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
     # maximize lower bound
