@@ -125,7 +125,7 @@ def test_getParam_0(true_n_latents=3, n_trials=15, n_neurons=100,
     ''' test get param from dynamic params'''
 
     dynamic_params = {"model_structure_params":
-                      {"n_latents": str(true_n_latents)}}
+                      {"n_latents": true_n_latents}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -143,8 +143,7 @@ def test_getParam_0(true_n_latents=3, n_trials=15, n_neurons=100,
         param_name="n_latents",
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
-        default_params=default_params,
-        conversion_func=int)
+        default_params=default_params)
     assert true_n_latents == n_latents
 
 
@@ -152,7 +151,7 @@ def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100,
                     n_ind_points=(10, 10, 10), diag_var_cov0_value=1e-2):
     ''' test get param from config_file params'''
     dynamic_params = {"model_structure_params":
-                      {"n_latents": str(n_latents)}}
+                      {"n_latents": n_latents}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -171,8 +170,7 @@ def test_getParam_1(n_latents=3, n_trials=20, n_neurons=100,
         param_name="trials_end_time",
         dynamic_params=dynamic_params,
         config_file_params=config_file_params,
-        default_params=default_params,
-        conversion_func=float)
+        default_params=default_params)
     assert true_trials_end_time == trials_end_time
 
 
@@ -379,12 +377,11 @@ def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5,
 def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
                                      n_ind_points=(10, 10, 10),
                                      diag_var_cov0_value=1e-2,
-                                     kernel_type = "exponentialQuadratic",
-                                     lengthscale0 = 2.0,
-                                    ):
+                                     kernel_type="exponentialQuadratic",
+                                     lengthscale0=2.0):
     # dynamic_params, short format, exponential quadratic kernel
-    dynamic_params = {"kernels_params0": {"k_type": kernel_type,
-                                         "k_lengthscale0": lengthscale0}}
+    dynamic_params = {"kernels_params0": {"k_types": kernel_type,
+                                          "k_lengthscales0": lengthscale0}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -410,14 +407,13 @@ def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
 def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
                                      n_ind_points=(10, 10, 10),
                                      diag_var_cov0_value=1e-2,
-                                     kernel_type = "periodic",
-                                     lengthscale0 = 2.0,
-                                     period0=3.0,
-                                    ):
+                                     kernel_types="periodic",
+                                     lengthscales0=2.0,
+                                     periods0=3.0):
     # dynamic_params, short format, periodic kernel
-    dynamic_params = {"kernels_params0": {"k_type": kernel_type,
-                                         "k_lengthscale0": lengthscale0,
-                                         "k_period0": period0}}
+    dynamic_params = {"kernels_params0": {"k_types": kernel_types,
+                                          "k_lengthscales0": lengthscales0,
+                                          "k_periods0": periods0}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
@@ -436,21 +432,19 @@ def test_getKernelsParams0AndTypes_1(n_neurons=20, n_latents=3, n_trials=50,
         config_file_params=config_file_params,
         default_params=default_params)
     for k in range(n_latents):
-        assert params0[k][0].item() == lengthscale0
-        assert params0[k][1].item() == period0
-        assert kernels_types[k] == kernel_type
+        assert params0[k][0].item() == lengthscales0
+        assert params0[k][1].item() == periods0
+        assert kernels_types[k] == kernel_types
 
 
 def test_getKernelsParams0AndTypes_2(n_neurons=20, n_latents=3, n_trials=50,
-                                     n_ind_points=(10, 10, 10), 
+                                     n_ind_points=(10, 10, 10),
                                      diag_var_cov0_value=1e-2,
-                                     section_name = "kernels_params0",
-                                     kernel_type_param_name = "k_type",
-                                     lengthscale_param_name = "k_lengthscale0",
-                                    ):
+                                     section_name="kernels_params0",
+                                     kernel_type_param_name="k_types",
+                                     lengthscale_param_name="k_lengthscales0"):
     # config_params, short format
-    dynamic_params = {"model_structure_params":
-                      {"n_latents": str(n_latents)}}
+    dynamic_params = {"model_structure_params": {"n_latents": n_latents}}
     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
     config = configparser.ConfigParser()
     config.read(estInitConfigFilename)
