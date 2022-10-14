@@ -325,9 +325,37 @@ def getParamsDictFromStringsDict(n_latents, n_trials, strings_dict, args_info):
 
 
 def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
-                             default_params=None,
-                             config_file_params=None,
-                             dynamic_params=None):
+                             default_params_spec=None,
+                             config_file_params_spec=None,
+                             dynamic_params_spec=None):
+    """Builds initial, expected log likelihood and optimization parameters, as
+    well as kernels types, from specifications given in
+    ``default_params_spec``, ``config_file_params_spec`` and
+    ``dynamic_params_spec``.
+
+    :param n_neurons: number of neurons.
+    :type  n_neurons: integer
+
+    :param n_trials: number of trials.
+    :type  n_trials: integer
+
+    :param n_latents: number of latents.
+    :type  n_latents: integer
+
+    :param default_params_spec: default parameters specification formated as described in :ref:`params_specs` and usually obtained using  :func:`svGPFA.utils.initUtils.getDefaultParamsDict`,
+    :type default_params_spec: list of dictionaries
+
+    :param config_file_params_spec: parameters specification obtained from a configuration file, formated as described in :ref:`params_specs` and usually obtained using ``gcnu_common.utils.config_dict.GetDict`` followed by :func:`svGPFA.utils.initUtils.getParamsDictFromStringsDict`,
+
+    :type config_file_params_spec: list of dictionaries
+
+    :param dynamic_params_spec: parameters specification obtained from command line arguments, formated as described in :ref:`params_specs` and usually obtained using :func:`svGPFA.utils.initUtils.getParamsDictFromArgs`,
+
+    :type dynamic_params_spec: list of dictionaries
+
+    """
+
+#     :param config_file_params_spec: parameters specification obtained from a configuration file, formated as described in :ref:`params_specs` and usually obtained using ``gcnu_common.utils.config_dict.GetDict`` followed by :func:`svGPFA.utils.initUtils.svGPFA.utils.initUtils.getParamsDictFromStringsDict`,
     n_quad = getParam(section_name="optim_params",
                       param_name="n_quad",
                       dynamic_params=dynamic_params,
@@ -403,7 +431,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                       "embedding": embeddingParams0}
     quad_params = {"leg_quad_points": leg_quad_points,
                    "leg_quad_weights": leg_quad_weights}
-    params = {"initial_params": initial_params, "quad_params": quad_params,
+    params = {"initial_params": initial_params, "ell_calculation_params": quad_params,
               "optim_params": optim_params}
     return params, kernels_types
 
