@@ -8,13 +8,11 @@ jobs:
       - uses: actions/setup-python@v2
       - name: Install dependencies
         run: |
-          pip install sphinx sphinx_rtd_theme sphinxcontrib-bibtex nbsphinx python_docs_theme pandoc
+          pip install sphinxcontrib-bibtex nbsphinx python_docs_theme
           pip install -e .[notebook]
-      - name: Sphinx build
-        uses: docker://pandoc/core:2.9
-        run: |
-          make -C docs/sphinx clean
-          make -C docs/sphinx html
+      - uses: ammaraskar/sphinx-action@master
+          with:
+            docs-folder: "docs/sphynx"
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
