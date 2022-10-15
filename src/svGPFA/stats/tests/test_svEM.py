@@ -71,7 +71,7 @@ def test_eStep_pointProcess_PyTorch():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
     eLLCalculationParams = {"leg_quad_points": legQuadPoints,
                   "leg_quad_weights": legQuadWeights}
@@ -104,11 +104,11 @@ def test_eStep_pointProcess_PyTorch():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
 
     svlb.setKernels(kernels=kernels)
-    svlb.setInitialParams(initialParams=initialParams)
+    svlb.setInitialParams(initial_params=initial_params)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setPriorCovRegParam(priorCovRegParam=indPointsLocsKMSRegEpsilon)
@@ -245,13 +245,13 @@ def test_mStepModelParams_pointProcess_PyTorch():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
     eLLCalculationParams = {"leg_quad_points": legQuadPoints,
                   "leg_quad_weights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
-    svlb.setInitialParams(initialParams=initialParams)
+    svlb.setInitialParams(initial_params=initial_params)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setPriorCovRegParam(priorCovRegParam=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
@@ -338,13 +338,13 @@ def test_mStepKernelParams_pointProcess_PyTorch():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
     eLLCalculationParams = {"leg_quad_points": legQuadPoints,
                   "leg_quad_weights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
-    svlb.setInitialParams(initialParams=initialParams)
+    svlb.setInitialParams(initial_params=initial_params)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setPriorCovRegParam(priorCovRegParam=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
@@ -479,13 +479,13 @@ def test_mStepIndPoints_pointProcess_PyTorch():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
     eLLCalculationParams = {"leg_quad_points": legQuadPoints,
                   "leg_quad_weights": legQuadWeights}
 
     svlb.setKernels(kernels=kernels)
-    svlb.setInitialParams(initialParams=initialParams)
+    svlb.setInitialParams(initial_params=initial_params)
     svlb.setMeasurements(measurements=YNonStacked)
     svlb.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
     svlb.setPriorCovRegParam(priorCovRegParam=indPointsLocsKMSRegEpsilon) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
@@ -572,7 +572,7 @@ def test_maximize_pointProcess_PyTorch():
     qKParams0 = {"posterior_on_ind_points": qUParams0,
                  "kernels_matrices_store": kmsParams0}
     qHParams0 = {"C0": C0, "d0": b0}
-    initialParams = {"posterior_on_latents": qKParams0,
+    initial_params = {"posterior_on_latents": qKParams0,
                      "embedding": qHParams0}
     eLLCalculationParams = {"leg_quad_points": legQuadPoints,
                   "leg_quad_weights": legQuadWeights}
@@ -604,9 +604,9 @@ def test_maximize_pointProcess_PyTorch():
                    },
                    #
                    "verbose": True}
-    svlb.setInitialParamsAndData(
+    svlb.setParamsAndData(
         measurements=YNonStacked,
-        initialParams=initialParams,
+        initial_params=initial_params,
         eLLCalculationParams=eLLCalculationParams,
         priorCovRegParam=indPointsLocsKMSRegEpsilon)
     lowerBoundHist, _, _, _ = svEM.maximize(model=svlb, optim_params=optim_params)

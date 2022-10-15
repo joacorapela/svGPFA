@@ -38,7 +38,7 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
-    def setInitialParams(self, initialParams):
+    def setInitialParams(self, initial_params):
         pass
 
     @abstractmethod
@@ -180,9 +180,9 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._svEmbeddingAllTimes.setKernels(kernels=kernels)
         self._svEmbeddingAssocTimes.setKernels(kernels=kernels)
 
-    def setInitialParams(self, initialParams):
-        self._svEmbeddingAllTimes.setInitialParams(initialParams=initialParams)
-        self._svEmbeddingAssocTimes.setInitialParams(initialParams=initialParams)
+    def setInitialParams(self, initial_params):
+        self._svEmbeddingAllTimes.setInitialParams(initial_params=initial_params)
+        self._svEmbeddingAssocTimes.setInitialParams(initial_params=initial_params)
 
     def setELLCalculationParams(self, eLLCalculationParams):
         self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
@@ -296,9 +296,9 @@ class PoissonELL(ExpectedLogLikelihood):
         self._svEmbeddingAllTimes.\
             setKernels(kernels=kernels)
 
-    def setInitialParams(self, initialParams):
+    def setInitialParams(self, initial_params):
         self._svEmbeddingAllTimes.\
-            setInitialParams(initialParams=initialParams)
+            setInitialParams(initial_params=initial_params)
 
     @abstractmethod
     def _getELinkAndELogLinkValues(self, eMean, eVar):

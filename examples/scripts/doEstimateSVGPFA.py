@@ -22,7 +22,10 @@ def main(argv):
     parser.add_argument("--est_init_number", help="estimation init number",
                         type=int, default=545)
     parser.add_argument("--n_latents", help="number of latents", type=int,
-                        default=3)
+                        default=2)
+    parser.add_argument("--common_n_ind_points", help="commont number of "
+                        "inducing points for all latents", type=int,
+                        default=9)
     parser.add_argument("--sim_res_filename_pattern",
                         help="simuluation result filename pattern",
                         type=str, default="../data/{:08d}_simRes.pickle")
@@ -38,6 +41,7 @@ def main(argv):
     sim_res_number = args.sim_res_number
     est_init_number = args.est_init_number
     n_latents = args.n_latents
+    common_n_ind_points = args.common_n_ind_points
     sim_res_filename_pattern = args.sim_res_filename_pattern
     est_init_config_filename_pattern = args.est_init_config_filename_pattern
 
@@ -51,7 +55,7 @@ def main(argv):
 
     #    build dynamic parameter specifications
     args_info = svGPFA.utils.initUtils.getArgsInfo()
-    dynamic_params = svGPFA.utils.initUtils.getParamsDictFromArgs(
+    dynamic_params_spec = svGPFA.utils.initUtils.getParamsDictFromArgs(
         n_latents=n_latents, n_trials=n_trials, args=vars(args),
         args_info=args_info)
     #    build configuration file parameter specifications
@@ -61,19 +65,20 @@ def main(argv):
     est_init_config.read(est_init_config_filename)
     strings_dict = gcnu_common.utils.config_dict.GetDict(
         config=est_init_config).get_dict()
-    config_file_params = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+    config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
     #    build default parameter specificiations
-    default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents)
+    default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
+        n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents,
+        common_n_ind_points=common_n_ind_points)
     #    finally, get the parameters from the dynamic,
     #    configuration file and default parameter specifications
     params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
-        n_trials=n_trials, n_neurons=n_neurons,
-        dynamic_params=dynamic_params,
-        config_file_params=config_file_params,
-        default_params=default_params)
+        n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
+        dynamic_params_spec=dynamic_params_spec,
+        config_file_params_spec=config_file_params_spec,
+        default_params_spec=default_params_spec)
 
     # build modelSaveFilename
     estPrefixUsed = True
@@ -95,10 +100,10 @@ def main(argv):
     model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.\
         buildModelPyTorch(kernels=kernels)
 
-    model.setInitialParamsAndData(
+    model.setParamsAndData(
         measurements=spikes_times,
-        initialParams=params["initial_params"],
-        eLLCalculationParams=params["quad_params"],
+        initial_params=params["initial_params"],
+        eLLCalculationParams=params["ell_calculation_params"],
         priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
     # maximize lower bound

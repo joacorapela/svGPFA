@@ -10,10 +10,36 @@ class SVLowerBound:
         self._eLL = eLL
         self._klDiv = klDiv
 
-    def setInitialParamsAndData(self, measurements, initialParams,
-                                eLLCalculationParams, priorCovRegParam):
+    def setParamsAndData(self, measurements, initial_params,
+                         eLLCalculationParams, priorCovRegParam):
+        """Sets model parameters and data.
+
+        :param measurements: ``measurements[r][n]`` are the measurements for trial ``r`` and neuron ``n``.
+
+            For a point-process SVLowerBound (i.e., for a SVLowerBound constructed with an expected log-likelihood of class :class:`svGPFA.stats.expectedLogLikelihood.PointProcessELL`) ``measurements[r][n]`` should be a list of spikes times for trial ``r`` and neuron ``n``.
+
+            For a Poisson SVLowerBound (i.e., for a SVLowerBound constructed with an expected log-likelihood of class :class:`svGPFA.stats.expectedLogLikelihood.PoissonELL`) ``measurements[r][n]`` should be a tuple of length ``n_bins`` containing the spike counts in bins.
+
+        :type  measurements: nested list
+
+        :param initial_params: initial parameters as returned by :func:`svGPFA.utils.initUtils.getParamsAndKernelsTypes`.
+
+        :type  initial_params: dictionary
+
+        :param eLLCalculationParams: parameters used to calculate the expected log likelighood.
+
+            For a point-process SVLowerBound ``eLLCalculationParams`` should be a dictionary with keys ``leg_quad_points`` and ``leg_quad_points``, containing the Legendre quadrature points and weights, respectivey, used to calculate the integral of the expected log likelihood (Eq. 7 in :cite:t:`dunckerAndSahani18`).
+
+            For a Poisson SVLowerBound ``eLLCalculationParams`` should be a dictionary with key ``binTimes`` containing the mean time of every bin.
+
+        :type eLLCalculationParams: dictionary
+
+        :param priorCovRegParam: regularization parameter for the prior covariance matrix (:math:`K_{zz}` in Eq. 2 of :cite:t:`dunckerAndSahani18`).
+
+        :type priorCovRegParam: float
+        """
         self.setMeasurements(measurements=measurements)
-        self.setInitialParams(initialParams=initialParams)
+        self.setInitialParams(initial_params=initial_params)
         self.setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
         self.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
         self.buildKernelsMatrices()
@@ -54,8 +80,8 @@ class SVLowerBound:
     def computeSVPosteriorOnLatentsStats(self):
         return self._eLL.computeSVPosteriorOnLatentsStats()
 
-    def setInitialParams(self, initialParams):
-        self._eLL.setInitialParams(initialParams=initialParams)
+    def setInitialParams(self, initial_params):
+        self._eLL.setInitialParams(initial_params=initial_params)
 
     def setKernels(self, kernels):
         self._eLL.setKernels(kernels=kernels)
@@ -97,7 +123,8 @@ class SVLowerBound:
 class SVLowerBoundWithParamsGettersAndSetters(SVLowerBound):
 
     def __init__(self, eLL, klDiv):
-        super(SVLowerBoundWithParamsGettersAndSetters, self).__init__(eLL, klDiv)
+        super(SVLowerBoundWithParamsGettersAndSetters, self).__init__(
+            eLL, klDiv)
         # shortcuts
         self._svPosteriorOnIndPoints = klDiv.get_svPosteriorOnIndPoints()
         self._svEmbedding = eLL.get_svEmbeddingAllTimes()

@@ -50,10 +50,10 @@ def test_evalSumAcrossLatentsTrials():
     klDiv = svGPFA.stats.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
 
-    qU.setInitialParams(initialParams=qUParams0)
+    qU.setInitialParams(initial_params=qUParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)
-    indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
-    indPointsLocsKMS.setRegParam(regParam=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    indPointsLocsKMS.setInitialParams(initial_params=kmsParams0)
+    indPointsLocsKMS.setRegParam(reg_param=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
     klDivEval = klDiv.evalSumAcrossLatentsAndTrials()
 

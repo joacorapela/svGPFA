@@ -1,26 +1,28 @@
 
+.. _params_specs:
+
 Parameters and their specification
 ##################################
 
 svGPFA uses different groups of parameters. We provide a utility function
-:meth:`svGPFA.utils.initUtils.getParamsAndKernelsTypes` that builds them from
+:func:`svGPFA.utils.initUtils.getParamsAndKernelsTypes` that builds them from
 parameter specifications. These specifications are short descriptions on how
 to build a parameter. For example, a parameter specification for the inducing
-points locations can be **equidistant**, indicating that the inducing points
+points locations can be ``equidistant``, indicating that the inducing points
 locations should be set to equidistant values between the start and end of a
 trial.
 
 A parameter specification is a nested list (e.g.,
-**param_spec[group_name][param_name]**) containing the specification of
-parameter **param_name** in group **group_name**. It can be built:
+``param_spec[group_name][param_name]``) containing the specification of
+parameter ``param_name`` in group ``group_name``. It can be built:
 
-    1. automatically, using default values, with the utility function :meth:`svGPFA.utils.initUtils.getDefaultParamsDict`,
+    1. automatically, using default values, with the utility function :func:`svGPFA.utils.initUtils.getDefaultParamsDict`,
            
     2. manually, by setting parameter specifications in the Python code,
 
-    3. from the command line, with the utility function :meth:`svGPFA.utils.initUtils.getParamsDictFromArgs`,
+    3. from the command line, with the utility function :func:`svGPFA.utils.initUtils.getParamsDictFromArgs`,
 
-    4. from a configuration file, with the utility function :meth:`svGPFA.utils.initUtils.getParamsDictFromStringsDict`.
+    4. from a configuration file, with the utility function :func:`svGPFA.utils.initUtils.getParamsDictFromStringsDict`.
           
     The `Colab <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`__ and `Jupyter <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ notebooks automatically build this list (1). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py>`__ demonstrates the manual construction of all parameters specifications (2). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ builds the parameters specification list from the command line and from this `configuration file <https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini>`__ (3, 4).
 
@@ -32,33 +34,33 @@ documentation of the above utility functions for details on how to use them.
 Data structure parameters
 =========================
 
-There are two data structure parameters **trials_start_times** and
-**trials_end_times**, which are tensors of length **n_trials** giving the start
+There are two data structure parameters ``trials_start_times`` and
+``trials_end_times``, which are tensors of length ``n_trials`` giving the start
 and end times of each trial; i.e., :math:`\tau_i` in Eq 7 in
 :cite:t:`dunckerAndSahani18`.
 
-These parameters can be specified in a longer or shorter format. If both are
+These parameters can be specified in a trial-specific or trial-common format. If both are
 specified, the longer format takes precedence.
 
-Trial-specific Python variable format
--------------------------------------
+Trial-specific format
+---------------------
 
 Two items need to be specified:
 
-* ``trials_start_times`` should provide a list of length **n_trials**, with float values indicating seconds, such that **trials_start_times[i]** gives the start time of the ith trial.
+* ``trials_start_times`` should provide a list of length ``n_trials``, with float values indicating seconds, such that ``trials_start_times[i]`` gives the start time of the ith trial.
 
-* ``trials_end_times`` should provide a list of length **n_trials**, with float values indicating seconds, such that **trials_end_times[i]** gives the end time of the ith trial.
+* ``trials_end_times`` should provide a list of length ``n_trials``, with float values indicating seconds, such that ``trials_end_times[i]`` gives the end time of the ith trial.
 
     .. code-block:: python
-       :caption: adding **data_structure_params** in the trial-specific Python variable format to **params_spec** (3 trials)
+       :caption: adding ``data_structure_params`` in the trial-specific Python variable format to ``params_spec`` (3 trials)
 
         params_spec["data_structure_params"] = {
             "trials_start_times": [0.0, 0.4, 0.7],
             "trials_end_times":   [0.2, 0.5, 0.9],
         }
 
-Trial-common Python variable format
------------------------------------
+Trial-common format
+-------------------
 
 Two items need to be specified:
 
@@ -67,7 +69,7 @@ Two items need to be specified:
 * ``trials_end_time`` should provide the end time (float value, secs) of all trials.
 
     .. code-block:: python
-       :caption: adding **data_structure_params** in the trial-common Python variable format to **params_spec**
+       :caption: adding ``data_structure_params`` in the trial-common Python variable format to ``params_spec``
 
         params_spec["data_structure_params"] = {
             "trials_start_time": 0.0,
@@ -81,7 +83,7 @@ Defaults
 All trials start at 0.0 sec and end at 1.0 sec.
 
     .. code-block:: python
-       :caption: default **data_structure_params** 
+       :caption: default ``data_structure_params`` 
 
         params_spec["data_structure_params"] = {
             "trials_start_time": 0.0,
@@ -123,20 +125,20 @@ Python variable format
 
 Two items need to be specified:
 
-* ``variational_mean0`` should be a list of size **n_latents**. The kth
-  element of this list should be a **torch.DoubleTensor** of
-  dimension (**n_trials**, **n_indPoints[k]**, 1), where
-  **variational_mean0[k][r, :, 0]** gives the initial variational mean for
-  latent **k** and trial **r**.
+* ``variational_mean0`` should be a list of size ``n_latents``. The kth
+  element of this list should be a ``torch.DoubleTensor`` of
+  dimension (``n_trials``, ``n_indPoints[k]``, 1), where
+  ``variational_mean0[k][r, :, 0]`` gives the initial variational mean for
+  latent ``k`` and trial ``r``.
 
-* ``variational_cov0`` should be a list of size **n_latents**. The kth element
-  of this list should be a **torch.DoubleTensor** of dimension
-  (**n_trials**, **n_indPoints[k]**, **n_indPoints[k]**), where
-  **variational_cov0[k][r, :, :]** gives the initial variational covariance
-  for latent **k** and trial **r**.
+* ``variational_cov0`` should be a list of size ``n_latents``. The kth element
+  of this list should be a ``torch.DoubleTensor`` of dimension
+  (``n_trials``, ``n_indPoints[k]``, ``n_indPoints[k]``), where
+  ``variational_cov0[k][r, :, :]`` gives the initial variational covariance
+  for latent ``k`` and trial ``r``.
 
     .. code-block:: python
-       :caption: adding random **variational_params0** in the Python variable format to **params_spec**
+       :caption: adding random ``variational_params0`` in the Python variable format to ``params_spec``
 
         n_latents = 3
         n_ind_points = [20, 10, 15]
@@ -169,7 +171,7 @@ For every latent, k, and every trial, r, two items need to be specified:
   *number_of_inducing_points*.
 
     .. code-block:: python
-       :caption: adding **variational_params0** in the latent-trial-specific filename format to **params_spec** (2 trials and 2 latents)
+       :caption: adding ``variational_params0`` in the latent-trial-specific filename format to ``params_spec`` (2 trials and 2 latents)
 
         params_spec["variational_params0"] = {
             "variational_mean0_filename_latent0_trial0": "../data/uniform_0.00_1.00_len09.csv",
@@ -198,7 +200,7 @@ Two items need to be specified:
   matrix of size *number_of_inducing_points* x *number_of_inducing_points*.
 
     .. code-block:: python
-       :caption: adding **variational_params0** in the latent-trial-common filename format to **params_spec**
+       :caption: adding ``variational_params0`` in the latent-trial-common filename format to ``params_spec``
 
         params_spec["variational_params0"] = {
             "variational_means0_filename": "../data/uniform_0.00_1.00_len09.csv",
@@ -216,7 +218,7 @@ Two items need to be specified:
 * ``variational_cov0_diag_value``  should provide a float value giving the diagonal value of the common variational covariance.
 
     .. code-block:: python
-       :caption: adding **variational_params0** in the constant value format
+       :caption: adding ``variational_params0`` in the constant value format
 
         params_spec["variational_params0"] = {
             "variational_mean0_constant_value": 0.0,
@@ -229,7 +231,7 @@ Defaults
 The default variational mean and covariance have constant values. For the variational mean the constant value is zero and for the variational covariance the constant diagonal value is 0.01.
 
     .. code-block:: python
-       :caption: default **variational_params0**
+       :caption: default ``variational_params0``
 
         params_spec["variational_params0"] = {
             "variational_mean0_constant_value": 0.0,
@@ -247,12 +249,12 @@ Python variable format
 ^^^^^^^^^^^^^^^^^^^^^^
 Two items need to be specified:
 
-* ``c0`` should be a **torch.DoubleTensor** of size (n_neurons, n_latents)
+* ``c0`` should be a ``torch.DoubleTensor`` of size (n_neurons, n_latents)
 
-* ``d0`` should be a **torch.DoubleTensor** of size (n_neurons, 1)
+* ``d0`` should be a ``torch.DoubleTensor`` of size (n_neurons, 1)
 
     .. code-block:: python
-       :caption: adding standard random **embedding_params0** in the Python variable format to **params_spec**
+       :caption: adding standard random ``embedding_params0`` in the Python variable format to ``params_spec``
 
         n_neurons = 100
         n_latents = 3
@@ -272,7 +274,7 @@ Two items need to be specified:
 * ``d0_filename`` gives the filename (csv format readable by pandas *read_csv* function) containing the values of offset vector ``d``.
 
     .. code-block:: python
-        :caption: adding **embedding_params0** in the filename format to **params_spec**
+        :caption: adding ``embedding_params0`` in the filename format to ``params_spec``
 
         params_spec["embedding_params0"] = {
             "c0_filename": "../data/C_constant_1.00constant_100neurons_02latents.csv",
@@ -290,18 +292,18 @@ Eight items need to be specified:
 
 * ``c0_scale`` float value giving the scale of the distribution of the loading matrix C (e.g., 1.0).
 
-* ``c0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **C**. This value can be specified for replicability. If not given, the random seed is not changed prior to generating **C**.
+* ``c0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix ``C``. This value can be specified for replicability. If not given, the random seed is not changed prior to generating ``C``.
 
-* ``d0_distribution`` string value giving the name of the distribution of the offset vector **d** (e.g., Normal).
+* ``d0_distribution`` string value giving the name of the distribution of the offset vector ``d`` (e.g., Normal).
 
-* ``d0_loc`` float number giving the location of the distribution of the offset vector **d** (e.g., 0.3).
+* ``d0_loc`` float number giving the location of the distribution of the offset vector ``d`` (e.g., 0.3).
 
-* ``d0_scale`` float value giving the scale of the distribution of the offset vector **d** (e.g., 1.0).
+* ``d0_scale`` float value giving the scale of the distribution of the offset vector ``d`` (e.g., 1.0).
 
-* ``d0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix **d**. This value can be specified for replicability. If not given, the random seed is not changed prior to generating **d**.
+* ``d0_random_seed`` optional integer value giving the value of the random seed to be set prior to generating the random transition matrix ``d``. This value can be specified for replicability. If not given, the random seed is not changed prior to generating ``d``.
 
     .. code-block:: python
-       :caption: adding **embedding_params0** in the random format to **params_spec**
+       :caption: adding ``embedding_params0`` in the random format to ``params_spec``
 
         params_spec["embedding_params0"] = {
             "c0_distribution": "Normal",
@@ -319,7 +321,7 @@ Defaults
 The default loading matrix C0/offset vector d0 is a zero mean standard normal random  matrix/vector.
 
     .. code-block:: python
-       :caption: default **embedding_params0**
+       :caption: default ``embedding_params0``
 
         params_spec["embedding_params0"] = {
             "c0_distribution": "Normal",
@@ -344,12 +346,12 @@ Python variable format
 
 Two items need to be specified:
 
-* ``k_types`` should be a list of size **n_latents**. The kth element of this list should be a string with the type of kernel for the kth latent (e.g., **k_types[k]=exponentialQuadratic**).
+* ``k_types`` should be a list of size ``n_latents``. The kth element of this list should be a string with the type of kernel for the kth latent (e.g., ``k_types[k]=exponentialQuadratic``).
 
-* ``k_params0`` should be a list of size **n_latents**. The kth element of this list should be a **torch.DoubleTensor** containing the parameters of the kth kernel (e.g., **k_params0[k]=torch.DoubleTensor([3.2])**).
+* ``k_params0`` should be a list of size ``n_latents``. The kth element of this list should be a ``torch.DoubleTensor`` containing the parameters of the kth kernel (e.g., ``k_params0[k]=torch.DoubleTensor([3.2])``).
 
     .. code-block:: python
-       :caption: adding **kernel_params** in Python variable format (2 latents) to **params_spec**
+       :caption: adding ``kernel_params`` in Python variable format (2 latents) to ``params_spec``
 
        expQuadK1_lengthscale = 2.9
        expQuadK2_lengthscale = 0.5
@@ -376,7 +378,7 @@ the value of item ``k_type_latent<k>``. For example, for
 the periodic kernel, respectively.
 
     .. code-block:: python
-       :caption: adding **kernel_params** in the latent-specific textual format (2 latents) to **params_spec**
+       :caption: adding ``kernel_params`` in the latent-specific textual format (2 latents) to ``params_spec``
 
        params_spec["kernels_params0"] = {
             "k_type_latent0": "exponentialQuadratic",
@@ -399,7 +401,7 @@ specify the lengthscale and period parameter of the periodic kernel,
 respectively.
 
     .. code-block:: python
-       :caption: adding **kernel_params** in the latent-common textual format to **params_spec**
+       :caption: adding ``kernel_params`` in the latent-common textual format to ``params_spec``
 
        params_spec["kernels_params0"] = {
            "k_types": "exponentialQuadratic",
@@ -411,7 +413,7 @@ Defaults
 For all latents, the default kernel is an exponential quadratic kernel with lengthscale 1.0.
 
     .. code-block:: python
-       :caption: default **kernel_params**
+       :caption: default ``kernel_params``
 
         params_spec["kernels_params0"] =  {
             "k_types": "exponentialQuadratic",
@@ -433,13 +435,13 @@ Python variable format
 
 One item needs to be specified:
 
-* ``ind_points_locs0`` should be a list of size **n_latents**. The kth element of
-  this list should be a **torch.DoubleTensor** of size (**n_trials**,
-  **n_indPoints[k]**, 1), where **ind_points_locs0[k][r, :, 0]** gives the
+* ``ind_points_locs0`` should be a list of size ``n_latents``. The kth element of
+  this list should be a ``torch.DoubleTensor`` of size (``n_trials``,
+  ``n_indPoints[k]``, 1), where ``ind_points_locs0[k][r, :, 0]`` gives the
   initial inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **ind_points_locs_params0** in Python variable format with uniformly distributed inducing points locations to **params_spec**
+       :caption: adding ``ind_points_locs_params0`` in Python variable format with uniformly distributed inducing points locations to ``params_spec``
 
        n_latents = 3
        n_ind_points = (10, 20, 15)
@@ -460,7 +462,7 @@ For each latent k and trial r one item needs to be specified:
   inducing points locations for latent k and trial r.
 
     .. code-block:: python
-       :caption: adding **ind_points_locs_params0** in the latent-trial-specific filename format to **params_spec** (2 latents, 2 trials)
+       :caption: adding ``ind_points_locs_params0`` in the latent-trial-specific filename format to ``params_spec`` (2 latents, 2 trials)
 
        params_spec["ind_points_locs_params0"] = {
            "ind_points_locs0_latent0_trial0_filename": "ind_points_locs0_latent0_trial0.csv",
@@ -478,7 +480,7 @@ pandas *read_csv* function) containing the initial inducing points locations
 for all latents and trials.
 
     .. code-block:: python
-       :caption: adding **ind_points_locs_params0** in the latent-trial-common filename format to **params_spec**
+       :caption: adding ``ind_points_locs_params0`` in the latent-trial-common filename format to ``params_spec``
 
        params_spec["ind_points_locs_params0"] = {
            "ind_points_locs0_filename": "ind_points_locs0.csv",
@@ -496,7 +498,7 @@ points are equidistant between the trial start and trial end. If
 positioned between the start and end of the trial.
 
     .. code-block:: python
-       :caption: adding **ind_points_locs_params0** in the layout format to **params_spec**
+       :caption: adding ``ind_points_locs_params0`` in the layout format to ``params_spec``
 
        n_ind_points = (10, 20, 15)
        params_spec["ind_points_locs_params0"] = {
@@ -510,7 +512,7 @@ Defaults
 The default inducing points locations for trial r and latent k are equdistant n_ind_points[k] between the start and end of trial r.
 
     .. code-block:: python
-       :caption: default **ind_points_locs_params0**
+       :caption: default ``ind_points_locs_params0``
 
        n_ind_points = (10, 10, 10)
         params_spec["ind_points_locs_params0"] = {
@@ -576,7 +578,7 @@ section ``[optim_params]`` should contain items:
   `<step>_line_search_fn=None`` line search is not used.
 
     .. code-block:: python
-       :caption: adding **optimisation_params** to **params_spec**
+       :caption: adding ``optimisation_params`` to ``params_spec``
 
         params_spec["optim_params"] = {
             "n_quad": 200,
@@ -623,7 +625,7 @@ Defaults
 The default optimization paramateters are shown below.
 
     .. code-block:: python
-       :caption: default **optimisation_params**
+       :caption: default ``optimisation_params``
 
         n_quad = 200
         prior_cov_reg_param = 1e-3
