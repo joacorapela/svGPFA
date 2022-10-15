@@ -22,7 +22,7 @@ doc/ipynb/*
 !/doc/sphinx/
 /doc/sphinx/*
 !/doc/sphinx/source
-/doc/sphinx/source/ipynb
+# /doc/sphinx/source/ipynb
 
 !/doc/design/
 /doc/design/*
