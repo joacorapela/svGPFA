@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
 
    svGPFA.plot
+   svGPFA.simulations
    svGPFA.stats
    svGPFA.utils
 

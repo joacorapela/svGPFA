@@ -1,5 +1,5 @@
-svGPFA
-======
+src
+===
 
 .. toctree::
    :maxdepth: 4

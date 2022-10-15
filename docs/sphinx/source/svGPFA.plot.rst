@@ -4,14 +4,6 @@ svGPFA.plot package
 Submodules
 ----------
 
-svGPFA.plot.plotUtils module
-----------------------------
-
-.. automodule:: svGPFA.plot.plotUtils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 svGPFA.plot.plotUtilsPlotly module
 ----------------------------------
 
