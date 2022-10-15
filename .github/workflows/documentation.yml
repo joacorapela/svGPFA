@@ -11,8 +11,8 @@ jobs:
           pip install sphinxcontrib-bibtex nbsphinx python_docs_theme
           pip install -e .[notebook]
       - uses: ammaraskar/sphinx-action@master
-          with:
-            docs-folder: "docs/sphynx"
+        with:
+          docs-folder: "docs/sphynx"
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
