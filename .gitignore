@@ -17,11 +17,13 @@ doc/*
 
 !doc/ipynb/
 doc/ipynb/*
-!doc/ipynb/doEstimateAndPlot.ipynb
+!doc/ipynb/doEstimateAndPlot_defaultInitialParams.ipynb
+!doc/ipynb/doEstimateAndPlot_customIntialParams.ipynb
 
 !/doc/sphinx/
 /doc/sphinx/*
 !/doc/sphinx/source
+/doc/sphinx/source/ipynb
 
 !/doc/design/
 /doc/design/*

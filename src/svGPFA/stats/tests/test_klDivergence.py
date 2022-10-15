@@ -42,18 +42,18 @@ def test_evalSumAcrossLatentsTrials():
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
     klDiv = svGPFA.stats.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
                          svPosteriorOnIndPoints=qU)
 
-    qU.setInitialParams(initialParams=qUParams0)
+    qU.setInitialParams(initial_params=qUParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)
-    indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
-    indPointsLocsKMS.setRegParam(regParam=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    indPointsLocsKMS.setInitialParams(initial_params=kmsParams0)
+    indPointsLocsKMS.setRegParam(reg_param=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
     klDivEval = klDiv.evalSumAcrossLatentsAndTrials()
 

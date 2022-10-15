@@ -1,3 +1,5 @@
+all: html
+	
 # Minimal makefile for Sphinx documentation
 #
 

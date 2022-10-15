@@ -46,13 +46,13 @@ def test_eval_IndPointsLocsKMS():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
     indPointsLocsKMS.setKernels(kernels=kernels)
-    indPointsLocsKMS.setInitialParams(initialParams=kmsParams0)
-    indPointsLocsKMS.setRegParam(regParam=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
+    indPointsLocsKMS.setInitialParams(initial_params=kmsParams0)
+    indPointsLocsKMS.setRegParam(reg_param=1e-5) # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
 
     Kzz = indPointsLocsKMS.getKzz()
@@ -105,13 +105,13 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
     indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
     indPointsLocsAndAllTimesKMS.setTimes(times=t)
-    indPointsLocsAndAllTimesKMS.setInitialParams(initialParams=kmsParams0)
+    indPointsLocsAndAllTimesKMS.setInitialParams(initial_params=kmsParams0)
     indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
 
     Ktz_allTimes = indPointsLocsAndAllTimesKMS.getKtz()
@@ -161,13 +161,13 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
-    kmsParams0 = {"kernelsParams0": kernelsParams0,
-                  "inducingPointsLocs0": Z0}
+    kmsParams0 = {"kernels_params0": kernelsParams0,
+                  "inducing_points_locs0": Z0}
 
     indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
     indPointsLocsAndAssocTimesKMS.setKernels(kernels=kernels)
     indPointsLocsAndAssocTimesKMS.setTimes(times=Y)
-    indPointsLocsAndAssocTimesKMS.setInitialParams(initialParams=kmsParams0)
+    indPointsLocsAndAssocTimesKMS.setInitialParams(initial_params=kmsParams0)
     indPointsLocsAndAssocTimesKMS.buildKernelsMatrices()
 
     Ktz_associatedTimes = indPointsLocsAndAssocTimesKMS.getKtz()

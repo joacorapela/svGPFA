@@ -38,7 +38,7 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
-    def setInitialParams(self, initialParams):
+    def setInitialParams(self, initial_params):
         pass
 
     @abstractmethod
@@ -68,7 +68,8 @@ class ExpectedLogLikelihood(ABC):
         eMean, eVar = self._svEmbeddingAllTimes.predict(times=times)
         nTrials = eMean.shape[0]
         nNeurons = eMean.shape[2]
-        answer = [[self._linkFunction(eMean[r,:,n]+0.5*eVar[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
+        answer = [[self._linkFunction(eMean[r, :, n]+0.5*eVar[r, :, n])
+                   for n in range(nNeurons)] for r in range(nTrials)]
         return answer
 
     def getSVPosteriorOnIndPointsParams(self):
@@ -179,13 +180,13 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._svEmbeddingAllTimes.setKernels(kernels=kernels)
         self._svEmbeddingAssocTimes.setKernels(kernels=kernels)
 
-    def setInitialParams(self, initialParams):
-        self._svEmbeddingAllTimes.setInitialParams(initialParams=initialParams)
-        self._svEmbeddingAssocTimes.setInitialParams(initialParams=initialParams)
+    def setInitialParams(self, initial_params):
+        self._svEmbeddingAllTimes.setInitialParams(initial_params=initial_params)
+        self._svEmbeddingAssocTimes.setInitialParams(initial_params=initial_params)
 
     def setELLCalculationParams(self, eLLCalculationParams):
-        self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["legQuadPoints"])
-        self._legQuadWeights = eLLCalculationParams["legQuadWeights"]
+        self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
+        self._legQuadWeights = eLLCalculationParams["leg_quad_weights"]
 
     @abstractmethod
     def _getELinkValues(self, eMean, eVar):
@@ -295,9 +296,9 @@ class PoissonELL(ExpectedLogLikelihood):
         self._svEmbeddingAllTimes.\
             setKernels(kernels=kernels)
 
-    def setInitialParams(self, initialParams):
+    def setInitialParams(self, initial_params):
         self._svEmbeddingAllTimes.\
-            setInitialParams(initialParams=initialParams)
+            setInitialParams(initial_params=initial_params)
 
     @abstractmethod
     def _getELinkAndELogLinkValues(self, eMean, eVar):

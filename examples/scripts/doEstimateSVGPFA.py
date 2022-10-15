@@ -19,11 +19,16 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--sim_res_number", help="simuluation result number",
                         type=int, default=32451751)
+    parser.add_argument("--est_init_number", help="estimation init number",
+                        type=int, default=545)
+    parser.add_argument("--n_latents", help="number of latents", type=int,
+                        default=2)
+    parser.add_argument("--common_n_ind_points", help="commont number of "
+                        "inducing points for all latents", type=int,
+                        default=9)
     parser.add_argument("--sim_res_filename_pattern",
                         help="simuluation result filename pattern",
                         type=str, default="../data/{:08d}_simRes.pickle")
-    parser.add_argument("--est_init_number", help="estimation init number",
-                        type=int, default=545)
     parser.add_argument("--est_init_config_filename_pattern",
                         help="estimation initialization configuration "
                              "filename pattern",
@@ -35,6 +40,8 @@ def main(argv):
         populated=args, remaining=remaining)
     sim_res_number = args.sim_res_number
     est_init_number = args.est_init_number
+    n_latents = args.n_latents
+    common_n_ind_points = args.common_n_ind_points
     sim_res_filename_pattern = args.sim_res_filename_pattern
     est_init_config_filename_pattern = args.est_init_config_filename_pattern
 
@@ -46,36 +53,32 @@ def main(argv):
     n_trials = len(spikes_times)
     n_neurons = len(spikes_times[0])
 
-    # get initial parameters
+    #    build dynamic parameter specifications
+    args_info = svGPFA.utils.initUtils.getArgsInfo()
+    dynamic_params_spec = svGPFA.utils.initUtils.getParamsDictFromArgs(
+        n_latents=n_latents, n_trials=n_trials, args=vars(args),
+        args_info=args_info)
+    #    build configuration file parameter specifications
     est_init_config_filename = est_init_config_filename_pattern.format(
         est_init_number)
     est_init_config = configparser.ConfigParser()
     est_init_config.read(est_init_config_filename)
-    n_latents = int(est_init_config["model_structure_params"]["n_latents"])
-    #    build dynamic parameters
-    args_info = svGPFA.utils.initUtils.getArgsInfo()
-    dynamic_params = svGPFA.utils.initUtils.getParamsDictFromArgs(
-        n_latents=n_latents, n_trials=n_trials, args=vars(args),
-        args_info=args_info)
-    #    build configuration file parameters
     strings_dict = gcnu_common.utils.config_dict.GetDict(
         config=est_init_config).get_dict()
-    config_file_params = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+    config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
         args_info=args_info)
-    #    build configuration default parameters
-    default_params = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents)
-    #    finally, extract initial parameters from the dynamic
-    initial_params, quad_params, kernels_types, optim_params = \
-        svGPFA.utils.initUtils.getParams(
-            n_trials=n_trials, n_neurons=n_neurons,
-            dynamic_params=dynamic_params,
-            config_file_params=config_file_params,
-            default_params=default_params)
-    kernels_params0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["kernelsParams0"]
-    optim_method = optim_params["optim_method"]
-    prior_cov_reg_param = optim_params["prior_cov_reg_param"]
+    #    build default parameter specificiations
+    default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
+        n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents,
+        common_n_ind_points=common_n_ind_points)
+    #    finally, get the parameters from the dynamic,
+    #    configuration file and default parameter specifications
+    params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
+        n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
+        dynamic_params_spec=dynamic_params_spec,
+        config_file_params_spec=config_file_params_spec,
+        default_params_spec=default_params_spec)
 
     # build modelSaveFilename
     estPrefixUsed = True
@@ -89,35 +92,30 @@ def main(argv):
         format(estResNumber)
 
     # build kernels
+    kernels_params0 = params["initial_params"]["posterior_on_latents"]["kernels_matrices_store"]["kernels_params0"]
     kernels = svGPFA.utils.miscUtils.buildKernels(
         kernels_types=kernels_types, kernels_params=kernels_params0)
 
     # create model
-    kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
-    indPointsCovRep = svGPFA.stats.svGPFAModelFactory.indPointsCovChol
-    model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
-        conditionalDist=svGPFA.stats.svGPFAModelFactory.PointProcess,
-        linkFunction=svGPFA.stats.svGPFAModelFactory.ExponentialLink,
-        embeddingType=svGPFA.stats.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
-        indPointsCovRep=indPointsCovRep)
+    model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.\
+        buildModelPyTorch(kernels=kernels)
 
-    model.setInitialParamsAndData(
+    model.setParamsAndData(
         measurements=spikes_times,
-        initialParams=initial_params,
-        eLLCalculationParams=quad_params,
-        priorCovRegParam=prior_cov_reg_param)
+        initial_params=params["initial_params"],
+        eLLCalculationParams=params["ell_calculation_params"],
+        priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
     # maximize lower bound
     svEM = svGPFA.stats.svEM.SVEM_PyTorch()
     lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-        svEM.maximize(model=model, optim_params=optim_params,
-                      method=optim_method)
+        svEM.maximize(model=model, optim_params=params["optim_params"],
+                      method=params["optim_params"]["optim_method"])
 
     # save estimated values
     estimResConfig = configparser.ConfigParser()
     estimResConfig["simulation_params"] = {"sim_res_number": sim_res_number}
-    estimResConfig["optim_params"] = optim_params
+    estimResConfig["optim_params"] = params["optim_params"]
     estimResConfig["estimation_params"] = {
         "est_init_number": est_init_number,
     }
