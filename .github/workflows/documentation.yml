@@ -9,7 +9,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme sphinxcontrib-bibtex nbsphinx python_docs_theme
-          pip install -e .
+          pip install -e .[notebook]
       - name: Sphinx build
         run: |
           make -C docs/sphinx clean
