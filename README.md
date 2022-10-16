@@ -1,4 +1,4 @@
-# Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA, [Duncker and Sahani, 2018](https://papers.nips.cc/paper/2018/file/d1ff1ec86b62cd5f3903ff19c3a326b2-Paper.pdf)) ![tests](https://github.com/joacorapela/svGPFA/actions/workflows/tests.yml/badge.svg?branch=master) ![docs](https://github.com/joacorapela/svGPFA/actions/workflows/documentation.yml/badge.svg?branch=master)
+# Python implementation of Sparse Variational Gaussian Process Factor Analysis (svGPFA, [Duncker and Sahani, 2018](https://papers.nips.cc/paper/2018/file/d1ff1ec86b62cd5f3903ff19c3a326b2-Paper.pdf)) ![tests](https://github.com/joacorapela/svGPFA/actions/workflows/tests.yml/badge.svg?branch=master) ![docs](https://github.com/joacorapela/svGPFA/actions/workflows/docs.yml/badge.svg?branch=master)
 
 svGPFA identifies common latent structure in neural population spike-trains.
 It uses shared latent Gaussian processes, which are combined linearly as in
