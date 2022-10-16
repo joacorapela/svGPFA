@@ -13,20 +13,20 @@ svGPFA.dic
 
 # directories
 # see https://stackoverflow.com/questions/3203228/git-ignore-exception/72380673#72380673
-doc/*
+docs/*
 
-!doc/ipynb/
-doc/ipynb/*
-!doc/ipynb/doEstimateAndPlot_defaultInitialParams.ipynb
+!docs/ipynb/
+docs/ipynb/*
+!docs/ipynb/doEstimateAndPlot_defaultInitialParams.ipynb
 
-!/doc/sphinx/
-/doc/sphinx/*
-!/doc/sphinx/source
-# /doc/sphinx/source/ipynb
+!/docs/sphinx/
+/docs/sphinx/*
+!/docs/sphinx/source
+# /docs/sphinx/source/ipynb
 
-!/doc/design/
-/doc/design/*
-!/doc/design/svGPFA.vpp
+!/docs/design/
+/docs/design/*
+!/docs/design/svGPFA.vpp
 
 examples/results/*
 !examples/results/.gitkeep
