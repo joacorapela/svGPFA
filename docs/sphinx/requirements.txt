@@ -1,3 +1,4 @@
+jinja2>=2.0
 sphinxcontrib-bibtex
 nbsphinx
 python_docs_theme
