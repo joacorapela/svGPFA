@@ -21,6 +21,13 @@ Sparse Variational Gaussian Processes Factor Analysis
    lowLevelInterface
 
 .. toctree::
+   :glob:
+   :maxdepth: 1
+   :caption: Examples:
+
+   ipynb/doEstimateAndPlot_defaultInitialParams.ipynb
+
+.. toctree::
    :maxdepth: 4
    :caption: Development notes:
 
