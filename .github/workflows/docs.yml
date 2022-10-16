@@ -18,6 +18,6 @@ jobs:
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: doc/sphinx/build/html
+          publish_dir: docs/sphinx/build/html
           force_orphan: true
 
