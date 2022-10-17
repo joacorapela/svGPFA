@@ -41,10 +41,10 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
 bibtex_bibfiles = ['gaussianProcesses.bib','stats.bib']
 bibtex_default_style = 'alpha'
 
-sphinx_gallery_conf = {
-    'examples_dirs': '../../../examples/sphinx_gallery/',   # path to your example scripts
-    'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
-}
+# sphinx_gallery_conf = {
+#     'examples_dirs': '../../../examples/sphinx_gallery/',   # path to your example scripts
+#     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+# }
 
 inheritance_graph_attrs = dict(fontsize=32, size='"80.0,80.0!"')
 # inheritance_node_attrs = dict(height=1, width=1)
@@ -54,7 +54,7 @@ inheritance_graph_attrs = dict(fontsize=32, size='"80.0,80.0!"')
 
 # Added this line because when building the project in readthedocs I get
 # an error contents.rst not found
-master_doc = 'index'
+# master_doc = 'index'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
