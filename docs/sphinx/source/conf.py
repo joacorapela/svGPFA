@@ -36,7 +36,8 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
               'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
               'sphinx.ext.graphviz', 'sphinx.ext.inheritance_diagram',
               'sphinx.ext.autosummary', 'sphinxcontrib.bibtex',
-              'nbsphinx', 'sphinx_gallery.gen_gallery', 
+              'nbsphinx',
+#               'nbsphinx', 'sphinx_gallery.gen_gallery', 
              ]
 bibtex_bibfiles = ['gaussianProcesses.bib','stats.bib']
 bibtex_default_style = 'alpha'
