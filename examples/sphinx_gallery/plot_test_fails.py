@@ -12,7 +12,6 @@ In this notebook we use simulated data to estimate an svGPFA model using the def
 
 import pickle
 
-# import svGPFA.utils.test
 import svGPFA.utils.initUtils
 
 #%%
@@ -41,9 +40,11 @@ n_neurons = len(spikes_times[0])                   # n_neurons
 # 1.4 Get default parameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# build default parameter specificiations                                                                                                                                              
-# default_params_spec = svGPFA.utils.test.getDefaultParamsDict(
+# build default parameter specificiations
 default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
     n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents,
     trials_start_time=trials_start_time, trials_end_time=trials_end_time,
     em_max_iter=em_max_iter)
+
+print("Execution succeeded")
+# update flag 1
