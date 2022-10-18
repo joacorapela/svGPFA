@@ -6,6 +6,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
+      - name: Install Pandoc
+        uses: r-lib/actions/setup-pandoc@9598b8eeb6d88de7d76d580d84443542bbfdffce
+        with:
+          pandoc-version: 2.11.1.1
       - name: Install dependencies
         run: |
           pip install -e .[notebook]
