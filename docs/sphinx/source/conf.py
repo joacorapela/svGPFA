@@ -31,12 +31,18 @@ release = '0.0.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest',
-              'sphinx.ext.intersphinx', 'sphinx.ext.todo',
-              'sphinx.ext.ifconfig', 'sphinx.ext.viewcode',
-              'sphinx.ext.graphviz', 'sphinx.ext.inheritance_diagram',
-              'sphinx.ext.autosummary', 'sphinxcontrib.bibtex',
-              'nbsphinx', 'sphinx_gallery.gen_gallery',
+extensions = ['sphinx.ext.autodoc',
+              'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx',
+              'sphinx.ext.todo',
+              'sphinx.ext.ifconfig',
+              'sphinx.ext.viewcode',
+              'sphinx.ext.graphviz',
+              'sphinx.ext.inheritance_diagram',
+              'sphinx.ext.autosummary',
+              'sphinxcontrib.bibtex',
+              'nbsphinx',
+#               'sphinx_gallery.gen_gallery',
              ]
 bibtex_bibfiles = ['gaussianProcesses.bib','stats.bib']
 bibtex_default_style = 'alpha'
