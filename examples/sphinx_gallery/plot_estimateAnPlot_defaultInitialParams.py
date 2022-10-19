@@ -52,13 +52,15 @@ n_neurons = len(spikes_times[0])                   # n_neurons
 
 
 #%%
-# build default parameter specificiations
+# Build default parameter specificiations
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
     n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents,
     trials_start_time=trials_start_time, trials_end_time=trials_end_time,
     em_max_iter=em_max_iter)
 #%%
-# get parameters and kernels types from the parameters specification
+# Get parameters and kernels types from the parameters specification
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
     n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
     default_params_spec=default_params_spec)
@@ -69,18 +71,21 @@ params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #%%
-# build kernels
+# Build kernels
+# ^^^^^^^^^^^^^
 kernels_params0 = params["initial_params"]["posterior_on_latents"]["kernels_matrices_store"]["kernels_params0"]
 kernels = svGPFA.utils.miscUtils.buildKernels(
     kernels_types=kernels_types, kernels_params=kernels_params0)
 
 #%%
-# create model
+# Create model
+# ^^^^^^^^^^^^
 model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.\
     buildModelPyTorch(kernels=kernels)
 
 #%%
-# set initial parameters
+# Set initial parameters
+# ^^^^^^^^^^^^^^^^^^^^^^
 model.setParamsAndData(
     measurements=spikes_times,
     initial_params=params["initial_params"],
@@ -88,45 +93,22 @@ model.setParamsAndData(
     priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
 
-#%%
+#
 # 1.6 Maximize the Lower Bound
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 #
-# svEM = svGPFA.stats.svEM.SVEM_PyTorch()
-# tic = time.perf_counter()
-# lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-#     svEM.maximize(model=model, optim_params=params["optim_params"],
-#                   method=params["optim_params"]["optim_method"])
-# toc = time.perf_counter()
-# print(f"Elapsed time {toc - tic:0.4f} seconds")
+svEM = svGPFA.stats.svEM.SVEM_PyTorch()
+tic = time.perf_counter()
+lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
+    svEM.maximize(model=model, optim_params=params["optim_params"],
+                  method=params["optim_params"]["optim_method"])
+toc = time.perf_counter()
+print(f"Elapsed time {toc - tic:0.4f} seconds")
 
 #%%
-# begin debug
-# results = {"lowerBoundHist": lowerBoundHist,
-#            "elapsedTimeHist": elapsedTimeHist,
-#            "terminationInfo": terminationInfo,
-#            "iterationsModelParams": iterationsModelParams,
-#            "model": model}
-# with open("/tmp/estimationResults.pickle", "wb") as f:
-#     load_res = pickle.dump(results, f)
-
-#%%
-# begin debug
-with open("/tmp/estimationResults.pickle", "rb") as f:
-    load_res = pickle.load(f)
-lowerBoundHist = load_res["lowerBoundHist"]
-elapsedTimeHist = load_res["elapsedTimeHist"]
-terminationInfo = load_res["terminationInfo"]
-model = load_res["model"]
-#%%
-# end debug
-
-#%%
-# 2 Plotting <a class="anchor" id="plotting"></a>
-# -----------------------------------------------
-
-#%%
+# 2 Plotting
+# ----------
 # 2.1 Imports for plotting
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -142,8 +124,7 @@ import svGPFA.plot.plotUtilsPlotly
 # 2.2 Lower bound history
 # ~~~~~~~~~~~~~~~~~~~~~~~
 fig = svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundHist(lowerBoundHist=lowerBoundHist)
-# fig.show()
-pio.show(fig)
+fig
 
 #%%
 # 2.3 Set neuron, latent, times to plot and trials colors
@@ -154,7 +135,8 @@ n_time_steps_CIF = 100
 trials_colorscale = "hot"
 
 #%%
-# set times to plot
+# Set times to plot
+# ^^^^^^^^^^^^^^^^^
 trials_start_times = [trials_start_time for r in range(n_trials)]
 trials_end_times = [trials_end_time for r in range(n_trials)]
 trials_times = svGPFA.utils.miscUtils.getTrialsTimes(
@@ -163,26 +145,27 @@ trials_times = svGPFA.utils.miscUtils.getTrialsTimes(
     n_steps=n_time_steps_CIF)
 
 #%%
-# set trials colors
+# Set trials colors
+# ^^^^^^^^^^^^^^^^^
 trials_colors = px.colors.sample_colorscale(
     colorscale=trials_colorscale, samplepoints=n_trials,
     colortype="rgb")
 
 #%%
-# set trials labels
+# Set trials labels
+# ^^^^^^^^^^^^^^^^^
 trials_labels = [str(r) for r in range(n_trials)]
 
 
 #%%
 # 2.4 Latents
 # ~~~~~~~~~~~
-
-#%%
-# plot estimated latent across trials
+#
+# Plot estimated latent across trials
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 test_mu_k, test_var_k = model.predictLatents(times=trials_times)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(times=trials_times.numpy(), latentsMeans=test_mu_k, latentsSTDs=torch.sqrt(test_var_k), latentToPlot=latent_to_plot, trials_colors=trials_colors, xlabel="Time (msec)")
-fig.show()
-
+fig
 
 #%%
 # 2.5 Embedding
@@ -192,7 +175,7 @@ embedding_means = embedding_means.detach().numpy()
 embedding_vars = embedding_vars.detach().numpy()
 title = "Neuron {:d}".format(neuron_to_plot)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingAcrossTrials(times=trials_times.numpy(), embeddingsMeans=embedding_means[:,:,neuron_to_plot], embeddingsSTDs=np.sqrt(embedding_vars[:,:,neuron_to_plot]), trials_colors=trials_colors, title=title)
-fig.show()
+fig
 
 #%%
 # 2.6 CIFs
@@ -200,7 +183,7 @@ fig.show()
 with torch.no_grad():
     ePos_CIF_values = model.computeExpectedPosteriorCIFs(times=trials_times)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(trials_times=trials_times, cif_values=ePos_CIF_values, neuron_index=neuron_to_plot, trials_colors=trials_colors)
-fig.show()
+fig
 
 
 #%%
@@ -208,7 +191,7 @@ fig.show()
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 estimatedC, estimatedD = model.getSVEmbeddingParams()
 fig = svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingParams(C=estimatedC.numpy(), d=estimatedD.numpy())
-fig.show()
+fig
 
 
 #%%
@@ -219,13 +202,12 @@ kernelsParams = model.getKernelsParams()
 kernelsTypes = [type(kernel).__name__ for kernel in model.getKernels()]
 fig = svGPFA.plot.plotUtilsPlotly.getPlotKernelsParams(
     kernelsTypes=kernelsTypes, kernelsParams=kernelsParams)
-fig.show()
-
+fig
 
 #%%
 # 3 Goodness of fit (GOF)
 # -----------------------
-#%%
+#
 # 3.1 Set trial and neuron for GOF assesment
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 trial_GOF = 0
@@ -247,8 +229,7 @@ with warnings.catch_warnings():
     diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikes_times_GOF, cifTimes=trials_times_GOF, cifValues=cif_values_KS, gamma=ksTest_gamma)
 title = "Trial {:d}, Neuron {:d}".format(trial_GOF, neuron_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
-fig.show()
-
+fig
 
 #%%
 # 3.3 ROC predictive analysis
@@ -264,4 +245,4 @@ Y = torch.from_numpy(cutRes.value_counts().values)
 fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
 roc_auc = sklearn.metrics.auc(fpr, tpr)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
-fig.show()
+fig
