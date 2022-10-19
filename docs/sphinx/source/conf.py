@@ -42,15 +42,10 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.autosummary',
               'sphinxcontrib.bibtex',
               'nbsphinx',
-#               'sphinx_gallery.gen_gallery',
+              'sphinx_gallery.gen_gallery',
              ]
 bibtex_bibfiles = ['gaussianProcesses.bib','stats.bib']
 bibtex_default_style = 'alpha'
-
-sphinx_gallery_conf = {
-    'examples_dirs': '../../../examples/sphinx_gallery/',   # path to your example scripts
-    'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
-}
 
 inheritance_graph_attrs = dict(fontsize=32, size='"80.0,80.0!"')
 # inheritance_node_attrs = dict(height=1, width=1)
@@ -89,4 +84,28 @@ html_theme = 'python_docs_theme'
 html_static_path = []
 
 # Added by Joaco to solve the memory problem with torch
-autodoc_mock_imports = ["torch"]
+# autodoc_mock_imports = ["torch"]
+
+# Added by Joaco to allow plotly plots in sphinx gallery
+
+# Output file base name for HTML help builder.
+htmlhelp_basename = 'plotlydoc'
+
+# Example configuration for intersphinx: refer to the Python standard library.
+intersphinx_mapping = {'https://docs.python.org/': None}
+
+import plotly.io as pio
+pio.renderers.default = 'sphinx_gallery'
+
+from plotly.io._sg_scraper import plotly_sg_scraper
+image_scrapers = ('matplotlib', plotly_sg_scraper,)
+
+sphinx_gallery_conf = {
+    'examples_dirs': '../../../examples/sphinx_gallery/',   # path to your example scripts
+    'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+    'image_scrapers': image_scrapers,
+    'doc_module': ('plotly',),
+    'backreferences_dir': 'api',
+    'reference_url': {'plotly': None,},
+}
+
