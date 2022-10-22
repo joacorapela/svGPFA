@@ -90,7 +90,7 @@ def getOptimParams(dynamic_params_spec, config_file_params_spec,
     return hierarchical_optim_params
 
 
-def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
+def getDefaultParamsDict(n_neurons, n_trials, n_latents,
                          n_ind_points=None, common_n_ind_points=10, n_quad=200,
                          trials_start_time=0.0, trials_end_time=1.0,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
@@ -253,6 +253,7 @@ def getArgsInfo():
                  },
                  "ind_points_locs_params0": {
                      "n_ind_points": strTo1DIntTensor,
+                     "common_n_ind_points": int,
                      "ind_points_locs0_layout": str,
                      "ind_points_locs0_filename": str,
                      "ind_points_locs0_filename_latent{:d}_trial{:d}": str,
@@ -400,7 +401,13 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                             dynamic_params_spec=dynamic_params_spec,
                             config_file_params_spec=config_file_params_spec,
                             default_params_spec=default_params_spec)
-
+    if n_ind_points is None:
+        common_n_ind_points = getParam(section_name="ind_points_locs_params0",
+                                       param_name="common_n_ind_points",
+                                       dynamic_params_spec=dynamic_params_spec,
+                                       config_file_params_spec=config_file_params_spec,
+                                       default_params_spec=default_params_spec)
+        n_ind_points = [common_n_ind_points for k in range(n_latents)]
     C0, d0 = getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params_spec=dynamic_params_spec,
@@ -554,7 +561,7 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
         if param is not None:
             return param
 
-    raise ValueError("embedding_params0 not found")
+    raise ValueError("embeddingraiserams_spec_params0 not found")
 
 
 def getLinearEmbeddingParam0InDict(param_label, params_dict,

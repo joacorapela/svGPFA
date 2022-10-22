@@ -24,6 +24,11 @@ docs/*
 /docs/design/*
 !/docs/design/svGPFA.vpp
 
+!/docs/ipynb/
+/docs/ipynb/*
+!/docs/ipynb/doEstimateAndPlot_collab.ipynb
+!/docs/ipynb/doEstimateAndPlot_defaultInitialParams.ipynb
+
 examples/results/*
 !examples/results/.gitkeep
 
