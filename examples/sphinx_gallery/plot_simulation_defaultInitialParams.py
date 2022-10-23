@@ -213,7 +213,7 @@ fig
 trial_GOF = 0
 neuron_GOF = 0
 
-trials_times_GOF = trials_times[trial_GOF, :, 0]   
+trial_times_GOF = trials_times[trial_GOF, :, 0]
 spikes_times_GOF = spikes_times[trial_GOF][neuron_GOF].numpy()
 
 #%%
@@ -223,10 +223,10 @@ spikes_times_GOF = spikes_times[trial_GOF][neuron_GOF].numpy()
 ksTest_gamma = 20                                 # number of simulations for the KS test numerical correction
 with torch.no_grad():
     epm_cif_values = model.computeExpectedPosteriorCIFs(times=trials_times)
-cif_values_KS = epm_cif_values[trial_GOF][neuron_GOF]
+cif_values_GOF = epm_cif_values[trial_GOF][neuron_GOF]
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikes_times_GOF, cifTimes=trials_times_GOF, cifValues=cif_values_KS, gamma=ksTest_gamma)
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikes_times_GOF, cifTimes=trial_times_GOF, cifValues=cif_values_GOF, gamma=ksTest_gamma)
 title = "Trial {:d}, Neuron {:d}".format(trial_GOF, neuron_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
 fig
@@ -235,10 +235,10 @@ fig
 # 3.3 ROC predictive analysis
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-dt_CIF = (trials_times_GOF[-1] - trials_times_GOF[0]) / n_time_steps_CIF
-pk = cif_values_KS*dt_CIF
-bins = pd.interval_range(start=trials_times_GOF[0].item(),
-                         end=trials_times_GOF[-1].item(),
+dt_CIF = (trial_times_GOF[-1] - trial_times_GOF[0]) / n_time_steps_CIF
+pk = cif_values_GOF*dt_CIF
+bins = pd.interval_range(start=trial_times_GOF[0].item(),
+                         end=trial_times_GOF[-1].item(),
                          periods=len(pk))
 cutRes, _ = pd.cut(spikes_times_GOF, bins=bins, retbins=True)
 Y = torch.from_numpy(cutRes.value_counts().values)
