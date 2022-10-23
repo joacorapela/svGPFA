@@ -5,6 +5,33 @@ import torch
 import svGPFA.stats.kernels
 
 
+def getKernels(nLatents, config, forceUnitScale):
+    kernels = [[] for r in range(nLatents)]
+    for k in range(nLatents):
+        kernelType = config["kernel_params"]["kTypeLatent{:d}".format(k)]
+        if kernelType=="periodic":
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            period = float(config["kernel_params"]["kPeriodScaledValueLatent{:d}".format(k)])
+            kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
+            kernel.setParams(params=torch.Tensor([lengthscale, period]).double())
+        elif kernelType=="exponentialQuadratic":
+            if not forceUnitScale:
+                scale = float(config["kernel_params"]["kScaleValueLatent{:d}".format(k)])
+            else:
+                scale = 1.0
+            lengthscale = float(config["kernel_params"]["kLengthscaleScaledValueLatent{:d}".format(k)])
+            kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale)
+            kernel.setParams(params=torch.Tensor([lengthscale]).double())
+        else:
+            raise ValueError("Invalid kernel type {:s} for latent {:d}".format(kernelType, k))
+        kernels[k] = kernel
+    return kernels
+
+
 def getScaledKernels(nLatents, config, forceUnitScale):
     kernels = [[] for r in range(nLatents)]
     kernelsParamsScales = [[] for r in range(nLatents)]
