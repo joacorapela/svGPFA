@@ -479,7 +479,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
     params = {"initial_params": initial_params,
               "ell_calculation_params": quad_params,
               "optim_params": optim_params}
-    return params, kernels_types
+    return params, kernels_types, trials_start_times, trials_end_times
 
 
 def getParam(section_name, param_name,
