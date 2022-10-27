@@ -1,214 +1,320 @@
-import sys
-import os.path
-import pdb
-import random
+
+"""
+Basal ganglia recordings from a mouse performing a bandit task
+==============================================================
+
+In this notebook we use data recorded from the basal ganglia of a mouse
+performing a bandit task from the to estimate an svGPFA model
+
+1. Estimate model
+-----------------
+
+1.1 Import required packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
+
+import warnings
+import numpy as np
 import torch
 import pickle
-import argparse
 import configparser
 import pandas as pd
 
-sys.path.append(os.path.expanduser("~/svGPFA/pythonCode/lib/"))
 import gcnu_common.utils.neuralDataAnalysis
+import gcnu_common.stats.pointProcesses.tests
+import gcnu_common.utils.config_dict
 import svGPFA.stats.svGPFAModelFactory
 import svGPFA.stats.svEM
-import svGPFA.utils.configUtils
 import svGPFA.utils.miscUtils
 import svGPFA.utils.initUtils
+import svGPFA.plot.plotUtilsPlotly
+
+#%%
+# 1.2 Set dataset-specific parameters
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~------
+block_types_indices = [3]
+region_spikes_times_filename_pattern = "../data/00000000_regionGPe_spikes_times_epochedaligned__last_center_out.{:s}"
+
+#%%
+# 1.3 Get spikes times
+# ~~~~~~~~~~~~~~~~~~~~
+min_nSpikes_perNeuron_perTrial = 1
+region_spikes_times_metadata_filename = \
+    region_spikes_times_filename_pattern.format("ini")
+region_spikes_times_config = configparser.ConfigParser()
+region_spikes_times_config.read(region_spikes_times_metadata_filename)
+
+region_spikes_times_filename = \
+    region_spikes_times_filename_pattern.format("pickle")
+with open(region_spikes_times_filename, "rb") as f:
+    loadRes = pickle.load(f)
+spikes_times = loadRes["spikes_times"]
 
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("est_init_number", help="estimation init number",
-                        type=int)
-    parser.add_argument("--region", help="electrode region", type=str,
-                        default="GPe")
-    parser.add_argument("--save_partial", help="save partial model estimates",
-                        action="store_true")
-    parser.add_argument("--block_types_indices", help="block types indices",
-                        default="[3]")
-    parser.add_argument("--min_nSpikes_perNeuron_perTrial",
-                        help="min number of spikes per neuron per trial",
-                        type=int, default=1)
-    parser.add_argument("--save_partial_filename_pattern_pattern",
-                        help="pattern for save partial model filename pattern",
-                        default="../../results/{:08d}_{{:s}}_estimatedModel.pickle")
-    parser.add_argument("--region_spikes_times_filename_pattern",
-                        help="region spikes times filename pattern",
-                        type=str,
-                        default="../../results/00000000_region{:s}_spikes_times_epochedaligned__last_center_out.{:s}")
-    parser.add_argument("--events_times_filename",
-                        help="events times filename",
-                        type=str,
-                        default="../../data/022822/s008_tab_m1113182_LR__20210516_173815__probabilistic_switching.df.csv")
-    parser.add_argument("--est_init_config_filename_pattern",
-                        help="estimation initialization filename pattern",
-                        type=str,
-                        default="../../init/{:08d}_estimation_metaData.ini")
-    parser.add_argument("--model_save_filename_pattern",
-                        help="model save filename pattern",
-                        type=str,
-                        default="../../results/{:08d}_estimatedModel.pickle")
-    parser.add_argument("--estimRes_metadata_filename_pattern",
-                        help="estimation result metadata filename pattern",
-                        type=str,
-                        default="../../results/{:08d}_estimation_metaData.ini")
-    parser.add_argument("--estim_data_for_matlab_filename_pattern",
-                        help="estimation dation for matlab filename pattern",
-                        type=str,
-                        default="../../results/{:08d}_estimationDataForMatlab.mat")
-    parsed, unknown = parser.parse_known_args()
-    for arg in unknown:
-        if arg.startswith(("-", "--")):
-            # you can pass any arguments to add_argument
-            parser.add_argument(arg.split('=')[0], type=str)
-    args = parser.parse_args()
-
-    region = args.region
-    est_init_number = args.est_init_number
-    save_partial = args.save_partial
-    block_types_indices = [int(str) for str in args.block_types_indices[1:-1].split(",")]
-    min_nSpikes_perNeuron_perTrial = args.min_nSpikes_perNeuron_perTrial
-    save_partial_filename_pattern_pattern = args.save_partial_filename_pattern_pattern
-    region_spikes_times_filename_pattern = args.region_spikes_times_filename_pattern
-    events_times_filename = args.events_times_filename
-    est_init_config_filename_pattern = args.est_init_config_filename_pattern
-    model_save_filename_pattern = args.model_save_filename_pattern
-    estimRes_metadata_filename_pattern = args.estimRes_metadata_filename_pattern
-    estim_data_for_matlab_filename_pattern = args.estim_data_for_matlab_filename_pattern
-
-    # get spike_times
-    region_spikes_times_metadata_filename = region_spikes_times_filename_pattern.format(region, "ini")
-    region_spikes_times_config = configparser.ConfigParser()
-    region_spikes_times_config.read(region_spikes_times_metadata_filename)
-    epoch_elapsed_time_before = float(region_spikes_times_config["epoch_info"]["epoch_elapsed_time_before"])
-    epoch_elapsed_time_after = float(region_spikes_times_config["epoch_info"]["epoch_elapsed_time_after"])
-
-    region_spikes_times_filename = region_spikes_times_filename_pattern.format(region, "pickle")
-    with open(region_spikes_times_filename, "rb") as f:
-        loadRes = pickle.load(f)
-    spikes_times = loadRes["spikes_times"]
-    events_times = pd.read_csv(events_times_filename)
-    trials_indices = [r for r in range(len(events_times)) if events_times.iloc[r]["block_type_index"] in block_types_indices]
-    spikes_times = [spikes_times[r] for r in trials_indices]
-    spikes_times, neurons_indices = gcnu_common.utils.neuralDataAnalysis.removeUnitsWithLessSpikesThanThrInAnyTrial(
+events_times_filename = "../data/s008_tab_m1113182_LR__20210516_173815__probabilistic_switching.df.csv"
+events_times = pd.read_csv(events_times_filename)
+trials_indices = [r for r in range(len(events_times))
+                  if events_times.iloc[r]["block_type_index"]
+                  in block_types_indices]
+spikes_times = [spikes_times[r] for r in trials_indices]
+spikes_times, neurons_indices = \
+    gcnu_common.utils.neuralDataAnalysis.removeUnitsWithLessSpikesThanThrInAnyTrial(
         spikes_times=spikes_times,
         min_nSpikes_perNeuron_perTrial=min_nSpikes_perNeuron_perTrial)
-    spikes_times = [[torch.tensor(spikes_times[r][n])
-                     for n in range(len(spikes_times[r]))]
-                    for r in range(len(spikes_times))]
-    n_trials = len(spikes_times)
-    n_neurons = len(spikes_times[0])
+spikes_times = [[torch.tensor(spikes_times[r][n])
+                 for n in range(len(spikes_times[r]))]
+                for r in range(len(spikes_times))]
+n_trials = len(spikes_times)
+n_neurons = len(spikes_times[0])
 
-    # get initial parameters
-    est_init_config_filename = est_init_config_filename_pattern.format(est_init_number)
-    est_init_config = configparser.ConfigParser()
-    est_init_config.read(est_init_config_filename)
+#%%
+# 1.4 Get estimation parameters
+n_latents = 10
 
-    initial_params, quad_params, kernels_types = \
-        svGPFA.utils.initUtils.getInitialAndQuadParamsAndKernelsTypes(
-            n_trials=n_trials, n_neurons=n_neurons, args=args,
-            config=est_init_config)
-    kernels_params0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["kernelsParams0"]
+#%%
+# Dynamic parameters specification
+dynamic_params_spec = {"optim_params": {"em_max_iter": 200}}
 
-    # get optimization parameters
-    optim_params = svGPFA.utils.initUtils.getOptimParams(
-        args=args, config=est_init_config)
-    optim_method = optim_params["optim_method"]
-    prior_cov_reg_param = optim_params["prior_cov_reg_param"]
+#%%
+# Config file parameters specification
+est_init_config_filename_pattern = "../init/{:08d}_estimation_metaData.ini"
+est_init_number = 35
 
-    # build modelSaveFilename
-    estPrefixUsed = True
-    while estPrefixUsed:
-        estResNumber = random.randint(0, 10**8)
-        estimResMetaDataFilename = "../../results/{:08d}_estimation_metaData.ini".format(estResNumber)
-        if not os.path.exists(estimResMetaDataFilename):
-            estPrefixUsed = False
-    modelSaveFilename = "../../results/{:08d}_estimatedModel.pickle".format(estResNumber)
+args_info = svGPFA.utils.initUtils.getArgsInfo()
+est_init_config_filename = est_init_config_filename_pattern.format(
+    est_init_number)
+est_init_config = configparser.ConfigParser()
+est_init_config.read(est_init_config_filename)
 
-    # save data for Matlab estimation
-    estimationDataForMatlabFilename = estim_data_for_matlab_filename_pattern.format(estResNumber)
+strings_dict = gcnu_common.utils.config_dict.GetDict(
+    config=est_init_config).get_dict()
+config_file_params_spec = \
+    svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+        n_latents=n_latents, n_trials=n_trials,
+        strings_dict=strings_dict, args_info=args_info)
 
-    dt_latents = 0.01
-    trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials, args=args, config=est_init_config)
-    oneSetLatentsTrialTimes = torch.arange(trials_start_times[0],
-                                           trials_end_times[0], dt_latents)
-    qSVec0, qSDiag0 = svGPFA.utils.miscUtils.getQSVecsAndQSDiagsFromQSCholVecs(
-        qsCholVecs=initial_params["svPosteriorOnLatents"]["svPosteriorOnIndPoints"]["cholVecs"])
-    qMu0 = initial_params["svPosteriorOnLatents"]["svPosteriorOnIndPoints"]["mean"]
-    C0 = initial_params["svEmbedding"]["C0"]
-    d0 = initial_params["svEmbedding"]["d0"]
-    Z0 = initial_params["svPosteriorOnLatents"]["kernelsMatricesStore"]["inducingPointsLocs0"]
-    legQuadPoints = quad_params["legQuadPoints"]
-    legQuadWeights = quad_params["legQuadWeights"]
-    trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials, args=args, config=est_init_config)
-    trials_lengths = [trials_end_times[r] - trials_start_times[r]
-                      for r in range(n_trials)]
-    n_latents = len(Z0)
-    latentsTrialsTimes = [oneSetLatentsTrialTimes for k in range(n_latents)]
-    svGPFA.utils.miscUtils.saveDataForMatlabEstimations(
-        qMu=qMu0, qSVec=qSVec0, qSDiag=qSDiag0,
-        C=C0, d=d0,
-        indPointsLocs=Z0,
-        legQuadPoints=legQuadPoints,
-        legQuadWeights=legQuadWeights,
-        kernelsTypes=kernels_types,
-        kernelsParams=kernels_params0,
-        spikesTimes=spikes_times,
-        indPointsLocsKMSRegEpsilon=prior_cov_reg_param,
-        trialsLengths=torch.tensor(trials_lengths).reshape(-1,1),
-        latentsTrialsTimes=latentsTrialsTimes,
-        emMaxIter=optim_params["em_max_iter"],
-        eStepMaxIter=optim_params["estep_optim_params"]["max_iter"],
-        mStepEmbeddingMaxIter=optim_params["mstep_embedding_optim_params"]["max_iter"],
-        mStepKernelsMaxIter=optim_params["mstep_kernels_optim_params"]["max_iter"],
-        mStepIndPointsMaxIter=optim_params["mstep_indpointslocs_optim_params"]["max_iter"],
-        saveFilename=estimationDataForMatlabFilename)
+#%%
+# Default parameter specificiations
+common_n_ind_points = 9
+default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
+    n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents,
+    common_n_ind_points=common_n_ind_points)
 
-    # build kernels
-    kernels = svGPFA.utils.miscUtils.buildKernels(kernels_types=kernels_types,
-                                                      kernels_params=kernels_params0)
+#%%
+# Finally, get the parameters from the dynamic,
+# configuration file and default parameter specifications
+params, kernels_types, trials_start_times, trials_end_times = \
+    svGPFA.utils.initUtils.getParamsAndKernelsTypes(
+        n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
+        dynamic_params_spec=dynamic_params_spec,
+        config_file_params_spec=config_file_params_spec,
+        default_params_spec=default_params_spec)
 
-    # create model
-    kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
-    indPointsCovRep = svGPFA.stats.svGPFAModelFactory.indPointsCovChol
-    model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
-        conditionalDist=svGPFA.stats.svGPFAModelFactory.PointProcess,
-        linkFunction=svGPFA.stats.svGPFAModelFactory.ExponentialLink,
-        embeddingType=svGPFA.stats.svGPFAModelFactory.LinearEmbedding,
-        kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
-        indPointsCovRep=indPointsCovRep)
+#%%
+# Build kernels
+kernels_params0 = params["initial_params"]["posterior_on_latents"]["kernels_matrices_store"]["kernels_params0"]
+kernels = svGPFA.utils.miscUtils.buildKernels(
+    kernels_types=kernels_types, kernels_params=kernels_params0)
 
-    model.setInitialParamsAndData(measurements=spikes_times,
-                                  initialParams=initial_params,
-                                  eLLCalculationParams=quad_params,
-                                  priorCovRegParam=prior_cov_reg_param)
+#%%
+# Create model
+kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
+indPointsCovRep = svGPFA.stats.svGPFAModelFactory.indPointsCovChol
+model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
+    conditionalDist=svGPFA.stats.svGPFAModelFactory.PointProcess,
+    linkFunction=svGPFA.stats.svGPFAModelFactory.ExponentialLink,
+    embeddingType=svGPFA.stats.svGPFAModelFactory.LinearEmbedding,
+    kernels=kernels, kernelMatrixInvMethod=kernelMatrixInvMethod,
+    indPointsCovRep=indPointsCovRep)
 
-    # save estimated values
-    estimResConfig = configparser.ConfigParser()
-    estimResConfig["data_params"] = {"region": region,
-                                     "trials_indices": trials_indices,
-                                     "nLatents": n_latents,
-                                     "from_time": trials_start_times[0].item(),
-                                     "to_time": trials_end_times[0].item()}
-    estimResConfig["optim_params"] = optim_params
-    estimResConfig["estimation_params"] = {"est_init_number": est_init_number}
-    with open(estimResMetaDataFilename, "w") as f: estimResConfig.write(f)
+model.setParamsAndData(
+    measurements=spikes_times,
+    initial_params=params["initial_params"],
+    eLLCalculationParams=params["ell_calculation_params"],
+    priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
-    # maximize lower bound
-    def getKernelParams(model):
-        kernelParams = model.getKernelsParams()[0]
-        return kernelParams
+#%%
+# ..
+#   svEM = svGPFA.stats.svEM.SVEM_PyTorch()
+#   lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
+#       svEM.maximize(model=model, optim_params=params["optim_params"],
+#           method=params["optim_params"]["optim_method"])
 
-    # maximize lower bound
-    svEM = svGPFA.stats.svEM.SVEM_PyTorch()
-    lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-        svEM.maximize(model=model, optim_params=optim_params,
-                      method=optim_method,
-                      getIterationModelParamsFn=getKernelParams)
+# beging debug
+# Load estimation results
+est_res_number = 77812201
+model_save_filename_pattern = "../results/{:08d}_estimatedModel.pickle"
 
-    resultsToSave = {"neurons_indices": neurons_indices, "lowerBoundHist": lowerBoundHist, "elapsedTimeHist": elapsedTimeHist, "terminationInfo": terminationInfo, "iterationModelParams": iterationsModelParams, "model": model}
-    with open(modelSaveFilename, "wb") as f: pickle.dump(resultsToSave, f)
-    print("Saved results to {:s}".format(modelSaveFilename))
+model_save_filename = model_save_filename_pattern.format(est_res_number)
+with open(model_save_filename, "rb") as f:
+    estResults = pickle.load(f)
+spikes_times = estResults["spikes_times"]
+trials_indices = estResults["trials_indices"]
+trials_start_times = estResults["trials_start_times"]
+trials_end_times = estResults["trials_end_times"]
+lowerBoundHist = estResults["lowerBoundHist"]
+elapsedTimeHist = estResults["elapsedTimeHist"]
+model = estResults["model"]
+neurons_indices = estResults["neurons_indices"]
+# end debug
 
+#%%
+# Set ploting parameters
+n_time_steps_CIF = 100
+latent_to_plot = 0
+neuron_to_plot = 0
+trial_to_plot = 0
+events_times_filename = "../data/s008_tab_m1113182_LR__20210516_173815__probabilistic_switching.df.csv"
+trial_choice_column_name = "choice"
+trial_rewarded_column_name = "rewarded"
+align_times_column_name = "aligned__last_center_out"
+centerIn_times_column_name = "aligned__last_center_in"
+centerOut_times_column_name = "aligned__last_center_out"
+sideIn_times_column_name = "aligned__side_in_after_last_center_out"
+
+marked_events_colors = ["yellow","magenta","cyan","black"]
+
+events_times = pd.read_csv(events_times_filename)
+trials_choices = events_times.iloc[trials_indices][trial_choice_column_name].to_numpy()
+
+trials_labels = np.array([str(i) for i in trials_indices])
+choices_colors_patterns = ["rgba(0,0,255,{:f})", "rgba(255,0,0,{:f})"]
+trials_colors_patterns = [choices_colors_patterns[0]
+                          if trials_choices[r] == -1
+                          else choices_colors_patterns[1]
+                          for r in range(n_trials)]
+trials_colors = [trial_color_pattern.format(1.0)
+                 for trial_color_pattern in trials_colors_patterns]
+align_times = events_times.iloc[trials_indices][align_times_column_name].to_numpy()
+centerIn_times = events_times.iloc[trials_indices][centerIn_times_column_name].to_numpy()
+centerOut_times = events_times.iloc[trials_indices][centerOut_times_column_name].to_numpy()
+sideIn_times = events_times.iloc[trials_indices][sideIn_times_column_name].to_numpy()
+trialEnd_times = np.append(centerIn_times[1:], np.NAN)
+marked_events = np.column_stack((centerIn_times, centerOut_times, sideIn_times, trialEnd_times))
+
+trials_choices = events_times.iloc[trials_indices][trial_choice_column_name].to_numpy()
+trials_rewarded = events_times.iloc[trials_indices][trial_rewarded_column_name].to_numpy()
+trials_annotations = {"choice": trials_choices,
+                      "rewarded": trials_rewarded,
+                      "choice_prev": np.insert(trials_choices[:-1], 0,
+                                               np.NAN),
+                      "rewarded_prev": np.insert(trials_rewarded[:-1], 0,
+                                                 np.NAN)}
+#%%
+# Plot lower bound
+fig = svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundHist(
+    lowerBoundHist=lowerBoundHist)
+fig
+
+#%%
+# Build trials times
+trials_times = svGPFA.utils.miscUtils.getTrialsTimes(
+    start_times=trials_start_times,
+    end_times=trials_end_times,
+    n_steps=n_time_steps_CIF)
+
+#%%
+# Plot estimated latent across trials
+testMuK, testVarK = model.predictLatents(times=trials_times)
+fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(
+    times=trials_times.numpy(),
+    latentsMeans=testMuK,
+    latentsSTDs=torch.sqrt(testVarK),
+    trials_labels=trials_labels,
+    latentToPlot=latent_to_plot,
+    trials_colors_patterns=trials_colors_patterns,
+    xlabel="Time (msec)")
+fig
+
+#%%
+# Plot orthonormalized estimated latent across trials
+testMuK, testVarK = model.predictLatents(times=trials_times)
+testMuK_np = [testMuK[r].detach().numpy() for r in range(len(testMuK))]
+estimatedC, estimatedD = model.getSVEmbeddingParams()
+estimatedC_np = estimatedC.detach().numpy()
+fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedLatentAcrossTrials(
+    trials_times=trials_times,
+    latentsMeans=testMuK_np, latentToPlot=latent_to_plot,
+    C=estimatedC_np,
+    align_event=align_times, marked_events=marked_events,
+    marked_events_colors=marked_events_colors,
+    trials_labels=trials_labels,
+    trials_annotations=trials_annotations,
+    trials_colors=trials_colors,
+    xlabel="Time (msec)")
+fig
+
+#%%
+# plot embedding
+embeddingMeans, embeddingVars = model.predictEmbedding(times=trials_times)
+embeddingMeans = embeddingMeans.detach().numpy()
+embeddingVars = embeddingVars.detach().numpy()
+title = "Neuron {:d}".format(neuron_to_plot)
+fig = svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingAcrossTrials(
+    times=trials_times.numpy(),
+    embeddingsMeans=embeddingMeans[:, :, neuron_to_plot],
+    embeddingsSTDs=np.sqrt(embeddingVars[:, :, neuron_to_plot]),
+    trials_colors_patterns=trials_colors_patterns,
+    title=title)
+fig
+
+#%%
+# Calculate expected CIF values (for KS test and CIF plots)
+with torch.no_grad():
+    cif_values = model.computeExpectedPosteriorCIFs(times=trials_times)
+cif_values_GOF = cif_values[trial_to_plot][neuron_to_plot]
+
+# CIFs one neuron all trials
+fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(
+    trials_times=trials_times, cif_values=cif_values,
+    neuron_index=neuron_to_plot, spikes_times=spikes_times,
+    align_event=centerOut_times, marked_events=marked_events,
+    marked_events_colors=marked_events_colors, trials_labels=trials_labels,
+    trials_annotations=trials_annotations,
+    trials_colors=trials_colors,
+)
+fig
+
+#%%
+# Plot orthonormalized embedding parameters
+estimatedC, estimatedD = model.getSVEmbeddingParams()
+fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedEmbeddingParams(
+    C=estimatedC.numpy(), d=estimatedD.numpy())
+fig
+
+#%%
+# plot kernel parameters
+kernelsParams = model.getKernelsParams()
+kernelsTypes = [type(kernel).__name__ for kernel in model.getKernels()]
+fig = svGPFA.plot.plotUtilsPlotly.getPlotKernelsParams(
+    kernelsTypes=kernelsTypes, kernelsParams=kernelsParams)
+fig
+
+#%%
+# Prepare GOF tests
+trial_times_GOF = trials_times[trial_to_plot, :, 0]
+spikes_times_GOF = spikes_times[trial_to_plot][neuron_to_plot].numpy()
+title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(
+    trial_to_plot, neuron_to_plot, len(spikes_times_GOF))
+
+# Plot KS test time rescaling (numerical correction)
+ksTestGamma = 10
+if len(spikes_times_GOF) > 0:
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikes_times_GOF, cifTimes=trial_times_GOF, cifValues=cif_values_GOF, gamma=ksTestGamma)
+fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
+fig
+
+#%%
+# ROC predictive analysis
+fpr, tpr, roc_auc = svGPFA.utils.miscUtils.computeSpikeClassificationROC(
+    spikes_times=spikes_times_GOF,
+    cif_times=trial_times_GOF,
+    cif_values=cif_values_GOF)
+fig = svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis(
+    fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
+fig
+
+
+# sphinx_gallery_thumbnail_path = '_static/basal_ganglia.png'
