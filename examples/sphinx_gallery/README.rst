@@ -1,3 +1,3 @@
-svGPFA code examples
-====================
+Applications to different datasets
+==================================
 
