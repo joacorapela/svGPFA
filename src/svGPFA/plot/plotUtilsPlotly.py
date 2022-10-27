@@ -329,12 +329,14 @@ def getPlotOrthonormalizedEmbeddingParams(C, d, linestyle="solid", marker="aster
 
 
 def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
-                            cbAlpha = 0.2,
-                            indPointsLocsColor="rgba(255,0,0,0.5)",
-                            trials_colors=None, default_trial_color="gray",
-                            xlabel="Time (msec)",
-                            ylabel="Value",
-                            title=""):
+                                 cbAlpha=0.2,
+                                 indPointsLocsColor="rgba(255,0,0,0.5)",
+                                 trials_colors_patterns=None,
+                                 default_trial_color_pattern="rgba(128,128,128,{:f})",
+                                 cb_transparency=0.3, mean_transparency=1.0,
+                                 xlabel="Time (msec)",
+                                 ylabel="Value",
+                                 title=""):
     # times = times.detach().numpy()
     # embeddingsMeans = embeddingsMeans.detach().numpy()
     # embeddingsSTDs = embeddingsSTDs.detach().numpy()
@@ -344,15 +346,13 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
     nTrials = embeddingsMeans.shape[0]
     for r in range(nTrials):
         trial_times = times[r, :, 0]
-        meanToPlot = embeddingsMeans[r,:]
-        stdToPlot = embeddingsSTDs[r,:]
+        meanToPlot = embeddingsMeans[r, :]
+        stdToPlot = embeddingsSTDs[r, :]
         ciToPlot = 1.96*stdToPlot
-        # color_rgb = plotly.colors.hex_to_rgb(colorsList[r%len(colorsList)])
-        # color_rgba_pattern = 'rgba({:d}, {:d}, {:d}, {{:f}})'.format(*color_rgb)
-        if trials_colors is not None:
-            embedding_color = trials_colors[r]
+        if trials_colors_patterns is not None:
+            trial_color_pattern = trials_colors_patterns[r]
         else:
-            embedding_color = default_trial_color
+            trial_color_pattern = default_trial_color_pattern
 
         # pdb.set_trace()
 #         import matplotlib
@@ -371,8 +371,8 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
             x=np.concatenate((x, x[::-1])),
             y=np.concatenate((y_upper, y_lower[::-1])),
             fill="toself",
-            fillcolor=embedding_color,
-            line=dict(color='rgba(255,255,255,0)'),
+            fillcolor=trial_color_pattern.format(cb_transparency),
+            line=dict(color=trial_color_pattern.format(0.0)),
             showlegend=False,
             # name="trial CB {:d}".format(r),
             legendgroup="trial{:02d}".format(r)
@@ -380,7 +380,7 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
         traceMean = go.Scatter(
             x=x,
             y=y,
-            line=dict(color=embedding_color),
+            line=dict(color=trial_color_pattern.format(mean_transparency)),
             mode="lines",
             name="trial {:d}".format(r),
             legendgroup="trial{:02d}".format(r),
@@ -1498,18 +1498,20 @@ def getPlotEstimatedLatentsForTrial(times, latentsMeans, latentsSTDs, indPointsL
     fig.update_layout(title_text=title)
     return fig
 
-def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
-                              indPointsLocs=None,
-                              cbAlpha = 0.2,
-                              indPointsLocsColor="rgba(255,0,0,0.5)",
-                              trials_colors=None, default_trial_color="gray",
-                              xlabel="Time (sec)",
-                              ylabel="Value",
-                              titlePattern="Latent {:d}"):
+
+def getPlotLatentAcrossTrials(
+        times, latentsMeans, latentsSTDs, latentToPlot,
+        trials_labels=None,
+        indPointsLocs=None, cbAlpha=0.2,
+        indPointsLocsColor="rgba(255,0,0,0.5)",
+        trials_colors_patterns=None,
+        default_trial_color_pattern="rgba(128,128,128,{:f})",
+        cb_transparency=0.3, mean_transparency=1.0, xlabel="Time (sec)",
+        ylabel="Value", titlePattern="Latent {:d}"):
     # times = times.detach().numpy()
     latentsMeans = latentsMeans.detach().numpy()
     latentsSTDs = latentsSTDs.detach().numpy()
-    if not indPointsLocs is None:
+    if indPointsLocs is not None:
         indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
 
     # pio.renderers.default = "browser"
@@ -1521,10 +1523,10 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
         meanToPlot = latentsMeans[r, :, latentToPlot]
         stdToPlot = latentsSTDs[r, :, latentToPlot]
         ciToPlot = 1.96*stdToPlot
-        if trials_colors is not None:
-            latent_color = trials_colors[r]
+        if trials_colors_patterns is not None:
+            trial_color_pattern = trials_colors_patterns[r]
         else:
-            latent_color = default_trial_color
+            trial_color_pattern = default_trial_color_pattern
 
         # pdb.set_trace()
 #         import matplotlib
@@ -1545,17 +1547,21 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
             x=np.concatenate((x, x[::-1])),
             y=np.concatenate((y_upper, y_lower[::-1])),
             fill="toself",
-            fillcolor=latent_color,
-            line=dict(color=latent_color),
+            fillcolor=trial_color_pattern.format(cb_transparency),
+            line=dict(color=trial_color_pattern.format(0.0)),
             showlegend=False,
             legendgroup="trial{:02d}".format(r)
         )
+        if trials_labels is not None:
+            trial_label = trials_labels[r]
+        else:
+            trial_label = "{:02d}".format(r)
         traceMean = go.Scatter(
             x=x,
             y=y,
-            line=dict(color=latent_color),
+            line=dict(color=trial_color_pattern.format(mean_transparency)),
             mode="lines",
-            name="trial {:d}".format(r),
+            name="trial {:s}".format(trial_label),
             legendgroup="trial{:02d}".format(r)
         )
         fig.add_trace(traceCB)
@@ -1585,8 +1591,8 @@ def getPlotLatentAcrossTrials(times, latentsMeans, latentsSTDs, latentToPlot,
 def getPlotOrthonormalizedLatentAcrossTrials(
         trials_times, latentsMeans, latentToPlot, C, trials_labels,
         align_event=None, marked_events=None, marked_events_colors=None,
-        marked_size=10,
-        trials_colors=None, default_trial_color="gray",
+        marked_size=10, trials_colors=None,
+        default_trial_color_pattern="rgba(128,128,128,{:f}",
         trials_annotations=None, ylim=None,
         xlabel="Time (sec)", ylabel="Value",
         titlePattern="Orthonormalized latent {:d}"):
@@ -1632,9 +1638,9 @@ def getPlotOrthonormalizedLatentAcrossTrials(
         max_trial_time = trials_times[r, -1, 0].item()
         meanToPlot = oLatentsMeans[r][:, latentToPlot]
         if trials_colors is not None:
-            latent_color = trials_colors[r]
+            trial_color = trials_colors[r]
         else:
-            latent_color = default_trial_color
+            trial_color = default_trial_color
 
         if trials_labels is not None:
             trial_label = trials_labels[r]
@@ -1643,7 +1649,7 @@ def getPlotOrthonormalizedLatentAcrossTrials(
         traceMean = go.Scatter(
             x=trials_times[r, :, 0],
             y=meanToPlot,
-            line=dict(color=latent_color),
+            line=dict(color=trial_color),
             mode="lines",
             name="trial {:s}".format(trial_label),
             legendgroup="trial{:02d}".format(r),
