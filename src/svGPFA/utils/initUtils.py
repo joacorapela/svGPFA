@@ -90,7 +90,7 @@ def getOptimParams(dynamic_params_spec, config_file_params_spec,
     return hierarchical_optim_params
 
 
-def getDefaultParamsDict(n_neurons, n_trials, n_latents,
+def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
                          n_ind_points=None, common_n_ind_points=10, n_quad=200,
                          trials_start_time=0.0, trials_end_time=1.0,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
@@ -253,7 +253,6 @@ def getArgsInfo():
                  },
                  "ind_points_locs_params0": {
                      "n_ind_points": strTo1DIntTensor,
-                     "common_n_ind_points": int,
                      "ind_points_locs0_layout": str,
                      "ind_points_locs0_filename": str,
                      "ind_points_locs0_filename_latent{:d}_trial{:d}": str,
@@ -401,13 +400,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                             dynamic_params_spec=dynamic_params_spec,
                             config_file_params_spec=config_file_params_spec,
                             default_params_spec=default_params_spec)
-    if n_ind_points is None:
-        common_n_ind_points = getParam(section_name="ind_points_locs_params0",
-                                       param_name="common_n_ind_points",
-                                       dynamic_params_spec=dynamic_params_spec,
-                                       config_file_params_spec=config_file_params_spec,
-                                       default_params_spec=default_params_spec)
-        n_ind_points = [common_n_ind_points for k in range(n_latents)]
+
     C0, d0 = getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params_spec=dynamic_params_spec,
@@ -479,7 +472,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
     params = {"initial_params": initial_params,
               "ell_calculation_params": quad_params,
               "optim_params": optim_params}
-    return params, kernels_types, trials_start_times, trials_end_times
+    return params, kernels_types
 
 
 def getParam(section_name, param_name,
@@ -561,7 +554,7 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
         if param is not None:
             return param
 
-    raise ValueError("embeddingraiserams_spec_params0 not found")
+    raise ValueError("embedding_params0 not found")
 
 
 def getLinearEmbeddingParam0InDict(param_label, params_dict,
@@ -582,30 +575,54 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
         print(f"Extracted from {params_dict_type} {param_label}_filename")
     # random
     elif section_name in params_dict and \
-            f"{param_label}_distribution" in params_dict[section_name] and \
-            f"{param_label}_loc" in params_dict[section_name] and \
-            f"{param_label}_scale" in params_dict[section_name]:
+            f"{param_label}_distribution" in params_dict[section_name]:
         param_distribution = \
             params_dict[section_name][f"{param_label}_distribution"]
-        param_loc = params_dict[section_name][f"{param_label}_loc"]
-        param_scale = params_dict[section_name][f"{param_label}_scale"]
         if f"{param_label}_random_seed" in params_dict[section_name]:
             param_random_seed = \
                 params_dict[section_name][f"{param_label}_random_seed"]
         else:
             param_random_seed = None
-        print(f"Extracted from {params_dict_type} "
-              f"{param_label}_distribution={param_distribution}, "
-              f"{param_label}_loc={param_loc}, "
-              f"{param_label}_scale={param_scale}, "
-              f"{param_label}_random_seed={param_random_seed}")
         # If param_random_seed was specified for replicability
         if param_random_seed is not None:
             torch.random.manual_seed(param_random_seed)
         if param_distribution == "Normal":
-            param = torch.distributions.normal.Normal(
-                param_loc, param_scale).sample(
-                    sample_shape=[n_rows, n_cols]).type(torch.double)
+            if f"{param_label}_loc" in params_dict[section_name] and \
+               f"{param_label}_scale" in params_dict[section_name]:
+                param_loc = params_dict[section_name][f"{param_label}_loc"]
+                param_scale = params_dict[section_name][f"{param_label}_scale"]
+                param = torch.distributions.normal.Normal(
+                    param_loc, param_scale).sample(
+                        sample_shape=[n_rows, n_cols]).type(torch.double)
+                print(f"Extracted from {params_dict_type} "
+                      f"{param_label}_distribution={param_distribution}, "
+                      f"{param_label}_loc={param_loc}, "
+                      f"{param_label}_scale={param_scale}, "
+                      f"{param_label}_random_seed={param_random_seed}")
+
+            else:
+                raise ValueError(
+                    f"For a {param_distribution} distribution "
+                    f"{param_label}_loc and {param_label}_scale need to be "
+                    "provided")
+        elif param_distribution == "Uniform":
+            if f"{param_label}_low" in params_dict[section_name] and \
+               f"{param_label}_high" in params_dict[section_name]:
+                param_low = params_dict[section_name][f"{param_label}_low"]
+                param_high = params_dict[section_name][f"{param_label}_high"]
+                param = torch.distributions.uniform.Uniform(
+                    low=param_low, high=param_high).sample(
+                        sample_shape=[n_rows, n_cols]).type(torch.double)
+                print(f"Extracted from {params_dict_type} "
+                    f"{param_label}_distribution={param_distribution}, "
+                    f"{param_label}_low={param_low}, "
+                    f"{param_label}_high={param_high}, "
+                    f"{param_label}_random_seed={param_random_seed}")
+            else:
+                raise ValueError(
+                    f"For a {param_distribution} distribution "
+                    f"{param_label}_low and {param_label}_high need to be "
+                    "provided")
         else:
             raise ValueError(
                 f"Invalid param_distribution={param_distribution}")
