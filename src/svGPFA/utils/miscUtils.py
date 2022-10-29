@@ -14,32 +14,6 @@ import gcnu_common.numerical_methods.utils
 import gcnu_common.stats.gaussianProcesses.eval
 
 
-def getOptimParams(optimParamsDict):
-    optimMethod = optimParamsDict["em_method"]
-    optimParams = {}
-    optimParams["em_max_iter"] = int(optimParamsDict["em_max_iter"])
-    steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-    for step in steps:
-        optimParams["{:s}_estimate".format(step)] = optimParamsDict["{:s}_estimate".format(step)]=="True"
-        optimParams["{:s}_optim_params".format(step)] = {
-            "max_iter": int(optimParamsDict["{:s}_max_iter".format(step)]),
-            "lr": float(optimParamsDict["{:s}_lr".format(step)]),
-            "tolerance_grad": float(optimParamsDict["{:s}_tolerance_grad".format(step)]),
-            "tolerance_change": float(optimParamsDict["{:s}_tolerance_change".format(step)]),
-            "line_search_fn": optimParamsDict["{:s}_line_search_fn".format(step)],
-        }
-    optimParams["verbose"] = optimParamsDict["verbose"]=="True"
-    return optimParams
-
-def getPropSamplesCovered(sample, mean, std, percent=.95):
-    if percent==.95:
-        factor = 1.96
-    else:
-        raise ValueError("percent=0.95 is the only option implemented at the moment")
-    covered = torch.logical_and(mean-factor*std<=sample, sample<mean+factor*std)
-    coverage = torch.count_nonzero(covered)/float(len(covered))
-    return coverage
-
 def separateNeuronsSpikeTimesByTrials(neurons_spike_times, epochs_times,
                                       trials_start_times, trials_end_times):
     n_trials = len(epochs_times)
