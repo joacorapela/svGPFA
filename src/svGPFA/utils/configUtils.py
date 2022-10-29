@@ -1,49 +1,8 @@
 
 import math
 import numpy as np
-import pandas as pd
 import torch
 import svGPFA.stats.kernels
-
-
-def getIdenticalVariationalCov0(nLatents, nTrials, config,
-                                keyName="qSigma0_filename"):
-    qSigma0 = [[] for r in range(nLatents)]
-    qSigma0Filename = config["variational_params"][keyName]
-    the_qSigma0 = torch.from_numpy(pd.read_csv(
-        qSigma0Filename, header=None).to_numpy())
-    nIndPoints = the_qSigma0.shape[0]
-    for k in range(nLatents):
-        qSigma0[k] = torch.empty((nTrials, nIndPoints, nIndPoints),
-                                 dtype=torch.double)
-        # qSigma0[k][r,:,:] = qSigma0kr
-        qSigma0[k][:, :, :] = the_qSigma0
-    return qSigma0
-
-
-def getIdenticalVariationalMean0(nLatents, nTrials, config, keyName="qMu0_filename"):
-    qMu0 = [[] for r in range(nLatents)]
-    qMu0Filename = config["variational_params"][keyName]
-    the_qMu0 = torch.from_numpy(pd.read_csv(
-        qMu0Filename, header=None).to_numpy()).flatten()
-    nIndPoints = len(the_qMu0)
-    for k in range(nLatents):
-        qMu0[k] = torch.empty((nTrials, nIndPoints, 1),
-                              dtype=torch.double)
-        qMu0[k][:, :, 0] = the_qMu0
-    return qMu0
-
-def getIdenticalIndPointsLocs0(nLatents, nTrials, config):
-    Z0 = [[] for k in range(nLatents)]
-    for k in range(nLatents):
-        the_Z0 = torch.tensor(
-            [float(str) for str in
-             config["indPoints_params"]["indPointsLocs"][1:-1].split(", ")], dtype=torch.double)
-        nIndPointsForLatent = len(the_Z0)
-        Z0[k] = torch.empty((nTrials, nIndPointsForLatent, 1),
-                            dtype=torch.double)
-        Z0[k][:, :, 0] = the_Z0
-    return Z0
 
 
 def getKernels(nLatents, config, forceUnitScale):
