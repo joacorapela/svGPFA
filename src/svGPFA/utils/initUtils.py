@@ -568,7 +568,7 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
         if param is not None:
             return param
 
-    raise ValueError("embedding_params0 not found")
+    raise ValueError("embedding_params_spec_params0 not found")
 
 
 def getLinearEmbeddingParam0InDict(param_label, params_dict,

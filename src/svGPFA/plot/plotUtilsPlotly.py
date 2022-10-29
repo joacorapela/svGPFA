@@ -121,19 +121,19 @@ def getSpikesTimesPlotOneTrial(spikes_times, title,
     )
     return fig
 
-
-def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
-                                title, marked_events=None, align_event=None,
+def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, title,
+                                trials_indices=None,
+                                marked_events=None, align_event=None,
                                 trials_colors=None, default_trial_color="black",
                                 xlabel="Time (sec)", ylabel="Trial",
                                 event_line_color="rgba(0, 0, 255, 0.2)",
                                 event_line_width=5, spikes_marker_size=9):
-    nTrials = len(trials_indices)
+    n_trials = len(spikes_times)
     min_time = np.Inf
     max_time = -np.Inf
     fig = go.Figure()
-    for r in range(nTrials):
-        spikes_times_trial_neuron = spikes_times[trials_indices[r]][neuron_index]
+    for r in range(n_trials):
+        spikes_times_trial_neuron = spikes_times[r][neuron_index]
         # workaround because if a trial contains only one spike spikes_times[n]
         # does not respond to the len function
         if spikes_times_trial_neuron.size == 1:
@@ -153,11 +153,12 @@ def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
             mode="markers",
             marker=dict(size=spikes_marker_size, color=spikes_color),
             showlegend=False,
-            # hoverinfo="skip",
+            hovertext=["trial {:d}".format(trials_indices[r])]*len(x),
+            hoverinfo="text",
         )
         fig.add_trace(trace)
     if marked_events is not None:
-        trials_indices = np.arange(0, nTrials)
+        trials_indices = np.arange(0, n_trials)
         n_marked_events = marked_events.shape[1]
         for i in range(n_marked_events):
             marked_times = marked_events[:, i]-align_event
@@ -171,6 +172,7 @@ def getSpikesTimesPlotOneNeuron(spikes_times, neuron_index, trials_indices,
                                      y=trials_indices,
                                      line=dict(color=event_line_color,
                                                width=event_line_width),
+                                     mode="lines+markers",
                                      showlegend=False)
             fig.add_trace(trace_event)
 
