@@ -2,6 +2,7 @@
 """
 Simulated data and default params
 =================================
+
 In this notebook we use simulated data to estimate an svGPFA model using the default initial parameters.
 
 1. Estimate model
@@ -10,6 +11,7 @@ In this notebook we use simulated data to estimate an svGPFA model using the def
 1.1 Import required packages
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
+import sys
 import time
 import warnings
 import torch
@@ -61,7 +63,7 @@ default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
 #%%
 # Get parameters and kernels types from the parameters specification
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
+params, kernels_types, _, _ = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
     n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
     default_params_spec=default_params_spec)
 
@@ -93,18 +95,27 @@ model.setParamsAndData(
     priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
 
-#
+#%%
 # 1.6 Maximize the Lower Bound
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 #
+
 svEM = svGPFA.stats.svEM.SVEM_PyTorch()
 tic = time.perf_counter()
 lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
     svEM.maximize(model=model, optim_params=params["optim_params"],
-                  method=params["optim_params"]["optim_method"])
+                  method=params["optim_params"]["optim_method"],
+                  out=sys.stdout)
 toc = time.perf_counter()
 print(f"Elapsed time {toc - tic:0.4f} seconds")
+
+# ..
+#   with open("/tmp/estimationResults.pickle", "rb") as f:
+#       load_res = pickle.load(f)
+#   lowerBoundHist = load_res["lowerBoundHist"]
+#   elapsedTimeHist = load_res["elapsedTimeHist"]
+#   model = load_res["model"]
 
 #%%
 # 2 Plotting
@@ -116,7 +127,6 @@ import numpy as np
 import pandas as pd
 import sklearn.metrics
 import plotly.express as px
-import plotly.io as pio
 import svGPFA.plot.plotUtilsPlotly
 
 
@@ -150,6 +160,7 @@ trials_times = svGPFA.utils.miscUtils.getTrialsTimes(
 trials_colors = px.colors.sample_colorscale(
     colorscale=trials_colorscale, samplepoints=n_trials,
     colortype="rgb")
+trials_colors_patterns = [f"rgba{trial_color[3:-1]}, {{:f}})" for trial_color in trials_colors]
 
 #%%
 # Set trials labels
@@ -164,7 +175,7 @@ trials_labels = [str(r) for r in range(n_trials)]
 # Plot estimated latent across trials
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 test_mu_k, test_var_k = model.predictLatents(times=trials_times)
-fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(times=trials_times.numpy(), latentsMeans=test_mu_k, latentsSTDs=torch.sqrt(test_var_k), latentToPlot=latent_to_plot, trials_colors=trials_colors, xlabel="Time (msec)")
+fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(times=trials_times.numpy(), latentsMeans=test_mu_k, latentsSTDs=torch.sqrt(test_var_k), latentToPlot=latent_to_plot, trials_colors_patterns=trials_colors_patterns, xlabel="Time (msec)")
 fig
 
 #%%
@@ -174,7 +185,7 @@ embedding_means, embedding_vars = model.predictEmbedding(times=trials_times)
 embedding_means = embedding_means.detach().numpy()
 embedding_vars = embedding_vars.detach().numpy()
 title = "Neuron {:d}".format(neuron_to_plot)
-fig = svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingAcrossTrials(times=trials_times.numpy(), embeddingsMeans=embedding_means[:,:,neuron_to_plot], embeddingsSTDs=np.sqrt(embedding_vars[:,:,neuron_to_plot]), trials_colors=trials_colors, title=title)
+fig = svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingAcrossTrials(times=trials_times.numpy(), embeddingsMeans=embedding_means[:,:,neuron_to_plot], embeddingsSTDs=np.sqrt(embedding_vars[:,:,neuron_to_plot]), trials_colors_patterns=trials_colors_patterns, title=title)
 fig
 
 #%%
@@ -246,3 +257,6 @@ fpr, tpr, thresholds = sklearn.metrics.roc_curve(Y, pk, pos_label=1)
 roc_auc = sklearn.metrics.auc(fpr, tpr)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
 fig
+
+
+# sphinx_gallery_thumbnail_path = '_static/model.png'
