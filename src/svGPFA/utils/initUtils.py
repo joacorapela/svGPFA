@@ -234,10 +234,14 @@ def getArgsInfo():
                      "c0_distribution": str,
                      "c0_loc": float,
                      "c0_scale": float,
+                     "c0_low": float,
+                     "c0_high": float,
                      "c0_random_seed": int,
                      "d0_distribution": str,
                      "d0_loc": float,
                      "d0_scale": float,
+                     "d0_low": float,
+                     "d0_high": float,
                      "d0_random_seed": int,
                  },
                  "kernels_params0": {
@@ -253,6 +257,8 @@ def getArgsInfo():
                  },
                  "ind_points_locs_params0": {
                      "n_ind_points": strTo1DIntTensor,
+                     "common_n_ind_points": int,
+                     "ind_points_locs0": strTo1DDoubleTensor,
                      "ind_points_locs0_layout": str,
                      "ind_points_locs0_filename": str,
                      "ind_points_locs0_filename_latent{:d}_trial{:d}": str,
@@ -400,6 +406,14 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                             dynamic_params_spec=dynamic_params_spec,
                             config_file_params_spec=config_file_params_spec,
                             default_params_spec=default_params_spec)
+    if n_ind_points is None:
+        common_n_ind_points = getParam(
+            section_name="ind_points_locs_params0",
+            param_name="common_n_ind_points",
+            dynamic_params_spec=dynamic_params_spec,
+            config_file_params_spec=config_file_params_spec,
+            default_params_spec=default_params_spec)
+        n_ind_points = [common_n_ind_points] * n_latents
 
     C0, d0 = getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
