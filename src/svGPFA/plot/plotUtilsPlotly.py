@@ -1594,7 +1594,7 @@ def getPlotOrthonormalizedLatentAcrossTrials(
         trials_times, latentsMeans, latentToPlot, C, trials_labels,
         align_event=None, marked_events=None, marked_events_colors=None,
         marked_size=10, trials_colors=None,
-        default_trial_color_pattern="rgba(128,128,128,{:f}",
+        default_trial_color="rgba(128,128,128)",
         trials_annotations=None, ylim=None,
         xlabel="Time (sec)", ylabel="Value",
         titlePattern="Orthonormalized latent {:d}"):
