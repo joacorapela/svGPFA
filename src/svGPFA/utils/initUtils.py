@@ -1015,7 +1015,6 @@ def buildUniformIndPointsLocs0(n_latents, n_trials, n_ind_points,
                  (trials_end_times[r]-trials_start_times[r])
             Z0_sorted, _ = Z0.sort()
             Z0s[k][r, :, 0] = Z0_sorted
-    breakpoint()
     return Z0s
 
 
