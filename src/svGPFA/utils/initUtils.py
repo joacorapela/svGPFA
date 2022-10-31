@@ -997,11 +997,9 @@ def buildEquidistantIndPointsLocs0(n_latents, n_trials, n_ind_points,
         Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1),
                              dtype=torch.double)
         for r in range(n_trials):
-            Z0 = trials_start_times[r] + \
-                 torch.rand(n_ind_points[k]) * \
-                 (trials_end_times[r]-trials_start_times[r])
-            Z0_sorted, _ = Z0.sort()
-            Z0s[k][r, :, 0] = Z0_sorted
+            Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
+                                n_ind_points[k])
+            Z0s[k][r, :, 0] = Z0
     return Z0s
 
 
@@ -1012,9 +1010,12 @@ def buildUniformIndPointsLocs0(n_latents, n_trials, n_ind_points,
         Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1),
                              dtype=torch.double)
         for r in range(n_trials):
-            Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
-                                n_ind_points[k])
-            Z0s[k][r, :, 0] = Z0
+            Z0 = trials_start_times[r] + \
+                 torch.rand(n_ind_points[k]) * \
+                 (trials_end_times[r]-trials_start_times[r])
+            Z0_sorted, _ = Z0.sort()
+            Z0s[k][r, :, 0] = Z0_sorted
+    breakpoint()
     return Z0s
 
 
