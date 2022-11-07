@@ -8,7 +8,7 @@ jobs:
       - uses: actions/setup-python@v4
       - name: Install dependencies
         run: |
-          pip install -e .[notebook]
+          pip install -e .[notebook,docs]
       - uses: ammaraskar/sphinx-action@master
         with:
           docs-folder: "docs/sphinx"
