@@ -8,7 +8,7 @@ scikit-learn
 sphinx-gallery
 matplotlib
 packaging>=21.0
-jinja2>=2.0
+jinja2>=3.0
 sphinxcontrib-bibtex
 nbsphinx
 python_docs_theme
