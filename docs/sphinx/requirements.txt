@@ -1,4 +1,7 @@
 matplotlib
+torch
+pandas
+configparser
 jinja2>=2.0
 sphinxcontrib-bibtex
 nbsphinx
