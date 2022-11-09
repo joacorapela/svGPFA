@@ -1,0 +1,1599 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>svGPFA.stats package &#8212; svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="svGPFA.utils package" href="svGPFA.utils.html" />
+    <link rel="prev" title="svGPFA.simulations package" href="svGPFA.simulations.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="svgpfa-stats-package">
+<h1>svGPFA.stats package<a class="headerlink" href="#svgpfa-stats-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-svGPFA.stats.expectedLogLikelihood">
+<span id="svgpfa-stats-expectedloglikelihood-module"></span><h2>svGPFA.stats.expectedLogLikelihood module<a class="headerlink" href="#module-svGPFA.stats.expectedLogLikelihood" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">ExpectedLogLikelihood</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes">
+<span class="sig-name descname"><span class="pre">computeEmbeddingsMeansAndVarsAtTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeExpectedPosteriorCIFs">
+<span class="sig-name descname"><span class="pre">computeExpectedPosteriorCIFs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeExpectedPosteriorCIFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computeSVPosteriorOnLatentsStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">evalSumAcrossTrialsAndNeurons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatentsStats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getIndPointsLocs">
+<span class="sig-name descname"><span class="pre">getIndPointsLocs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getKernels">
+<span class="sig-name descname"><span class="pre">getKernels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getKernelsParams">
+<span class="sig-name descname"><span class="pre">getKernelsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams">
+<span class="sig-name descname"><span class="pre">getSVEmbeddingParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams">
+<span class="sig-name descname"><span class="pre">getSVPosteriorOnIndPointsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.get_svEmbeddingAllTimes">
+<span class="sig-name descname"><span class="pre">get_svEmbeddingAllTimes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.get_svEmbeddingAllTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.predictEmbedding">
+<span class="sig-name descname"><span class="pre">predictEmbedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.predictEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.predictLatents">
+<span class="sig-name descname"><span class="pre">predictLatents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.predictLatents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.sampleCIFs">
+<span class="sig-name descname"><span class="pre">sampleCIFs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nudget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.sampleCIFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setELLCalculationParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setELLCalculationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLLCalculationParams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setELLCalculationParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setKernels">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setMeasurements">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setMeasurements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setPriorCovRegParam">
+<span class="sig-name descname"><span class="pre">setPriorCovRegParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priorCovRegParam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setPriorCovRegParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">PointProcessELL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svEmbeddingAssocTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.computeSVPosteriorOnLatentsStats">
+<span class="sig-name descname"><span class="pre">computeSVPosteriorOnLatentsStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.evalSumAcrossTrialsAndNeurons">
+<span class="sig-name descname"><span class="pre">evalSumAcrossTrialsAndNeurons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatentsStats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.evalSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.setELLCalculationParams">
+<span class="sig-name descname"><span class="pre">setELLCalculationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLLCalculationParams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setELLCalculationParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELL.setMeasurements">
+<span class="sig-name descname"><span class="pre">setMeasurements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">PointProcessELLExpLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svEmbeddingAssocTimes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL" title="svGPFA.stats.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointProcessELL</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">PointProcessELLQuad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svEmbeddingAssocTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL" title="svGPFA.stats.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointProcessELL</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad.setELLCalculationParams">
+<span class="sig-name descname"><span class="pre">setELLCalculationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLLCalculationParams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad.setELLCalculationParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">PoissonELL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.computeSVPostOnLatentsStats">
+<span class="sig-name descname"><span class="pre">computeSVPostOnLatentsStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.computeSVPostOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.computeSVPosteriorOnLatentsStats">
+<span class="sig-name descname"><span class="pre">computeSVPosteriorOnLatentsStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons">
+<span class="sig-name descname"><span class="pre">evalSumAcrossTrialsAndNeurons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatentsStats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.setELLCalculationParams">
+<span class="sig-name descname"><span class="pre">setELLCalculationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLLCalculationParams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.setELLCalculationParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELL.setMeasurements">
+<span class="sig-name descname"><span class="pre">setMeasurements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">PoissonELLExpLink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL" title="svGPFA.stats.expectedLogLikelihood.PoissonELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoissonELL</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.expectedLogLikelihood.PoissonELLQuad">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.expectedLogLikelihood.</span></span><span class="sig-name descname"><span class="pre">PoissonELLQuad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svEmbeddingAllTimes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.expectedLogLikelihood.PoissonELLQuad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL" title="svGPFA.stats.expectedLogLikelihood.PoissonELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoissonELL</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.kernels">
+<span id="svgpfa-stats-kernels-module"></span><h2>svGPFA.stats.kernels module<a class="headerlink" href="#module-svGPFA.stats.kernels" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.ExponentialQuadraticKernel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernels.</span></span><span class="sig-name descname"><span class="pre">ExponentialQuadraticKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengthscaleScale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">torch.float64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.ExponentialQuadraticKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernels.Kernel" title="svGPFA.stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix">
+<span class="sig-name descname"><span class="pre">buildKernelMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag">
+<span class="sig-name descname"><span class="pre">buildKernelMatrixDiag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.ExponentialQuadraticKernel.getNamedParams">
+<span class="sig-name descname"><span class="pre">getNamedParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.ExponentialQuadraticKernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.ExponentialQuadraticKernel.getScaledParams">
+<span class="sig-name descname"><span class="pre">getScaledParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.ExponentialQuadraticKernel.getScaledParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.Kernel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernels.</span></span><span class="sig-name descname"><span class="pre">Kernel</span></span><a class="headerlink" href="#svGPFA.stats.kernels.Kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.Kernel.buildKernelMatrix">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildKernelMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.Kernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.Kernel.buildKernelMatrixDiag">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildKernelMatrixDiag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.Kernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.Kernel.getNamedParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getNamedParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.Kernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.Kernel.getParams">
+<span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.Kernel.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.Kernel.setParams">
+<span class="sig-name descname"><span class="pre">setParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.Kernel.setParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.PeriodicKernel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernels.</span></span><span class="sig-name descname"><span class="pre">PeriodicKernel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lengthscaleScale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periodScale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">torch.float64</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.PeriodicKernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernels.Kernel" title="svGPFA.stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.PeriodicKernel.buildKernelMatrix">
+<span class="sig-name descname"><span class="pre">buildKernelMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.PeriodicKernel.buildKernelMatrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.PeriodicKernel.buildKernelMatrixDiag">
+<span class="sig-name descname"><span class="pre">buildKernelMatrixDiag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.PeriodicKernel.buildKernelMatrixDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.PeriodicKernel.getNamedParams">
+<span class="sig-name descname"><span class="pre">getNamedParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.PeriodicKernel.getNamedParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernels.PeriodicKernel.getScaledParams">
+<span class="sig-name descname"><span class="pre">getScaledParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernels.PeriodicKernel.getScaledParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.kernelsMatricesStore">
+<span id="svgpfa-stats-kernelsmatricesstore-module"></span><h2>svGPFA.stats.kernelsMatricesStore module<a class="headerlink" href="#module-svGPFA.stats.kernelsMatricesStore" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsAndAllTimesKMS</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKttKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsAndAssocTimesKMS</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsAndTimesKMS</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKtt">
+<span class="sig-name descname"><span class="pre">getKtt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKtt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKttDiag">
+<span class="sig-name descname"><span class="pre">getKttDiag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKttDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKtz">
+<span class="sig-name descname"><span class="pre">getKtz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKtz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.setTimes">
+<span class="sig-name descname"><span class="pre">setTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.setTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsKMS</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.getKzz">
+<span class="sig-name descname"><span class="pre">getKzz</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.getKzz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.getRegParam">
+<span class="sig-name descname"><span class="pre">getRegParam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.getRegParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.setRegParam">
+<span class="sig-name descname"><span class="pre">setRegParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reg_param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.setRegParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.solveForLatent">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solveForLatent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.solveForLatent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.solveForLatentAndTrial">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">solveForLatentAndTrial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trialIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.solveForLatentAndTrial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsKMS_Chol</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsKMS</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol.solveForLatent">
+<span class="sig-name descname"><span class="pre">solveForLatent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol.solveForLatent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol.solveForLatentAndTrial">
+<span class="sig-name descname"><span class="pre">solveForLatentAndTrial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trialIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol.solveForLatentAndTrial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_CholWithGettersAndSetters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsKMS_CholWithGettersAndSetters</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_CholWithGettersAndSetters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsKMS_Chol</span></code></a>, <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters" title="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsKMS_PInv</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsKMS</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv.solveForLatent">
+<span class="sig-name descname"><span class="pre">solveForLatent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv.solveForLatent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv.solveForLatentAndTrial">
+<span class="sig-name descname"><span class="pre">solveForLatentAndTrial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentIndex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trialIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv.solveForLatentAndTrial" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInvWithGettersAndSetters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">IndPointsLocsKMS_PInvWithGettersAndSetters</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInvWithGettersAndSetters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInv</span></code></a>, <a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters" title="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">KernelMatricesStoreGettersAndSetters</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs">
+<span class="sig-name descname"><span class="pre">get_flattened_ind_points_locs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_ind_points_locs_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params">
+<span class="sig-name descname"><span class="pre">get_flattened_kernels_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_kernels_params_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_ind_points_locs_from_flattened">
+<span class="sig-name descname"><span class="pre">set_ind_points_locs_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_ind_points_locs_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_ind_points_locs_requires_grad">
+<span class="sig-name descname"><span class="pre">set_ind_points_locs_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_ind_points_locs_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_kernels_params_from_flattened">
+<span class="sig-name descname"><span class="pre">set_kernels_params_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_kernels_params_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_kernels_params_requires_grad">
+<span class="sig-name descname"><span class="pre">set_kernels_params_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_kernels_params_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.kernelsMatricesStore.</span></span><span class="sig-name descname"><span class="pre">KernelsMatricesStore</span></span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.buildKernelsMatrices">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getIndPointsLocs">
+<span class="sig-name descname"><span class="pre">getIndPointsLocs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getKernels">
+<span class="sig-name descname"><span class="pre">getKernels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getKernelsParams">
+<span class="sig-name descname"><span class="pre">getKernelsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind_points_locs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setKernelsParams">
+<span class="sig-name descname"><span class="pre">setKernelsParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.klDivergence">
+<span id="svgpfa-stats-kldivergence-module"></span><h2>svGPFA.stats.klDivergence module<a class="headerlink" href="#module-svGPFA.stats.klDivergence" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.klDivergence.KLDivergence">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.klDivergence.</span></span><span class="sig-name descname"><span class="pre">KLDivergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indPointsLocsKMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svPosteriorOnIndPoints</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.klDivergence.KLDivergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials">
+<span class="sig-name descname"><span class="pre">evalSumAcrossLatentsAndTrials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.klDivergence.KLDivergence.get_indPointsLocsKMS">
+<span class="sig-name descname"><span class="pre">get_indPointsLocsKMS</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.klDivergence.KLDivergence.get_indPointsLocsKMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.klDivergence.KLDivergence.get_svPosteriorOnIndPoints">
+<span class="sig-name descname"><span class="pre">get_svPosteriorOnIndPoints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.klDivergence.KLDivergence.get_svPosteriorOnIndPoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svEM">
+<span id="svgpfa-stats-svem-module"></span><h2>svGPFA.stats.svEM module<a class="headerlink" href="#module-svGPFA.stats.svEM" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.ErrorTerminationInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">ErrorTerminationInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.ErrorTerminationInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEM.TerminationInfo" title="svGPFA.stats.svEM.TerminationInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.ErrorTerminationInfo.error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#svGPFA.stats.svEM.ErrorTerminationInfo.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">SVEM</span></span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM.maximize">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='ECM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;sphinx_gallery.gen_rst._LoggingTee</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='results/00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM.maximize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
+Sahani, 2018.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only parameters <strong>model</strong>, <strong>optim_params</strong> and <strong>method</strong> should
+be set by users. The remaining parameters are used to interface
+<a class="reference internal" href="#svGPFA.stats.svEM.SVEM.maximize" title="svGPFA.stats.svEM.SVEM.maximize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svEM.SVEM.maximize()</span></code></a> with the dashboard.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound" title="svGPFA.stats.svLowerBound.SVLowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.svLowerBound.SVLowerBound</span></code></a>) – svGPFA model used to calculate the lower bound</p></li>
+<li><p><strong>optim_params</strong> (<em>dictionary</em>) – optimization parameters. The format of this dictionary is identical to the one described in <a class="reference internal" href="params.html#optim-params"><span class="std std-ref">Optimisation parameters</span></a>. It can be obtained at the key <code class="docutils literal notranslate"><span class="pre">optim_params</span></code> of the dictionary returned by <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes" title="svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsAndKernelsTypes()</span></code></a>.</p></li>
+<li><p><strong>method</strong> – either ECM for Expectation Conditional Maximization or mECM for multicycle expectation conditional maximization. Refer to <span id="id1">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span> for details on these algorithms.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM_PyTorch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">SVEM_PyTorch</span></span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_PyTorch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEM.SVEM" title="svGPFA.stats.svEM.SVEM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEM</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM_PyTorch.maximize">
+<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='ECM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;sphinx_gallery.gen_rst._LoggingTee</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='results/00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_PyTorch.maximize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
+Sahani, 2018.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only parameters <strong>model</strong>, <strong>optim_params</strong> and <strong>method</strong> should
+be set by users. The remaining parameters are used to interface
+<a class="reference internal" href="#svGPFA.stats.svEM.SVEM.maximize" title="svGPFA.stats.svEM.SVEM.maximize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svEM.SVEM.maximize()</span></code></a> with the dashboard.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound" title="svGPFA.stats.svLowerBound.SVLowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.svLowerBound.SVLowerBound</span></code></a>) – svGPFA model used to calculate the lower bound</p></li>
+<li><p><strong>optim_params</strong> (<em>dictionary</em>) – optimization parameters. The format of this dictionary is identical to the one described in <a class="reference internal" href="params.html#optim-params"><span class="std std-ref">Optimisation parameters</span></a>. It can be obtained at the key <code class="docutils literal notranslate"><span class="pre">optim_params</span></code> of the dictionary returned by <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes" title="svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsAndKernelsTypes()</span></code></a>.</p></li>
+<li><p><strong>method</strong> – either ECM for Expectation Conditional Maximization or mECM for multicycle expectation conditional maximization. Refer to <span id="id2">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span> for details on these algorithms.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM_SciPy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">SVEM_SciPy</span></span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_SciPy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEM.SVEM" title="svGPFA.stats.svEM.SVEM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEM</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM_SciPy.maximize">
+<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='EM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;sphinx_gallery.gen_rst._LoggingTee</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_SciPy.maximize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
+Sahani, 2018.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only parameters <strong>model</strong>, <strong>optim_params</strong> and <strong>method</strong> should
+be set by users. The remaining parameters are used to interface
+<a class="reference internal" href="#svGPFA.stats.svEM.SVEM.maximize" title="svGPFA.stats.svEM.SVEM.maximize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svEM.SVEM.maximize()</span></code></a> with the dashboard.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound" title="svGPFA.stats.svLowerBound.SVLowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.svLowerBound.SVLowerBound</span></code></a>) – svGPFA model used to calculate the lower bound</p></li>
+<li><p><strong>optim_params</strong> (<em>dictionary</em>) – optimization parameters. The format of this dictionary is identical to the one described in <a class="reference internal" href="params.html#optim-params"><span class="std std-ref">Optimisation parameters</span></a>. It can be obtained at the key <code class="docutils literal notranslate"><span class="pre">optim_params</span></code> of the dictionary returned by <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes" title="svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsAndKernelsTypes()</span></code></a>.</p></li>
+<li><p><strong>method</strong> – either ECM for Expectation Conditional Maximization or mECM for multicycle expectation conditional maximization. Refer to <span id="id3">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span> for details on these algorithms.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.TerminationInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">TerminationInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.TerminationInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.TerminationInfo.message">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#svGPFA.stats.svEM.TerminationInfo.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svEmbedding">
+<span id="svgpfa-stats-svembedding-module"></span><h2>svGPFA.stats.svEmbedding module<a class="headerlink" href="#module-svGPFA.stats.svEmbedding" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbedding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEmbedding.</span></span><span class="sig-name descname"><span class="pre">LinearSVEmbedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatents</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEmbedding.SVEmbedding" title="svGPFA.stats.svEmbedding.SVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEmbedding</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbedding.getParams">
+<span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbedding.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nudget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding.sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbedding.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEmbedding.</span></span><span class="sig-name descname"><span class="pre">LinearSVEmbeddingAllTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatents</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding" title="svGPFA.stats.svEmbedding.LinearSVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbedding</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes">
+<span class="sig-name descname"><span class="pre">computeMeansAndVarsAtTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.predictLatents">
+<span class="sig-name descname"><span class="pre">predictLatents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.predictLatents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.setPriorCovRegParam">
+<span class="sig-name descname"><span class="pre">setPriorCovRegParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priorCovRegParam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.setPriorCovRegParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEmbedding.</span></span><span class="sig-name descname"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatents</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes" title="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params">
+<span class="sig-name descname"><span class="pre">get_flattened_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_params_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_from_flattened">
+<span class="sig-name descname"><span class="pre">set_params_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_requires_grad">
+<span class="sig-name descname"><span class="pre">set_params_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEmbedding.</span></span><span class="sig-name descname"><span class="pre">LinearSVEmbeddingAssocTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatents</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding" title="svGPFA.stats.svEmbedding.LinearSVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbedding</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes.setNeuronForSpikeIndex">
+<span class="sig-name descname"><span class="pre">setNeuronForSpikeIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neuronForSpikeIndex</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes.setNeuronForSpikeIndex" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEmbedding.</span></span><span class="sig-name descname"><span class="pre">SVEmbedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatents</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.computeMeansAndVars">
+<span class="sig-name descname"><span class="pre">computeMeansAndVars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatentsStats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.computeMeansAndVars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.computeSVPosteriorOnLatentsStats">
+<span class="sig-name descname"><span class="pre">computeSVPosteriorOnLatentsStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.getIndPointsLocs">
+<span class="sig-name descname"><span class="pre">getIndPointsLocs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.getKernels">
+<span class="sig-name descname"><span class="pre">getKernels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.getKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.getKernelsParams">
+<span class="sig-name descname"><span class="pre">getKernelsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.getKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.getParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.getSVPosteriorOnIndPointsParams">
+<span class="sig-name descname"><span class="pre">getSVPosteriorOnIndPointsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.getSVPosteriorOnIndPointsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indPointsLocs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.setInitialParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svEmbedding.SVEmbedding.setTimes">
+<span class="sig-name descname"><span class="pre">setTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEmbedding.SVEmbedding.setTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svGPFAModelFactory">
+<span id="svgpfa-stats-svgpfamodelfactory-module"></span><h2>svGPFA.stats.svGPFAModelFactory module<a class="headerlink" href="#module-svGPFA.stats.svGPFAModelFactory" title="Permalink to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.ExponentialLink">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">ExponentialLink</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.ExponentialLink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.Gaussian">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">Gaussian</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.Gaussian" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.LinearEmbedding">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">LinearEmbedding</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.LinearEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.NonExponentialLink">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">NonExponentialLink</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1001</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.NonExponentialLink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.PointProcess">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">PointProcess</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.PointProcess" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.Poisson">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">Poisson</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.Poisson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">SVGPFAModelFactory</span></span><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildModelPyTorch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditionalDist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddingType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernelMatrixInvMethod</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsCovRep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an svGPFA model. <code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svLowerBound.SVLowerBound.setInitialDataAndParams()</span></code> should be invoked before using the created model as argument to <a class="reference internal" href="#svGPFA.stats.svEM.SVEM.maximize" title="svGPFA.stats.svEM.SVEM.maximize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svEM.SVEM.maximize()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kernels</strong> (list of instances from subclass of (<code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.kernel.Kernel</span></code>)) – list of kernels (<code class="xref py py-mod docutils literal notranslate"><span class="pre">svGPFA.stats.kernel</span></code>) to be used in the model</p></li>
+<li><p><strong>conditionalDist</strong> (<em>int</em>) – likelihood distribution (e.g., svGPFA.stats.SVGPFAModelFactory.PointProcess or svGPFA.stats.SVGPFAModelFactory.Gaussian)</p></li>
+<li><p><strong>embeddingType</strong> (<em>int</em>) – type of embedding (e.g., svGPFA.stats.SVGPFAModelFactory.LinearEmbedding)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an unitialized model. Parameters and data need to be set (by calling <a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData" title="svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData()</span></code></a>) before invoking <a class="reference internal" href="#svGPFA.stats.svEM.SVEM.maximize" title="svGPFA.stats.svEM.SVEM.maximize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svEM.SVEM.maximize()</span></code></a>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>an instance of <a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound" title="svGPFA.stats.svLowerBound.SVLowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.svLowerBound.SVLowerBound</span></code></a>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelSciPy">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildModelSciPy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conditionalDist</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linkFunction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embeddingType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernelMatrixInvMethod</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsCovRep</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelSciPy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.indPointsCovChol">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">indPointsCovChol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100001</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.indPointsCovChol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.indPointsCovRank1PlusDiag">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">indPointsCovRank1PlusDiag</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100000</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.indPointsCovRank1PlusDiag" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">kernelMatrixInvChol</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10000</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="svGPFA.stats.svGPFAModelFactory.kernelMatrixInvPInv">
+<span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svGPFAModelFactory.</span></span><span class="sig-name descname"><span class="pre">kernelMatrixInvPInv</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10001</span></em><a class="headerlink" href="#svGPFA.stats.svGPFAModelFactory.kernelMatrixInvPInv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svLBFGS">
+<span id="svgpfa-stats-svlbfgs-module"></span><h2>svGPFA.stats.svLBFGS module<a class="headerlink" href="#module-svGPFA.stats.svLBFGS" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.ErrorTerminationInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svLBFGS.</span></span><span class="sig-name descname"><span class="pre">ErrorTerminationInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLBFGS.ErrorTerminationInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svLBFGS.TerminationInfo" title="svGPFA.stats.svLBFGS.TerminationInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.ErrorTerminationInfo.error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#svGPFA.stats.svLBFGS.ErrorTerminationInfo.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.SVLBFGS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svLBFGS.</span></span><span class="sig-name descname"><span class="pre">SVLBFGS</span></span><a class="headerlink" href="#svGPFA.stats.svLBFGS.SVLBFGS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.SVLBFGS.maximize">
+<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='EM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='UTF-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLBFGS.SVLBFGS.maximize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.TerminationInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svLBFGS.</span></span><span class="sig-name descname"><span class="pre">TerminationInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLBFGS.TerminationInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.TerminationInfo.message">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">message</span></span><a class="headerlink" href="#svGPFA.stats.svLBFGS.TerminationInfo.message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svLowerBound">
+<span id="svgpfa-stats-svlowerbound-module"></span><h2>svGPFA.stats.svLowerBound module<a class="headerlink" href="#module-svGPFA.stats.svLowerBound" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svLowerBound.</span></span><span class="sig-name descname"><span class="pre">SVLowerBound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">klDiv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.computeEmbeddingMeansAndVarsAtTimes">
+<span class="sig-name descname"><span class="pre">computeEmbeddingMeansAndVarsAtTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.computeEmbeddingMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.computeExpectedPosteriorCIFs">
+<span class="sig-name descname"><span class="pre">computeExpectedPosteriorCIFs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.computeExpectedPosteriorCIFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.computeSVPosteriorOnLatentsStats">
+<span class="sig-name descname"><span class="pre">computeSVPosteriorOnLatentsStats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.computeSVPosteriorOnLatentsStats" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.eval">
+<span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.eval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.evalELLSumAcrossTrialsAndNeurons">
+<span class="sig-name descname"><span class="pre">evalELLSumAcrossTrialsAndNeurons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnLatentsStats</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.evalELLSumAcrossTrialsAndNeurons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.getIndPointsLocs">
+<span class="sig-name descname"><span class="pre">getIndPointsLocs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.getKernels">
+<span class="sig-name descname"><span class="pre">getKernels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.getKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.getKernelsParams">
+<span class="sig-name descname"><span class="pre">getKernelsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.getKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.getSVEmbeddingParams">
+<span class="sig-name descname"><span class="pre">getSVEmbeddingParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.getSVEmbeddingParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.getSVPosteriorOnIndPointsParams">
+<span class="sig-name descname"><span class="pre">getSVPosteriorOnIndPointsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.getSVPosteriorOnIndPointsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.predictEmbedding">
+<span class="sig-name descname"><span class="pre">predictEmbedding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.predictEmbedding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.predictLatents">
+<span class="sig-name descname"><span class="pre">predictLatents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.predictLatents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.sampleCIFs">
+<span class="sig-name descname"><span class="pre">sampleCIFs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nudget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.sampleCIFs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setELLCalculationParams">
+<span class="sig-name descname"><span class="pre">setELLCalculationParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLLCalculationParams</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setELLCalculationParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setMeasurements">
+<span class="sig-name descname"><span class="pre">setMeasurements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurements</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setMeasurements" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData">
+<span class="sig-name descname"><span class="pre">setParamsAndData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">measurements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eLLCalculationParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priorCovRegParam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets model parameters and data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>measurements</strong> (<em>nested list</em>) – <p><code class="docutils literal notranslate"><span class="pre">measurements[r][n]</span></code> are the measurements for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and neuron <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
+<p>For a point-process SVLowerBound (i.e., for a SVLowerBound constructed with an expected log-likelihood of class <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL" title="svGPFA.stats.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.expectedLogLikelihood.PointProcessELL</span></code></a>) <code class="docutils literal notranslate"><span class="pre">measurements[r][n]</span></code> should be a list of spikes times for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and neuron <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
+<p>For a Poisson SVLowerBound (i.e., for a SVLowerBound constructed with an expected log-likelihood of class <a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL" title="svGPFA.stats.expectedLogLikelihood.PoissonELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">svGPFA.stats.expectedLogLikelihood.PoissonELL</span></code></a>) <code class="docutils literal notranslate"><span class="pre">measurements[r][n]</span></code> should be a tuple of length <code class="docutils literal notranslate"><span class="pre">n_bins</span></code> containing the spike counts in bins.</p>
+</p></li>
+<li><p><strong>initial_params</strong> (<em>dictionary</em>) – initial parameters as returned by <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes" title="svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsAndKernelsTypes()</span></code></a>.</p></li>
+<li><p><strong>eLLCalculationParams</strong> (<em>dictionary</em>) – <p>parameters used to calculate the expected log likelighood.</p>
+<p>For a point-process SVLowerBound <code class="docutils literal notranslate"><span class="pre">eLLCalculationParams</span></code> should be a dictionary with keys <code class="docutils literal notranslate"><span class="pre">leg_quad_points</span></code> and <code class="docutils literal notranslate"><span class="pre">leg_quad_points</span></code>, containing the Legendre quadrature points and weights, respectivey, used to calculate the integral of the expected log likelihood (Eq. 7 in <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>For a Poisson SVLowerBound <code class="docutils literal notranslate"><span class="pre">eLLCalculationParams</span></code> should be a dictionary with key <code class="docutils literal notranslate"><span class="pre">binTimes</span></code> containing the mean time of every bin.</p>
+</p></li>
+<li><p><strong>priorCovRegParam</strong> (<em>float</em>) – regularization parameter for the prior covariance matrix (<span class="math notranslate nohighlight">\(K_{zz}\)</span> in Eq. 2 of <span id="id5">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBound.setPriorCovRegParam">
+<span class="sig-name descname"><span class="pre">setPriorCovRegParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priorCovRegParam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBound.setPriorCovRegParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svLowerBound.</span></span><span class="sig-name descname"><span class="pre">SVLowerBoundWithParamsGettersAndSetters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eLL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">klDiv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound" title="svGPFA.stats.svLowerBound.SVLowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVLowerBound</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs">
+<span class="sig-name descname"><span class="pre">get_flattened_indPointsLocs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_indPointsLocs_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params">
+<span class="sig-name descname"><span class="pre">get_flattened_kernels_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_kernels_params_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params">
+<span class="sig-name descname"><span class="pre">get_flattened_svEmbedding_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_svEmbedding_params_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params">
+<span class="sig-name descname"><span class="pre">get_flattened_svPosteriorOnIndPoints_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_svPosteriorOnIndPoints_params_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_from_flattened">
+<span class="sig-name descname"><span class="pre">set_indPointsLocs_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_requires_grad">
+<span class="sig-name descname"><span class="pre">set_indPointsLocs_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_from_flattened">
+<span class="sig-name descname"><span class="pre">set_kernels_params_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_requires_grad">
+<span class="sig-name descname"><span class="pre">set_kernels_params_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_from_flattened">
+<span class="sig-name descname"><span class="pre">set_svEmbedding_params_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_requires_grad">
+<span class="sig-name descname"><span class="pre">set_svEmbedding_params_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_from_flattened">
+<span class="sig-name descname"><span class="pre">set_svPosteriorOnIndPoints_params_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_requires_grad">
+<span class="sig-name descname"><span class="pre">set_svPosteriorOnIndPoints_params_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svPosteriorOnIndPoints">
+<span id="svgpfa-stats-svposterioronindpoints-module"></span><h2>svGPFA.stats.svPosteriorOnIndPoints module<a class="headerlink" href="#module-svGPFA.stats.svPosteriorOnIndPoints" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnIndPoints.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnIndPoints</span></span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.buildCov">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildCov</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.buildCov" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getMean">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getMean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getMean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.setInitialParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnIndPoints.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnIndPointsChol</span></span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints" title="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.buildCov">
+<span class="sig-name descname"><span class="pre">buildCov</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.buildCov" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.getMean">
+<span class="sig-name descname"><span class="pre">getMean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.getMean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.getParams">
+<span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnIndPoints.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters</span></span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol" title="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params">
+<span class="sig-name descname"><span class="pre">get_flattened_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params_grad">
+<span class="sig-name descname"><span class="pre">get_flattened_params_grad</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_from_flattened">
+<span class="sig-name descname"><span class="pre">set_params_from_flattened</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flattened_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_from_flattened" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_requires_grad">
+<span class="sig-name descname"><span class="pre">set_params_requires_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_requires_grad" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnIndPoints.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag</span></span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints" title="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.buildCov">
+<span class="sig-name descname"><span class="pre">buildCov</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.buildCov" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.getMean">
+<span class="sig-name descname"><span class="pre">getMean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.getMean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.getParams">
+<span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.getParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats.svPosteriorOnLatents">
+<span id="svgpfa-stats-svposterioronlatents-module"></span><h2>svGPFA.stats.svPosteriorOnLatents module<a class="headerlink" href="#module-svGPFA.stats.svPosteriorOnLatents" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnLatents.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnLatents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnIndPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsLocsKMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsLocsAndTimesKMS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.buildKernelsMatrices">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.computeMeansAndVars">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">computeMeansAndVars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.computeMeansAndVars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getIndPointsLocs">
+<span class="sig-name descname"><span class="pre">getIndPointsLocs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getKernels">
+<span class="sig-name descname"><span class="pre">getKernels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getKernelsParams">
+<span class="sig-name descname"><span class="pre">getKernelsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getKernelsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getSVPosteriorOnIndPointsParams">
+<span class="sig-name descname"><span class="pre">getSVPosteriorOnIndPointsParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getSVPosteriorOnIndPointsParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setIndPointsLocs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indPointsLocs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setInitialParams">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setKernels">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setPriorCovRegParam">
+<span class="sig-name descname"><span class="pre">setPriorCovRegParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">priorCovRegParam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setPriorCovRegParam" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setTimes">
+<span class="sig-name descname"><span class="pre">setTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnLatents.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnLatentsAllTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnIndPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsLocsKMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsLocsAndTimesKMS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVars">
+<span class="sig-name descname"><span class="pre">computeMeansAndVars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes">
+<span class="sig-name descname"><span class="pre">computeMeansAndVarsAtTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nudget</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indPointsLocs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svPosteriorOnLatents.</span></span><span class="sig-name descname"><span class="pre">SVPosteriorOnLatentsAssocTimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">svPosteriorOnIndPoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsLocsKMS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indPointsLocsAndTimesKMS</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.buildKernelsMatrices">
+<span class="sig-name descname"><span class="pre">buildKernelsMatrices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.buildKernelsMatrices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.computeMeansAndVars">
+<span class="sig-name descname"><span class="pre">computeMeansAndVars</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.computeMeansAndVars" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setIndPointsLocs">
+<span class="sig-name descname"><span class="pre">setIndPointsLocs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indPointsLocs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setIndPointsLocs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setInitialParams">
+<span class="sig-name descname"><span class="pre">setInitialParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setInitialParams" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setKernels">
+<span class="sig-name descname"><span class="pre">setKernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kernels</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setKernels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-svGPFA.stats">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-svGPFA.stats" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">svGPFA</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Scripts for estimation and visualization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataStructures.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objectOrientedDesign.html">Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementationNotes.html">Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="derivations.html">Derivations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="params.html">Parameters and their specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="svGPFA.html">svGPFA package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="svGPFA.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.plot.html">svGPFA.plot package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.simulations.html">svGPFA.simulations package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">svGPFA.stats package</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.expectedLogLikelihood">svGPFA.stats.expectedLogLikelihood module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.kernels">svGPFA.stats.kernels module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.kernelsMatricesStore">svGPFA.stats.kernelsMatricesStore module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.klDivergence">svGPFA.stats.klDivergence module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svEM">svGPFA.stats.svEM module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svEmbedding">svGPFA.stats.svEmbedding module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svGPFAModelFactory">svGPFA.stats.svGPFAModelFactory module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svLBFGS">svGPFA.stats.svLBFGS module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svLowerBound">svGPFA.stats.svLowerBound module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svPosteriorOnIndPoints">svGPFA.stats.svPosteriorOnIndPoints module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats.svPosteriorOnLatents">svGPFA.stats.svPosteriorOnLatents module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#module-svGPFA.stats">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.utils.html">svGPFA.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.html#module-svGPFA">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">src</a><ul>
+  <li><a href="svGPFA.html">svGPFA package</a><ul>
+      <li>Previous: <a href="svGPFA.simulations.html" title="previous chapter">svGPFA.simulations package</a></li>
+      <li>Next: <a href="svGPFA.utils.html" title="next chapter">svGPFA.utils package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Lea Duncker and Maneesh Sahani.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/svGPFA.stats.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

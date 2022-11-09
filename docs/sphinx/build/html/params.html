@@ -1,0 +1,872 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Parameters and their specification &#8212; svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="references.html" />
+    <link rel="prev" title="Derivations" href="derivations.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="parameters-and-their-specification">
+<span id="params-specs"></span><h1>Parameters and their specification<a class="headerlink" href="#parameters-and-their-specification" title="Permalink to this heading">¶</a></h1>
+<p>svGPFA uses different groups of parameters. We provide a utility function
+<a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes" title="svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsAndKernelsTypes()</span></code></a> that builds them from
+parameter specifications. These specifications are short descriptions on how
+to build a parameter. For example, a parameter specification for the inducing
+points locations can be <code class="docutils literal notranslate"><span class="pre">equidistant</span></code>, indicating that the inducing points
+locations should be set to equidistant values between the start and end of a
+trial.</p>
+<p>A parameter specification is a nested list (e.g.,
+<code class="docutils literal notranslate"><span class="pre">param_spec[group_name][param_name]</span></code>) containing the specification of
+parameter <code class="docutils literal notranslate"><span class="pre">param_name</span></code> in group <code class="docutils literal notranslate"><span class="pre">group_name</span></code>. It can be built:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>automatically, using default values, with the utility function <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getDefaultParamsDict" title="svGPFA.utils.initUtils.getDefaultParamsDict"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getDefaultParamsDict()</span></code></a>,</p></li>
+<li><p>manually, by setting parameter specifications in the Python code,</p></li>
+<li><p>from the command line, with the utility function <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsDictFromArgs" title="svGPFA.utils.initUtils.getParamsDictFromArgs"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsDictFromArgs()</span></code></a>,</p></li>
+<li><p>from a configuration file, with the utility function <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsDictFromStringsDict" title="svGPFA.utils.initUtils.getParamsDictFromStringsDict"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsDictFromStringsDict()</span></code></a>.</p></li>
+</ol>
+<p>The <a class="reference external" href="https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb">Colab</a> and <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py">Jupyter</a> notebooks automatically build this list (1). This <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py">script</a> demonstrates the manual construction of all parameters specifications (2). This <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py">script</a> builds the parameters specification list from the command line and from this <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini">configuration file</a> (3, 4).</p>
+</div></blockquote>
+<p>Below we describe all svGPFA parameters and their specifications. Refer to the
+documentation of the above utility functions for details on how to use them.</p>
+<section id="data-structure-parameters">
+<span id="data-structure-params"></span><h2>Data structure parameters<a class="headerlink" href="#data-structure-parameters" title="Permalink to this heading">¶</a></h2>
+<p>There are two data structure parameters <code class="docutils literal notranslate"><span class="pre">trials_start_times</span></code> and
+<code class="docutils literal notranslate"><span class="pre">trials_end_times</span></code>, which are tensors of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code> giving the start
+and end times of each trial; i.e., <span class="math notranslate nohighlight">\(\tau_i\)</span> in Eq 7 in
+<span id="id1">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>.</p>
+<p>These parameters can be specified in a trial-specific or trial-common format. If both are
+specified, the longer format takes precedence.</p>
+<section id="trial-specific-format">
+<h3>Trial-specific format<a class="headerlink" href="#trial-specific-format" title="Permalink to this heading">¶</a></h3>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">trials_start_times</span></code> should provide a list of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, with float values indicating seconds, such that <code class="docutils literal notranslate"><span class="pre">trials_start_times[i]</span></code> gives the start time of the ith trial.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trials_end_times</span></code> should provide a list of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, with float values indicating seconds, such that <code class="docutils literal notranslate"><span class="pre">trials_end_times[i]</span></code> gives the end time of the ith trial.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id21">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code> in the trial-specific Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (3 trials)</span><a class="headerlink" href="#id21" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;data_structure_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;trials_start_times&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span>
+     <span class="s2">&quot;trials_end_times&quot;</span><span class="p">:</span>   <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="trial-common-format">
+<h3>Trial-common format<a class="headerlink" href="#trial-common-format" title="Permalink to this heading">¶</a></h3>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">trials_start_time</span></code> should provide the start time (float value, secs) of all trials.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trials_end_time</span></code> should provide the end time (float value, secs) of all trials.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id22">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code> in the trial-common Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id22" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;data_structure_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;trials_start_time&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;trials_end_time&quot;</span><span class="p">:</span>   <span class="mf">1.0</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="defaults">
+<h3>Defaults<a class="headerlink" href="#defaults" title="Permalink to this heading">¶</a></h3>
+<p>All trials start at 0.0 sec and end at 1.0 sec.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id23">
+<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code></span><a class="headerlink" href="#id23" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;data_structure_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;trials_start_time&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;trials_end_time&quot;</span><span class="p">:</span>   <span class="mf">1.0</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="initial-values-of-model-parameters">
+<span id="initial-value-params"></span><h2>Initial values of model parameters<a class="headerlink" href="#initial-values-of-model-parameters" title="Permalink to this heading">¶</a></h2>
+<p>Initial values for four types of model parameters need to be specified:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#variational-params0"><span class="std std-ref">Variational parameters</span></a>,</p></li>
+<li><p><a class="reference internal" href="#embedding-params0"><span class="std std-ref">Embedding parameters</span></a>,</p></li>
+<li><p><a class="reference internal" href="#kernels-params0"><span class="std std-ref">Kernel parameters</span></a>,</p></li>
+<li><p><a class="reference internal" href="#ind-points-locs-params0"><span class="std std-ref">Inducing points locations parameters</span></a>.</p></li>
+</ul>
+<p>For most parameters types initial values can be specified in a binary format or
+in a non-binary shorter or longer formats. In the binary format parameters are
+given as PyTorch tensors. The shorter format provides the same initial value
+for all latents and trials, whereas the longer format gives
+different initial values for each latent and trial. If both shorter and longer
+format are specified, the longer format take precedence.</p>
+<section id="variational-parameters">
+<span id="variational-params0"></span><h3>Variational parameters<a class="headerlink" href="#variational-parameters" title="Permalink to this heading">¶</a></h3>
+<p>The variational parameters are the means (<span class="math notranslate nohighlight">\(\mathbf{m}_k^{(r)}\)</span>,
+<span id="id2">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) and covariances (<span class="math notranslate nohighlight">\(S_k^{(r)}\)</span>,
+<span id="id3">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) of the inducing points
+(<span class="math notranslate nohighlight">\(\mathbf{u}_k^{(r)}\)</span>, <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3). The data
+structures for these parameters are described in the next section.</p>
+<section id="python-variable-format">
+<h4>Python variable format<a class="headerlink" href="#python-variable-format" title="Permalink to this heading">¶</a></h4>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_mean0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth
+element of this list should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of
+dimension (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_indPoints[k]</span></code>, 1), where
+<code class="docutils literal notranslate"><span class="pre">variational_mean0[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code> gives the initial variational mean for
+latent <code class="docutils literal notranslate"><span class="pre">k</span></code> and trial <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_cov0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element
+of this list should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of dimension
+(<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_indPoints[k]</span></code>, <code class="docutils literal notranslate"><span class="pre">n_indPoints[k]</span></code>), where
+<code class="docutils literal notranslate"><span class="pre">variational_cov0[k][r,</span> <span class="pre">:,</span> <span class="pre">:]</span></code> gives the initial variational covariance
+for latent <code class="docutils literal notranslate"><span class="pre">k</span></code> and trial <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id24">
+<div class="code-block-caption"><span class="caption-text">adding random <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id24" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">n_latents</span> <span class="o">=</span> <span class="mi">3</span>
+ <span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span>
+ <span class="n">var_mean0</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_ind_points</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">)]</span>
+ <span class="n">diag_value</span> <span class="o">=</span> <span class="mf">1e-2</span>
+ <span class="n">var_cov0</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">)]</span>
+ <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">):</span>
+     <span class="n">var_cov0</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_ind_points</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">n_ind_points</span><span class="p">[</span><span class="n">k</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+     <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+         <span class="n">var_cov0</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">n_ind_points</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span><span class="o">*</span><span class="n">diag_value</span>
+ <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;variational_mean0&quot;</span><span class="p">:</span> <span class="n">var_mean0</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0&quot;</span><span class="p">:</span>  <span class="n">var_cov0</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="latent-trial-specific-filename-format">
+<h4>Latent-trial-specific filename format<a class="headerlink" href="#latent-trial-specific-filename-format" title="Permalink to this heading">¶</a></h4>
+<p>For every latent, k, and every trial, r, two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_mean0_filename_latent&lt;k&gt;_trial&lt;r&gt;</span></code> should provide the filename
+(csv format readable by pandas <em>read_csv</em> function) containing the initial
+values of the variational mean for latent k and trial r. This file should
+contain a vector of size <em>number_of_inducing_points</em>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_cov0_filename_latent&lt;k&gt;_trial&lt;r&gt;</span></code> should provide the filename
+(csv format readable by pandas <em>read_csv</em> function) containing the initial
+values of the variational covariance for latent k and trial r. This file
+should contain a matrix of size <em>number_of_inducing_points</em> x
+<em>number_of_inducing_points</em>.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id25">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the latent-trial-specific filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (2 trials and 2 latents)</span><a class="headerlink" href="#id25" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;variational_mean0_filename_latent0_trial0&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/uniform_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0_filename_latent0_trial0&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-2_09x09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_mean0_filename_latent0_trial1&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/gaussian_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0_filename_latent0_trial1&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-4_09x09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_mean0_filename_latent1_trial0&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/uniform_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0_filename_latent1_trial0&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-2_09x09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_mean0_filename_latent1_trial1&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/gaussian_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0_filename_latent1_trial1&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-4_09x09.csv&quot;</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="latent-trial-common-filename-format">
+<h4>Latent-trial-common filename format<a class="headerlink" href="#latent-trial-common-filename-format" title="Permalink to this heading">¶</a></h4>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_means0_filename</span></code> should provide the filename (csv format readable
+by pandas <em>read_csv</em> function) containing the initial values of the
+variational mean for all latents and trials. This file should contain a
+vector of size <em>number_of_inducing_points</em>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_covs0_filename</span></code> should provide the filename (csv format readable
+by pandas <em>read_csv</em> function) containing the initial values of the
+variational covariance for all latents and trials. This file should contain a
+matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_points</em>.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id26">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the latent-trial-common filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id26" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;variational_means0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/uniform_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;variational_covs0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-2_09x09.csv&quot;</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="constant-value-format">
+<h4>Constant value format<a class="headerlink" href="#constant-value-format" title="Permalink to this heading">¶</a></h4>
+<p>This initialization option sets the same variational mean and covariance across all latents and trials. The common variational mean has all elements equal to a constant value, and the common variational covariance is a scaled identity matrix.</p>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_mean0_constant_value</span></code> should provide a float value giving the constant value of all elements of the common variational mean.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">variational_cov0_diag_value</span></code>  should provide a float value giving the diagonal value of the common variational covariance.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id27">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the constant value format</span><a class="headerlink" href="#id27" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;variational_mean0_constant_value&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0_diag_value&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id5">
+<h4>Defaults<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h4>
+<p>The default variational mean and covariance have constant values. For the variational mean the constant value is zero and for the variational covariance the constant diagonal value is 0.01.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id28">
+<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code></span><a class="headerlink" href="#id28" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;variational_mean0_constant_value&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;variational_cov0_diag_value&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="embedding-parameters">
+<span id="embedding-params0"></span><h3>Embedding parameters<a class="headerlink" href="#embedding-parameters" title="Permalink to this heading">¶</a></h3>
+<p>The embedding parameters are the loading matrix (<span class="math notranslate nohighlight">\(C\)</span>, <span id="id6">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1, middle) and offset vector (<span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, <span id="id7">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1 middle). The data structures for these parameters are described in the next section.</p>
+<section id="id8">
+<h4>Python variable format<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">c0</span></code> should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of size (n_neurons, n_latents)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d0</span></code> should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of size (n_neurons, 1)</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id29">
+<div class="code-block-caption"><span class="caption-text">adding standard random <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id29" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">n_neurons</span> <span class="o">=</span> <span class="mi">100</span>
+ <span class="n">n_latents</span> <span class="o">=</span> <span class="mi">3</span>
+
+ <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;c0&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_latents</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">),</span>
+     <span class="s2">&quot;d0&quot;</span><span class="p">:</span>  <span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">),</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="filename-format">
+<h4>Filename format<a class="headerlink" href="#filename-format" title="Permalink to this heading">¶</a></h4>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">c0_filename</span></code> gives the filename (csv format readable by pandas <em>read_csv</em> function) containing the values of loading matrix <code class="docutils literal notranslate"><span class="pre">C</span></code>,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d0_filename</span></code> gives the filename (csv format readable by pandas <em>read_csv</em> function) containing the values of offset vector <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id30">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id30" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;c0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/C_constant_1.00constant_100neurons_02latents.csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;d0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/d_constant_0.00constant_100neurons.csv&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="random-format">
+<h4>Random format<a class="headerlink" href="#random-format" title="Permalink to this heading">¶</a></h4>
+<p>Eight items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">c0_distribution</span></code> string value giving the name of the distribution of the loading matrix C (e.g., Normal).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c0_loc</span></code> float number giving the location of the distribution of the loading matrix C (e.g., 0.0).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c0_scale</span></code> float value giving the scale of the distribution of the loading matrix C (e.g., 1.0).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">c0_random_seed</span></code> optional integer value giving the value of the random seed to be set prior to generating the random transition matrix <code class="docutils literal notranslate"><span class="pre">C</span></code>. This value can be specified for replicability. If not given, the random seed is not changed prior to generating <code class="docutils literal notranslate"><span class="pre">C</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d0_distribution</span></code> string value giving the name of the distribution of the offset vector <code class="docutils literal notranslate"><span class="pre">d</span></code> (e.g., Normal).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d0_loc</span></code> float number giving the location of the distribution of the offset vector <code class="docutils literal notranslate"><span class="pre">d</span></code> (e.g., 0.3).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d0_scale</span></code> float value giving the scale of the distribution of the offset vector <code class="docutils literal notranslate"><span class="pre">d</span></code> (e.g., 1.0).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d0_random_seed</span></code> optional integer value giving the value of the random seed to be set prior to generating the random transition matrix <code class="docutils literal notranslate"><span class="pre">d</span></code>. This value can be specified for replicability. If not given, the random seed is not changed prior to generating <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id31">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the random format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id31" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;c0_distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;c0_loc&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;c0_scale&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;c0_random_seed&quot;</span><span class="p">:</span> <span class="mi">102030</span><span class="p">,</span>
+     <span class="s2">&quot;d0_distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;d0_loc&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;d0_scale&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;d0_random_seed&quot;</span><span class="p">:</span> <span class="mi">203040</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id9">
+<h4>Defaults<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
+<p>The default loading matrix C0/offset vector d0 is a zero mean standard normal random  matrix/vector.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id32">
+<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code></span><a class="headerlink" href="#id32" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;c0_distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;c0_loc&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;c0_scale&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;d0_distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;d0_loc&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+     <span class="s2">&quot;d0_scale&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="kernel-parameters">
+<span id="kernels-params0"></span><h3>Kernel parameters<a class="headerlink" href="#kernel-parameters" title="Permalink to this heading">¶</a></h3>
+<p>The kernel parameters of latent k are those of the Gaussian process covariance
+function (<span class="math notranslate nohighlight">\(\kappa_k(\cdot,\cdot)\)</span>, <span id="id10">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p. 2). The data
+structures for these parameters are described in the next section.</p>
+<section id="id11">
+<h4>Python variable format<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
+<p>Two items need to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">k_types</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element of this list should be a string with the type of kernel for the kth latent (e.g., <code class="docutils literal notranslate"><span class="pre">k_types[k]=exponentialQuadratic</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">k_params0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element of this list should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> containing the parameters of the kth kernel (e.g., <code class="docutils literal notranslate"><span class="pre">k_params0[k]=torch.DoubleTensor([3.2])</span></code>).</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id33">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in Python variable format (2 latents) to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id33" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">expQuadK1_lengthscale</span> <span class="o">=</span> <span class="mf">2.9</span>
+<span class="n">expQuadK2_lengthscale</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">periodK1_lengthscale</span> <span class="o">=</span> <span class="mf">3.1</span>
+<span class="n">periodK1_period</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;k_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span> <span class="s2">&quot;periodic&quot;</span><span class="p">],</span>
+     <span class="s2">&quot;k_params0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">DoubleTensor</span><span class="p">([</span><span class="n">expQuadK1_lengthscale</span><span class="p">]),</span>
+                   <span class="n">torch</span><span class="o">.</span><span class="n">DoubleTensor</span><span class="p">([</span><span class="n">expQuadK2_lengthscale</span><span class="p">]),</span>
+                   <span class="n">torch</span><span class="o">.</span><span class="n">DoubleTensor</span><span class="p">([</span><span class="n">periodK1_lengthscale</span><span class="p">,</span> <span class="n">periodK1_lengthscale</span><span class="p">]),</span>
+                  <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="latent-specific-textual-format">
+<h4>Latent-specific textual format<a class="headerlink" href="#latent-specific-textual-format" title="Permalink to this heading">¶</a></h4>
+<p>For each latent k, item <code class="docutils literal notranslate"><span class="pre">k_type_latent&lt;k&gt;</span></code> needs to be specified, giving the
+name of the kernel for latent k. Other items required depend on
+the value of item <code class="docutils literal notranslate"><span class="pre">k_type_latent&lt;k&gt;</span></code>. For example, for
+<code class="docutils literal notranslate"><span class="pre">k_type_latent&lt;k&gt;=exponentialQuadratic</span></code>, item
+<code class="docutils literal notranslate"><span class="pre">k_lengthscale0_latent&lt;k&gt;</span></code> should specify the lengthscale parameter, and for
+<code class="docutils literal notranslate"><span class="pre">k_type_latent&lt;k&gt;=periodic</span></code> items <code class="docutils literal notranslate"><span class="pre">k_lengthscale0_latent&lt;k&gt;</span></code> and
+<code class="docutils literal notranslate"><span class="pre">k_period0_latent&lt;k&gt;</span></code> should specify the lengthscale and period parameter of
+the periodic kernel, respectively.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id34">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in the latent-specific textual format (2 latents) to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id34" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;k_type_latent0&quot;</span><span class="p">:</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;k_lengthscale0_latent0&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+     <span class="s2">&quot;k_type_latent1&quot;</span><span class="p">:</span> <span class="s2">&quot;periodic&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;k_lengthscale0_latent1&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;k_period0_latent1&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+<section id="latent-common-textual-format">
+<h4>Latent-common textual format<a class="headerlink" href="#latent-common-textual-format" title="Permalink to this heading">¶</a></h4>
+<p>The shorter format requires
+item <code class="docutils literal notranslate"><span class="pre">k_types</span></code>, giving the name name of the kernel to be used for all latent variables.
+Other required items depend on the value of
+item <code class="docutils literal notranslate"><span class="pre">k_types</span></code>. For example, for <code class="docutils literal notranslate"><span class="pre">k_types=exponentialQuadratic</span></code>,
+item <code class="docutils literal notranslate"><span class="pre">k_lengthscales0</span></code> should specify the lengthscale parameter, and for
+<code class="docutils literal notranslate"><span class="pre">k_types=periodic</span></code> items <code class="docutils literal notranslate"><span class="pre">k_lengthscales0</span></code> and <code class="docutils literal notranslate"><span class="pre">k_periods0</span></code> should
+specify the lengthscale and period parameter of the periodic kernel,
+respectively.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id35">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in the latent-common textual format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id35" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;k_types&quot;</span><span class="p">:</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;k_lengthscales0&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+<section id="id12">
+<h4>Defaults<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h4>
+<p>For all latents, the default kernel is an exponential quadratic kernel with lengthscale 1.0.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id36">
+<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code></span><a class="headerlink" href="#id36" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span>  <span class="p">{</span>
+     <span class="s2">&quot;k_types&quot;</span><span class="p">:</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;k_lengthscales0&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="inducing-points-locations-parameters">
+<span id="ind-points-locs-params0"></span><h3>Inducing points locations parameters<a class="headerlink" href="#inducing-points-locations-parameters" title="Permalink to this heading">¶</a></h3>
+<p>The inducing points locations, or input locations, are the points
+(<span class="math notranslate nohighlight">\(\mathbf{z}_k^{(r)}\)</span>, <span id="id13">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) where the
+Gaussian process are evaluated to obtain the inducing points. The data
+structures for these parameters are described in the next section.</p>
+<section id="id14">
+<h4>Python variable format<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h4>
+<p>One item needs to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ind_points_locs0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element of
+this list should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>,
+<code class="docutils literal notranslate"><span class="pre">n_indPoints[k]</span></code>, 1), where <code class="docutils literal notranslate"><span class="pre">ind_points_locs0[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code> gives the
+initial inducing points locations for latent k and trial r.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id37">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in Python variable format with uniformly distributed inducing points locations to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id37" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_latents</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">n_trials</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">trials_start_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">trials_end_time</span> <span class="o">=</span> <span class="mf">7.0</span>
+<span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;ind_points_locs0&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">trials_start_time</span> <span class="o">+</span> <span class="p">(</span><span class="n">trials_end_time</span><span class="o">-</span><span class="n">trials_start_time</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_ind_points</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">)]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id15">
+<h4>Latent-trial-specific filename format<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h4>
+<p>For each latent k and trial r one item needs to be specified:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ind_points_locs0_latent&lt;k&gt;_trial&lt;r&gt;_filename</span></code> giving the name of the file
+(csv format readable by pandas <em>read_csv</em> function) containing the initial
+inducing points locations for latent k and trial r.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id38">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the latent-trial-specific filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (2 latents, 2 trials)</span><a class="headerlink" href="#id38" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ind_points_locs0_latent0_trial0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0_latent0_trial0.csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ind_points_locs0_latent0_trial1_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0_latent0_trial1.csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ind_points_locs0_latent1_trial0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0_latent1_trial0.csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ind_points_locs0_latent1_trial1_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0_latent1_trial1.csv&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</section>
+<section id="id16">
+<h4>Latent-trial-common filename format<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h4>
+<p>This shorter format requires the specification of the item
+<code class="docutils literal notranslate"><span class="pre">ind_points_locs0_filename</span></code> giving the name of the file (csv format readable by
+pandas <em>read_csv</em> function) containing the initial inducing points locations
+for all latents and trials.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id39">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the latent-trial-common filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id39" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;ind_points_locs0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0.csv&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+<section id="layout-format">
+<h4>Layout format<a class="headerlink" href="#layout-format" title="Permalink to this heading">¶</a></h4>
+<p>The layout format requires the specification of the number of inducing points
+in the item <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>. The layout of the initial inducing points
+locations is given by the item <code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span> <span class="pre">=</span> <span class="pre">equidistant</span></code> the initial locations of the inducing
+points are equidistant between the trial start and trial end. If
+<code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span> <span class="pre">=</span> <span class="pre">uniform</span></code> the initial inducing points are uniformly
+positioned between the start and end of the trial.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id40">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the layout format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id40" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;n_ind_points&quot;</span><span class="p">:</span> <span class="n">n_ind_points</span><span class="p">,</span>
+    <span class="s2">&quot;ind_points_locs0_layout&quot;</span><span class="p">:</span> <span class="s2">&quot;equidistant&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+<section id="id17">
+<h4>Defaults<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h4>
+<p>The default inducing points locations for trial r and latent k are equdistant n_ind_points[k] between the start and end of trial r.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id41">
+<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code></span><a class="headerlink" href="#id41" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+ <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;n_ind_points&quot;</span><span class="p">:</span> <span class="n">n_ind_points</span><span class="p">,</span>
+     <span class="s2">&quot;ind_points_locs0_layout&quot;</span><span class="p">:</span> <span class="s2">&quot;equidistant&quot;</span><span class="p">,</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+</section>
+<section id="optimisation-parameters">
+<span id="optim-params"></span><h2>Optimisation parameters<a class="headerlink" href="#optimisation-parameters" title="Permalink to this heading">¶</a></h2>
+<p>Parameters values that control the optimisation should be specified
+in section <code class="docutils literal notranslate"><span class="pre">[optim_params]</span></code>.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">optim_method</span></code> specifies the method used for for parameter optimisation.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">optim_method</span> <span class="pre">=</span> <span class="pre">ECM</span></code> then the Expectation Conditional Maximisation
+method is used (<span id="id18">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, section 5.2).  Here the
+M-step is broken into three conditional maximisation steps: maximisation of
+the lower bound wrt the embedding parameters (mstep-embedding), wrt the
+kernels parameters (mstep-kernels) and wrt the inducing points locations
+(mstep-indPointsLocs). Thus, one ECM iteration comprises one E-step (i.e.,
+maximisation of the lower bound wrt the embedding parameters) followed by
+the three previous M-step conditional maximisation’s.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">optim_method</span> <span class="pre">=</span> <span class="pre">mECM</span></code> then the Multicycle ECM is used
+(<span id="id19">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, section 5.3). Here
+one E-step maximisation is performed before each of the M-step conditional
+maximisation’s. Thus, one mECM iteration comprises estep, mstep-embedding,
+estep,  mstep-kernels, estep, mstep-indPointsLocs.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">em_max_iter</span></code> integer value specifying the maximum number of EM iterations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code> boolean value indicating whether the optimisation should be
+verbose or silent.</p></li>
+</ul>
+<p>For each <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span> <span class="pre">in</span> <span class="pre">{estep,mstep_embedding,mstep_kernels,mstep_indPointsLocs}</span></code>
+section <code class="docutils literal notranslate"><span class="pre">[optim_params]</span></code> should contain items:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_estimate</span></code> boolean value indicating whether <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span></code> should be
+estimated or not.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_max_iter</span></code> integer value indicating the maximum number of iterations
+used by <code class="docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code> for the optimisation of the <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span></code> within
+one EM iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_lr</span></code> float value indicating the learning rate used by
+<code class="docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code> for the optimisation of the <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span></code> within one EM
+iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_tolerance_grad</span></code> float value indicating the termination tolerance on
+first-order optimality used by <code class="docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code> for the optimisation of
+the <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span></code> within one EM iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_tolerance_change</span></code> float value indicating the termination tolerance
+on function value per parameter changes used by <code class="docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code> for the
+optimisation of the <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span></code> within one EM iteration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_line_search_fn</span></code> string value indicating the line search method used
+by <code class="docutils literal notranslate"><span class="pre">torch.optim.LBFGS</span></code>. If <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;_line_search_fn=strong_wolfe</span></code> line
+search is performed using the strong_wolfe method. If
+<cite>&lt;step&gt;_line_search_fn=None`</cite> line search is not used.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id42">
+<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">optimisation_params</span></code> to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id42" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;optim_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;n_quad&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+     <span class="s2">&quot;prior_cov_reg_param&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;optim_method&quot;</span><span class="p">:</span> <span class="s2">&quot;ECM&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;em_max_iter&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;estep_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;estep_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;estep_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;estep_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;estep_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;estep_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;mstep_embedding_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;mstep_kernels_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;mstep_indpointslocs_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+<section id="id20">
+<h3>Defaults<a class="headerlink" href="#id20" title="Permalink to this heading">¶</a></h3>
+<p>The default optimization paramateters are shown below.</p>
+<blockquote>
+<div><div class="literal-block-wrapper docutils container" id="id43">
+<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">optimisation_params</span></code></span><a class="headerlink" href="#id43" title="Permalink to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">n_quad</span> <span class="o">=</span> <span class="mi">200</span>
+ <span class="n">prior_cov_reg_param</span> <span class="o">=</span> <span class="mf">1e-3</span>
+ <span class="n">em_max_iter</span> <span class="o">=</span> <span class="mi">50</span>
+
+ <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;optim_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;n_quad&quot;</span><span class="p">:</span> <span class="n">n_quad</span><span class="p">,</span>
+     <span class="s2">&quot;prior_cov_reg_param&quot;</span><span class="p">:</span> <span class="n">prior_cov_reg_param</span><span class="p">,</span>
+     <span class="s2">&quot;optim_method&quot;</span><span class="p">:</span> <span class="s2">&quot;ecm&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;em_max_iter&quot;</span><span class="p">:</span> <span class="n">em_max_iter</span><span class="p">,</span>
+     <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;estep_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;estep_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;estep_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;estep_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;estep_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;estep_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;mstep_embedding_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_embedding_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;mstep_kernels_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_kernels_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span><span class="p">,</span>
+     <span class="c1">#</span>
+     <span class="s2">&quot;mstep_indpointslocs_estimate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_max_iter&quot;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_lr&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_tolerance_grad&quot;</span><span class="p">:</span> <span class="mf">1e-7</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_tolerance_change&quot;</span><span class="p">:</span> <span class="mf">1e-9</span><span class="p">,</span>
+     <span class="s2">&quot;mstep_indpointslocs_line_search_fn&quot;</span><span class="p">:</span> <span class="s2">&quot;strong_wolfe&quot;</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div></blockquote>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">svGPFA</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Scripts for estimation and visualization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataStructures.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objectOrientedDesign.html">Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementationNotes.html">Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="derivations.html">Derivations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Parameters and their specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-structure-parameters">Data structure parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#trial-specific-format">Trial-specific format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trial-common-format">Trial-common format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defaults">Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#initial-values-of-model-parameters">Initial values of model parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#variational-parameters">Variational parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#python-variable-format">Python variable format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#latent-trial-specific-filename-format">Latent-trial-specific filename format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#latent-trial-common-filename-format">Latent-trial-common filename format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#constant-value-format">Constant value format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id5">Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#embedding-parameters">Embedding parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id8">Python variable format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filename-format">Filename format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#random-format">Random format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id9">Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#kernel-parameters">Kernel parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id11">Python variable format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#latent-specific-textual-format">Latent-specific textual format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#latent-common-textual-format">Latent-common textual format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id12">Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#inducing-points-locations-parameters">Inducing points locations parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id14">Python variable format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id15">Latent-trial-specific filename format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id16">Latent-trial-common filename format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#layout-format">Layout format</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id17">Defaults</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optimisation-parameters">Optimisation parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id20">Defaults</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="derivations.html" title="previous chapter">Derivations</a></li>
+      <li>Next: <a href="references.html" title="next chapter">References</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Lea Duncker and Maneesh Sahani.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/params.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Data structures &#8212; svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Object-oriented design" href="objectOrientedDesign.html" />
+    <link rel="prev" title="Basal ganglia recordings from a mouse performing a bandit task" href="auto_examples/plot_basal_ganglia.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="data-structures">
+<h1>Data structures<a class="headerlink" href="#data-structures" title="Permalink to this heading">¶</a></h1>
+<ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">spikes_times</span></code>: data structure containing spikes times
+(<span class="math notranslate nohighlight">\(\mathbf{t}_n^{(r)}\)</span> in Eq. 6 of <span id="id1">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>Double list of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code> by <code class="docutils literal notranslate"><span class="pre">n_neurons</span></code> such that
+<code class="docutils literal notranslate"><span class="pre">spikes_times[r][n]</span></code> is a list-like collection of spikes times for trials
+<code class="docutils literal notranslate"><span class="pre">r</span></code> and  neuron <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ind_points_locs</span></code>: data structure containing inducing points locations
+(<span class="math notranslate nohighlight">\(\mathbf{z}_k^{(r)}\)</span> in Eq. 3 of <span id="id2">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>,
+<code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>, 1), such that <code class="docutils literal notranslate"><span class="pre">ind_points_locs[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code> gives the
+inducing points locations for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and latent <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">leg_quad_points</span></code> and <code class="docutils literal notranslate"><span class="pre">leg_quad_weights</span></code>: data structures containing the
+Legendre quadrature points and weights, respectively, used for the
+calculation of the integral in the first term of the expected posterior
+log-likelihood in Eq. 7 in <span id="id3">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>.</p>
+<p>Both <code class="docutils literal notranslate"><span class="pre">leg_quad_points</span></code> and <code class="docutils literal notranslate"><span class="pre">leg_quad_weights</span></code> are tensors of size
+(<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_quad_elem</span></code>, 1), such that <code class="docutils literal notranslate"><span class="pre">leg_quad_points[r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code>
+and <code class="docutils literal notranslate"><span class="pre">leg_quad_weights[r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code> give the quadrature points and weights,
+respectively, of trial <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">var_mean</span></code>: mean of the variational distribution
+<span class="math notranslate nohighlight">\(q(\mathbf{u}_k^{(r)})\)</span> (<span class="math notranslate nohighlight">\(\mathbf{m}_k^{(r)}\)</span> in the paragraph
+above Eq. 4 of <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>,
+<code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>, 1), such that <code class="docutils literal notranslate"><span class="pre">var_mean[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code> gives the
+variational mean for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and latent <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">var_chol</span></code>: vectorized cholesky factor of the covariance of the
+variational distribution <span class="math notranslate nohighlight">\(q(\mathbf{u}_k^{(r)})\)</span> (<span class="math notranslate nohighlight">\(S_k^{(r)}\)</span> in the paragraph above Eq. 4 of
+<span id="id5">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code> * (<code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code> + 1)/2, 1), such that <code class="docutils literal notranslate"><span class="pre">var_chol[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code> gives the vectorized cholesky factor of the variational covariance for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and latent <code class="docutils literal notranslate"><span class="pre">k</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">emb_post_mean_quad</span></code>: embedding posterior mean (<span class="math notranslate nohighlight">\(\nu_n^{(r)}(t)\)</span> in Eq. 5
+of <span id="id6">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>) evaluated at the Legendre quadrature
+points.</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensor of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, n_ind_points, 1), such that <code class="docutils literal notranslate"><span class="pre">emb_post_mean[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code>  gives the embedding posterior mean for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and latent <code class="docutils literal notranslate"><span class="pre">k</span></code>, evaluated at <code class="docutils literal notranslate"><span class="pre">leg_quad_points[r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">emb_post_var_quad</span></code>: embedding posterior variance (<span class="math notranslate nohighlight">\(\sigma_n^{(r)}(t, t)\)</span> in Eq. 5
+of <span id="id7">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>) evaluated at the Legendre quadrature
+points.</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, n_ind_points, 1), such that <code class="docutils literal notranslate"><span class="pre">emb_post_var[k][r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code>  gives the embedding posterior variance for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and latent <code class="docutils literal notranslate"><span class="pre">k</span></code>, evaluated at <code class="docutils literal notranslate"><span class="pre">leg_quad_points[r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Kzz</span></code>: kernel covariance function evaluated at inducing points locations (<span class="math notranslate nohighlight">\(K_{zz}^{(kr)}\)</span> in Eq. 5 of <span id="id8">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>, <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>), such that <code class="docutils literal notranslate"><span class="pre">Kzz[k][r,</span> <span class="pre">i,</span> <span class="pre">j]</span></code> is the kernel covariance function for latent <code class="docutils literal notranslate"><span class="pre">k</span></code> evaluated at the ith and kth components of the inducing point locations for latent <code class="docutils literal notranslate"><span class="pre">k</span></code> and trial <code class="docutils literal notranslate"><span class="pre">r</span></code> (<code class="docutils literal notranslate"><span class="pre">Kzz[k][r,</span> <span class="pre">i,</span> <span class="pre">j]</span></code> = <span class="math notranslate nohighlight">\(\kappa_k(\mathbf{z}_k^{(r)}[i], \mathbf{z}_k^{(r)}[j])\)</span>).</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Kzz_inv</span></code>: lower-triangular cholesky factors (<span class="math notranslate nohighlight">\(L^{(kr)}\)</span>) of kernel covariance matrices evaluated at inducing points locations (<span class="math notranslate nohighlight">\(K_{zz}^{(kr)}=L^{(kr)}\left(L^{(kr)}\right)^\intercal\)</span>).</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>, <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>), such that <code class="docutils literal notranslate"><span class="pre">Kzz_inv[k][r,</span> <span class="pre">:,</span> <span class="pre">:]</span></code> is the lower-triangular cholesky factor <span class="math notranslate nohighlight">\(L^{(kr)}\)</span>.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ktz</span></code>: kernel covariance function evaluated at the quadrature points and at the inducing points locations (<span class="math notranslate nohighlight">\(\kappa_k(t, \mathbf{z}_k^{(r)})\)</span> in Eq. 5 of <span id="id9">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p></li>
+</ol>
+<blockquote>
+<div><p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_quad_elem</span></code>, <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>), such that <code class="docutils literal notranslate"><span class="pre">Kzz[k][r,</span> <span class="pre">i,</span> <span class="pre">j]</span></code> is the kernel covariance function for latent <code class="docutils literal notranslate"><span class="pre">k</span></code> evaluated at the ith quadrature time for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> (<code class="docutils literal notranslate"><span class="pre">leg_quad_points[r,</span> <span class="pre">:,</span> <span class="pre">0]</span></code>) and at the jth inducing points location for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> and latent <code class="docutils literal notranslate"><span class="pre">k</span></code> (<code class="docutils literal notranslate"><span class="pre">Kzz[k][r,</span> <span class="pre">i,</span> <span class="pre">j]</span></code> = <span class="math notranslate nohighlight">\(\kappa_k(\text{leg_quad_points}[r, i, 0], \mathbf{z}_k^{(r)}[j]\)</span>).</p>
+</div></blockquote>
+<ol class="arabic" start="11">
+<li><p><code class="docutils literal notranslate"><span class="pre">Ktt</span></code>: kernel covariance function evaluated at quadrature points (<span class="math notranslate nohighlight">\(\kappa_k(t, t)\)</span> in Eq. 5 of <span id="id10">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>).</p>
+<p>Note: svGPFA does not need to evaluate <span class="math notranslate nohighlight">\(\kappa_k(t, t')\)</span> for <span class="math notranslate nohighlight">\(t\neq t'\)</span>. It only needs to evaluate <span class="math notranslate nohighlight">\(\kappa_k(t, t)\)</span> to calculate the variance of the posterior embedding <span class="math notranslate nohighlight">\(\sigma^2_n(t, t)\)</span>, which is used to compute <span class="math notranslate nohighlight">\(\mathbb{E}_{q(h_n^{(r)})}\left[g(h_n^{(r)}(t))\right]\)</span>.</p>
+<p>List of length <code class="docutils literal notranslate"><span class="pre">n_latents</span></code> of PyTorch tensors of size (<code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, <code class="docutils literal notranslate"><span class="pre">n_quad_elem</span></code>, <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>), such that <code class="docutils literal notranslate"><span class="pre">Ktt[k][r,</span> <span class="pre">i,</span> <span class="pre">k]</span></code> is the kernel variance function for latent <code class="docutils literal notranslate"><span class="pre">k</span></code> evaluated at the ith quadrature time for trial <code class="docutils literal notranslate"><span class="pre">r</span></code> (<code class="docutils literal notranslate"><span class="pre">leg_quad_points[r,</span> <span class="pre">i,</span> <span class="pre">0]</span></code>). That is <code class="docutils literal notranslate"><span class="pre">Ktt[k][r,</span> <span class="pre">i,</span> <span class="pre">k]</span></code> = <span class="math notranslate nohighlight">\(\kappa_k(\text{leg_quad_points[r, i, 0]},  \text{leg_quad_points[r, i, 0]})\)</span>.</p>
+</li>
+</ol>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">svGPFA</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Description:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Scripts for estimation and visualization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development notes:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objectOrientedDesign.html">Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementationNotes.html">Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="derivations.html">Derivations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="params.html">Parameters and their specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="auto_examples/plot_basal_ganglia.html" title="previous chapter">Basal ganglia recordings from a mouse performing a bandit task</a></li>
+      <li>Next: <a href="objectOrientedDesign.html" title="next chapter">Object-oriented design</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Lea Duncker and Maneesh Sahani.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/dataStructures.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

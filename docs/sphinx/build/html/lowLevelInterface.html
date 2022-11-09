@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Low-level interface &#8212; svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Scripts for estimation and visualization" href="auto_examples/index.html" />
+    <link rel="prev" title="High-level interface" href="highLevelInterface.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="low-level-interface">
+<h1>Low-level interface<a class="headerlink" href="#low-level-interface" title="Permalink to this heading">¶</a></h1>
+<p>The class <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory" title="svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVGPFAModelFactory</span></code></a> creates
+an svGPFA model and an instance of the class <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM" title="svGPFA.stats.svEM.SVEM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEM</span></code></a>
+optimises its parameters.  Please refer to the svGPFA <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/doc/design/Classes.pdf">class</a> and <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/doc/design/Interactions.pdf">interaction</a> diagrams.</p>
+<p>There is a one-to-one mapping between classes in the <a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats" title="svGPFA.stats"><code class="xref py py-mod docutils literal notranslate"><span class="pre">svGPFA.stats</span></code></a> package and equations in <span id="id1">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>.</p>
+<ul>
+<li><p>Class <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound" title="svGPFA.stats.svLowerBound.SVLowerBound"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVLowerBound</span></code></a> corresponds to the right-hand-side of <code class="docutils literal notranslate"><span class="pre">Eq.4</span></code>. This class uses the <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a> and <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.klDivergence.KLDivergence" title="svGPFA.stats.klDivergence.KLDivergence"><code class="xref py py-class docutils literal notranslate"><span class="pre">KLDivergence</span></code></a> classes, described next.</p></li>
+<li><p>The abstract class <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a> corresponds to the first term of the right-hand-side of <code class="docutils literal notranslate"><span class="pre">Eq.4</span></code>.</p>
+<ol class="arabic simple">
+<li><p>The abstract subclass <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL" title="svGPFA.stats.expectedLogLikelihood.PointProcessELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointProcessELL</span></code></a> implements the functionality of <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a> for point-process observations, and corresponds to <code class="docutils literal notranslate"><span class="pre">Eq.7</span></code>. If the link function (i.e., g in <code class="docutils literal notranslate"><span class="pre">Eq.7</span></code>) is the exponential function, then the one-dimensional integral in the first term of <code class="docutils literal notranslate"><span class="pre">Eq.7</span></code> can be solved analytically (concrete subclass <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink" title="svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointProcessELLExpLink</span></code></a>). For other link functions we can solve this integral using Gaussian quadrature (concrete subclass <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad" title="svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointProcessELLQuad</span></code></a>).</p></li>
+<li><p>Similarly, the subclasses <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL" title="svGPFA.stats.expectedLogLikelihood.PoissonELL"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoissonELL</span></code></a>, <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink" title="svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoissonELLExpLink</span></code></a> and <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELLQuad" title="svGPFA.stats.expectedLogLikelihood.PoissonELLQuad"><code class="xref py py-class docutils literal notranslate"><span class="pre">PoissonELLQuad</span></code></a> implement the functionality of <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a> for Poisson observations.</p></li>
+</ol>
+</li>
+<li><p>The concrete class <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.klDivergence.KLDivergence" title="svGPFA.stats.klDivergence.KLDivergence"><code class="xref py py-class docutils literal notranslate"><span class="pre">KLDivergence</span></code></a> corresponds to the second term of the right-hand-side of <code class="docutils literal notranslate"><span class="pre">Eq.4</span></code> and implements the KL divergence between the prior on inducing points, <span class="math notranslate nohighlight">\(p(\mathbf{u}_k^{(r)})\)</span>, and the posterior on inducing points, <span class="math notranslate nohighlight">\(q(\mathbf{u}_k^{(r)})\)</span>.</p></li>
+<li><p><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood" title="svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a> uses <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding" title="svGPFA.stats.svEmbedding.SVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEmbedding</span></code></a>, which calculates the mean and variance of the svGPFA embedding (<span class="math notranslate nohighlight">\(h_n^{(r)}\)</span> in <code class="docutils literal notranslate"><span class="pre">Eq.1</span></code>), given in <code class="docutils literal notranslate"><span class="pre">Eq.5</span></code>. <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding" title="svGPFA.stats.svEmbedding.SVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEmbedding</span></code></a> is an abstract class, which has <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbedding" title="svGPFA.stats.svEmbedding.LinearSVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbedding</span></code></a> as abstract sublcass. Two concrete subclasses of <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbedding" title="svGPFA.stats.svEmbedding.LinearSVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbedding</span></code></a> are provided, which optimise the calculation of the embedding for two different uses in <code class="docutils literal notranslate"><span class="pre">Eq.7</span></code>.</p>
+<ol class="arabic simple">
+<li><p>The first term in the right-hand-side of <code class="docutils literal notranslate"><span class="pre">Eq.7</span></code> requires the calculation of the embedding at sample times in a grid, which are the same for all neurons. This calculation is implemented in <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes" title="svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes</span></code></a>.</p></li>
+<li><p>The second term in the right-hand-side of <code class="docutils literal notranslate"><span class="pre">Eq.7</span></code> requires the calculation of the embedding at spike times, which are different for each neuron. This calculation is implemented in <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes" title="svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearSVEmbeddingAssocTimes</span></code></a>.</p></li>
+</ol>
+</li>
+<li><p><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding" title="svGPFA.stats.svEmbedding.SVEmbedding"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEmbedding</span></code></a> uses <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a>, which calculates the mean and variance of the latent variables, <span class="math notranslate nohighlight">\(x_k^{(r)}\)</span> in <code class="docutils literal notranslate"><span class="pre">Eq.1</span></code>. These means and variances are not described by their own equations in <a class="reference external" href="https://papers.nips.cc/paper/8245-temporal-alignment-and-latent-gaussian-process-factor-inference-in-population-spike-trains">Duncker and Sahani, 2018</a>, but are embedded in <code class="docutils literal notranslate"><span class="pre">Eq.5</span></code>. They are</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\nu_k^{(r)}(t) &amp;= \kappa_k(t,z_k)K_{zz}^{(k)^{-1}}m_k^{(r)}\\\sigma_k^{(r)}(t) &amp;= \kappa_k(t,t)+\mathbf{\kappa}_k(t,\mathbf{z}_k)\left(K_{zz}^{(k)^{-1}}S_k^{(r)}K_{zz}^{(k)^{-1}}-K_{zz}^{(k)^{  -1}}\right)\mathbf{\kappa}_k(\mathbf{z}_k,t)\end{aligned}\end{align} \]</div>
+</div></blockquote>
+<p><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a> is an abstract class. As above, two concrete subclasses are provided. <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes</span></code></a> computes the means and variances in a grid of time points and <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes</span></code></a> calculates these statistics at spike times.</p>
+</li>
+<li><p><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents" title="svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a> uses <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a>, which stores kernel matrices between inducing points, <span class="math notranslate nohighlight">\(K_{zz}\)</span>, between time points, <span class="math notranslate nohighlight">\(K_{tt}\)</span>, and between time points and inducing points, <span class="math notranslate nohighlight">\(K_{tz}\)</span>. <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a> is an abstract class with two subclasses. <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsKMS</span></code></a> is a concrete subclass of <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a> that stores kernel matrices between inducing points, and their Cholesky decompositions. <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS</span></code></a> is an abstract subclass of <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a> which stores covariance matrices between time points and between time points and inducing points. As above, <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsAndAllTimesKMS</span></code></a> and <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsAndAssocTimesKMS</span></code></a> are concrete subclasses of <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS" title="svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS"><code class="xref py py-class docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS</span></code></a> for times points in a grid and for spike times, respectively.</p></li>
+<li><p><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore" title="svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a> uses  <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel" title="svGPFA.stats.kernels.Kernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code></a>, which is an abstract class for constructing kernel matrices. Concrete subclasses construct kernel matrices for specific types of kernels (e.g., <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.ExponentialQuadraticKernel" title="svGPFA.stats.kernels.ExponentialQuadraticKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel</span></code></a> and <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.PeriodicKernel" title="svGPFA.stats.kernels.PeriodicKernel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PeriodicKernel</span></code></a>).</p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">svGPFA</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Description:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Low-level interface</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Scripts for estimation and visualization</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataStructures.html">Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objectOrientedDesign.html">Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementationNotes.html">Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="derivations.html">Derivations</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="params.html">Parameters and their specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="highLevelInterface.html" title="previous chapter">High-level interface</a></li>
+      <li>Next: <a href="auto_examples/index.html" title="next chapter">Scripts for estimation and visualization</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Lea Duncker and Maneesh Sahani.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/lowLevelInterface.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
