@@ -1,0 +1,14 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+Computation times
+=================
+**138:19.271** total execution time for **auto_examples** files:
+
++---------------------------------------------------------------------------------------------------------------------+------------+--------+
+| :ref:`sphx_glr_auto_examples_plot_basal_ganglia.py` (``plot_basal_ganglia.py``)                                     | 138:19.271 | 0.0 MB |
++---------------------------------------------------------------------------------------------------------------------+------------+--------+
+| :ref:`sphx_glr_auto_examples_plot_simulation_defaultInitialParams.py` (``plot_simulation_defaultInitialParams.py``) | 00:00.000  | 0.0 MB |
++---------------------------------------------------------------------------------------------------------------------+------------+--------+
