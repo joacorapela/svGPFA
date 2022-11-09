@@ -18,6 +18,8 @@ docs/*
 
 !/docs/sphinx/
 /docs/sphinx/*
+!/docs/sphinx/build/
+/docs/sphinx/build/*
 !/docs/sphinx/build/html
 
 !/docs/design/
