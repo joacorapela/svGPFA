@@ -67,7 +67,7 @@ documentation of the above utility functions for details on how to use them.</p>
 <p>There are two data structure parameters <code class="docutils literal notranslate"><span class="pre">trials_start_times</span></code> and
 <code class="docutils literal notranslate"><span class="pre">trials_end_times</span></code>, which are tensors of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code> giving the start
 and end times of each trial; i.e., <span class="math notranslate nohighlight">\(\tau_i\)</span> in Eq 7 in
-<span id="id1">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>.</p>
+<span id="id1">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>.</p>
 <p>These parameters can be specified in a trial-specific or trial-common format. If both are
 specified, the longer format takes precedence.</p>
 <section id="trial-specific-format">
@@ -144,9 +144,9 @@ format are specified, the longer format take precedence.</p>
 <section id="variational-parameters">
 <span id="variational-params0"></span><h3>Variational parameters<a class="headerlink" href="#variational-parameters" title="Permalink to this heading">¶</a></h3>
 <p>The variational parameters are the means (<span class="math notranslate nohighlight">\(\mathbf{m}_k^{(r)}\)</span>,
-<span id="id2">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) and covariances (<span class="math notranslate nohighlight">\(S_k^{(r)}\)</span>,
-<span id="id3">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) of the inducing points
-(<span class="math notranslate nohighlight">\(\mathbf{u}_k^{(r)}\)</span>, <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3). The data
+<span id="id2">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) and covariances (<span class="math notranslate nohighlight">\(S_k^{(r)}\)</span>,
+<span id="id3">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) of the inducing points
+(<span class="math notranslate nohighlight">\(\mathbf{u}_k^{(r)}\)</span>, <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3). The data
 structures for these parameters are described in the next section.</p>
 <section id="python-variable-format">
 <h4>Python variable format<a class="headerlink" href="#python-variable-format" title="Permalink to this heading">¶</a></h4>
@@ -283,7 +283,7 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </section>
 <section id="embedding-parameters">
 <span id="embedding-params0"></span><h3>Embedding parameters<a class="headerlink" href="#embedding-parameters" title="Permalink to this heading">¶</a></h3>
-<p>The embedding parameters are the loading matrix (<span class="math notranslate nohighlight">\(C\)</span>, <span id="id6">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1, middle) and offset vector (<span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, <span id="id7">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1 middle). The data structures for these parameters are described in the next section.</p>
+<p>The embedding parameters are the loading matrix (<span class="math notranslate nohighlight">\(C\)</span>, <span id="id6">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1, middle) and offset vector (<span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, <span id="id7">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1 middle). The data structures for these parameters are described in the next section.</p>
 <section id="id8">
 <h4>Python variable format<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
 <p>Two items need to be specified:</p>
@@ -382,7 +382,7 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 <section id="kernel-parameters">
 <span id="kernels-params0"></span><h3>Kernel parameters<a class="headerlink" href="#kernel-parameters" title="Permalink to this heading">¶</a></h3>
 <p>The kernel parameters of latent k are those of the Gaussian process covariance
-function (<span class="math notranslate nohighlight">\(\kappa_k(\cdot,\cdot)\)</span>, <span id="id10">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p. 2). The data
+function (<span class="math notranslate nohighlight">\(\kappa_k(\cdot,\cdot)\)</span>, <span id="id10">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p. 2). The data
 structures for these parameters are described in the next section.</p>
 <section id="id11">
 <h4>Python variable format<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
@@ -477,7 +477,7 @@ respectively.</p>
 <section id="inducing-points-locations-parameters">
 <span id="ind-points-locs-params0"></span><h3>Inducing points locations parameters<a class="headerlink" href="#inducing-points-locations-parameters" title="Permalink to this heading">¶</a></h3>
 <p>The inducing points locations, or input locations, are the points
-(<span class="math notranslate nohighlight">\(\mathbf{z}_k^{(r)}\)</span>, <span id="id13">Duncker and Sahani [<a class="reference internal" href="references.html#id7" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) where the
+(<span class="math notranslate nohighlight">\(\mathbf{z}_k^{(r)}\)</span>, <span id="id13">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) where the
 Gaussian process are evaluated to obtain the inducing points. The data
 structures for these parameters are described in the next section.</p>
 <section id="id14">
@@ -593,7 +593,7 @@ in section <code class="docutils literal notranslate"><span class="pre">[optim_p
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">optim_method</span></code> specifies the method used for for parameter optimisation.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">optim_method</span> <span class="pre">=</span> <span class="pre">ECM</span></code> then the Expectation Conditional Maximisation
-method is used (<span id="id18">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, section 5.2).  Here the
+method is used (<span id="id18">McLachlan and Krishnan [<a class="reference internal" href="references.html#id65" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, section 5.2).  Here the
 M-step is broken into three conditional maximisation steps: maximisation of
 the lower bound wrt the embedding parameters (mstep-embedding), wrt the
 kernels parameters (mstep-kernels) and wrt the inducing points locations
@@ -601,7 +601,7 @@ kernels parameters (mstep-kernels) and wrt the inducing points locations
 maximisation of the lower bound wrt the embedding parameters) followed by
 the three previous M-step conditional maximisation’s.</p>
 <p>If <code class="docutils literal notranslate"><span class="pre">optim_method</span> <span class="pre">=</span> <span class="pre">mECM</span></code> then the Multicycle ECM is used
-(<span id="id19">McLachlan and Krishnan [<a class="reference internal" href="references.html#id67" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, section 5.3). Here
+(<span id="id19">McLachlan and Krishnan [<a class="reference internal" href="references.html#id65" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, section 5.3). Here
 one E-step maximisation is performed before each of the M-step conditional
 maximisation’s. Thus, one mECM iteration comprises estep, mstep-embedding,
 estep,  mstep-kernels, estep, mstep-indPointsLocs.</p>
