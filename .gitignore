@@ -18,8 +18,7 @@ docs/*
 
 !/docs/sphinx/
 /docs/sphinx/*
-!/docs/sphinx/source
-/docs/sphinx/source/auto_examples
+!/docs/sphinx/build/html
 
 !/docs/design/
 /docs/design/*
