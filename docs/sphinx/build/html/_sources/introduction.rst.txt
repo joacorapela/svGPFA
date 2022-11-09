@@ -20,5 +20,3 @@ experimental condition and across all trials. Variability in the timing of a
 neural computation is modelled using a nested Gaussian process.
 
 For examples of running svGPFA, and plotting its estimates, please refer to this `Google Colab notebook <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`_, this `Jupyter notebook <https://github.com/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot.ipynb>`_, or this `Python script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`_.
-
-.. literalinclude:: examples/parameters_dict.json
