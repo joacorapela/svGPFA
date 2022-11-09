@@ -78,10 +78,6 @@ class SVEM_PyTorch(SVEM):
                  savePartial=False,
                  savePartialFilenamePattern="results/00000000_{:s}_estimatedModel.pickle",
                 ):
-        # begin debug
-        # self._model = model
-        # end debug
-
         if latentsStreamFN is not None and latentsTimes is None:
             raise RuntimeError("Please specify latentsTime if you want to save latents")
 
@@ -108,29 +104,36 @@ class SVEM_PyTorch(SVEM):
             with open(latentsStreamFN, 'wb') as f:
                 np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
             lowerBoundLock.unlock()
-        iter += 1
         logStream = io.StringIO()
-        if method.lower()=="ecm":
-            steps = ["estep", "mstep_embedding", "mstep_kernels", "mstep_indpointslocs"]
-            functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "mstep_kernels": self._mStepKernels, "mstep_indpointslocs": self._mStepIndPointsLocs}
-        elif method.lower()=="mecm":
+        if method.lower() == "ecm":
+            steps = ["estep", "mstep_embedding", "mstep_kernels",
+                     "mstep_indpointslocs"]
+        elif method.lower() == "mecm":
             # see McLachlan, G. J., & Krishnan, T. (2007). The EM algorithm and
             # extensions (Vol. 382). John Wiley & Sons) Chapter 5
-            steps = ["estep", "mstep_embedding", "estep", "mstep_kernels", "estep", "mstep_indpointslocs"]
-            functions_for_steps = {"estep": self._eStep, "mstep_embedding": self._mStepEmbedding, "estep": self._eStep, "mstep_kernels": self._mStepKernels, "estep": self._eStep, "mstep_indpointslocs": self._mStepIndPointsLocs}
+            steps = ["estep", "mstep_embedding", "estep", "mstep_kernels",
+                     "estep", "mstep_indpointslocs"]
         else:
             raise ValueError("Invalid method={:s}. Supported values are ECM and mECM".format(method))
+        functions_for_steps = {"estep": self._eStep,
+                               "mstep_embedding": self._mStepEmbedding,
+                               "mstep_kernels": self._mStepKernels,
+                               "mstep_indpointslocs": self._mStepIndPointsLocs}
         if getIterationModelParamsFn is not None:
-            initialModelsParams = getIterationModelParamsFn(model=model)
-            iterationsModelParams = torch.empty((optim_params["em_max_iter"]+1, len(initialModelsParams)), dtype=torch.double)
-            iterationsModelParams[0,:] = initialModelsParams
+            iterationModelParams = getIterationModelParamsFn(model=model)
+            iterationsModelParams = torch.empty((optim_params["em_max_iter"]+1,
+                                                 len(iterationModelParams)),
+                                                dtype=torch.double)
+            iterationsModelParams[iter, :] = iterationModelParams
         else:
             iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
-        while iter<=optim_params["em_max_iter"]:
+        iter += 1
+        while iter <= optim_params["em_max_iter"]:
             for step in steps:
                 if optim_params["{:s}_estimate".format(step)]:
-                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(iter, step, maxRes["lowerBound"])
+                    message = "Iteration {:02d}, {:s} start: {:f}\n".format(
+                        iter, step, maxRes["lowerBound"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -140,25 +143,13 @@ class SVEM_PyTorch(SVEM):
                         logStreamFN=logStreamFN
                     )
 #                     try:
-                    maxRes = functions_for_steps[step](model=model, optim_params=optim_params["{:s}_optim_params".format(step)])
-                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(iter, step, maxRes["lowerBound"], maxRes["niter"], maxRes["nfeval"])
-#                     except Exception as e:
-#                         ex_type, ex_value, ex_traceback = sys.exc_info()
-#                         # Extract unformatter stack traces as tuples
-#                         trace_back = traceback.extract_tb(ex_traceback)
-# 
-#                         # Format stacktrace
-#                         stack_trace = list()
-# 
-#                         for trace in trace_back:
-#                             stack_trace.append("File : %s , Line : %d, Func.Name : %s, Message : %s" % (trace[0], trace[1], trace[2], trace[3]))
-# 
-#                         print("Exception type : %s " % ex_type.__name__)
-#                         print("Exception message : %s" %ex_value)
-#                         print("Stack trace : %s" %stack_trace)
-# 
-#                         terminationInfo = ErrorTerminationInfo("Error", sys.exc_info()[:2])
-#                         return lowerBoundHist, elapsedTimeHist, terminationInfo
+                    maxRes = functions_for_steps[step](
+                        model=model,
+                        optim_params=optim_params["{:s}_optim_params".format(
+                            step)])
+                    message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(
+                        iter, step, maxRes["lowerBound"], maxRes["niter"],
+                        maxRes["nfeval"])
                     if verbose:
                         out.write(message)
                     self._writeToLockedLog(
@@ -168,31 +159,45 @@ class SVEM_PyTorch(SVEM):
                         logStreamFN=logStreamFN
                     )
                     if savePartial:
-                        savePartialFilename = savePartialFilenamePattern.format("{:s}{:03d}".format(step, iter))
+                        savePartialFilename = \
+                            savePartialFilenamePattern.format(
+                                "{:s}{:03d}".format(step, iter))
                         resultsToSave = {"model": model}
-                        with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
+                        with open(savePartialFilename, "wb") as f:
+                            pickle.dump(resultsToSave, f)
                     if getIterationModelParamsFn is not None:
-                        iterationsModelParams[iter+1,:] = getIterationModelParamsFn(model=model)
+                        iterationsModelParams[iter, :] = \
+                            getIterationModelParamsFn(model=model)
             elapsedTimeHist.append(time.time()-startTime)
             lowerBoundHist.append(maxRes["lowerBound"].item())
 
-            if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
+            if lowerBoundLock is not None and \
+               lowerBoundStreamFN is not None and \
+               not lowerBoundLock.is_locked():
                 lowerBoundLock.lock()
                 with open(lowerBoundStreamFN, 'wb') as f:
                     np.save(f, np.array(lowerBoundHist))
                 lowerBoundLock.unlock()
 
-            if latentsLock is not None and latentsStreamFN is not None and not latentsLock.is_locked():
+            if latentsLock is not None and \
+               latentsStreamFN is not None and \
+               not latentsLock.is_locked():
                 latentsLock.lock()
                 muK, varK = model.predictLatents(newTimes=latentsTimes)
 
                 with open(latentsStreamFN, 'wb') as f:
-                    np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
+                    np.savez(f, iteration=iter,
+                             times=latentsTimes.detach().numpy(),
+                             muK=muK.detach().numpy(),
+                             varK=varK.detach().numpy())
                 lowerBoundLock.unlock()
 
             iter += 1
-        terminationInfo = TerminationInfo("Maximum number of iterations ({:d}) reached".format(optim_params["em_max_iter"]))
-        return lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams
+        terminationInfo = TerminationInfo(
+            "Maximum number of iterations ({:d}) reached".format(
+                optim_params["em_max_iter"]))
+        return lowerBoundHist, elapsedTimeHist, terminationInfo, \
+            iterationsModelParams
 
     def _eStep(self, model, optim_params):
         x = model.getSVPosteriorOnIndPointsParams()

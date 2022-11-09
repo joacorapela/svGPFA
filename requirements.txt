@@ -1,8 +1,10 @@
 notebook
 numpy
 pandas
+matplotlib
 plotly
 scipy
 scikit-learn
 torch
 gcnu_common
+sphinx-gallery

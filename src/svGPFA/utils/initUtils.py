@@ -92,7 +92,6 @@ def getOptimParams(dynamic_params_spec, config_file_params_spec,
 
 def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
                          n_ind_points=None, common_n_ind_points=10, n_quad=200,
-                         trials_start_time=0.0, trials_end_time=1.0,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
                          lengthscale=1.0, em_max_iter=50):
     if n_ind_points is None:
@@ -109,8 +108,6 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
                     diag_var_cov0_value
 
     params_dict = {
-        "data_structure_params": {"trials_start_time": trials_start_time,
-                                  "trials_end_time": trials_end_time},
         "variational_params0": {
             "variational_mean0": var_mean0,
             "variational_cov0": var_cov0,
@@ -234,10 +231,14 @@ def getArgsInfo():
                      "c0_distribution": str,
                      "c0_loc": float,
                      "c0_scale": float,
+                     "c0_low": float,
+                     "c0_high": float,
                      "c0_random_seed": int,
                      "d0_distribution": str,
                      "d0_loc": float,
                      "d0_scale": float,
+                     "d0_low": float,
+                     "d0_high": float,
                      "d0_random_seed": int,
                  },
                  "kernels_params0": {
@@ -253,6 +254,8 @@ def getArgsInfo():
                  },
                  "ind_points_locs_params0": {
                      "n_ind_points": strTo1DIntTensor,
+                     "common_n_ind_points": int,
+                     "ind_points_locs0": strTo1DDoubleTensor,
                      "ind_points_locs0_layout": str,
                      "ind_points_locs0_filename": str,
                      "ind_points_locs0_filename_latent{:d}_trial{:d}": str,
@@ -360,6 +363,7 @@ def getParamsDictFromStringsDict(n_latents, n_trials, strings_dict, args_info):
 
 
 def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
+                             trials_start_times, trials_end_times,
                              default_params_spec=None,
                              config_file_params_spec=None,
                              dynamic_params_spec=None):
@@ -400,15 +404,17 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
                             dynamic_params_spec=dynamic_params_spec,
                             config_file_params_spec=config_file_params_spec,
                             default_params_spec=default_params_spec)
+    if n_ind_points is None:
+        common_n_ind_points = getParam(
+            section_name="ind_points_locs_params0",
+            param_name="common_n_ind_points",
+            dynamic_params_spec=dynamic_params_spec,
+            config_file_params_spec=config_file_params_spec,
+            default_params_spec=default_params_spec)
+        n_ind_points = [common_n_ind_points] * n_latents
 
     C0, d0 = getLinearEmbeddingParams0(
         n_neurons=n_neurons, n_latents=n_latents,
-        dynamic_params_spec=dynamic_params_spec,
-        config_file_params_spec=config_file_params_spec,
-        default_params_spec=default_params_spec)
-
-    trials_start_times, trials_end_times = getTrialsStartEndTimes(
-        n_trials=n_trials,
         dynamic_params_spec=dynamic_params_spec,
         config_file_params_spec=config_file_params_spec,
         default_params_spec=default_params_spec)
@@ -554,7 +560,7 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
         if param is not None:
             return param
 
-    raise ValueError("embedding_params0 not found")
+    raise ValueError("embedding_params_spec_params0 not found")
 
 
 def getLinearEmbeddingParam0InDict(param_label, params_dict,
@@ -633,79 +639,6 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
         param = None
 
     return param
-
-
-def getTrialsStartEndTimes(n_trials, dynamic_params_spec=None,
-                           config_file_params_spec=None,
-                           default_params_spec=None):
-    trials_start_times = getTrialsTimes(
-        param_float_label="trials_start_time",
-        param_list_label="trials_start_times",
-        n_trials=n_trials,
-        dynamic_params_spec=dynamic_params_spec,
-        config_file_params_spec=config_file_params_spec,
-        default_params_spec=default_params_spec)
-    trials_end_times = getTrialsTimes(
-        param_float_label="trials_end_time",
-        param_list_label="trials_end_times",
-        n_trials=n_trials,
-        dynamic_params_spec=dynamic_params_spec,
-        config_file_params_spec=config_file_params_spec,
-        default_params_spec=default_params_spec)
-    return trials_start_times, trials_end_times
-
-
-def getTrialsTimes(param_list_label, param_float_label, n_trials,
-                   dynamic_params_spec=None, config_file_params_spec=None,
-                   default_params_spec=None,
-                   trials_section_name="data_structure_params"):
-    if dynamic_params_spec is not None:
-        param = getTrialsTimesInDict(n_trials=n_trials,
-                                     param_list_label=param_list_label,
-                                     param_float_label=param_float_label,
-                                     params_dict=dynamic_params_spec,
-                                     params_dict_type="dynamic")
-        if param is not None:
-            return param
-
-    if config_file_params_spec is not None:
-        param = getTrialsTimesInDict(n_trials=n_trials,
-                                     param_list_label=param_list_label,
-                                     param_float_label=param_float_label,
-                                     params_dict=config_file_params_spec,
-                                     params_dict_type="config_file")
-        if param is not None:
-            return param
-
-    if default_params_spec is not None:
-        param = getTrialsTimesInDict(n_trials=n_trials,
-                                     param_list_label=param_list_label,
-                                     param_float_label=param_float_label,
-                                     params_dict=default_params_spec,
-                                     params_dict_type="default")
-        if param is not None:
-            return param
-
-    raise ValueError("trials_times not found")
-
-
-def getTrialsTimesInDict(n_trials, param_list_label, param_float_label,
-                         params_dict, params_dict_type,
-                         section_name="data_structure_params"):
-    if section_name in params_dict and \
-       param_list_label in params_dict[section_name]:
-        trials_times = params_dict[section_name][param_list_label]
-        print(f"Extracted from {params_dict_type} {param_list_label}")
-    elif section_name in params_dict and \
-            param_float_label in params_dict[section_name]:
-        trials_times_list = [
-            float(params_dict[section_name][param_float_label])
-            for r in range(n_trials)]
-        trials_times = torch.DoubleTensor(trials_times_list)
-        print(f"Extracted from {params_dict_type} {param_list_label}")
-    else:
-        trials_times = None
-    return trials_times
 
 
 def getKernelsParams0AndTypes(n_latents, dynamic_params_spec=None,
@@ -983,11 +916,9 @@ def buildEquidistantIndPointsLocs0(n_latents, n_trials, n_ind_points,
         Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1),
                              dtype=torch.double)
         for r in range(n_trials):
-            Z0 = trials_start_times[r] + \
-                 torch.rand(n_ind_points[k]) * \
-                 (trials_end_times[r]-trials_start_times[r])
-            Z0_sorted, _ = Z0.sort()
-            Z0s[k][r, :, 0] = Z0_sorted
+            Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
+                                n_ind_points[k])
+            Z0s[k][r, :, 0] = Z0
     return Z0s
 
 
@@ -998,9 +929,11 @@ def buildUniformIndPointsLocs0(n_latents, n_trials, n_ind_points,
         Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1),
                              dtype=torch.double)
         for r in range(n_trials):
-            Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
-                                n_ind_points[k])
-            Z0s[k][r, :, 0] = Z0
+            Z0 = trials_start_times[r] + \
+                 torch.rand(n_ind_points[k]) * \
+                 (trials_end_times[r]-trials_start_times[r])
+            Z0_sorted, _ = Z0.sort()
+            Z0s[k][r, :, 0] = Z0_sorted
     return Z0s
 
 

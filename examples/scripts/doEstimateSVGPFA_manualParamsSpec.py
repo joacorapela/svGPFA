@@ -1,3 +1,8 @@
+"""
+Example svGPFA script for parameter estimation -- custom parameters
+===================================================================
+
+"""
 import sys
 import os
 import random

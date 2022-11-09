@@ -1,3 +1,3 @@
-svGPFA code examples
-====================
+Scripts for estimation and visualization
+========================================
 

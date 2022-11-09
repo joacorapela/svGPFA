@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import scipy
 import sklearn.metrics
+import numpy as np
 import torch
 # import matplotlib.pyplot as plt
 import warnings
@@ -11,6 +12,27 @@ import warnings
 import svGPFA.stats.kernels
 import gcnu_common.numerical_methods.utils
 import gcnu_common.stats.gaussianProcesses.eval
+
+
+def separateNeuronsSpikeTimesByTrials(neurons_spike_times, epochs_times,
+                                      trials_start_times_rel,
+                                      trials_end_times_rel):
+    n_trials = len(epochs_times)
+    n_neurons = len(neurons_spike_times)
+    trials_spikes_times = [[] for r in range(n_trials)]
+    for r in range(n_trials):
+        trial_epoch_time = epochs_times[r]
+        trial_start_time_rel = trials_start_times_rel[r]
+        trial_end_time_rel = trials_end_times_rel[r]
+        trial_spikes_times = [[] for n in range(n_neurons)]
+        for n in range(n_neurons):
+            neuron_spikes_times_rel = neurons_spike_times[n]-trial_epoch_time
+            trial_neuron_spikes_times = neuron_spikes_times_rel[
+                np.logical_and(trial_start_time_rel <= neuron_spikes_times_rel,
+                               neuron_spikes_times_rel < trial_end_time_rel)]
+            trial_spikes_times[n] = trial_neuron_spikes_times
+        trials_spikes_times[r] = trial_spikes_times
+    return trials_spikes_times
 
 
 def buildKernels(kernels_types, kernels_params):

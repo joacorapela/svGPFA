@@ -275,105 +275,105 @@ def test_getLinearEmbeddingParams0_2(n_neurons=20, n_latents=7, n_trials=10,
     assert torch.all(true_d0 == d0)
 
 
-def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
-                                  n_ind_points=(10, 10, 10, 10, 10),
-                                  diag_var_cov0_value=1e-2,
-                                  trials_start_time=3.0, trials_end_time=12.0):
-    dynamic_params_spec = {"data_structure_params":
-                      {"trials_start_time": trials_start_time,
-                       "trials_end_time": trials_end_time}}
-    estInitConfigFilename = "data/99999999_estimation_metaData.ini"
-    config = configparser.ConfigParser()
-    config.read(estInitConfigFilename)
-    strings_dict = gcnu_common.utils.config_dict.GetDict(
-        config=config).get_dict()
-    args_info = svGPFA.utils.initUtils.getArgsInfo()
-    config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
-        n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
-        args_info=args_info)
-    default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
-        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
-    true_trials_start_times = torch.Tensor(
-        [dynamic_params_spec["data_structure_params"]["trials_start_time"] 
-         for r in range(n_trials)])
-    true_trials_end_times = torch.Tensor(
-        [dynamic_params_spec["data_structure_params"]["trials_end_time"] 
-         for r in range(n_trials)])
-    trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials,
-        dynamic_params_spec=dynamic_params_spec,
-        config_file_params_spec=config_file_params_spec,
-        default_params_spec=default_params_spec)
-    assert torch.all(true_trials_start_times == trials_start_times)
-    assert torch.all(true_trials_end_times == trials_end_times)
-
-
-def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5,
-                                  n_ind_points=(10, 10, 10, 10, 10),
-                                  diag_var_cov0_value=1e-2):
-    dynamic_params_spec = {"model_structure_params":
-                      {"n_latents": str(n_latents)}}
-    estInitConfigFilename = "data/99999999_estimation_metaData.ini"
-    config = configparser.ConfigParser()
-    config.read(estInitConfigFilename)
-    strings_dict = gcnu_common.utils.config_dict.GetDict(
-        config=config).get_dict()
-    args_info = svGPFA.utils.initUtils.getArgsInfo()
-    config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
-        n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
-        args_info=args_info)
-    default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
-        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
-    true_trials_start_times = torch.Tensor(
-        [float(config_file_params_spec["data_structure_params"]["trials_start_time"])
-         for r in range(n_trials)])
-    true_trials_end_times = torch.Tensor(
-        [float(config_file_params_spec["data_structure_params"]["trials_end_time"])
-         for r in range(n_trials)])
-    trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials,
-        dynamic_params_spec=dynamic_params_spec,
-        config_file_params_spec=config_file_params_spec,
-        default_params_spec=default_params_spec)
-    assert torch.all(true_trials_start_times == trials_start_times)
-    assert torch.all(true_trials_end_times == trials_end_times)
-
-
-def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5,
-                                  n_ind_points=(10, 10, 10, 10, 10),
-                                  diag_var_cov0_value=1e-2):
-    dynamic_params_spec = {"model_structure_params":
-                      {"n_latents": str(n_latents)}}
-    estInitConfigFilename = "data/99999999_estimation_metaData.ini"
-    config = configparser.ConfigParser()
-    config.read(estInitConfigFilename)
-    strings_dict = gcnu_common.utils.config_dict.GetDict(
-        config=config).get_dict()
-    args_info = svGPFA.utils.initUtils.getArgsInfo()
-    config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
-        n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
-        args_info=args_info)
-    del config_file_params_spec["data_structure_params"]
-    default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
-        n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
-        n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
-    true_trials_start_times = torch.Tensor(
-        [float(default_params_spec["data_structure_params"]["trials_start_time"])
-         for r in range(n_trials)])
-    true_trials_end_times = torch.Tensor(
-        [float(default_params_spec["data_structure_params"]["trials_end_time"])
-         for r in range(n_trials)])
-    trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
-        n_trials=n_trials,
-        dynamic_params_spec=dynamic_params_spec,
-        config_file_params_spec=config_file_params_spec,
-        default_params_spec=default_params_spec)
-    assert torch.all(true_trials_start_times == trials_start_times)
-    assert torch.all(true_trials_end_times == trials_end_times)
-
-
+# def test_getTrialsStartEndTimes_0(n_trials=15, n_neurons=100, n_latents=5,
+#                                   n_ind_points=(10, 10, 10, 10, 10),
+#                                   diag_var_cov0_value=1e-2,
+#                                   trials_start_time=3.0, trials_end_time=12.0):
+#     dynamic_params_spec = {"data_structure_params":
+#                       {"trials_start_time": trials_start_time,
+#                        "trials_end_time": trials_end_time}}
+#     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
+#     config = configparser.ConfigParser()
+#     config.read(estInitConfigFilename)
+#     strings_dict = gcnu_common.utils.config_dict.GetDict(
+#         config=config).get_dict()
+#     args_info = svGPFA.utils.initUtils.getArgsInfo()
+#     config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+#         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
+#         args_info=args_info)
+#     default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
+#         n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+#         n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
+#     true_trials_start_times = torch.Tensor(
+#         [dynamic_params_spec["data_structure_params"]["trials_start_time"] 
+#          for r in range(n_trials)])
+#     true_trials_end_times = torch.Tensor(
+#         [dynamic_params_spec["data_structure_params"]["trials_end_time"] 
+#          for r in range(n_trials)])
+#     trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
+#         n_trials=n_trials,
+#         dynamic_params_spec=dynamic_params_spec,
+#         config_file_params_spec=config_file_params_spec,
+#         default_params_spec=default_params_spec)
+#     assert torch.all(true_trials_start_times == trials_start_times)
+#     assert torch.all(true_trials_end_times == trials_end_times)
+# 
+# 
+# def test_getTrialsStartEndTimes_1( n_trials=15, n_neurons=100, n_latents=5,
+#                                   n_ind_points=(10, 10, 10, 10, 10),
+#                                   diag_var_cov0_value=1e-2):
+#     dynamic_params_spec = {"model_structure_params":
+#                       {"n_latents": str(n_latents)}}
+#     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
+#     config = configparser.ConfigParser()
+#     config.read(estInitConfigFilename)
+#     strings_dict = gcnu_common.utils.config_dict.GetDict(
+#         config=config).get_dict()
+#     args_info = svGPFA.utils.initUtils.getArgsInfo()
+#     config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+#         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
+#         args_info=args_info)
+#     default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
+#         n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+#         n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
+#     true_trials_start_times = torch.Tensor(
+#         [float(config_file_params_spec["data_structure_params"]["trials_start_time"])
+#          for r in range(n_trials)])
+#     true_trials_end_times = torch.Tensor(
+#         [float(config_file_params_spec["data_structure_params"]["trials_end_time"])
+#          for r in range(n_trials)])
+#     trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
+#         n_trials=n_trials,
+#         dynamic_params_spec=dynamic_params_spec,
+#         config_file_params_spec=config_file_params_spec,
+#         default_params_spec=default_params_spec)
+#     assert torch.all(true_trials_start_times == trials_start_times)
+#     assert torch.all(true_trials_end_times == trials_end_times)
+# 
+# 
+# def test_getTrialsStartEndTimes_2(n_trials=15, n_neurons=100, n_latents=5,
+#                                   n_ind_points=(10, 10, 10, 10, 10),
+#                                   diag_var_cov0_value=1e-2):
+#     dynamic_params_spec = {"model_structure_params":
+#                       {"n_latents": str(n_latents)}}
+#     estInitConfigFilename = "data/99999999_estimation_metaData.ini"
+#     config = configparser.ConfigParser()
+#     config.read(estInitConfigFilename)
+#     strings_dict = gcnu_common.utils.config_dict.GetDict(
+#         config=config).get_dict()
+#     args_info = svGPFA.utils.initUtils.getArgsInfo()
+#     config_file_params_spec = svGPFA.utils.initUtils.getParamsDictFromStringsDict(
+#         n_latents=n_latents, n_trials=n_trials, strings_dict=strings_dict,
+#         args_info=args_info)
+#     del config_file_params_spec["data_structure_params"]
+#     default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
+#         n_neurons=n_neurons, n_trials=n_trials, n_ind_points=n_ind_points,
+#         n_latents=n_latents, diag_var_cov0_value=diag_var_cov0_value)
+#     true_trials_start_times = torch.Tensor(
+#         [float(default_params_spec["data_structure_params"]["trials_start_time"])
+#          for r in range(n_trials)])
+#     true_trials_end_times = torch.Tensor(
+#         [float(default_params_spec["data_structure_params"]["trials_end_time"])
+#          for r in range(n_trials)])
+#     trials_start_times, trials_end_times = svGPFA.utils.initUtils.getTrialsStartEndTimes(
+#         n_trials=n_trials,
+#         dynamic_params_spec=dynamic_params_spec,
+#         config_file_params_spec=config_file_params_spec,
+#         default_params_spec=default_params_spec)
+#     assert torch.all(true_trials_start_times == trials_start_times)
+#     assert torch.all(true_trials_end_times == trials_end_times)
+# 
+# 
 def test_getKernelsParams0AndTypes_0(n_neurons=20, n_latents=3, n_trials=50,
                                      n_ind_points=(10, 10, 10),
                                      diag_var_cov0_value=1e-2,
@@ -818,9 +818,9 @@ if __name__ == "__main__":
     test_getLinearEmbeddingParams0_0()
     test_getLinearEmbeddingParams0_1()
     test_getLinearEmbeddingParams0_2()
-    test_getTrialsStartEndTimes_0()
-    test_getTrialsStartEndTimes_1()
-    test_getTrialsStartEndTimes_2()
+#     test_getTrialsStartEndTimes_0()
+#     test_getTrialsStartEndTimes_1()
+#     test_getTrialsStartEndTimes_2()
     test_getKernelsParams0AndTypes_0()
     test_getKernelsParams0AndTypes_1()
     test_getKernelsParams0AndTypes_2()
