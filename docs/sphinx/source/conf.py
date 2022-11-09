@@ -14,7 +14,7 @@ extensions = [
     'sphinx_gallery.gen_gallery',
     ]
 
-bibtex_bibfiles = ['latentVariables.bib','stats.bib']
+bibtex_bibfiles = ['latentsVariablesModels.bib','stats.bib']
 bibtex_default_style = 'alpha'
 
 sphinx_gallery_conf = {
