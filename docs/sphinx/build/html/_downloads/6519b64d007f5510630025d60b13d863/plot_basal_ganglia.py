@@ -96,12 +96,6 @@ config_file_params_spec = \
         strings_dict=strings_dict, args_info=args_info)
 
 #%%
-# Content of file ``est_init_config_filename``
-#
-# .. literalinclude:: README.rst
-#
-
-#%%
 # Finally, get the parameters from the dynamic and configuration file parameter specifications
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
