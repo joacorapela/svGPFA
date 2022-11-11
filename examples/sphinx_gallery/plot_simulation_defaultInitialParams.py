@@ -245,7 +245,7 @@ with torch.no_grad():
 cif_values_GOF = epm_cif_values[trial_GOF][neuron_GOF]
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikesTimes=spikes_times_GOF, cifTimes=trial_times_GOF, cifValues=cif_values_GOF, gamma=ksTest_gamma)
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikes_times=spikes_times_GOF, cif_times=trial_times_GOF, cif_values=cif_values_GOF, gamma=ksTestGamma)
 title = "Trial {:d}, Neuron {:d}".format(trial_GOF, neuron_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
 fig
