@@ -68,6 +68,7 @@ est_init_number = 39
 n_trials = len(spikes_times)
 n_neurons = len(spikes_times[0])
 est_init_config_filename_pattern = "../init/{:08d}_estimation_metaData.ini"
+model_save_filename = "../results/basal_ganglia_model.pickle"
 
 #%%
 # 1.4 Get parameters
@@ -142,7 +143,6 @@ model.setParamsAndData(
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 
-#%%
 svEM = svGPFA.stats.svEM.SVEM_PyTorch()
 tic = time.perf_counter()
 lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
@@ -150,6 +150,15 @@ svEM.maximize(model=model, optim_params=params["optim_params"],
               method=params["optim_params"]["optim_method"], out=sys.stdout)
 toc = time.perf_counter()
 print(f"Elapsed time {toc - tic:0.4f} seconds")
+
+resultsToSave = {"lowerBoundHist": lowerBoundHist,
+                 "elapsedTimeHist": elapsedTimeHist,
+                 "terminationInfo": terminationInfo,
+                 "iterationModelParams": iterationsModelParams,
+                 "model": model}
+with open(model_save_filename, "wb") as f:
+    pickle.dump(resultsToSave, f)
+print("Saved results to {:s}".format(model_save_filename))
 
 #%%
 # ..
@@ -183,7 +192,7 @@ n_time_steps_CIF = 100
 latent_to_plot = 0
 neuron_to_plot = 0
 trial_to_plot = 0
-latents_to_jointly_plot = (0, 1, 2)
+ortho_latents_to_plot = (0, 1, 2)
 events_times_filename = "../data/s008_tab_m1113182_LR__20210516_173815__probabilistic_switching.df.csv"
 trial_choice_column_name = "choice"
 trial_rewarded_column_name = "rewarded"
@@ -192,6 +201,7 @@ centerIn_times_column_name = "aligned__last_center_in"
 centerOut_times_column_name = "aligned__last_center_out"
 sideIn_times_column_name = "aligned__side_in_after_last_center_out"
 marked_events_colors = ["yellow","magenta","cyan","black"]
+fig_filename_prefix = "../figures/basal_ganglia_"
 
 events_times = pd.read_csv(events_times_filename)
 trials_choices = events_times.iloc[trials_indices][trial_choice_column_name].to_numpy()
@@ -229,6 +239,9 @@ trials_times = svGPFA.utils.miscUtils.getTrialsTimes(
 # ^^^^^^^^^^^^^^^^^^^^^^^
 fig = svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundHist(
     lowerBoundHist=lowerBoundHist)
+fig_filename_pattern = "{:s}_lowerBoundHistVSIterNo.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix, "html"))
 fig
 
 #%%
@@ -243,6 +256,11 @@ fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(
     latentToPlot=latent_to_plot,
     trials_colors_patterns=trials_colors_patterns,
     xlabel="Time (msec)")
+fig_filename_pattern = "{:s}_latent{:d}.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            latent_to_plot, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           latent_to_plot, "html"))
 fig
 
 #%%
@@ -262,6 +280,11 @@ fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedLatentAcrossTrials(
     trials_annotations=trials_annotations,
     trials_colors=trials_colors,
     xlabel="Time (msec)")
+fig_filename_pattern = "{:s}_orthonormalized_latent{:d}.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            latent_to_plot, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           latent_to_plot, "html"))
 fig
 
 #%%
@@ -270,12 +293,18 @@ fig
 
 fig = svGPFA.plot.plotUtilsPlotly.get3DPlotOrthonormalizedLatentsAcrossTrials(
     trials_times=trials_times.numpy(), latentsMeans=testMuK_np,
-    C=estimatedC_np, latentsToPlot=latents_to_jointly_plot,
+    C=estimatedC_np, latentsToPlot=ortho_latents_to_plot,
     align_event=align_times, marked_events=marked_events,
     marked_events_colors=marked_events_colors,
     trials_labels=trials_labels,
     trials_annotations=trials_annotations,
     trials_colors=trials_colors)
+ortho_latents_to_plot_str = "".join(str(i)+"_" for i in ortho_latents_to_plot)
+fig_filename_pattern = "{:s}_orthonormalized_latents{:s}.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            ortho_latents_to_plot_str, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           ortho_latents_to_plot_str, "html"))
 fig
 
 #%%
@@ -291,11 +320,16 @@ fig = svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingAcrossTrials(
     embeddingsSTDs=np.sqrt(embeddingVars[:, :, neuron_to_plot]),
     trials_colors_patterns=trials_colors_patterns,
     title=title)
+fig_filename_pattern = "{:s}_embedding_neuron{:d}.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            neuron_to_plot, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           neuron_to_plot, "html"))
 fig
 
 #%%
-# 2.7 CIFs
-# ~~~~~~~~
+# 2.7 Intensity function
+# ~~~~~~~~~~~~~~~~~~~~~~
 with torch.no_grad():
     cif_values = model.computeExpectedPosteriorCIFs(times=trials_times)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(
@@ -306,6 +340,11 @@ fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(
     trials_annotations=trials_annotations,
     trials_colors=trials_colors,
 )
+fig_filename_pattern = "{:s}_intensity_function_neuron{:d}.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            neuron_to_plot, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           neuron_to_plot, "html"))
 fig
 
 #%%
@@ -314,6 +353,9 @@ fig
 estimatedC, estimatedD = model.getSVEmbeddingParams()
 fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedEmbeddingParams(
     C=estimatedC.numpy(), d=estimatedD.numpy())
+fig_filename_pattern = "{:s}_orthonormalized_embedding_params.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix, "html"))
 fig
 
 #%%
@@ -323,6 +365,9 @@ kernelsParams = model.getKernelsParams()
 kernelsTypes = [type(kernel).__name__ for kernel in model.getKernels()]
 fig = svGPFA.plot.plotUtilsPlotly.getPlotKernelsParams(
     kernelsTypes=kernelsTypes, kernelsParams=kernelsParams)
+fig_filename_pattern = "{:s}_kernels_params.{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix, "html"))
 fig
 
 #%%
@@ -337,14 +382,23 @@ spikes_times_GOF = spikes_times[trial_GOF][neuron_to_plot].numpy()
 #%%
 # 3.1 KS time-rescaling GOF test
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ksTestGamma = 10
+ks_test_gamma = 10
 if len(spikes_times_GOF) > 0:
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikes_times=spikes_times_GOF, cif_times=trial_times_GOF, cif_values=cif_values_GOF, gamma=ksTestGamma)
+        diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikes_times=spikes_times_GOF,
+                                                                                      cif_times=trial_times_GOF,
+                                                                                      cif_values=cif_values_GOF,
+                                                                                      gamma=ks_test_gamma)
 title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(
     trial_GOF, neuron_GOF, len(spikes_times_GOF))
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
+fig_filename_pattern = \
+    "{:s}_ksTestTimeRescaling_numericalCorrection_trial{:03d}_neuron{:03d}..{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            trial_GOF, neuron_GOF, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           trial_GOF, neuron_GOF, "png"))
 fig
 
 #%%
@@ -358,7 +412,18 @@ with warnings.catch_warnings():
         cif_values=cif_values_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis(
     fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
+fig_filename_pattern = "{:s}_predictive_analysis_trial{:03d}_neuron{:03d}..{:s}"
+fig.write_image(fig_filename_pattern.format(fig_filename_prefix,
+                                            trial_GOF, neuron_GOF, "png"))
+fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
+                                           trial_GOF, neuron_GOF, "png"))
 fig
 
+#%%
+# .. raw:: html
+#
+#    <h3><font color="red">To run the Python script or Jupyter notebook below,
+#    please download them to the <i>examples/sphinx_gallery</i> folder of the
+#    repository and execute them from there.</font></h3>
 
 # sphinx_gallery_thumbnail_path = '_static/basal_ganglia.png'
