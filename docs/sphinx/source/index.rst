@@ -46,7 +46,7 @@ Sparse Variational Gaussian Processes Factor Analysis
    :maxdepth: 5
    :caption: Code:
 
-   modules
+   svGPFA
 
 Indices and tables
 ==================
