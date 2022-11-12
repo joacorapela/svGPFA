@@ -47,6 +47,7 @@ trials_end_times = [trials_end_time] * n_trials
 
 n_latents = 2
 em_max_iter = 30
+model_save_filename = "../results/simulation_model.pickle"
 
 #%%
 # 1.4 Get parameters
@@ -108,6 +109,15 @@ lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
                   out=sys.stdout)
 toc = time.perf_counter()
 print(f"Elapsed time {toc - tic:0.4f} seconds")
+
+resultsToSave = {"lowerBoundHist": lowerBoundHist,
+                 "elapsedTimeHist": elapsedTimeHist,
+                 "terminationInfo": terminationInfo,
+                 "iterationModelParams": iterationsModelParams,
+                 "model": model}
+with open(model_save_filename, "wb") as f:
+    pickle.dump(resultsToSave, f)
+print("Saved results to {:s}".format(model_save_filename))
 
 #%%
 # ..
@@ -239,13 +249,16 @@ spikes_times_GOF = spikes_times[trial_GOF][neuron_GOF].numpy()
 # 3.1 KS time-rescaling GOF test
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-ksTest_gamma = 20                                 # number of simulations for the KS test numerical correction
+ks_test_gamma = 20                                 # number of simulations for the KS test numerical correction
 with torch.no_grad():
     epm_cif_values = model.computeExpectedPosteriorCIFs(times=trials_times)
 cif_values_GOF = epm_cif_values[trial_GOF][neuron_GOF]
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
-    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(spikes_times=spikes_times_GOF, cif_times=trial_times_GOF, cif_values=cif_values_GOF, gamma=ksTestGamma)
+    diffECDFsX, diffECDFsY, estECDFx, estECDFy, simECDFx, simECDFy, cb = \
+        gcnu_common.stats.pointProcesses.tests.KSTestTimeRescalingNumericalCorrection(
+            spikes_times=spikes_times_GOF, cif_times=trial_times_GOF,
+            cif_values=cif_values_GOF, gamma=ks_test_gamma)
 title = "Trial {:d}, Neuron {:d}".format(trial_GOF, neuron_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
 fig
@@ -260,5 +273,12 @@ fpr, tpr, roc_auc = svGPFA.utils.miscUtils.computeSpikeClassificationROC(
     cif_values=cif_values_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis(fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
 fig
+
+#%%
+# .. raw:: html
+#
+#    <h3><font color="red">To run the Python script or Jupyter notebook below,
+#    please download them to the <i>examples/sphinx_gallery</i> folder of the
+#    repository and execute them from there.</font></h3>
 
 # sphinx_gallery_thumbnail_path = '_static/model.png'
