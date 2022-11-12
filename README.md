@@ -24,6 +24,8 @@ Documentation can be found [here](https://joacorapela.github.io/svGPFA/).
 
 # Installation
 
+We recommend installing svGPFA in a Python virtual environment.
+
 1. clone this repo
 
 2. change the current directory to that of the cloned repo
