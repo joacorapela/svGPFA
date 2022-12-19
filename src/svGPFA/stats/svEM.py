@@ -3,7 +3,9 @@ import sys
 import abc
 import io
 import time
+import traceback
 import math
+import copy
 import pickle
 import numpy as np
 import torch
@@ -13,6 +15,7 @@ class SVEM(abc.ABC):
 
     @abc.abstractmethod
     def maximize(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
+                 printIterationModelParams=True,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -71,6 +74,7 @@ class SVEM(abc.ABC):
 class SVEM_PyTorch(SVEM):
 
     def maximize(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
+                 printIterationModelParams=True,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -121,10 +125,11 @@ class SVEM_PyTorch(SVEM):
                                "mstep_indpointslocs": self._mStepIndPointsLocs}
         if getIterationModelParamsFn is not None:
             iterationModelParams = getIterationModelParamsFn(model=model)
-            iterationsModelParams = torch.empty((optim_params["em_max_iter"]+1,
-                                                 len(iterationModelParams)),
-                                                dtype=torch.double)
-            iterationsModelParams[iter, :] = iterationModelParams
+            if printIterationModelParams:
+                print(iterationModelParams)
+            iterationsModelParams = [None for i in
+                                     range(optim_params["em_max_iter"]+1)]
+            iterationsModelParams[iter] = iterationModelParams
         else:
             iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
@@ -142,11 +147,20 @@ class SVEM_PyTorch(SVEM):
                         logStream=logStream,
                         logStreamFN=logStreamFN
                     )
-#                     try:
-                    maxRes = functions_for_steps[step](
-                        model=model,
-                        optim_params=optim_params["{:s}_optim_params".format(
-                            step)])
+                    try:
+                        maxRes = functions_for_steps[step](
+                            model=model,
+                            optim_params=optim_params["{:s}_optim_params".format(
+                                step)])
+                    except Exception as e:
+                        stack_trace = traceback.format_exc()
+                        print(e)
+                        print(stack_trace)
+                        terminationInfo = ErrorTerminationInfo(
+                            message=f"Error occured while processing {step} in iteration {iter}",
+                            error=e, stack_trace=stack_trace)
+                        return lowerBoundHist, elapsedTimeHist, \
+                               terminationInfo, iterationsModelParams
                     message = "Iteration {:02d}, {:s} end: {:f}, niter: {:d}, nfeval: {:d}\n".format(
                         iter, step, maxRes["lowerBound"], maxRes["niter"],
                         maxRes["nfeval"])
@@ -166,8 +180,10 @@ class SVEM_PyTorch(SVEM):
                         with open(savePartialFilename, "wb") as f:
                             pickle.dump(resultsToSave, f)
                     if getIterationModelParamsFn is not None:
-                        iterationsModelParams[iter, :] = \
-                            getIterationModelParamsFn(model=model)
+                        iterationModelParams = getIterationModelParamsFn(model=model)
+                        if printIterationModelParams:
+                            print(iterationModelParams)
+                        iterationsModelParams[iter] = iterationModelParams
             elapsedTimeHist.append(time.time()-startTime)
             lowerBoundHist.append(maxRes["lowerBound"].item())
 
@@ -268,6 +284,7 @@ class SVEM_PyTorch(SVEM):
 class SVEM_SciPy(SVEM):
 
     def maximize(self, model, optim_params, method="EM", getIterationModelParamsFn=None,
+                 printIterationModelParams=True,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
                  latentsTimes=None, latentsLock=None, latentsStreamFN=None,
@@ -503,11 +520,16 @@ class TerminationInfo:
         return self._message
 
 class ErrorTerminationInfo(TerminationInfo):
-    def __init__(self, message, error):
+    def __init__(self, message, error, stack_trace):
         super().__init__(message=message)
         self._error = error
+        self._stack_trace = stack_trace
 
     @property
     def error(self):
         return self._error
+
+    @property
+    def stack_trace(self):
+        return self._stack_trace
 
