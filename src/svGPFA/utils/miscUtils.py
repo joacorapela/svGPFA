@@ -9,6 +9,7 @@ import torch
 # import matplotlib.pyplot as plt
 import warnings
 
+# from . import my_globals
 import svGPFA.stats.kernels
 import gcnu_common.numerical_methods.utils
 import gcnu_common.stats.gaussianProcesses.eval
@@ -207,6 +208,8 @@ def clock(func):
     return clocked
 
 def chol3D(K):
+#     if my_globals.raise_exception:
+#         raise ValueError("Test error in chol3D")
     Kchol = torch.zeros(K.shape, dtype=K.dtype, device=K.device)
     nTrial = K.shape[0]
     for i in range(nTrial):
