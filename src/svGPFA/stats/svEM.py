@@ -233,12 +233,24 @@ class SVEM_PyTorch(SVEM):
 
     def _mStepKernels(self, model, optim_params):
         x = model.getKernelsParams()
+        prev_x = [copy.deepcopy(anx) for anx in x]
         def evalFunc():
             model.buildKernelsMatrices()
             answer = model.eval()
             return answer
         optimizer = torch.optim.LBFGS(x, **optim_params)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
+        try:
+            answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
+            # begin debug
+            # print("*** Updated kernels params ***")
+            # print(x)
+            # raise ValueError("Test error in _mStepKernels")
+            # end debug
+        except Exception:
+            x = [anx.detach() for anx in x]
+            for i in range(len(x)):
+                x[i][:] = prev_x[i][:]
+            raise
         return answer
 
     def _mStepIndPointsLocs(self, model, optim_params):
