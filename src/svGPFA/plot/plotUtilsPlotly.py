@@ -13,43 +13,40 @@ import plotly
 # import plotly.express as px
 
 import svGPFA.utils.miscUtils
-import gcnu_common.utils.neuralDataAnalysis
+import gcnu_common.utils.neural_data_analysis
+
 
 # spike rates and times
-def getPlotSpikeRatesForAllTrialsAndAllNeurons(
-    spikes_rates, xlabel="Neuron", ylabel="Average Spike Rate (Hz)",
-    legend_label_pattern = "Trial {:d}"):
+def getPlotSpikesRatesAllTrialsAllNeurons(
+        spikes_rates, trials_ids, clusters_ids,
+        xlabel="Neuron Index", ylabel="Average Spike Rate (Hz)"):
 
-    n_trials = spikes_rates.shape[0]
-    nNeurons = spikes_rates.shape[1]
+    n_neurons = spikes_rates.shape[1]
+    neurons_indices = np.arange(n_neurons)
 
-    data = []
-    layout = {
-        "xaxis": {"title": xlabel},
-        "yaxis": {"title": ylabel},
-    }
-    neuronsIndices = np.arange(nNeurons)
-    for r in range(n_trials):
-        data.append(
-            {
-                "type": "scatter",
-                "mode": "lines+markers",
-                "name": legend_label_pattern.format(r),
-                "x": neuronsIndices,
-                "y": spikes_rates[r, :]
-            },
-        )
-    fig = go.Figure(
-        data=data,
-        layout=layout,
-    )
+    fig = go.Figure()
+    for r, trial_id in enumerate(trials_ids):
+        hover_text = \
+            ["Cluster ID: {:02d}<br>Trial ID: {:f}<br>Spike Rate: {:f}".format(
+                cluster_id, trial_id, spikes_rates[r][n])
+                for n, cluster_id in enumerate(clusters_ids)]
+        trace = go.Scatter(x=neurons_indices, y=spikes_rates[r, :],
+                           name=f"{trial_id}", hoverinfo="text", text=hover_text)
+        fig.add_trace(trace)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+
     return fig
 
 
-def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)", ylabel="Neuron", titlePattern="Trial {:d}"):
+def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)",
+                                              ylabel="Neuron",
+                                              titlePattern="Trial {:d}"):
     n_trials = len(spikesTimes)
     subplotsTitles = ["trial={:d}".format(r) for r in range(n_trials)]
-    fig = plotly.subplots.make_subplots(rows=n_trials, cols=1, shared_xaxes=True, shared_yaxes=True, subplot_titles=subplotsTitles)
+    fig = plotly.subplots.make_subplots(rows=n_trials, cols=1,
+                                        shared_xaxes=True, shared_yaxes=True,
+                                        subplot_titles=subplotsTitles)
     for r in range(n_trials):
         for n in range(len(spikesTimes[r])):
             trace = go.Scatter(
@@ -61,9 +58,9 @@ def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)", 
                 # hoverinfo="skip",
             )
             fig.add_trace(trace, row=r+1, col=1)
-        if r==n_trials-1:
+        if r == n_trials-1:
             fig.update_xaxes(title_text=xlabel, row=r+1, col=1)
-        if r==math.floor(n_trials/2):
+        if r == math.floor(n_trials/2):
             fig.update_yaxes(title_text=ylabel, row=r+1, col=1)
     fig.update_layout(
         {
@@ -73,10 +70,12 @@ def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)", 
     )
     return fig
 
+
 def getSpikesTimesPlotOneTrial(spikes_times, title,
                                align_event_times=None, marked_events=None,
                                xlabel="Time (sec)", ylabel="Neuron",
-                               event_line_color="rgba(0, 0, 255, 0.2)", event_line_width=5):
+                               event_line_color="rgba(0, 0, 255, 0.2)",
+                               event_line_width=5):
     nNeurons = len(spikes_times)
     min_time = np.Inf
     max_time = -np.Inf
