@@ -121,9 +121,10 @@ def getSpikesTimesPlotOneTrial(spikes_times, title,
     return fig
 
 def getSpikesTimesPlotOneNeuron(spikes_times,
-                                sorting_times,
-                                neuron_index, title,
-                                trials_ids,
+                                neuron_index,
+                                sorting_times=None,
+                                title="",
+                                trials_ids=None,
                                 marked_events_times=None,
                                 marked_events_colors=None,
                                 marked_events_markers=None,
@@ -133,6 +134,9 @@ def getSpikesTimesPlotOneNeuron(spikes_times,
                                 xlabel="Time (sec)", ylabel="Trial",
                                 event_line_color="rgba(0, 0, 255, 0.2)",
                                 event_line_width=5, spikes_marker_size=9):
+    n_trials = len(spikes_times)
+    if trials_ids is None:
+        trials_ids = np.arange(n_trials)
     if sorting_times is not None:
         argsort = np.argsort(sorting_times)
         spikes_times = [spikes_times[r] for r in argsort]
@@ -1504,7 +1508,7 @@ def getPlotEstimatedLatentsForTrial(times, latentsMeans, latentsSTDs, indPointsL
 
 def getPlotLatentAcrossTrials(
         times, latentsMeans, latentsSTDs, latentToPlot,
-        trials_labels=None,
+        trials_ids=None,
         indPointsLocs=None, cbAlpha=0.2,
         indPointsLocsColor="rgba(255,0,0,0.5)",
         trials_colors_patterns=None,
@@ -1543,8 +1547,8 @@ def getPlotLatentAcrossTrials(
         y = meanToPlot
         y_upper = y + ciToPlot
         y_lower = y - ciToPlot
-        ymax = max(np.max(meanToPlot+ciToPlot), np.max(meanToPlot+ciToPlot))
-        ymin = min(np.min(meanToPlot-ciToPlot), np.min(meanToPlot-ciToPlot))
+#         ymax = max(np.max(meanToPlot+ciToPlot), np.max(meanToPlot+ciToPlot))
+#         ymin = min(np.min(meanToPlot-ciToPlot), np.min(meanToPlot-ciToPlot))
 
         traceCB = go.Scatter(
             x=np.concatenate((x, x[::-1])),
@@ -1555,8 +1559,8 @@ def getPlotLatentAcrossTrials(
             showlegend=False,
             legendgroup="trial{:02d}".format(r)
         )
-        if trials_labels is not None:
-            trial_label = trials_labels[r]
+        if trials_ids is not None:
+            trial_label = "{:02d}".format(trials_ids[r])
         else:
             trial_label = "{:02d}".format(r)
         traceMean = go.Scatter(
@@ -1773,7 +1777,7 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
 def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
         times, latentsMeans, latentToPlot, C,
         sort_event=None, align_event_times=None, marked_events=None,
-        trials_labels=None, trials_annotations=None, zlim=None,
+        trials_ids=None, trials_annotations=None, zlim=None,
         title="", xlabel="Time (sec)", ylabel="Trial Index",
         event_line_color="white", event_line_width=5):
     # times = times.detach().numpy()
@@ -1809,7 +1813,9 @@ def getPlotOrthonormalizedLatentImageOneNeuronAllTrials(
         # align_event_times = np.zeros(shape=(len(sort_event), 1))
         align_event_times = np.zeros(shape=(n_trials, 1))
     sorted_trials_indices = np.arange(0, n_trials)
-    if trials_labels is None:
+    if trials_ids is not None:
+        trials_labels = [str(trial_id) for trial_id in trials_ids]
+    else:
         trials_labels = [str(i) for i in sorted_trials_indices]
     if sort_event is not None:
         sort_indices = np.argsort(sort_event-align_event_times).tolist()
