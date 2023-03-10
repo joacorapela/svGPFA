@@ -6,12 +6,14 @@ Basal ganglia recordings from a mouse performing a bandit task
 In this notebook we use data recorded from the basal ganglia of a mouse
 performing a bandit task from the to estimate an svGPFA model
 
-1. Estimate model
------------------
-
-1.1 Import required packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
+
+#%%
+# 1. Estimate model
+# -----------------
+# 
+# 1.1 Import required packages
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 import sys
 import time
@@ -21,13 +23,14 @@ import pickle
 import configparser
 import pandas as pd
 
-import gcnu_common.utils.neuralDataAnalysis
+import gcnu_common.utils.neural_data_analysis
 import gcnu_common.stats.pointProcesses.tests
 import gcnu_common.utils.config_dict
 import svGPFA.stats.svGPFAModelFactory
 import svGPFA.stats.svEM
 import svGPFA.utils.miscUtils
 import svGPFA.utils.initUtils
+import svGPFA.plot.plotUtilsPlotly
 
 
 #%%
@@ -46,32 +49,72 @@ trials_start_times = loadRes["trials_start_times"]
 trials_end_times = loadRes["trials_end_times"]
 
 
-events_times_filename = "../data/s008_tab_m1113182_LR__20210516_173815__probabilistic_switching.df.csv"
+events_times_filename = ("../data/s008_tab_m1113182_LR__20210516_173815__"
+                         "probabilistic_switching.df.csv")
 events_times = pd.read_csv(events_times_filename)
 trials_indices = [r for r in range(len(events_times))
                   if events_times.iloc[r]["block_type_index"]
                   in block_types_indices]
-spikes_times, neurons_indices = \
-    gcnu_common.utils.neuralDataAnalysis.removeUnitsWithLessSpikesThanThrInAnyTrial(
+spikes_times, neurons_indices = gcnu_common.utils.neural_data_analysis.\
+    removeUnitsWithLessSpikesThanThrInAnyTrial(
         spikes_times=spikes_times,
         min_nSpikes_perNeuron_perTrial=min_nSpikes_perNeuron_perTrial)
 spikes_times = [[torch.tensor(spikes_times[r][n])
                  for n in range(len(spikes_times[r]))]
                 for r in range(len(spikes_times))]
+n_trials = len(spikes_times)
+n_neurons = len(spikes_times[0])
 
 #%%
-# 1.3 Set estimation hyperparameters
+# 1.3 Check that spikes have been epoched correctly
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#%%
+# Plot spikes 
+# ~~~~~~~~~~~
+# Plot the spikes of all trials of a randomly chosen neuron. Most trials should
+# contain at least one spike.
+
+neuron_to_plot_index = torch.randint(low=0, high=n_neurons, size=(1,)).item()
+fig = svGPFA.plot.plotUtilsPlotly.getSpikesTimesPlotOneNeuron(
+    spikes_times=spikes_times,
+    neuron_index=neuron_to_plot_index,
+    title=f"Neuron index: {neuron_to_plot_index}",
+)
+fig
+
+#%%
+# Run some simple checks on spikes
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The function ``checkEpochedSpikesTimes`` tests that:
+#
+#   a. every neuron fired at least one spike across all trials,
+#   b. for each trial, the spikes times of every neuron are between the trial
+#      start and end times.
+#
+# If any check fails, a ``ValueError`` will be raised. Otherwise a checks
+# passed message should be printed.
+
+try:
+    gcnu_common.utils.neural_data_analysis.checkEpochedSpikesTimes(
+        spikes_times=spikes_times, trials_start_times=trials_start_times,
+        trials_end_times=trials_end_times,
+    )
+except ValueError:
+    raise
+print("Checks passed")
+
+#%%
+# 1.4 Set estimation hyperparameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 n_latents = 10
 em_max_iter_dyn = 200
 est_init_number = 39
-n_trials = len(spikes_times)
-n_neurons = len(spikes_times[0])
 est_init_config_filename_pattern = "../init/{:08d}_estimation_metaData.ini"
 model_save_filename = "../results/basal_ganglia_model.pickle"
 
 #%%
-# 1.4 Get parameters
+# 1.5 Get parameters
 # ~~~~~~~~~~~~~~~~~~
 
 #%%
@@ -82,7 +125,6 @@ dynamic_params_spec = {"optim_params": {"em_max_iter": em_max_iter_dyn}}
 #%%
 # Config file parameters specification
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 args_info = svGPFA.utils.initUtils.getArgsInfo()
 est_init_config_filename = est_init_config_filename_pattern.format(
     est_init_number)
@@ -107,7 +149,7 @@ params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
     config_file_params_spec=config_file_params_spec)
 
 #%%
-# 1.5 Create kernels, a model and set its initial parameters
+# 1.6 Create kernels, a model and set its initial parameters
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #%%
@@ -139,38 +181,35 @@ model.setParamsAndData(
     priorCovRegParam=params["optim_params"]["prior_cov_reg_param"])
 
 #%%
-# 1.6 Maximize the Lower Bound
+# 1.7 Maximize the Lower Bound
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 
-svEM = svGPFA.stats.svEM.SVEM_PyTorch()
-tic = time.perf_counter()
-lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-svEM.maximize(model=model, optim_params=params["optim_params"],
-              method=params["optim_params"]["optim_method"], out=sys.stdout)
-toc = time.perf_counter()
-print(f"Elapsed time {toc - tic:0.4f} seconds")
+# svEM = svGPFA.stats.svEM.SVEM_PyTorch()
+# tic = time.perf_counter()
+# lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
+# svEM.maximize(model=model, optim_params=params["optim_params"],
+#               method=params["optim_params"]["optim_method"], out=sys.stdout)
+# toc = time.perf_counter()
+# print(f"Elapsed time {toc - tic:0.4f} seconds")
 
-resultsToSave = {"lowerBoundHist": lowerBoundHist,
-                 "elapsedTimeHist": elapsedTimeHist,
-                 "terminationInfo": terminationInfo,
-                 "iterationModelParams": iterationsModelParams,
-                 "model": model}
-with open(model_save_filename, "wb") as f:
-    pickle.dump(resultsToSave, f)
-print("Saved results to {:s}".format(model_save_filename))
+# resultsToSave = {"lowerBoundHist": lowerBoundHist,
+#                  "elapsedTimeHist": elapsedTimeHist,
+#                  "terminationInfo": terminationInfo,
+#                  "iterationModelParams": iterationsModelParams,
+#                  "model": model}
+# with open(model_save_filename, "wb") as f:
+#     pickle.dump(resultsToSave, f)
+# print("Saved results to {:s}".format(model_save_filename))
 
 #%%
 # ..
-#   est_res_number = 91693124
-#   model_save_filename_pattern = "../results/{:08d}_estimatedModel.pickle"
-#   
-#   model_save_filename = model_save_filename_pattern.format(est_res_number)
-#   with open(model_save_filename, "rb") as f:
-#       estResults = pickle.load(f)
-#   lowerBoundHist = estResults["lowerBoundHist"]
-#   elapsedTimeHist = estResults["elapsedTimeHist"]
-#   model = estResults["model"]
+
+with open(model_save_filename, "rb") as f:
+    estResults = pickle.load(f)
+lowerBoundHist = estResults["lowerBoundHist"]
+elapsedTimeHist = estResults["elapsedTimeHist"]
+model = estResults["model"]
 
 #%%
 # 2 Plotting
@@ -206,7 +245,7 @@ fig_filename_prefix = "../figures/basal_ganglia_"
 events_times = pd.read_csv(events_times_filename)
 trials_choices = events_times.iloc[trials_indices][trial_choice_column_name].to_numpy()
 
-trials_labels = np.array([str(i) for i in trials_indices])
+trials_ids = np.array([i for i in trials_indices])
 choices_colors_patterns = ["rgba(0,0,255,{:f})", "rgba(255,0,0,{:f})"]
 trials_colors_patterns = [choices_colors_patterns[0]
                           if trials_choices[r] == -1
@@ -219,7 +258,7 @@ centerIn_times = events_times.iloc[trials_indices][centerIn_times_column_name].t
 centerOut_times = events_times.iloc[trials_indices][centerOut_times_column_name].to_numpy()
 sideIn_times = events_times.iloc[trials_indices][sideIn_times_column_name].to_numpy()
 trialEnd_times = np.append(centerIn_times[1:], np.NAN)
-marked_events = np.column_stack((centerIn_times, centerOut_times, sideIn_times, trialEnd_times))
+marked_events_times = np.column_stack((centerIn_times, centerOut_times, sideIn_times, trialEnd_times))
 
 trials_choices = events_times.iloc[trials_indices][trial_choice_column_name].to_numpy()
 trials_rewarded = events_times.iloc[trials_indices][trial_rewarded_column_name].to_numpy()
@@ -252,7 +291,7 @@ fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(
     times=trials_times.numpy(),
     latentsMeans=testMuK,
     latentsSTDs=torch.sqrt(testVarK),
-    trials_labels=trials_labels,
+    trials_ids=trials_ids,
     latentToPlot=latent_to_plot,
     trials_colors_patterns=trials_colors_patterns,
     xlabel="Time (msec)")
@@ -272,11 +311,12 @@ estimatedC, estimatedD = model.getSVEmbeddingParams()
 estimatedC_np = estimatedC.detach().numpy()
 fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedLatentAcrossTrials(
     trials_times=trials_times,
-    latentsMeans=testMuK_np, latentToPlot=latent_to_plot,
+    latentsMeans=testMuK_np,
     C=estimatedC_np,
-    align_event=align_times, marked_events=marked_events,
+    trials_ids=trials_ids,
+    latentToPlot=latent_to_plot,
+    align_event_times=align_times, marked_events_times=marked_events_times,
     marked_events_colors=marked_events_colors,
-    trials_labels=trials_labels,
     trials_annotations=trials_annotations,
     trials_colors=trials_colors,
     xlabel="Time (msec)")
@@ -294,9 +334,9 @@ fig
 fig = svGPFA.plot.plotUtilsPlotly.get3DPlotOrthonormalizedLatentsAcrossTrials(
     trials_times=trials_times.numpy(), latentsMeans=testMuK_np,
     C=estimatedC_np, latentsToPlot=ortho_latents_to_plot,
-    align_event=align_times, marked_events=marked_events,
+    align_event_times=align_times, marked_events_times=marked_events_times,
     marked_events_colors=marked_events_colors,
-    trials_labels=trials_labels,
+    trials_ids=trials_ids,
     trials_annotations=trials_annotations,
     trials_colors=trials_colors)
 ortho_latents_to_plot_str = "".join(str(i)+"_" for i in ortho_latents_to_plot)
@@ -335,8 +375,8 @@ with torch.no_grad():
 fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(
     trials_times=trials_times, cif_values=cif_values,
     neuron_index=neuron_to_plot, spikes_times=spikes_times,
-    align_event=centerOut_times, marked_events=marked_events,
-    marked_events_colors=marked_events_colors, trials_labels=trials_labels,
+    align_event_times=centerOut_times, marked_events_times=marked_events_times,
+    marked_events_colors=marked_events_colors, trials_ids=trials_ids,
     trials_annotations=trials_annotations,
     trials_colors=trials_colors,
 )
