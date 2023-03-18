@@ -13,7 +13,7 @@ performing a bandit task from the to estimate an svGPFA model
 # -----------------
 # 
 # 1.1 Import required packages
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 import sys
 import time
@@ -35,7 +35,7 @@ import svGPFA.plot.plotUtilsPlotly
 
 #%%
 # 1.2 Get spikes times
-# ~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^
 block_types_indices = [0]
 region_spikes_times_filename_pattern = "../data/00000000_regionGPe_blockTypeIndices0_spikes_times_epochedaligned__last_center_out.{:s}"
 min_nSpikes_perNeuron_perTrial = 1
@@ -67,11 +67,11 @@ n_neurons = len(spikes_times[0])
 
 #%%
 # 1.3 Check that spikes have been epoched correctly
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #%%
 # Plot spikes 
-# ~~~~~~~~~~~
+# """""""""""
 # Plot the spikes of all trials of a randomly chosen neuron. Most trials should
 # contain at least one spike.
 
@@ -85,7 +85,7 @@ fig
 
 #%%
 # Run some simple checks on spikes
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# """"""""""""""""""""""""""""""""
 # The function ``checkEpochedSpikesTimes`` tests that:
 #
 #   a. every neuron fired at least one spike across all trials,
@@ -106,7 +106,7 @@ print("Checks passed")
 
 #%%
 # 1.4 Set estimation hyperparameters
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 n_latents = 10
 em_max_iter_dyn = 200
 est_init_number = 39
@@ -115,16 +115,16 @@ model_save_filename = "../results/basal_ganglia_model.pickle"
 
 #%%
 # 1.5 Get parameters
-# ~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^
 
 #%%
 # Dynamic parameters specification
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# """"""""""""""""""""""""""""""""
 dynamic_params_spec = {"optim_params": {"em_max_iter": em_max_iter_dyn}}
 
 #%%
 # Config file parameters specification
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# """"""""""""""""""""""""""""""""""""
 args_info = svGPFA.utils.initUtils.getArgsInfo()
 est_init_config_filename = est_init_config_filename_pattern.format(
     est_init_number)
@@ -140,7 +140,7 @@ config_file_params_spec = \
 
 #%%
 # Finally, get the parameters from the dynamic and configuration file parameter specifications
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
     n_trials=n_trials, n_neurons=n_neurons, n_latents=n_latents,
     trials_start_times=trials_start_times,
@@ -154,14 +154,14 @@ params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
 
 #%%
 # Build kernels
-# ^^^^^^^^^^^^^
+# """""""""""""
 kernels_params0 = params["initial_params"]["posterior_on_latents"]["kernels_matrices_store"]["kernels_params0"]
 kernels = svGPFA.utils.miscUtils.buildKernels(
     kernels_types=kernels_types, kernels_params=kernels_params0)
 
 #%%
 # Create model
-# ^^^^^^^^^^^^
+# """"""""""""
 kernelMatrixInvMethod = svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol
 indPointsCovRep = svGPFA.stats.svGPFAModelFactory.indPointsCovChol
 model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
@@ -173,7 +173,7 @@ model = svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch(
 
 #%%
 # Set initial parameters
-# ^^^^^^^^^^^^^^^^^^^^^^
+# """"""""""""""""""""""
 model.setParamsAndData(
     measurements=spikes_times,
     initial_params=params["initial_params"],
@@ -182,7 +182,7 @@ model.setParamsAndData(
 
 #%%
 # 1.7 Maximize the Lower Bound
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 
 # svEM = svGPFA.stats.svEM.SVEM_PyTorch()
@@ -217,7 +217,7 @@ model = estResults["model"]
 
 #%%
 # 2.1 Imports for plotting
-# ~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^
 
 import numpy as np
 import pandas as pd
@@ -328,8 +328,8 @@ fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
 fig
 
 #%%
-# 2.7 Joint evolution of first three orthonormalized latents
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# 2.6 Joint evolution of first three orthonormalized latents
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 fig = svGPFA.plot.plotUtilsPlotly.get3DPlotOrthonormalizedLatentsAcrossTrials(
     trials_times=trials_times.numpy(), latentsMeans=testMuK_np,
@@ -348,8 +348,8 @@ fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
 fig
 
 #%%
-# 2.6 Embedding
-# ~~~~~~~~~~~~~
+# 2.7 Embedding
+# ^^^^^^^^^^^^^
 embeddingMeans, embeddingVars = model.predictEmbedding(times=trials_times)
 embeddingMeans = embeddingMeans.detach().numpy()
 embeddingVars = embeddingVars.detach().numpy()
@@ -368,8 +368,8 @@ fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
 fig
 
 #%%
-# 2.7 Intensity function
-# ~~~~~~~~~~~~~~~~~~~~~~
+# 2.8 Intensity function
+# ^^^^^^^^^^^^^^^^^^^^^^
 with torch.no_grad():
     cif_values = model.computeExpectedPosteriorCIFs(times=trials_times)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(
@@ -388,8 +388,8 @@ fig.write_html(fig_filename_pattern.format(fig_filename_prefix,
 fig
 
 #%%
-# 2.8 Embedding parameters
-# ~~~~~~~~~~~~~~~~~~~~~~~~
+# 2.9 Embedding parameters
+# ^^^^^^^^^^^^^^^^^^^^^^^^
 estimatedC, estimatedD = model.getSVEmbeddingParams()
 fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedEmbeddingParams(
     C=estimatedC.numpy(), d=estimatedD.numpy())
@@ -399,8 +399,8 @@ fig.write_html(fig_filename_pattern.format(fig_filename_prefix, "html"))
 fig
 
 #%%
-# 2.9 Kernels parameters
-# ~~~~~~~~~~~~~~~~~~~~~~
+# 2.10 Kernels parameters
+# ^^^^^^^^^^^^^^^^^^^^^^^
 kernelsParams = model.getKernelsParams()
 kernelsTypes = [type(kernel).__name__ for kernel in model.getKernels()]
 fig = svGPFA.plot.plotUtilsPlotly.getPlotKernelsParams(
@@ -421,7 +421,7 @@ spikes_times_GOF = spikes_times[trial_GOF][neuron_to_plot].numpy()
 
 #%%
 # 3.1 KS time-rescaling GOF test
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ks_test_gamma = 10
 if len(spikes_times_GOF) > 0:
     with warnings.catch_warnings():
@@ -443,7 +443,7 @@ fig
 
 #%%
 # 3.2 ROC predictive analysis
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     fpr, tpr, roc_auc = svGPFA.utils.miscUtils.computeSpikeClassificationROC(
