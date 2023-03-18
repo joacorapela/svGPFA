@@ -11,7 +11,5 @@ The parameters optimized in svGPFA are:
 
 4. inducing points locations: :math:`\mathbf{z}_k^{(r)}\in\mathbb{R}^\text{n_ind_points(k)}` in Eq. 2 of :cite:t:`dunckerAndSahani18`.
 
-for :math:`k=1,\ldots,K` and :math:`r=1,\ldots,R`.
-
 The estimation of svGPFA parameters is performed using the Expectation Conditional Maximization algorithm (:cite:t:`mcLachlanAndKrishnan08`, see :meth:`svGPFA.stats.svEM.SVEM.maximize`), which reduces to a sequence of numerical optimizations. Because we use PyTorch's autograd to compute derivatives, these optimizations only require the calculation of the svGPFA lower bound (left hand side of Eq. 4 in :cite:t:`dunckerAndSahani18`). Below we provide details about how the calculation of this lower bound is implemented.
 
