@@ -210,7 +210,7 @@ Two items need to be specified:
 Constant value format
 ^^^^^^^^^^^^^^^^^^^^^
 
-This initialization option sets the same variational mean and covariance across all latents and trials. The common variational mean has all elements equal to a constant value, and the common variational covariance is a scaled identity matrix.
+This initialisation option sets the same variational mean and covariance across all latents and trials. The common variational mean has all elements equal to a constant value, and the common variational covariance is a scaled identity matrix.
 
 Two items need to be specified:
 
@@ -490,26 +490,32 @@ Layout format
 ^^^^^^^^^^^^^
 
 The layout format requires the specification of the number of inducing points
-in the item ``n_ind_points``. The layout of the initial inducing points
-locations is given by the item ``ind_points_locs0_layout``. If
-``ind_points_locs0_layout = equidistant`` the initial locations of the inducing
-points are equidistant between the trial start and trial end. If
-``ind_points_locs0_layout = uniform`` the initial inducing points are uniformly
-positioned between the start and end of the trial.
+in the item ``n_ind_points`` or in the item ``common_n_ind_points``. Item
+``n_ind_points`` is a list of length ``n_trials``, such that
+``n_ind_points[r]`` gives the number of inducing points in trial ``r``. Item
+``common_n_ind_points`` is an integer, that gives the number of inducing points
+of all trials.
+
+The layout of the initial inducing points locations is given by the item
+``ind_points_locs0_layout``. If ``ind_points_locs0_layout = equidistant`` the
+initial locations of the inducing points are equidistant between the trial
+start and trial end. If ``ind_points_locs0_layout = uniform`` the initial
+inducing points are distributed randomly between the start and end of the
+trial.
 
     .. code-block:: python
        :caption: adding ``ind_points_locs_params0`` in the layout format to ``params_spec``
 
        n_ind_points = (10, 20, 15)
        params_spec["ind_points_locs_params0"] = {
-            "n_ind_points": n_ind_points,
+           "n_ind_points": n_ind_points,
            "ind_points_locs0_layout": "equidistant",
        }
 
 Defaults
 ^^^^^^^^
 
-The default inducing points locations for trial r and latent k are equdistant n_ind_points[k] between the start and end of trial r.
+The default inducing points locations for trial r and latent k are equidistant n_ind_points[k] between the start and end of trial r.
 
     .. code-block:: python
        :caption: default ``ind_points_locs_params0``
@@ -622,7 +628,7 @@ section ``[optim_params]`` should contain items:
 Defaults
 --------
 
-The default optimization paramateters are shown below.
+The default optimisation parameters are shown below.
 
     .. code-block:: python
        :caption: default ``optimisation_params``
