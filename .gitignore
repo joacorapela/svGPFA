@@ -10,17 +10,20 @@ slurm-*
 *egg-info
 checkSpelling.csh
 svGPFA.dic
+src/svGPFA/utils/my_globals.py
 
 # directories
 # see https://stackoverflow.com/questions/3203228/git-ignore-exception/72380673#72380673
 dist/*
 # docs/*
+.mypy_cache/*
 
 docs/sphinx/Makefile
 docs/sphinx/Makefile-autodoc
 docs/sphinx/make.bat
 docs/sphinx/requirements.txt
 docs/sphinx/source/auto_examples/*
+docs/ipynb/.ipynb_checkpoints/*
 
 # !/docs/sphinx/**/
 # /docs/sphinx/*
