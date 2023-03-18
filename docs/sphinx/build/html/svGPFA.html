@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>svGPFA package &#8212; svGPFA 0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -14,10 +14,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="svGPFA.plot package" href="svGPFA.plot.html" />
@@ -46,38 +44,539 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="svGPFA.plot.html">svGPFA.plot package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.plot.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.plot.html#module-svGPFA.plot.plotUtilsPlotly">svGPFA.plot.plotUtilsPlotly module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.plot.html#module-svGPFA.plot.plotUtilsPlotly">svGPFA.plot.plotUtilsPlotly module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.get3DPlotOrthonormalizedLatentsAcrossTrials"><code class="docutils literal notranslate"><span class="pre">get3DPlotOrthonormalizedLatentsAcrossTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotCIF"><code class="docutils literal notranslate"><span class="pre">getPlotCIF()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotCIFsImageOneNeuronAllTrials"><code class="docutils literal notranslate"><span class="pre">getPlotCIFsImageOneNeuronAllTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials"><code class="docutils literal notranslate"><span class="pre">getPlotCIFsOneNeuronAllTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingAcrossTrials"><code class="docutils literal notranslate"><span class="pre">getPlotEmbeddingAcrossTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotEmbeddingParams"><code class="docutils literal notranslate"><span class="pre">getPlotEmbeddingParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotEstimatedLatentsForTrial"><code class="docutils literal notranslate"><span class="pre">getPlotEstimatedLatentsForTrial()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotKernelsParams"><code class="docutils literal notranslate"><span class="pre">getPlotKernelsParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotKernelsParamsOneLatent"><code class="docutils literal notranslate"><span class="pre">getPlotKernelsParamsOneLatent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials"><code class="docutils literal notranslate"><span class="pre">getPlotLatentAcrossTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundHist"><code class="docutils literal notranslate"><span class="pre">getPlotLowerBoundHist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundVsOneParam"><code class="docutils literal notranslate"><span class="pre">getPlotLowerBoundVsOneParam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundVsTwoParamsParam"><code class="docutils literal notranslate"><span class="pre">getPlotLowerBoundVsTwoParamsParam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotMean"><code class="docutils literal notranslate"><span class="pre">getPlotMean()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotMeanWithCI"><code class="docutils literal notranslate"><span class="pre">getPlotMeanWithCI()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedEmbeddingParams"><code class="docutils literal notranslate"><span class="pre">getPlotOrthonormalizedEmbeddingParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedLatentAcrossTrials"><code class="docutils literal notranslate"><span class="pre">getPlotOrthonormalizedLatentAcrossTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedLatentImageOneNeuronAllTrials"><code class="docutils literal notranslate"><span class="pre">getPlotOrthonormalizedLatentImageOneNeuronAllTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection"><code class="docutils literal notranslate"><span class="pre">getPlotResKSTestTimeRescalingNumericalCorrection()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis"><code class="docutils literal notranslate"><span class="pre">getPlotResROCAnalysis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotSimulatedAndEstimatedCIFs"><code class="docutils literal notranslate"><span class="pre">getPlotSimulatedAndEstimatedCIFs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotSmoothedSpikes"><code class="docutils literal notranslate"><span class="pre">getPlotSmoothedSpikes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotSpikesRatesAllTrialsAllNeurons"><code class="docutils literal notranslate"><span class="pre">getPlotSpikesRatesAllTrialsAllNeurons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedEmbedding"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedEmbedding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingParams"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedEmbeddingParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedEmbeddingPropCovered"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedEmbeddingPropCovered()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsCovs"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedIndPointsCovs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedIndPointsCovsOneTrialOneLatent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedIndPointsLocs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsLocsOneTrialOneLatent"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedIndPointsLocsOneTrialOneLatent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsMeans"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedIndPointsMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedIndPointsMeansOneTrialOneLatent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParams"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedKernelsParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedKernelsParamsOneLatent"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedKernelsParamsOneLatent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedLatents"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedLatents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedLatentsMeans"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedLatentsMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTrueAndEstimatedLatentsOneTrialOneLatent"><code class="docutils literal notranslate"><span class="pre">getPlotTrueAndEstimatedLatentsOneTrialOneLatent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTruePythonAndMatlabCIFs"><code class="docutils literal notranslate"><span class="pre">getPlotTruePythonAndMatlabCIFs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTruePythonAndMatlabEmbedding"><code class="docutils literal notranslate"><span class="pre">getPlotTruePythonAndMatlabEmbedding()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTruePythonAndMatlabEmbeddingPropCovered"><code class="docutils literal notranslate"><span class="pre">getPlotTruePythonAndMatlabEmbeddingPropCovered()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTruePythonAndMatlabKernelsParams"><code class="docutils literal notranslate"><span class="pre">getPlotTruePythonAndMatlabKernelsParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getPlotTruePythonAndMatlabLatents"><code class="docutils literal notranslate"><span class="pre">getPlotTruePythonAndMatlabLatents()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getSimulatedEmbeddingPlot"><code class="docutils literal notranslate"><span class="pre">getSimulatedEmbeddingPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getSimulatedLatentPlot"><code class="docutils literal notranslate"><span class="pre">getSimulatedLatentPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getSimulatedLatentsPlot"><code class="docutils literal notranslate"><span class="pre">getSimulatedLatentsPlot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getSimulatedSpikesTimesPlotMultipleTrials"><code class="docutils literal notranslate"><span class="pre">getSimulatedSpikesTimesPlotMultipleTrials()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getSpikesTimesPlotOneNeuron"><code class="docutils literal notranslate"><span class="pre">getSpikesTimesPlotOneNeuron()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html#svGPFA.plot.plotUtilsPlotly.getSpikesTimesPlotOneTrial"><code class="docutils literal notranslate"><span class="pre">getSpikesTimesPlotOneTrial()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.plot.html#module-svGPFA.plot">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="svGPFA.simulations.html">svGPFA.simulations package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.simulations.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.simulations.html#module-svGPFA.simulations.simulations">svGPFA.simulations.simulations module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.simulations.html#module-svGPFA.simulations.utils">svGPFA.simulations.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.simulations.html#module-svGPFA.simulations.simulations">svGPFA.simulations.simulations module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.BaseSimulator"><code class="docutils literal notranslate"><span class="pre">BaseSimulator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.BaseSimulator.getCIF"><code class="docutils literal notranslate"><span class="pre">BaseSimulator.getCIF()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.BaseSimulator.simulate"><code class="docutils literal notranslate"><span class="pre">BaseSimulator.simulate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.GPFASimulator"><code class="docutils literal notranslate"><span class="pre">GPFASimulator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.GPFASimulator.getLatentsSamplesMeansAndSTDs"><code class="docutils literal notranslate"><span class="pre">GPFASimulator.getLatentsSamplesMeansAndSTDs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.GPFAwithIndPointsSimulator"><code class="docutils literal notranslate"><span class="pre">GPFAwithIndPointsSimulator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.simulations.GPFAwithIndPointsSimulator.getLatentsSamplesMeansAndSTDs"><code class="docutils literal notranslate"><span class="pre">GPFAwithIndPointsSimulator.getLatentsSamplesMeansAndSTDs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.simulations.html#module-svGPFA.simulations.utils">svGPFA.simulations.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.simulations.html#svGPFA.simulations.utils.getTrueVariationalMean"><code class="docutils literal notranslate"><span class="pre">getTrueVariationalMean()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.simulations.html#module-svGPFA.simulations">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="svGPFA.stats.html">svGPFA.stats package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.expectedLogLikelihood">svGPFA.stats.expectedLogLikelihood module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.kernels">svGPFA.stats.kernels module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.kernelsMatricesStore">svGPFA.stats.kernelsMatricesStore module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.klDivergence">svGPFA.stats.klDivergence module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svEM">svGPFA.stats.svEM module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svEmbedding">svGPFA.stats.svEmbedding module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svGPFAModelFactory">svGPFA.stats.svGPFAModelFactory module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svLBFGS">svGPFA.stats.svLBFGS module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svLowerBound">svGPFA.stats.svLowerBound module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svPosteriorOnIndPoints">svGPFA.stats.svPosteriorOnIndPoints module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svPosteriorOnLatents">svGPFA.stats.svPosteriorOnLatents module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.expectedLogLikelihood">svGPFA.stats.expectedLogLikelihood module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.computeEmbeddingsMeansAndVarsAtTimes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeExpectedPosteriorCIFs"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.computeExpectedPosteriorCIFs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.computeSVPosteriorOnLatentsStats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.evalSumAcrossTrialsAndNeurons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.getIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getKernels"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.getKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getKernelsParams"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.getKernelsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getSVEmbeddingParams"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.getSVEmbeddingParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.getSVPosteriorOnIndPointsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.get_svEmbeddingAllTimes"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.get_svEmbeddingAllTimes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.predictEmbedding"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.predictEmbedding()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.predictLatents"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.predictLatents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.sampleCIFs"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.sampleCIFs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setELLCalculationParams"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.setELLCalculationParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setInitialParams"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setKernels"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setMeasurements"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.setMeasurements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood.setPriorCovRegParam"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood.setPriorCovRegParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL"><code class="docutils literal notranslate"><span class="pre">PointProcessELL</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.computeSVPosteriorOnLatentsStats"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.computeSVPosteriorOnLatentsStats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.evalSumAcrossTrialsAndNeurons"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.evalSumAcrossTrialsAndNeurons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setELLCalculationParams"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.setELLCalculationParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setInitialParams"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setKernels"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELL.setMeasurements"><code class="docutils literal notranslate"><span class="pre">PointProcessELL.setMeasurements()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink"><code class="docutils literal notranslate"><span class="pre">PointProcessELLExpLink</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad"><code class="docutils literal notranslate"><span class="pre">PointProcessELLQuad</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad.setELLCalculationParams"><code class="docutils literal notranslate"><span class="pre">PointProcessELLQuad.setELLCalculationParams()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL"><code class="docutils literal notranslate"><span class="pre">PoissonELL</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">PoissonELL.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.computeSVPostOnLatentsStats"><code class="docutils literal notranslate"><span class="pre">PoissonELL.computeSVPostOnLatentsStats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.computeSVPosteriorOnLatentsStats"><code class="docutils literal notranslate"><span class="pre">PoissonELL.computeSVPosteriorOnLatentsStats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.evalSumAcrossTrialsAndNeurons"><code class="docutils literal notranslate"><span class="pre">PoissonELL.evalSumAcrossTrialsAndNeurons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.setELLCalculationParams"><code class="docutils literal notranslate"><span class="pre">PoissonELL.setELLCalculationParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">PoissonELL.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.setInitialParams"><code class="docutils literal notranslate"><span class="pre">PoissonELL.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.setKernels"><code class="docutils literal notranslate"><span class="pre">PoissonELL.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELL.setMeasurements"><code class="docutils literal notranslate"><span class="pre">PoissonELL.setMeasurements()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink"><code class="docutils literal notranslate"><span class="pre">PoissonELLExpLink</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.expectedLogLikelihood.PoissonELLQuad"><code class="docutils literal notranslate"><span class="pre">PoissonELLQuad</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.kernels">svGPFA.stats.kernels module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.ExponentialQuadraticKernel"><code class="docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.ExponentialQuadraticKernel.buildKernelMatrix"><code class="docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel.buildKernelMatrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.ExponentialQuadraticKernel.buildKernelMatrixDiag"><code class="docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel.buildKernelMatrixDiag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.ExponentialQuadraticKernel.getNamedParams"><code class="docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel.getNamedParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.ExponentialQuadraticKernel.getScaledParams"><code class="docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel.getScaledParams()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel"><code class="docutils literal notranslate"><span class="pre">Kernel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel.buildKernelMatrix"><code class="docutils literal notranslate"><span class="pre">Kernel.buildKernelMatrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel.buildKernelMatrixDiag"><code class="docutils literal notranslate"><span class="pre">Kernel.buildKernelMatrixDiag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel.getNamedParams"><code class="docutils literal notranslate"><span class="pre">Kernel.getNamedParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel.getParams"><code class="docutils literal notranslate"><span class="pre">Kernel.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.Kernel.setParams"><code class="docutils literal notranslate"><span class="pre">Kernel.setParams()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.PeriodicKernel"><code class="docutils literal notranslate"><span class="pre">PeriodicKernel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.PeriodicKernel.buildKernelMatrix"><code class="docutils literal notranslate"><span class="pre">PeriodicKernel.buildKernelMatrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.PeriodicKernel.buildKernelMatrixDiag"><code class="docutils literal notranslate"><span class="pre">PeriodicKernel.buildKernelMatrixDiag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.PeriodicKernel.getNamedParams"><code class="docutils literal notranslate"><span class="pre">PeriodicKernel.getNamedParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernels.PeriodicKernel.getScaledParams"><code class="docutils literal notranslate"><span class="pre">PeriodicKernel.getScaledParams()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.kernelsMatricesStore">svGPFA.stats.kernelsMatricesStore module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAllTimesKMS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAllTimesKMS.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAllTimesKMS.buildKttKernelsMatrices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAssocTimesKMS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAssocTimesKMS.buildKernelsMatrices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKtt"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS.getKtt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKttDiag"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS.getKttDiag()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.getKtz"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS.getKtz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS.setTimes"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS.setTimes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.getKzz"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS.getKzz()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.getRegParam"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS.getRegParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.setRegParam"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS.setRegParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.solveForLatent"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS.solveForLatent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS.solveForLatentAndTrial"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS.solveForLatentAndTrial()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_Chol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol.solveForLatent"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_Chol.solveForLatent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol.solveForLatentAndTrial"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_Chol.solveForLatentAndTrial()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_CholWithGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_CholWithGettersAndSetters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInv</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv.solveForLatent"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInv.solveForLatent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv.solveForLatentAndTrial"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInv.solveForLatentAndTrial()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInvWithGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInvWithGettersAndSetters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs_grad"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.get_flattened_ind_points_locs_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params_grad"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.get_flattened_kernels_params_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_ind_points_locs_from_flattened"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.set_ind_points_locs_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_ind_points_locs_requires_grad"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.set_ind_points_locs_requires_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_kernels_params_from_flattened"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.set_kernels_params_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters.set_kernels_params_requires_grad"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters.set_kernels_params_requires_grad()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.getIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getKernels"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.getKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.getKernelsParams"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.getKernelsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setInitialParams"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setKernels"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore.setKernelsParams"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore.setKernelsParams()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.klDivergence">svGPFA.stats.klDivergence module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.klDivergence.KLDivergence"><code class="docutils literal notranslate"><span class="pre">KLDivergence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials"><code class="docutils literal notranslate"><span class="pre">KLDivergence.evalSumAcrossLatentsAndTrials()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.klDivergence.KLDivergence.get_indPointsLocsKMS"><code class="docutils literal notranslate"><span class="pre">KLDivergence.get_indPointsLocsKMS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.klDivergence.KLDivergence.get_svPosteriorOnIndPoints"><code class="docutils literal notranslate"><span class="pre">KLDivergence.get_svPosteriorOnIndPoints()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svEM">svGPFA.stats.svEM module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.ErrorTerminationInfo"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.ErrorTerminationInfo.error"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo.error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.ErrorTerminationInfo.stack_trace"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo.stack_trace</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM"><code class="docutils literal notranslate"><span class="pre">SVEM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM.maximize"><code class="docutils literal notranslate"><span class="pre">SVEM.maximize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM_PyTorch"><code class="docutils literal notranslate"><span class="pre">SVEM_PyTorch</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM_PyTorch.maximize"><code class="docutils literal notranslate"><span class="pre">SVEM_PyTorch.maximize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM_SciPy"><code class="docutils literal notranslate"><span class="pre">SVEM_SciPy</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM_SciPy.maximize"><code class="docutils literal notranslate"><span class="pre">SVEM_SciPy.maximize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.TerminationInfo"><code class="docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.TerminationInfo.message"><code class="docutils literal notranslate"><span class="pre">TerminationInfo.message</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svEmbedding">svGPFA.stats.svEmbedding module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbedding"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbedding</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbedding.getParams"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbedding.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbedding.sample"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbedding.sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbedding.setInitialParams"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbedding.setInitialParams()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes.computeMeansAndVarsAtTimes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.predict"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.predictLatents"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes.predictLatents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes.setPriorCovRegParam"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes.setPriorCovRegParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params_grad"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.get_flattened_params_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_from_flattened"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_requires_grad"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters.set_params_requires_grad()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAssocTimes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes.setNeuronForSpikeIndex"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAssocTimes.setNeuronForSpikeIndex()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding"><code class="docutils literal notranslate"><span class="pre">SVEmbedding</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.computeMeansAndVars"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.computeMeansAndVars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.computeSVPosteriorOnLatentsStats"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.computeSVPosteriorOnLatentsStats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.getIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.getIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.getKernels"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.getKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.getKernelsParams"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.getKernelsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.getParams"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.getSVPosteriorOnIndPointsParams"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.getSVPosteriorOnIndPointsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.setKernels"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEmbedding.SVEmbedding.setTimes"><code class="docutils literal notranslate"><span class="pre">SVEmbedding.setTimes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svGPFAModelFactory">svGPFA.stats.svGPFAModelFactory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.ExponentialLink"><code class="docutils literal notranslate"><span class="pre">ExponentialLink</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.Gaussian"><code class="docutils literal notranslate"><span class="pre">Gaussian</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.LinearEmbedding"><code class="docutils literal notranslate"><span class="pre">LinearEmbedding</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.NonExponentialLink"><code class="docutils literal notranslate"><span class="pre">NonExponentialLink</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.PointProcess"><code class="docutils literal notranslate"><span class="pre">PointProcess</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.Poisson"><code class="docutils literal notranslate"><span class="pre">Poisson</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory"><code class="docutils literal notranslate"><span class="pre">SVGPFAModelFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelPyTorch"><code class="docutils literal notranslate"><span class="pre">SVGPFAModelFactory.buildModelPyTorch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory.buildModelSciPy"><code class="docutils literal notranslate"><span class="pre">SVGPFAModelFactory.buildModelSciPy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.indPointsCovChol"><code class="docutils literal notranslate"><span class="pre">indPointsCovChol</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.indPointsCovRank1PlusDiag"><code class="docutils literal notranslate"><span class="pre">indPointsCovRank1PlusDiag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol"><code class="docutils literal notranslate"><span class="pre">kernelMatrixInvChol</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svGPFAModelFactory.kernelMatrixInvPInv"><code class="docutils literal notranslate"><span class="pre">kernelMatrixInvPInv</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svLBFGS">svGPFA.stats.svLBFGS module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLBFGS.ErrorTerminationInfo"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLBFGS.ErrorTerminationInfo.error"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo.error</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLBFGS.SVLBFGS"><code class="docutils literal notranslate"><span class="pre">SVLBFGS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLBFGS.SVLBFGS.maximize"><code class="docutils literal notranslate"><span class="pre">SVLBFGS.maximize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLBFGS.TerminationInfo"><code class="docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLBFGS.TerminationInfo.message"><code class="docutils literal notranslate"><span class="pre">TerminationInfo.message</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svLowerBound">svGPFA.stats.svLowerBound module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound"><code class="docutils literal notranslate"><span class="pre">SVLowerBound</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.computeEmbeddingMeansAndVarsAtTimes"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.computeEmbeddingMeansAndVarsAtTimes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.computeExpectedPosteriorCIFs"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.computeExpectedPosteriorCIFs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.computeSVPosteriorOnLatentsStats"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.computeSVPosteriorOnLatentsStats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.eval"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.eval()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.evalELLSumAcrossTrialsAndNeurons"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.evalELLSumAcrossTrialsAndNeurons()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.getIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.getIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.getKernels"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.getKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.getKernelsParams"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.getKernelsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.getSVEmbeddingParams"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.getSVEmbeddingParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.getSVPosteriorOnIndPointsParams"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.getSVPosteriorOnIndPointsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.predictEmbedding"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.predictEmbedding()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.predictLatents"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.predictLatents()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.sampleCIFs"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.sampleCIFs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setELLCalculationParams"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setELLCalculationParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setKernels"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setMeasurements"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setMeasurements()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setParamsAndData()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBound.setPriorCovRegParam"><code class="docutils literal notranslate"><span class="pre">SVLowerBound.setPriorCovRegParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_indPointsLocs_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_kernels_params_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_svEmbedding_params_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.get_flattened_svPosteriorOnIndPoints_params_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_from_flattened"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_requires_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_indPointsLocs_requires_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_from_flattened"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_requires_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_kernels_params_requires_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_from_flattened"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_requires_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_svEmbedding_params_requires_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_from_flattened"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_requires_grad"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters.set_svPosteriorOnIndPoints_params_requires_grad()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svPosteriorOnIndPoints">svGPFA.stats.svPosteriorOnIndPoints module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.buildCov"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints.buildCov()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getMean"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints.getMean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.getParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints.setInitialParams()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.buildCov"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol.buildCov()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.getMean"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol.getMean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.getParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol.setInitialParams()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params_grad"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters.get_flattened_params_grad()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_from_flattened"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_from_flattened()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_requires_grad"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters.set_params_requires_grad()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.buildCov"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag.buildCov()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.getMean"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag.getMean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.getParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag.setInitialParams()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats.svPosteriorOnLatents">svGPFA.stats.svPosteriorOnLatents module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.computeMeansAndVars"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.computeMeansAndVars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.getIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getKernels"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.getKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getKernelsParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.getKernelsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.getSVPosteriorOnIndPointsParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.getSVPosteriorOnIndPointsParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setKernels"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.setKernels()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setPriorCovRegParam"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.setPriorCovRegParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents.setTimes"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents.setTimes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVars"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.computeMeansAndVars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.computeMeansAndVarsAtTimes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.predict"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.sample"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes.setKernels"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes.setKernels()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.buildKernelsMatrices"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes.buildKernelsMatrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.computeMeansAndVars"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes.computeMeansAndVars()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setIndPointsLocs"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes.setIndPointsLocs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setInitialParams"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes.setInitialParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes.setKernels"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes.setKernels()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.stats.html#module-svGPFA.stats">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="svGPFA.utils.html">svGPFA.utils package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.configUtils">svGPFA.utils.configUtils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.initUtils">svGPFA.utils.initUtils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.miscUtils">svGPFA.utils.miscUtils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.configUtils">svGPFA.utils.configUtils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.configUtils.getIndPointsMeans"><code class="docutils literal notranslate"><span class="pre">getIndPointsMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.configUtils.getKernels"><code class="docutils literal notranslate"><span class="pre">getKernels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.configUtils.getLatentsMeansFuncs"><code class="docutils literal notranslate"><span class="pre">getLatentsMeansFuncs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.configUtils.getScaledKernels"><code class="docutils literal notranslate"><span class="pre">getScaledKernels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.configUtils.getVariationalMean0FromList"><code class="docutils literal notranslate"><span class="pre">getVariationalMean0FromList()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.initUtils">svGPFA.utils.initUtils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.buildEquidistantIndPointsLocs0"><code class="docutils literal notranslate"><span class="pre">buildEquidistantIndPointsLocs0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.buildFloatListFromStringRep"><code class="docutils literal notranslate"><span class="pre">buildFloatListFromStringRep()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.buildUniformIndPointsLocs0"><code class="docutils literal notranslate"><span class="pre">buildUniformIndPointsLocs0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.flatToHierarchicalOptimParams"><code class="docutils literal notranslate"><span class="pre">flatToHierarchicalOptimParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getArgsInfo"><code class="docutils literal notranslate"><span class="pre">getArgsInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getConstantIndPointsMeans"><code class="docutils literal notranslate"><span class="pre">getConstantIndPointsMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getDefaultParamsDict"><code class="docutils literal notranslate"><span class="pre">getDefaultParamsDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getDiffAcrossLatentsAndTrialsIndPointsLocs0"><code class="docutils literal notranslate"><span class="pre">getDiffAcrossLatentsAndTrialsIndPointsLocs0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getDiffAcrossLatentsAndTrialsVariationalCov0"><code class="docutils literal notranslate"><span class="pre">getDiffAcrossLatentsAndTrialsVariationalCov0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getDiffAcrossLatentsAndTrialsVariationalMean0"><code class="docutils literal notranslate"><span class="pre">getDiffAcrossLatentsAndTrialsVariationalMean0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getIndPointsLocs0"><code class="docutils literal notranslate"><span class="pre">getIndPointsLocs0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getIndPointsLocs0InDict"><code class="docutils literal notranslate"><span class="pre">getIndPointsLocs0InDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getKernelsParams0"><code class="docutils literal notranslate"><span class="pre">getKernelsParams0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getKernelsParams0AndTypes"><code class="docutils literal notranslate"><span class="pre">getKernelsParams0AndTypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getKernelsParams0AndTypesInDict"><code class="docutils literal notranslate"><span class="pre">getKernelsParams0AndTypesInDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getKernelsScaledParams0"><code class="docutils literal notranslate"><span class="pre">getKernelsScaledParams0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getKzzChol0"><code class="docutils literal notranslate"><span class="pre">getKzzChol0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getLinearEmbeddingParam0"><code class="docutils literal notranslate"><span class="pre">getLinearEmbeddingParam0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getLinearEmbeddingParam0InDict"><code class="docutils literal notranslate"><span class="pre">getLinearEmbeddingParam0InDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getLinearEmbeddingParams0"><code class="docutils literal notranslate"><span class="pre">getLinearEmbeddingParams0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getOptimParams"><code class="docutils literal notranslate"><span class="pre">getOptimParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParam"><code class="docutils literal notranslate"><span class="pre">getParam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="docutils literal notranslate"><span class="pre">getParamsAndKernelsTypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsDictFromArgs"><code class="docutils literal notranslate"><span class="pre">getParamsDictFromArgs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsDictFromStringsDict"><code class="docutils literal notranslate"><span class="pre">getParamsDictFromStringsDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getSVPosteriorOnIndPointsParams0"><code class="docutils literal notranslate"><span class="pre">getSVPosteriorOnIndPointsParams0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getSameAcrossLatentsAndTrialsIndPointsLocs0"><code class="docutils literal notranslate"><span class="pre">getSameAcrossLatentsAndTrialsIndPointsLocs0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getSameAcrossLatentsAndTrialsVariationalCov0"><code class="docutils literal notranslate"><span class="pre">getSameAcrossLatentsAndTrialsVariationalCov0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getSameAcrossLatentsAndTrialsVariationalMean0"><code class="docutils literal notranslate"><span class="pre">getSameAcrossLatentsAndTrialsVariationalMean0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getScaledIdentityQSigma0"><code class="docutils literal notranslate"><span class="pre">getScaledIdentityQSigma0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getUniformIndPointsMeans"><code class="docutils literal notranslate"><span class="pre">getUniformIndPointsMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getVariationalCov0"><code class="docutils literal notranslate"><span class="pre">getVariationalCov0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getVariationalCov0InDict"><code class="docutils literal notranslate"><span class="pre">getVariationalCov0InDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getVariationalMean0"><code class="docutils literal notranslate"><span class="pre">getVariationalMean0()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getVariationalMean0InDict"><code class="docutils literal notranslate"><span class="pre">getVariationalMean0InDict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.strTo1DDoubleTensor"><code class="docutils literal notranslate"><span class="pre">strTo1DDoubleTensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.strTo1DIntTensor"><code class="docutils literal notranslate"><span class="pre">strTo1DIntTensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.strTo1DTensor"><code class="docutils literal notranslate"><span class="pre">strTo1DTensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.strTo2DDoubleTensor"><code class="docutils literal notranslate"><span class="pre">strTo2DDoubleTensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.strTo2DIntTensor"><code class="docutils literal notranslate"><span class="pre">strTo2DIntTensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.strTo2DTensor"><code class="docutils literal notranslate"><span class="pre">strTo2DTensor()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils.miscUtils">svGPFA.utils.miscUtils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.build3DdiagFromDiagVector"><code class="docutils literal notranslate"><span class="pre">build3DdiagFromDiagVector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.buildCovsFromCholVecs"><code class="docutils literal notranslate"><span class="pre">buildCovsFromCholVecs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.buildKernels"><code class="docutils literal notranslate"><span class="pre">buildKernels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.buildQSigmaFromQSVecAndQSDiag"><code class="docutils literal notranslate"><span class="pre">buildQSigmaFromQSVecAndQSDiag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.chol3D"><code class="docutils literal notranslate"><span class="pre">chol3D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.clock"><code class="docutils literal notranslate"><span class="pre">clock()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.computeSpikeClassificationROC"><code class="docutils literal notranslate"><span class="pre">computeSpikeClassificationROC()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.computeSpikeRates"><code class="docutils literal notranslate"><span class="pre">computeSpikeRates()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getCIFs"><code class="docutils literal notranslate"><span class="pre">getCIFs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getCholFromVec"><code class="docutils literal notranslate"><span class="pre">getCholFromVec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getDiagIndicesIn3DArray"><code class="docutils literal notranslate"><span class="pre">getDiagIndicesIn3DArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getEmbeddingMeans"><code class="docutils literal notranslate"><span class="pre">getEmbeddingMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getEmbeddingSTDs"><code class="docutils literal notranslate"><span class="pre">getEmbeddingSTDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getEmbeddingSamples"><code class="docutils literal notranslate"><span class="pre">getEmbeddingSamples()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getLatentsMeansAndSTDs"><code class="docutils literal notranslate"><span class="pre">getLatentsMeansAndSTDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getLatentsSTDs"><code class="docutils literal notranslate"><span class="pre">getLatentsSTDs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getLatentsSamplesMeansAndSTDsFromSampledMeans"><code class="docutils literal notranslate"><span class="pre">getLatentsSamplesMeansAndSTDsFromSampledMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getLegQuadPointsAndWeights"><code class="docutils literal notranslate"><span class="pre">getLegQuadPointsAndWeights()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getPropSamplesCovered"><code class="docutils literal notranslate"><span class="pre">getPropSamplesCovered()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getQSVecsAndQSDiagsFromQSCholVecs"><code class="docutils literal notranslate"><span class="pre">getQSVecsAndQSDiagsFromQSCholVecs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getSRQSigmaVec"><code class="docutils literal notranslate"><span class="pre">getSRQSigmaVec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getSRQSigmaVecsFromKzz"><code class="docutils literal notranslate"><span class="pre">getSRQSigmaVecsFromKzz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getTrialsTimes"><code class="docutils literal notranslate"><span class="pre">getTrialsTimes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.getVectorRepOfLowerTrianMatrices"><code class="docutils literal notranslate"><span class="pre">getVectorRepOfLowerTrianMatrices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.orthonormalizeLatentsMeans"><code class="docutils literal notranslate"><span class="pre">orthonormalizeLatentsMeans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.pinv3D"><code class="docutils literal notranslate"><span class="pre">pinv3D()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.saveDataForMatlabEstimations"><code class="docutils literal notranslate"><span class="pre">saveDataForMatlabEstimations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.miscUtils.separateNeuronsSpikeTimesByTrials"><code class="docutils literal notranslate"><span class="pre">separateNeuronsSpikeTimesByTrials()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="svGPFA.utils.html#module-svGPFA.utils">Module contents</a></li>
 </ul>
 </li>
@@ -181,8 +680,8 @@
       &copy;2019, Lea Duncker and Maneesh Sahani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
       <a href="_sources/svGPFA.rst.txt"

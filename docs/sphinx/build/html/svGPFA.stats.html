@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>svGPFA.stats package &#8212; svGPFA 0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -14,10 +14,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -621,11 +619,16 @@
 <span id="svgpfa-stats-svem-module"></span><h2>svGPFA.stats.svEM module<a class="headerlink" href="#module-svGPFA.stats.svEM" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="svGPFA.stats.svEM.ErrorTerminationInfo">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">ErrorTerminationInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.ErrorTerminationInfo" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">svGPFA.stats.svEM.</span></span><span class="sig-name descname"><span class="pre">ErrorTerminationInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stack_trace</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.ErrorTerminationInfo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEM.TerminationInfo" title="svGPFA.stats.svEM.TerminationInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="svGPFA.stats.svEM.ErrorTerminationInfo.error">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error</span></span><a class="headerlink" href="#svGPFA.stats.svEM.ErrorTerminationInfo.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="svGPFA.stats.svEM.ErrorTerminationInfo.stack_trace">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stack_trace</span></span><a class="headerlink" href="#svGPFA.stats.svEM.ErrorTerminationInfo.stack_trace" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -636,7 +639,7 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM.maximize">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='ECM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='UTF-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='results/00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM.maximize" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='ECM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printIterationModelParams=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;sphinx_gallery.gen_rst._LoggingTee</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='results/00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM.maximize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
 Sahani, 2018.</p>
 <div class="admonition note">
@@ -664,7 +667,7 @@ be set by users. The remaining parameters are used to interface
 <dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEM.SVEM" title="svGPFA.stats.svEM.SVEM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEM</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM_PyTorch.maximize">
-<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='ECM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='UTF-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='results/00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_PyTorch.maximize" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='ECM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printIterationModelParams=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;sphinx_gallery.gen_rst._LoggingTee</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='results/00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_PyTorch.maximize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
 Sahani, 2018.</p>
 <div class="admonition note">
@@ -692,7 +695,7 @@ be set by users. The remaining parameters are used to interface
 <dd><p>Bases: <a class="reference internal" href="#svGPFA.stats.svEM.SVEM" title="svGPFA.stats.svEM.SVEM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SVEM</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="svGPFA.stats.svEM.SVEM_SciPy.maximize">
-<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='EM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='UTF-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_SciPy.maximize" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optim_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='EM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">printIterationModelParams=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;sphinx_gallery.gen_rst._LoggingTee</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svEM.SVEM_SciPy.maximize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Maximizes the sparse variational lower bound, Eq. 4 in Duncker and
 Sahani, 2018.</p>
 <div class="admonition note">
@@ -983,7 +986,7 @@ be set by users. The remaining parameters are used to interface
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="svGPFA.stats.svLBFGS.SVLBFGS.maximize">
-<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='EM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='UTF-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLBFGS.SVLBFGS.maximize" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">maximize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimParams</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method='EM'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">getIterationModelParamsFn=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowerBoundStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsTimes=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsLock=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latentsStreamFN=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out=&lt;_io.TextIOWrapper</span> <span class="pre">name='&lt;stdout&gt;'</span> <span class="pre">mode='w'</span> <span class="pre">encoding='utf-8'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartial=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savePartialFilenamePattern='00000000_{:s}_estimatedModel.pickle'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#svGPFA.stats.svLBFGS.SVLBFGS.maximize" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1520,17 +1523,93 @@ be set by users. The remaining parameters are used to interface
 <li class="toctree-l3"><a class="reference internal" href="svGPFA.simulations.html">svGPFA.simulations package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">svGPFA.stats package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.expectedLogLikelihood">svGPFA.stats.expectedLogLikelihood module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.kernels">svGPFA.stats.kernels module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.kernelsMatricesStore">svGPFA.stats.kernelsMatricesStore module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.klDivergence">svGPFA.stats.klDivergence module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svEM">svGPFA.stats.svEM module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svEmbedding">svGPFA.stats.svEmbedding module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svGPFAModelFactory">svGPFA.stats.svGPFAModelFactory module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svLBFGS">svGPFA.stats.svLBFGS module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svLowerBound">svGPFA.stats.svLowerBound module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svPosteriorOnIndPoints">svGPFA.stats.svPosteriorOnIndPoints module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svPosteriorOnLatents">svGPFA.stats.svPosteriorOnLatents module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.expectedLogLikelihood">svGPFA.stats.expectedLogLikelihood module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.ExpectedLogLikelihood"><code class="docutils literal notranslate"><span class="pre">ExpectedLogLikelihood</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELL"><code class="docutils literal notranslate"><span class="pre">PointProcessELL</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink"><code class="docutils literal notranslate"><span class="pre">PointProcessELLExpLink</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PointProcessELLQuad"><code class="docutils literal notranslate"><span class="pre">PointProcessELLQuad</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PoissonELL"><code class="docutils literal notranslate"><span class="pre">PoissonELL</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink"><code class="docutils literal notranslate"><span class="pre">PoissonELLExpLink</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.expectedLogLikelihood.PoissonELLQuad"><code class="docutils literal notranslate"><span class="pre">PoissonELLQuad</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.kernels">svGPFA.stats.kernels module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernels.ExponentialQuadraticKernel"><code class="docutils literal notranslate"><span class="pre">ExponentialQuadraticKernel</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernels.Kernel"><code class="docutils literal notranslate"><span class="pre">Kernel</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernels.PeriodicKernel"><code class="docutils literal notranslate"><span class="pre">PeriodicKernel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.kernelsMatricesStore">svGPFA.stats.kernelsMatricesStore module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAllTimesKMS</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndAssocTimesKMS</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsAndTimesKMS</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_Chol</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_CholWithGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_CholWithGettersAndSetters</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInv"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInv</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_PInvWithGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">IndPointsLocsKMS_PInvWithGettersAndSetters</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.KernelMatricesStoreGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">KernelMatricesStoreGettersAndSetters</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.kernelsMatricesStore.KernelsMatricesStore"><code class="docutils literal notranslate"><span class="pre">KernelsMatricesStore</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.klDivergence">svGPFA.stats.klDivergence module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.klDivergence.KLDivergence"><code class="docutils literal notranslate"><span class="pre">KLDivergence</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svEM">svGPFA.stats.svEM module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEM.ErrorTerminationInfo"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEM.SVEM"><code class="docutils literal notranslate"><span class="pre">SVEM</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEM.SVEM_PyTorch"><code class="docutils literal notranslate"><span class="pre">SVEM_PyTorch</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEM.SVEM_SciPy"><code class="docutils literal notranslate"><span class="pre">SVEM_SciPy</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEM.TerminationInfo"><code class="docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svEmbedding">svGPFA.stats.svEmbedding module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbedding"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbedding</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimes</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimesWithParamsGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAllTimesWithParamsGettersAndSetters</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes"><code class="docutils literal notranslate"><span class="pre">LinearSVEmbeddingAssocTimes</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svEmbedding.SVEmbedding"><code class="docutils literal notranslate"><span class="pre">SVEmbedding</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svGPFAModelFactory">svGPFA.stats.svGPFAModelFactory module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.ExponentialLink"><code class="docutils literal notranslate"><span class="pre">ExponentialLink</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.Gaussian"><code class="docutils literal notranslate"><span class="pre">Gaussian</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.LinearEmbedding"><code class="docutils literal notranslate"><span class="pre">LinearEmbedding</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.NonExponentialLink"><code class="docutils literal notranslate"><span class="pre">NonExponentialLink</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.PointProcess"><code class="docutils literal notranslate"><span class="pre">PointProcess</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.Poisson"><code class="docutils literal notranslate"><span class="pre">Poisson</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.SVGPFAModelFactory"><code class="docutils literal notranslate"><span class="pre">SVGPFAModelFactory</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.indPointsCovChol"><code class="docutils literal notranslate"><span class="pre">indPointsCovChol</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.indPointsCovRank1PlusDiag"><code class="docutils literal notranslate"><span class="pre">indPointsCovRank1PlusDiag</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.kernelMatrixInvChol"><code class="docutils literal notranslate"><span class="pre">kernelMatrixInvChol</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svGPFAModelFactory.kernelMatrixInvPInv"><code class="docutils literal notranslate"><span class="pre">kernelMatrixInvPInv</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svLBFGS">svGPFA.stats.svLBFGS module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svLBFGS.ErrorTerminationInfo"><code class="docutils literal notranslate"><span class="pre">ErrorTerminationInfo</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svLBFGS.SVLBFGS"><code class="docutils literal notranslate"><span class="pre">SVLBFGS</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svLBFGS.TerminationInfo"><code class="docutils literal notranslate"><span class="pre">TerminationInfo</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svLowerBound">svGPFA.stats.svLowerBound module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBound"><code class="docutils literal notranslate"><span class="pre">SVLowerBound</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svLowerBound.SVLowerBoundWithParamsGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">SVLowerBoundWithParamsGettersAndSetters</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svPosteriorOnIndPoints">svGPFA.stats.svPosteriorOnIndPoints module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPoints"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPoints</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsChol</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsCholWithGettersAndSetters"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsCholWithGettersAndSetters</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsRank1PlusDiag"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnIndPointsRank1PlusDiag</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats.svPosteriorOnLatents">svGPFA.stats.svPosteriorOnLatents module</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatents</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAllTimes</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="#svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes"><code class="docutils literal notranslate"><span class="pre">SVPosteriorOnLatentsAssocTimes</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l4"><a class="reference internal" href="#module-svGPFA.stats">Module contents</a></li>
 </ul>
 </li>
@@ -1579,8 +1658,8 @@ be set by users. The remaining parameters are used to interface
       &copy;2019, Lea Duncker and Maneesh Sahani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
       <a href="_sources/svGPFA.stats.rst.txt"

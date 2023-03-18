@@ -22,6 +22,7 @@ import svGPFA.stats.svGPFAModelFactory
 import svGPFA.stats.svEM
 import svGPFA.utils.miscUtils
 import svGPFA.utils.initUtils
+import svGPFA.plot.plotUtilsPlotly
 import gcnu_common.stats.pointProcesses.tests
 
 
@@ -42,7 +43,46 @@ trials_start_times = [trials_start_time] * n_trials
 trials_end_times = [trials_end_time] * n_trials
 
 #%%
-# 1.3 Set estimation hyperparameters
+# 1.3 Check that spikes have been epoched correctly
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#%%
+# Plot spikes 
+# ~~~~~~~~~~~
+# Plot the spikes of all trials of a randomly chosen neuron. Most trials should
+# contain at least one spike.
+
+neuron_to_plot_index = torch.randint(low=0, high=n_neurons, size=(1,)).item()
+fig = svGPFA.plot.plotUtilsPlotly.getSpikesTimesPlotOneNeuron(
+    spikes_times=spikes_times,
+    neuron_index=neuron_to_plot_index,
+    title=f"Neuron index: {neuron_to_plot_index}",
+)
+fig
+
+#%%
+# Run some simple checks on spikes
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The function ``checkEpochedSpikesTimes`` tests that:
+#
+#   a. every neuron fired at least one spike across all trials,
+#   b. for each trial, the spikes times of every neuron are between the trial
+#      start and end times.
+#
+# If any check fails, a ``ValueError`` will be raised. Otherwise a checks
+# passed message should be printed.
+
+try:
+    gcnu_common.utils.neural_data_analysis.checkEpochedSpikesTimes(
+        spikes_times=spikes_times, trials_start_times=trials_start_times,
+        trials_end_times=trials_end_times,
+    )
+except ValueError:
+    raise
+print("Checks passed")
+
+#%%
+# 1.4 Set estimation hyperparameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 n_latents = 2
@@ -50,7 +90,7 @@ em_max_iter = 30
 model_save_filename = "../results/simulation_model.pickle"
 
 #%%
-# 1.4 Get parameters
+# 1.5 Get parameters
 # ~~~~~~~~~~~~~~~~~~
 
 #%%
@@ -59,6 +99,7 @@ model_save_filename = "../results/simulation_model.pickle"
 default_params_spec = svGPFA.utils.initUtils.getDefaultParamsDict(
     n_neurons=n_neurons, n_trials=n_trials, n_latents=n_latents,
     em_max_iter=em_max_iter)
+
 #%%
 # Get parameters and kernels types from the parameters specification
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -69,7 +110,7 @@ params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
     default_params_spec=default_params_spec)
 
 #%%
-# 1.5 Create kernels, a model and set its initial parameters
+# 1.6 Create kernels, a model and set its initial parameters
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #%%
@@ -96,7 +137,7 @@ model.setParamsAndData(
 
 
 #%%
-# 1.6 Maximize the Lower Bound
+# 1.7 Maximize the Lower Bound
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 #
@@ -161,25 +202,30 @@ trials_times = svGPFA.utils.miscUtils.getTrialsTimes(
 trials_colors = px.colors.sample_colorscale(
     colorscale=trials_colorscale, samplepoints=n_trials,
     colortype="rgb")
-trials_colors_patterns = [f"rgba{trial_color[3:-1]}, {{:f}})" for trial_color in trials_colors]
+trials_colors_patterns = [f"rgba{trial_color[3:-1]}, {{:f}})"
+                          for trial_color in trials_colors]
 
 #%%
-# Set trials labels
+# Set trials ids
 # ^^^^^^^^^^^^^^^^^
-trials_labels = [str(r) for r in range(n_trials)]
+trials_ids = [r for r in range(n_trials)]
 
 
 #%%
 # 2.3 Lower bound history
 # ~~~~~~~~~~~~~~~~~~~~~~~
-fig = svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundHist(lowerBoundHist=lowerBoundHist)
+fig = svGPFA.plot.plotUtilsPlotly.getPlotLowerBoundHist(
+    lowerBoundHist=lowerBoundHist)
 fig
 
 #%%
 # 2.4 Latent across trials
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 test_mu_k, test_var_k = model.predictLatents(times=trials_times)
-fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(times=trials_times.numpy(), latentsMeans=test_mu_k, latentsSTDs=torch.sqrt(test_var_k), latentToPlot=latent_to_plot, trials_colors_patterns=trials_colors_patterns, xlabel="Time (msec)")
+fig = svGPFA.plot.plotUtilsPlotly.getPlotLatentAcrossTrials(
+    times=trials_times.numpy(), latentsMeans=test_mu_k,
+    latentsSTDs=torch.sqrt(test_var_k), latentToPlot=latent_to_plot,
+    trials_colors_patterns=trials_colors_patterns, xlabel="Time (msec)")
 fig
 
 #%%
@@ -191,9 +237,10 @@ estimatedC, estimatedD = model.getSVEmbeddingParams()
 estimatedC_np = estimatedC.detach().numpy()
 fig = svGPFA.plot.plotUtilsPlotly.getPlotOrthonormalizedLatentAcrossTrials(
     trials_times=trials_times,
-    latentsMeans=testMuK_np, latentToPlot=latent_to_plot,
+    latentsMeans=testMuK_np,
     C=estimatedC_np,
-    trials_labels=trials_labels,
+    trials_ids=trials_ids,
+    latentToPlot=latent_to_plot,
     trials_colors=trials_colors,
     xlabel="Time (msec)")
 fig
@@ -215,7 +262,8 @@ with torch.no_grad():
     ePos_CIF_values = model.computeExpectedPosteriorCIFs(times=trials_times)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotCIFsOneNeuronAllTrials(
     trials_times=trials_times, cif_values=ePos_CIF_values,
-    neuron_index=neuron_to_plot, trials_colors=trials_colors)
+    trials_ids=trials_ids, neuron_index=neuron_to_plot,
+    trials_colors=trials_colors)
 fig
 
 

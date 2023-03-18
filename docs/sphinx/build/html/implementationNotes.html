@@ -4,7 +4,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
     <title>Implementation notes &#8212; svGPFA 0.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
@@ -14,10 +14,8 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -48,7 +46,6 @@
 <li><p>kernels parameters: parameters of <span class="math notranslate nohighlight">\(\kappa_k(\cdot,\cdot)\)</span> in Eq. 1, top row, of <span id="id3">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>,</p></li>
 <li><p>inducing points locations: <span class="math notranslate nohighlight">\(\mathbf{z}_k^{(r)}\in\mathbb{R}^\text{n_ind_points(k)}\)</span> in Eq. 2 of <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>.</p></li>
 </ol>
-<p>for <span class="math notranslate nohighlight">\(k=1,\ldots,K\)</span> and <span class="math notranslate nohighlight">\(r=1,\ldots,R\)</span>.</p>
 <p>The estimation of svGPFA parameters is performed using the Expectation Conditional Maximization algorithm (<span id="id5">McLachlan and Krishnan [<a class="reference internal" href="references.html#id65" title="Geoffrey J McLachlan and Thriyambakam Krishnan. The EM algorithm and extensions. John Wiley &amp; Sons, 2nd edition, 2008.">MK08</a>]</span>, see <a class="reference internal" href="svGPFA.stats.html#svGPFA.stats.svEM.SVEM.maximize" title="svGPFA.stats.svEM.SVEM.maximize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">svGPFA.stats.svEM.SVEM.maximize()</span></code></a>), which reduces to a sequence of numerical optimizations. Because we use PyTorch’s autograd to compute derivatives, these optimizations only require the calculation of the svGPFA lower bound (left hand side of Eq. 4 in <span id="id6">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>). Below we provide details about how the calculation of this lower bound is implemented.</p>
 </section>
 
@@ -134,8 +131,8 @@
       &copy;2019, Lea Duncker and Maneesh Sahani.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
       
       |
       <a href="_sources/implementationNotes.rst.txt"

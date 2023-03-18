@@ -17,10 +17,10 @@ Scripts for estimation and visualization
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_plot_simulation_defaultInitialParams_thumb.png
-    :alt: Simulated data and default params
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_simulation_thumb.png
+    :alt:
 
-  :ref:`sphx_glr_auto_examples_plot_simulation_defaultInitialParams.py`
+  :ref:`sphx_glr_auto_examples_plot_simulation.py`
 
 .. raw:: html
 
@@ -30,14 +30,31 @@ Scripts for estimation and visualization
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="In this notebook we download publically available data from the International Brain Laboratory,...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_striatum_ibl_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_striatum_ibl.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">IBL's Recordings from the striatum of a mouse performing a visual discrimination task</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="In this notebook we use data recorded from the basal ganglia of a mouse performing a bandit tas...">
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_plot_basal_ganglia_thumb.png
-    :alt: Basal ganglia recordings from a mouse performing a bandit task
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_GPe_thumb.png
+    :alt:
 
-  :ref:`sphx_glr_auto_examples_plot_basal_ganglia.py`
+  :ref:`sphx_glr_auto_examples_plot_GPe.py`
 
 .. raw:: html
 
@@ -53,8 +70,9 @@ Scripts for estimation and visualization
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_simulation_defaultInitialParams
-   /auto_examples/plot_basal_ganglia
+   /auto_examples/plot_simulation
+   /auto_examples/plot_striatum_ibl
+   /auto_examples/plot_GPe
 
 
 .. only:: html
