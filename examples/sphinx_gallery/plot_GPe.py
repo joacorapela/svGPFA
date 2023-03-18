@@ -116,6 +116,7 @@ model_save_filename = "../results/basal_ganglia_model.pickle"
 #%%
 # 1.5 Get parameters
 # ^^^^^^^^^^^^^^^^^^
+# Details on how to specify svGPFA parameters are provided `here <../params.html>`_
 
 #%%
 # Dynamic parameters specification

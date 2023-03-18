@@ -189,6 +189,7 @@ print("Checks passed")
 #%%
 # 3. Get parameters
 # -----------------
+# Details on how to specify svGPFA parameters are provided `here <../params.html>`_
 
 #%%
 # Dynamic parameters specification
