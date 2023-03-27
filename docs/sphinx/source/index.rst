@@ -9,27 +9,19 @@ Sparse Variational Gaussian Processes Factor Analysis
 =====================================================
 
 .. toctree::
-   :caption: Introduction:
+   :numbered:
+   :maxdepth: 4
+   :caption: General notes:
 
    introduction
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Description:
-
    highLevelInterface
    lowLevelInterface
-
-.. toctree::
-   :glob:
-   :maxdepth: 1
-   :caption: Examples:
-
    auto_examples/index
 
 .. toctree::
+   :numbered:
    :maxdepth: 4
-   :caption: Development notes:
+   :caption: Advanced notes:
 
    dataStructures
    objectOrientedDesign
@@ -37,6 +29,7 @@ Sparse Variational Gaussian Processes Factor Analysis
    derivations
 
 .. toctree::
+   :numbered:
    :caption: Appendix:
 
    params
@@ -44,6 +37,7 @@ Sparse Variational Gaussian Processes Factor Analysis
 
 .. toctree::
    :maxdepth: 5
+   :numbered:
    :caption: Code:
 
    svGPFA
