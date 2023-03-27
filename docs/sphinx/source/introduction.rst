@@ -19,4 +19,4 @@ variability in individual trials, across subset of trials belonging to the same
 experimental condition and across all trials. Variability in the timing of a
 neural computation is modelled using a nested Gaussian process.
 
-For examples of running svGPFA, and plotting its estimates, please refer to this `Google Colab notebook <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`_, or to the `gallery of scripts for estimation and visualisation <https://joacorapela.github.io/svGPFA/auto_examples/index.html>`_.
+For examples of running svGPFA, and plotting its estimates, please refer to this `Google Colab notebook <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/docs/ipynb/doEstimateAndPlot_collab.ipynb>`_, or to the `gallery of scripts for estimation and visualisation <https://joacorapela.github.io/svGPFA/auto_examples/index.html>`_.
