@@ -1,44 +1,184 @@
 
-<!DOCTYPE html>
-
+  <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Parameters and their specification &#8212; svGPFA 0.0.1 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/sphinx_highlight.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
+    <title>1. Parameters and their specification | svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/theme.39dcd091ff2d4f33bf46.css" />
+    <link rel="stylesheet" href="_static/proof.css" />
+    <link rel="stylesheet" href="_static/sg_gallery.css" />
+    <link rel="stylesheet" href="_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" href="_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" href="_static/sg_gallery-rendered-html.css" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="References" href="references.html" />
-    <link rel="prev" title="Derivations" href="derivations.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="next" title="2. References" href="references.html" />
+    <link rel="prev" title="4. Derivations" href="derivations.html" />
+  </head>
 
-  </head><body>
-  
+  <body class="antialiased text-gray scroll-smooth">
+    <div
+      id="page"
+      data-controller="sidebar search "
+      data-action="keydown@window->search#focus "
+      class="min-h-screen xl:h-screen flex flex-col xl:grid xl:grid-layout print:block print:h-auto"
+    >
+      <a class="block transition -translate-x-full focus:translate-x-0 opacity-0 focus:opacity-100 text-xl bg-white p-4 z-20 absolute top-0 left-0 h-14" href="#span-class-section-number-1-span-parameters-and-their-specification" title="Skip navigation links">Skip to content</a>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+      <header class="grid-area-header z-10 h-14 fixed w-full top-0 print:hidden">
+        <div class="bg-gray-dark shadow-md flex items-center h-full xl:px-2 relative"><div class="flex items-center">
+      <button
+    data-action="sidebar#open"
+    data-sidebar-target="hamburger"
+    class="xl:hidden h-14 w-14 leading-14 text-gray-100 hover:bg-gray-700 hover:text-brand focus:outline-none focus:bg-gray-700 focus:text-brand">
+  <span class="sr-only">Open navigation menu</span>
+  <svg aria-hidden="true" class="fill-current h-8 w-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+</button><a class="hover:bg-gray-700 focus:bg-gray-700 focus:outline-none"
+   href="index.html"
+   title="Back to homepage"><span class="hidden lg:inline-block shrink-0 font-medium text-gray-100 mx-5 leading-14 tracking-wider">svGPFA 0.0.1 documentation</span>
+</a></div><div class="flex justify-end items-center flex-1"><form
+  id="searchbox"
+  action="search.html"
+  data-action="click->search#focusSearchInput"
+  method="get"
+  class="flex print:hidden justify-between items-center leading-14 md:ml-4 bg-gray-dark text-gray-300 focus-within:bg-gray-50 focus-within:text-gray-800 focus-within:absolute focus-within:inset-x-0 focus-within:top-0 md:focus-within:w-full md:focus-within:static z-10">
 
-          <div class="body" role="main">
-            
+  <button
+    class="text-inherit h-14 w-14"
+    aria-label="Get search results"
+    tabindex="-1"
+  >
+    <svg aria-hidden="true" class="fill-current stroke-current h-8 w-8" stroke-width="0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+  </button>
+
+  <input
+    name="q"
+    id="search-input"
+    data-search-target="searchInput"
+    type="search"
+    aria-label="Search the docs"
+    placeholder="Search the docs"
+    class="pr-2 bg-transparent text-inherit focus:outline-none w-0 md:w-auto focus:w-full transition-all duration-100"
+  />
+</form></div>
+</div>
+      </header>
+
+      
+<aside data-sidebar-target="sidebar" class="grid-area-sidebar h-full fixed pt-14 xl:relative inset-y-0 left-0 z-20 xl:z-0 print:hidden overflow-y-auto transition-all transform transform-gpu -translate-x-full opacity-0 duration-300 xl:translate-x-0 xl:opacity-100">
+  <nav
+  role="navigation"
+  class="h-full overflow-y-auto bg-white text-gray-600 pt-8 flex flex-col"
+>
+  <div class="nav-toc flex-1 pl-6"><p class="caption" role="heading"><span class="caption-text">General notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">2. High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">3. Low-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">4. Scripts for estimation and visualization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_simulation.html">4.1. Simulated data and default params</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_simulation.html#estimate-model">4.1.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_simulation.html#goodness-of-fit-analysis">4.1.2. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_simulation.html#plotting">4.1.3. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_GPe.html">4.2. Basal ganglia recordings from a mouse performing a bandit task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_GPe.html#estimate-model">4.2.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_GPe.html#goodness-of-fit-analysis">4.2.2. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_GPe.html#plotting">4.2.3. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html">4.3. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html#setup-environment">4.3.1. Setup environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html#epoch">4.3.2. Epoch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html#get-parameters">4.3.3. Get parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html#estimate-svgpfa-model">4.3.4. Estimate svGPFA model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html#goodness-of-fit-analysis">4.3.5. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_examples/plot_striatum_ibl.html#plotting">4.3.6. Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataStructures.html">1. Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="objectOrientedDesign.html">2. Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="implementationNotes.html">3. Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="derivations.html">4. Derivations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="derivations.html#gpfa-model">4.1. GPFA model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="derivations.html#gpfa-with-inducing-points-model">4.2. GPFA with inducing points model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="derivations.html#svgpfa-variational-lower-bound">4.3. svGPFA variational lower bound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="derivations.html#variational-distribution-of-h-nr-cdot">4.4. Variational distribution of <span class="math notranslate nohighlight">\(h_{nr}(\cdot)\)</span></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">1. Parameters and their specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-structure-parameters">1.1. Data structure parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#trial-specific-format">1.1.1. Trial-specific format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#trial-common-format">1.1.2. Trial-common format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defaults">1.1.3. Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#initial-values-of-model-parameters">1.2. Initial values of model parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#variational-parameters">1.2.1. Variational parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#embedding-parameters">1.2.2. Embedding parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#kernel-parameters">1.2.3. Kernel parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inducing-points-locations-parameters">1.2.4. Inducing points locations parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optimisation-parameters">1.3. Optimisation parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id20">1.3.1. Defaults</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">2. References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="svGPFA.html">1. svGPFA package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.html#subpackages">1.1. Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.plot.html">1.1.1. svGPFA.plot package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.simulations.html">1.1.2. svGPFA.simulations package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.stats.html">1.1.3. svGPFA.stats package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svGPFA.utils.html">1.1.4. svGPFA.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="svGPFA.html#module-svGPFA">1.2. Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+  <button
+      data-action="sidebar#close"
+      title="Close navigation menu"
+      class="text-4xl text-gray-800 p-4 bottom-0 hover:text-brand xl:hidden focus:text-brand self-center">
+    <span class="sr-only">Close navigation menu</span>
+    <svg aria-hidden="true" class="fill-current stroke-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+</nav>
+</aside>
+
+<main
+  class="px-4 pt-14 xl:ml-fluid grid-area-main overflow-y-auto flex flex-col flex-1 h-full mx-0 md:mx-auto xl:mr-0"
+><nav role="navigation"
+     aria-label="breadcrumbs"
+     class="print:hidden mt-12 text-sm text-gray-light">
+  <a class="text-gray-light text-sm hover:text-gray-dark font-medium focus:text-gray-dark" href="index.html">svGPFA 0.0.1 documentation</a>
+  <span class="mr-1">/</span><span aria-current="page"><span class="section-number">1. </span>Parameters and their specification</span>
+</nav>
+  <article role="main" class="flex-1">
+    
   <section id="parameters-and-their-specification">
-<span id="params-specs"></span><h1>Parameters and their specification<a class="headerlink" href="#parameters-and-their-specification" title="Permalink to this heading">¶</a></h1>
+<span id="params-specs"></span><h1><span class="section-number">1. </span>Parameters and their specification<a class="headerlink" href="#parameters-and-their-specification" title="Permalink to this heading"><span>#</span></a></h1>
 <p>svGPFA uses different groups of parameters. We provide a utility function
 <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsAndKernelsTypes" title="svGPFA.utils.initUtils.getParamsAndKernelsTypes"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsAndKernelsTypes()</span></code></a> that builds them from
 parameter specifications. These specifications are short descriptions on how
@@ -56,12 +196,12 @@ parameter <code class="docutils literal notranslate"><span class="pre">param_nam
 <li><p>from the command line, with the utility function <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsDictFromArgs" title="svGPFA.utils.initUtils.getParamsDictFromArgs"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsDictFromArgs()</span></code></a>,</p></li>
 <li><p>from a configuration file, with the utility function <a class="reference internal" href="svGPFA.utils.html#svGPFA.utils.initUtils.getParamsDictFromStringsDict" title="svGPFA.utils.initUtils.getParamsDictFromStringsDict"><code class="xref py py-func docutils literal notranslate"><span class="pre">svGPFA.utils.initUtils.getParamsDictFromStringsDict()</span></code></a>.</p></li>
 </ol>
-<p>The <a class="reference external" href="https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb">Colab</a> and <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py">Jupyter</a> notebooks automatically build this list (1). This <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py">script</a> demonstrates the manual construction of all parameters specifications (2). This <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py">script</a> builds the parameters specification list from the command line and from this <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini">configuration file</a> (3, 4).</p>
+<p>The <a class="reference external" href="https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb">Colab</a> notebooks automatically builds this list (1). This <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py">script</a> builds the parameters specification list from the command line and from this <a class="reference external" href="https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini">configuration file</a> (3, 4).</p>
 </div></blockquote>
 <p>Below we describe all svGPFA parameters and their specifications. Refer to the
 documentation of the above utility functions for details on how to use them.</p>
 <section id="data-structure-parameters">
-<span id="data-structure-params"></span><h2>Data structure parameters<a class="headerlink" href="#data-structure-parameters" title="Permalink to this heading">¶</a></h2>
+<span id="data-structure-params"></span><h2><span class="section-number">1.1. </span>Data structure parameters<a class="headerlink" href="#data-structure-parameters" title="Permalink to this heading"><span>#</span></a></h2>
 <p>There are two data structure parameters <code class="docutils literal notranslate"><span class="pre">trials_start_times</span></code> and
 <code class="docutils literal notranslate"><span class="pre">trials_end_times</span></code>, which are tensors of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code> giving the start
 and end times of each trial; i.e., <span class="math notranslate nohighlight">\(\tau_i\)</span> in Eq 7 in
@@ -69,14 +209,14 @@ and end times of each trial; i.e., <span class="math notranslate nohighlight">\(
 <p>These parameters can be specified in a trial-specific or trial-common format. If both are
 specified, the longer format takes precedence.</p>
 <section id="trial-specific-format">
-<h3>Trial-specific format<a class="headerlink" href="#trial-specific-format" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">1.1.1. </span>Trial-specific format<a class="headerlink" href="#trial-specific-format" title="Permalink to this heading"><span>#</span></a></h3>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">trials_start_times</span></code> should provide a list of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, with float values indicating seconds, such that <code class="docutils literal notranslate"><span class="pre">trials_start_times[i]</span></code> gives the start time of the ith trial.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">trials_end_times</span></code> should provide a list of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, with float values indicating seconds, such that <code class="docutils literal notranslate"><span class="pre">trials_end_times[i]</span></code> gives the end time of the ith trial.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id21">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code> in the trial-specific Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (3 trials)</span><a class="headerlink" href="#id21" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.1 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code> in the trial-specific Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (3 trials)</span><a class="headerlink" href="#id21" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;data_structure_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;trials_start_times&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">],</span>
      <span class="s2">&quot;trials_end_times&quot;</span><span class="p">:</span>   <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span>
@@ -89,14 +229,14 @@ specified, the longer format takes precedence.</p>
 </ul>
 </section>
 <section id="trial-common-format">
-<h3>Trial-common format<a class="headerlink" href="#trial-common-format" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">1.1.2. </span>Trial-common format<a class="headerlink" href="#trial-common-format" title="Permalink to this heading"><span>#</span></a></h3>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">trials_start_time</span></code> should provide the start time (float value, secs) of all trials.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">trials_end_time</span></code> should provide the end time (float value, secs) of all trials.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id22">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code> in the trial-common Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id22" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.2 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code> in the trial-common Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id22" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;data_structure_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;trials_start_time&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
      <span class="s2">&quot;trials_end_time&quot;</span><span class="p">:</span>   <span class="mf">1.0</span><span class="p">,</span>
@@ -109,11 +249,11 @@ specified, the longer format takes precedence.</p>
 </ul>
 </section>
 <section id="defaults">
-<h3>Defaults<a class="headerlink" href="#defaults" title="Permalink to this heading">¶</a></h3>
+<h3><span class="section-number">1.1.3. </span>Defaults<a class="headerlink" href="#defaults" title="Permalink to this heading"><span>#</span></a></h3>
 <p>All trials start at 0.0 sec and end at 1.0 sec.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id23">
-<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code></span><a class="headerlink" href="#id23" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.3 </span><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">data_structure_params</span></code></span><a class="headerlink" href="#id23" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;data_structure_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;trials_start_time&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
      <span class="s2">&quot;trials_end_time&quot;</span><span class="p">:</span>   <span class="mf">1.0</span><span class="p">,</span>
@@ -125,7 +265,7 @@ specified, the longer format takes precedence.</p>
 </section>
 </section>
 <section id="initial-values-of-model-parameters">
-<span id="initial-value-params"></span><h2>Initial values of model parameters<a class="headerlink" href="#initial-values-of-model-parameters" title="Permalink to this heading">¶</a></h2>
+<span id="initial-value-params"></span><h2><span class="section-number">1.2. </span>Initial values of model parameters<a class="headerlink" href="#initial-values-of-model-parameters" title="Permalink to this heading"><span>#</span></a></h2>
 <p>Initial values for four types of model parameters need to be specified:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#variational-params0"><span class="std std-ref">Variational parameters</span></a>,</p></li>
@@ -140,14 +280,14 @@ for all latents and trials, whereas the longer format gives
 different initial values for each latent and trial. If both shorter and longer
 format are specified, the longer format take precedence.</p>
 <section id="variational-parameters">
-<span id="variational-params0"></span><h3>Variational parameters<a class="headerlink" href="#variational-parameters" title="Permalink to this heading">¶</a></h3>
+<span id="variational-params0"></span><h3><span class="section-number">1.2.1. </span>Variational parameters<a class="headerlink" href="#variational-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <p>The variational parameters are the means (<span class="math notranslate nohighlight">\(\mathbf{m}_k^{(r)}\)</span>,
 <span id="id2">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) and covariances (<span class="math notranslate nohighlight">\(S_k^{(r)}\)</span>,
 <span id="id3">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) of the inducing points
 (<span class="math notranslate nohighlight">\(\mathbf{u}_k^{(r)}\)</span>, <span id="id4">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3). The data
 structures for these parameters are described in the next section.</p>
 <section id="python-variable-format">
-<h4>Python variable format<a class="headerlink" href="#python-variable-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.1.1. </span>Python variable format<a class="headerlink" href="#python-variable-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">variational_mean0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth
@@ -162,7 +302,7 @@ of this list should be a <code class="docutils literal notranslate"><span class=
 for latent <code class="docutils literal notranslate"><span class="pre">k</span></code> and trial <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id24">
-<div class="code-block-caption"><span class="caption-text">adding random <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id24" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.4 </span><span class="caption-text">adding random <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id24" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">n_latents</span> <span class="o">=</span> <span class="mi">3</span>
  <span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span>
  <span class="n">var_mean0</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_ind_points</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">)]</span>
@@ -184,7 +324,7 @@ for latent <code class="docutils literal notranslate"><span class="pre">k</span>
 </ul>
 </section>
 <section id="latent-trial-specific-filename-format">
-<h4>Latent-trial-specific filename format<a class="headerlink" href="#latent-trial-specific-filename-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.1.2. </span>Latent-trial-specific filename format<a class="headerlink" href="#latent-trial-specific-filename-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>For every latent, k, and every trial, r, two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">variational_mean0_filename_latent&lt;k&gt;_trial&lt;r&gt;</span></code> should provide the filename
@@ -198,7 +338,7 @@ should contain a matrix of size <em>number_of_inducing_points</em> x
 <em>number_of_inducing_points</em>.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id25">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the latent-trial-specific filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (2 trials and 2 latents)</span><a class="headerlink" href="#id25" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.5 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the latent-trial-specific filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (2 trials and 2 latents)</span><a class="headerlink" href="#id25" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;variational_mean0_filename_latent0_trial0&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/uniform_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
      <span class="s2">&quot;variational_cov0_filename_latent0_trial0&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-2_09x09.csv&quot;</span><span class="p">,</span>
@@ -217,7 +357,7 @@ should contain a matrix of size <em>number_of_inducing_points</em> x
 </ul>
 </section>
 <section id="latent-trial-common-filename-format">
-<h4>Latent-trial-common filename format<a class="headerlink" href="#latent-trial-common-filename-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.1.3. </span>Latent-trial-common filename format<a class="headerlink" href="#latent-trial-common-filename-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">variational_means0_filename</span></code> should provide the filename (csv format readable
@@ -230,7 +370,7 @@ variational covariance for all latents and trials. This file should contain a
 matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_points</em>.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id26">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the latent-trial-common filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id26" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.6 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the latent-trial-common filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id26" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;variational_means0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/uniform_0.00_1.00_len09.csv&quot;</span><span class="p">,</span>
      <span class="s2">&quot;variational_covs0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/identity_scaled1e-2_09x09.csv&quot;</span><span class="p">,</span>
@@ -243,15 +383,15 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </ul>
 </section>
 <section id="constant-value-format">
-<h4>Constant value format<a class="headerlink" href="#constant-value-format" title="Permalink to this heading">¶</a></h4>
-<p>This initialization option sets the same variational mean and covariance across all latents and trials. The common variational mean has all elements equal to a constant value, and the common variational covariance is a scaled identity matrix.</p>
+<h4><span class="section-number">1.2.1.4. </span>Constant value format<a class="headerlink" href="#constant-value-format" title="Permalink to this heading"><span>#</span></a></h4>
+<p>This initialisation option sets the same variational mean and covariance across all latents and trials. The common variational mean has all elements equal to a constant value, and the common variational covariance is a scaled identity matrix.</p>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">variational_mean0_constant_value</span></code> should provide a float value giving the constant value of all elements of the common variational mean.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">variational_cov0_diag_value</span></code>  should provide a float value giving the diagonal value of the common variational covariance.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id27">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the constant value format</span><a class="headerlink" href="#id27" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.7 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code> in the constant value format</span><a class="headerlink" href="#id27" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;variational_mean0_constant_value&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
      <span class="s2">&quot;variational_cov0_diag_value&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
@@ -264,11 +404,11 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </ul>
 </section>
 <section id="id5">
-<h4>Defaults<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.1.5. </span>Defaults<a class="headerlink" href="#id5" title="Permalink to this heading"><span>#</span></a></h4>
 <p>The default variational mean and covariance have constant values. For the variational mean the constant value is zero and for the variational covariance the constant diagonal value is 0.01.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id28">
-<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code></span><a class="headerlink" href="#id28" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.8 </span><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">variational_params0</span></code></span><a class="headerlink" href="#id28" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;variational_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;variational_mean0_constant_value&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
      <span class="s2">&quot;variational_cov0_diag_value&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
@@ -280,17 +420,17 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </section>
 </section>
 <section id="embedding-parameters">
-<span id="embedding-params0"></span><h3>Embedding parameters<a class="headerlink" href="#embedding-parameters" title="Permalink to this heading">¶</a></h3>
+<span id="embedding-params0"></span><h3><span class="section-number">1.2.2. </span>Embedding parameters<a class="headerlink" href="#embedding-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <p>The embedding parameters are the loading matrix (<span class="math notranslate nohighlight">\(C\)</span>, <span id="id6">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1, middle) and offset vector (<span class="math notranslate nohighlight">\(\mathbf{d}\)</span>, <span id="id7">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, Eq. 1 middle). The data structures for these parameters are described in the next section.</p>
 <section id="id8">
-<h4>Python variable format<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.2.1. </span>Python variable format<a class="headerlink" href="#id8" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">c0</span></code> should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of size (n_neurons, n_latents)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">d0</span></code> should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> of size (n_neurons, 1)</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id29">
-<div class="code-block-caption"><span class="caption-text">adding standard random <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id29" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.9 </span><span class="caption-text">adding standard random <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the Python variable format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id29" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">n_neurons</span> <span class="o">=</span> <span class="mi">100</span>
  <span class="n">n_latents</span> <span class="o">=</span> <span class="mi">3</span>
 
@@ -306,14 +446,14 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </ul>
 </section>
 <section id="filename-format">
-<h4>Filename format<a class="headerlink" href="#filename-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.2.2. </span>Filename format<a class="headerlink" href="#filename-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">c0_filename</span></code> gives the filename (csv format readable by pandas <em>read_csv</em> function) containing the values of loading matrix <code class="docutils literal notranslate"><span class="pre">C</span></code>,</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">d0_filename</span></code> gives the filename (csv format readable by pandas <em>read_csv</em> function) containing the values of offset vector <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id30">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id30" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.10 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id30" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;c0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/C_constant_1.00constant_100neurons_02latents.csv&quot;</span><span class="p">,</span>
     <span class="s2">&quot;d0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;../data/d_constant_0.00constant_100neurons.csv&quot;</span><span class="p">,</span>
@@ -326,7 +466,7 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </ul>
 </section>
 <section id="random-format">
-<h4>Random format<a class="headerlink" href="#random-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.2.3. </span>Random format<a class="headerlink" href="#random-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Eight items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">c0_distribution</span></code> string value giving the name of the distribution of the loading matrix C (e.g., Normal).</p></li>
@@ -339,7 +479,7 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 <li><p><code class="docutils literal notranslate"><span class="pre">d0_random_seed</span></code> optional integer value giving the value of the random seed to be set prior to generating the random transition matrix <code class="docutils literal notranslate"><span class="pre">d</span></code>. This value can be specified for replicability. If not given, the random seed is not changed prior to generating <code class="docutils literal notranslate"><span class="pre">d</span></code>.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id31">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the random format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id31" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.11 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code> in the random format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id31" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;c0_distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
      <span class="s2">&quot;c0_loc&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -358,11 +498,11 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </ul>
 </section>
 <section id="id9">
-<h4>Defaults<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.2.4. </span>Defaults<a class="headerlink" href="#id9" title="Permalink to this heading"><span>#</span></a></h4>
 <p>The default loading matrix C0/offset vector d0 is a zero mean standard normal random  matrix/vector.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id32">
-<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code></span><a class="headerlink" href="#id32" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.12 </span><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">embedding_params0</span></code></span><a class="headerlink" href="#id32" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;embedding_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;c0_distribution&quot;</span><span class="p">:</span> <span class="s2">&quot;Normal&quot;</span><span class="p">,</span>
      <span class="s2">&quot;c0_loc&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
@@ -378,19 +518,19 @@ matrix of size <em>number_of_inducing_points</em> x <em>number_of_inducing_point
 </section>
 </section>
 <section id="kernel-parameters">
-<span id="kernels-params0"></span><h3>Kernel parameters<a class="headerlink" href="#kernel-parameters" title="Permalink to this heading">¶</a></h3>
+<span id="kernels-params0"></span><h3><span class="section-number">1.2.3. </span>Kernel parameters<a class="headerlink" href="#kernel-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <p>The kernel parameters of latent k are those of the Gaussian process covariance
 function (<span class="math notranslate nohighlight">\(\kappa_k(\cdot,\cdot)\)</span>, <span id="id10">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p. 2). The data
 structures for these parameters are described in the next section.</p>
 <section id="id11">
-<h4>Python variable format<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.3.1. </span>Python variable format<a class="headerlink" href="#id11" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Two items need to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">k_types</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element of this list should be a string with the type of kernel for the kth latent (e.g., <code class="docutils literal notranslate"><span class="pre">k_types[k]=exponentialQuadratic</span></code>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">k_params0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element of this list should be a <code class="docutils literal notranslate"><span class="pre">torch.DoubleTensor</span></code> containing the parameters of the kth kernel (e.g., <code class="docutils literal notranslate"><span class="pre">k_params0[k]=torch.DoubleTensor([3.2])</span></code>).</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id33">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in Python variable format (2 latents) to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id33" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.13 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in Python variable format (2 latents) to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id33" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">expQuadK1_lengthscale</span> <span class="o">=</span> <span class="mf">2.9</span>
 <span class="n">expQuadK2_lengthscale</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">periodK1_lengthscale</span> <span class="o">=</span> <span class="mf">3.1</span>
@@ -410,7 +550,7 @@ structures for these parameters are described in the next section.</p>
 </ul>
 </section>
 <section id="latent-specific-textual-format">
-<h4>Latent-specific textual format<a class="headerlink" href="#latent-specific-textual-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.3.2. </span>Latent-specific textual format<a class="headerlink" href="#latent-specific-textual-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>For each latent k, item <code class="docutils literal notranslate"><span class="pre">k_type_latent&lt;k&gt;</span></code> needs to be specified, giving the
 name of the kernel for latent k. Other items required depend on
 the value of item <code class="docutils literal notranslate"><span class="pre">k_type_latent&lt;k&gt;</span></code>. For example, for
@@ -421,7 +561,7 @@ the value of item <code class="docutils literal notranslate"><span class="pre">k
 the periodic kernel, respectively.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id34">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in the latent-specific textual format (2 latents) to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id34" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.14 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in the latent-specific textual format (2 latents) to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id34" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;k_type_latent0&quot;</span><span class="p">:</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span>
      <span class="s2">&quot;k_lengthscale0_latent0&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
@@ -435,7 +575,7 @@ the periodic kernel, respectively.</p>
 </div></blockquote>
 </section>
 <section id="latent-common-textual-format">
-<h4>Latent-common textual format<a class="headerlink" href="#latent-common-textual-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.3.3. </span>Latent-common textual format<a class="headerlink" href="#latent-common-textual-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>The shorter format requires
 item <code class="docutils literal notranslate"><span class="pre">k_types</span></code>, giving the name name of the kernel to be used for all latent variables.
 Other required items depend on the value of
@@ -446,7 +586,7 @@ specify the lengthscale and period parameter of the periodic kernel,
 respectively.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id35">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in the latent-common textual format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id35" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.15 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code> in the latent-common textual format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id35" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;k_types&quot;</span><span class="p">:</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span>
     <span class="s2">&quot;k_lengthscales0&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -457,11 +597,11 @@ respectively.</p>
 </div></blockquote>
 </section>
 <section id="id12">
-<h4>Defaults<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.3.4. </span>Defaults<a class="headerlink" href="#id12" title="Permalink to this heading"><span>#</span></a></h4>
 <p>For all latents, the default kernel is an exponential quadratic kernel with lengthscale 1.0.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id36">
-<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code></span><a class="headerlink" href="#id36" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.16 </span><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">kernel_params</span></code></span><a class="headerlink" href="#id36" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span> <span class="o">=</span>  <span class="p">{</span>
      <span class="s2">&quot;k_types&quot;</span><span class="p">:</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">,</span>
      <span class="s2">&quot;k_lengthscales0&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -473,13 +613,13 @@ respectively.</p>
 </section>
 </section>
 <section id="inducing-points-locations-parameters">
-<span id="ind-points-locs-params0"></span><h3>Inducing points locations parameters<a class="headerlink" href="#inducing-points-locations-parameters" title="Permalink to this heading">¶</a></h3>
+<span id="ind-points-locs-params0"></span><h3><span class="section-number">1.2.4. </span>Inducing points locations parameters<a class="headerlink" href="#inducing-points-locations-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <p>The inducing points locations, or input locations, are the points
 (<span class="math notranslate nohighlight">\(\mathbf{z}_k^{(r)}\)</span>, <span id="id13">Duncker and Sahani [<a class="reference internal" href="references.html#id5" title="Lea Duncker and Maneesh Sahani. Temporal alignment and latent gaussian process factor inference in population spike trains. In Advances in Neural Information Processing Systems, 10445–10455. 2018.">DS18</a>]</span>, p.3) where the
 Gaussian process are evaluated to obtain the inducing points. The data
 structures for these parameters are described in the next section.</p>
 <section id="id14">
-<h4>Python variable format<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.4.1. </span>Python variable format<a class="headerlink" href="#id14" title="Permalink to this heading"><span>#</span></a></h4>
 <p>One item needs to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">ind_points_locs0</span></code> should be a list of size <code class="docutils literal notranslate"><span class="pre">n_latents</span></code>. The kth element of
@@ -488,7 +628,7 @@ this list should be a <code class="docutils literal notranslate"><span class="pr
 initial inducing points locations for latent k and trial r.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id37">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in Python variable format with uniformly distributed inducing points locations to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id37" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.17 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in Python variable format with uniformly distributed inducing points locations to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id37" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_latents</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
 <span class="n">n_trials</span> <span class="o">=</span> <span class="mi">50</span>
@@ -505,7 +645,7 @@ initial inducing points locations for latent k and trial r.</p>
 </ul>
 </section>
 <section id="id15">
-<h4>Latent-trial-specific filename format<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.4.2. </span>Latent-trial-specific filename format<a class="headerlink" href="#id15" title="Permalink to this heading"><span>#</span></a></h4>
 <p>For each latent k and trial r one item needs to be specified:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">ind_points_locs0_latent&lt;k&gt;_trial&lt;r&gt;_filename</span></code> giving the name of the file
@@ -513,7 +653,7 @@ initial inducing points locations for latent k and trial r.</p>
 inducing points locations for latent k and trial r.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id38">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the latent-trial-specific filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (2 latents, 2 trials)</span><a class="headerlink" href="#id38" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.18 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the latent-trial-specific filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code> (2 latents, 2 trials)</span><a class="headerlink" href="#id38" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;ind_points_locs0_latent0_trial0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0_latent0_trial0.csv&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ind_points_locs0_latent0_trial1_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0_latent0_trial1.csv&quot;</span><span class="p">,</span>
@@ -528,14 +668,14 @@ inducing points locations for latent k and trial r.</p>
 </ul>
 </section>
 <section id="id16">
-<h4>Latent-trial-common filename format<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.4.3. </span>Latent-trial-common filename format<a class="headerlink" href="#id16" title="Permalink to this heading"><span>#</span></a></h4>
 <p>This shorter format requires the specification of the item
 <code class="docutils literal notranslate"><span class="pre">ind_points_locs0_filename</span></code> giving the name of the file (csv format readable by
 pandas <em>read_csv</em> function) containing the initial inducing points locations
 for all latents and trials.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id39">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the latent-trial-common filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id39" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.19 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the latent-trial-common filename format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id39" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;ind_points_locs0_filename&quot;</span><span class="p">:</span> <span class="s2">&quot;ind_points_locs0.csv&quot;</span><span class="p">,</span>
 <span class="p">}</span>
@@ -545,20 +685,25 @@ for all latents and trials.</p>
 </div></blockquote>
 </section>
 <section id="layout-format">
-<h4>Layout format<a class="headerlink" href="#layout-format" title="Permalink to this heading">¶</a></h4>
+<h4><span class="section-number">1.2.4.4. </span>Layout format<a class="headerlink" href="#layout-format" title="Permalink to this heading"><span>#</span></a></h4>
 <p>The layout format requires the specification of the number of inducing points
-in the item <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code>. The layout of the initial inducing points
-locations is given by the item <code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span></code>. If
-<code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span> <span class="pre">=</span> <span class="pre">equidistant</span></code> the initial locations of the inducing
-points are equidistant between the trial start and trial end. If
-<code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span> <span class="pre">=</span> <span class="pre">uniform</span></code> the initial inducing points are uniformly
-positioned between the start and end of the trial.</p>
+in the item <code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code> or in the item <code class="docutils literal notranslate"><span class="pre">common_n_ind_points</span></code>. Item
+<code class="docutils literal notranslate"><span class="pre">n_ind_points</span></code> is a list of length <code class="docutils literal notranslate"><span class="pre">n_trials</span></code>, such that
+<code class="docutils literal notranslate"><span class="pre">n_ind_points[r]</span></code> gives the number of inducing points in trial <code class="docutils literal notranslate"><span class="pre">r</span></code>. Item
+<code class="docutils literal notranslate"><span class="pre">common_n_ind_points</span></code> is an integer, that gives the number of inducing points
+of all trials.</p>
+<p>The layout of the initial inducing points locations is given by the item
+<code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span></code>. If <code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span> <span class="pre">=</span> <span class="pre">equidistant</span></code> the
+initial locations of the inducing points are equidistant between the trial
+start and trial end. If <code class="docutils literal notranslate"><span class="pre">ind_points_locs0_layout</span> <span class="pre">=</span> <span class="pre">uniform</span></code> the initial
+inducing points are distributed randomly between the start and end of the
+trial.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id40">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the layout format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id40" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.20 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code> in the layout format to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id40" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
 <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-     <span class="s2">&quot;n_ind_points&quot;</span><span class="p">:</span> <span class="n">n_ind_points</span><span class="p">,</span>
+    <span class="s2">&quot;n_ind_points&quot;</span><span class="p">:</span> <span class="n">n_ind_points</span><span class="p">,</span>
     <span class="s2">&quot;ind_points_locs0_layout&quot;</span><span class="p">:</span> <span class="s2">&quot;equidistant&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
@@ -567,15 +712,15 @@ positioned between the start and end of the trial.</p>
 </div></blockquote>
 </section>
 <section id="id17">
-<h4>Defaults<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h4>
-<p>The default inducing points locations for trial r and latent k are equdistant n_ind_points[k] between the start and end of trial r.</p>
+<h4><span class="section-number">1.2.4.5. </span>Defaults<a class="headerlink" href="#id17" title="Permalink to this heading"><span>#</span></a></h4>
+<p>The default inducing points locations for trial r and latent k are equidistant n_ind_points[k] between the start and end of trial r.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id41">
-<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code></span><a class="headerlink" href="#id41" title="Permalink to this code">¶</a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_ind_points</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
- <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-     <span class="s2">&quot;n_ind_points&quot;</span><span class="p">:</span> <span class="n">n_ind_points</span><span class="p">,</span>
-     <span class="s2">&quot;ind_points_locs0_layout&quot;</span><span class="p">:</span> <span class="s2">&quot;equidistant&quot;</span><span class="p">,</span>
+<div class="code-block-caption"><span class="caption-number">Listing 1.21 </span><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">ind_points_locs_params0</span></code></span><a class="headerlink" href="#id41" title="Permalink to this code"><span>#</span></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">common_n_ind_points</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;ind_points_locs_params0&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;common_n_ind_points&quot;</span><span class="p">:</span> <span class="n">common_n_ind_points</span><span class="p">,</span>
+    <span class="s2">&quot;ind_points_locs0_layout&quot;</span><span class="p">:</span> <span class="s2">&quot;equidistant&quot;</span><span class="p">,</span>
  <span class="p">}</span>
 </pre></div>
 </div>
@@ -585,7 +730,7 @@ positioned between the start and end of the trial.</p>
 </section>
 </section>
 <section id="optimisation-parameters">
-<span id="optim-params"></span><h2>Optimisation parameters<a class="headerlink" href="#optimisation-parameters" title="Permalink to this heading">¶</a></h2>
+<span id="optim-params"></span><h2><span class="section-number">1.3. </span>Optimisation parameters<a class="headerlink" href="#optimisation-parameters" title="Permalink to this heading"><span>#</span></a></h2>
 <p>Parameters values that control the optimisation should be specified
 in section <code class="docutils literal notranslate"><span class="pre">[optim_params]</span></code>.</p>
 <ul>
@@ -631,7 +776,7 @@ search is performed using the strong_wolfe method. If
 <cite>&lt;step&gt;_line_search_fn=None`</cite> line search is not used.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id42">
-<div class="code-block-caption"><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">optimisation_params</span></code> to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id42" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.22 </span><span class="caption-text">adding <code class="docutils literal notranslate"><span class="pre">optimisation_params</span></code> to <code class="docutils literal notranslate"><span class="pre">params_spec</span></code></span><a class="headerlink" href="#id42" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">params_spec</span><span class="p">[</span><span class="s2">&quot;optim_params&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
      <span class="s2">&quot;n_quad&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
      <span class="s2">&quot;prior_cov_reg_param&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">,</span>
@@ -676,11 +821,11 @@ search is performed using the strong_wolfe method. If
 </li>
 </ul>
 <section id="id20">
-<h3>Defaults<a class="headerlink" href="#id20" title="Permalink to this heading">¶</a></h3>
-<p>The default optimization paramateters are shown below.</p>
+<h3><span class="section-number">1.3.1. </span>Defaults<a class="headerlink" href="#id20" title="Permalink to this heading"><span>#</span></a></h3>
+<p>The default optimisation parameters are shown below.</p>
 <blockquote>
 <div><div class="literal-block-wrapper docutils container" id="id43">
-<div class="code-block-caption"><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">optimisation_params</span></code></span><a class="headerlink" href="#id43" title="Permalink to this code">¶</a></div>
+<div class="code-block-caption"><span class="caption-number">Listing 1.23 </span><span class="caption-text">default <code class="docutils literal notranslate"><span class="pre">optimisation_params</span></code></span><a class="headerlink" href="#id43" title="Permalink to this code"><span>#</span></a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="n">n_quad</span> <span class="o">=</span> <span class="mi">200</span>
  <span class="n">prior_cov_reg_param</span> <span class="o">=</span> <span class="mf">1e-3</span>
  <span class="n">em_max_iter</span> <span class="o">=</span> <span class="mi">50</span>
@@ -729,142 +874,35 @@ search is performed using the strong_wolfe method. If
 </section>
 
 
-          </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">svGPFA</a></h1>
+  </article>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="introduction.html">Overview</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Description:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="highLevelInterface.html">High-level interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lowLevelInterface.html">Low-level interface</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Scripts for estimation and visualization</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Development notes:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="dataStructures.html">Data structures</a></li>
-<li class="toctree-l1"><a class="reference internal" href="objectOrientedDesign.html">Object-oriented design</a></li>
-<li class="toctree-l1"><a class="reference internal" href="implementationNotes.html">Implementation notes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="derivations.html">Derivations</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Parameters and their specification</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#data-structure-parameters">Data structure parameters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#trial-specific-format">Trial-specific format</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#trial-common-format">Trial-common format</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#defaults">Defaults</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#initial-values-of-model-parameters">Initial values of model parameters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#variational-parameters">Variational parameters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#python-variable-format">Python variable format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#latent-trial-specific-filename-format">Latent-trial-specific filename format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#latent-trial-common-filename-format">Latent-trial-common filename format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#constant-value-format">Constant value format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5">Defaults</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#embedding-parameters">Embedding parameters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id8">Python variable format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#filename-format">Filename format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#random-format">Random format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id9">Defaults</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#kernel-parameters">Kernel parameters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id11">Python variable format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#latent-specific-textual-format">Latent-specific textual format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#latent-common-textual-format">Latent-common textual format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id12">Defaults</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#inducing-points-locations-parameters">Inducing points locations parameters</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id14">Python variable format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id15">Latent-trial-specific filename format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id16">Latent-trial-common filename format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#layout-format">Layout format</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id17">Defaults</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#optimisation-parameters">Optimisation parameters</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id20">Defaults</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="svGPFA.html">svGPFA package</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="derivations.html" title="previous chapter">Derivations</a></li>
-      <li>Next: <a href="references.html" title="next chapter">References</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>document.getElementById('searchbox').style.display = "block"</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2019, Lea Duncker and Maneesh Sahani.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 6.1.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
-      
-      |
-      <a href="_sources/params.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
-
+  <footer>
     
+      <div class="mt-20 mb-4 text-sm text-gray-700 print:mt-4">&copy; 2019, Lea Duncker and Maneesh Sahani&nbsp;Made with <a href="https://www.sphinx-doc.org">Sphinx 6.1.3</a></div>
+    
+  </footer></main>
 
+
+      <button
+  data-search-target="snackbar"
+  data-action="search#hideSnackbar"
+  class="fixed bottom-0 right-0 z-20 opacity-0 p-4 m-4 tracking-wide bg-gray-900 text-gray-100 transition transform transform-gpu duration-500 translate-y-full"
+>
+  Clear highlights
+</button><div
+  data-sidebar-target="screen"
+  data-action="click->sidebar#close"
+  class="fixed hidden inset-0 bg-black bg-opacity-50">
+</div>
+    </div>
+    
+      
+<script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+<script src="_static/doctools.js"></script>
+<script src="_static/sphinx_highlight.js"></script>
+<script src="_static/proof.js"></script>
+<script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="_static/theme.b62e1ded0c8c099a2d47.js"></script>
     
   </body>
 </html>

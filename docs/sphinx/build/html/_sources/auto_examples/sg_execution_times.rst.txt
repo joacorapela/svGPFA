@@ -6,12 +6,12 @@
 
 Computation times
 =================
-**00:33.704** total execution time for **auto_examples** files:
+**00:26.797** total execution time for **auto_examples** files:
 
 +-------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_striatum_ibl.py` (``plot_striatum_ibl.py``) | 00:33.704 | 0.0 MB |
-+-------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_auto_examples_plot_GPe.py` (``plot_GPe.py``)                   | 00:00.000 | 0.0 MB |
+| :ref:`sphx_glr_auto_examples_plot_GPe.py` (``plot_GPe.py``)                   | 00:26.797 | 0.0 MB |
 +-------------------------------------------------------------------------------+-----------+--------+
 | :ref:`sphx_glr_auto_examples_plot_simulation.py` (``plot_simulation.py``)     | 00:00.000 | 0.0 MB |
++-------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_auto_examples_plot_striatum_ibl.py` (``plot_striatum_ibl.py``) | 00:00.000 | 0.0 MB |
 +-------------------------------------------------------------------------------+-----------+--------+

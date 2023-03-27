@@ -1,0 +1,758 @@
+
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    
+    <title>svGPFA.stats.svEM | svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/theme.39dcd091ff2d4f33bf46.css" />
+    <link rel="stylesheet" href="../../../_static/proof.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+  </head>
+
+  <body class="antialiased text-gray scroll-smooth">
+    <div
+      id="page"
+      data-controller="sidebar search "
+      data-action="keydown@window->search#focus "
+      class="min-h-screen xl:h-screen flex flex-col xl:grid xl:grid-layout print:block print:h-auto"
+    >
+      <a class="block transition -translate-x-full focus:translate-x-0 opacity-0 focus:opacity-100 text-xl bg-white p-4 z-20 absolute top-0 left-0 h-14" href="#svgpfa-stats-svem" title="Skip navigation links">Skip to content</a>
+
+      <header class="grid-area-header z-10 h-14 fixed w-full top-0 print:hidden">
+        <div class="bg-gray-dark shadow-md flex items-center h-full xl:px-2 relative"><div class="flex items-center">
+      <button
+    data-action="sidebar#open"
+    data-sidebar-target="hamburger"
+    class="xl:hidden h-14 w-14 leading-14 text-gray-100 hover:bg-gray-700 hover:text-brand focus:outline-none focus:bg-gray-700 focus:text-brand">
+  <span class="sr-only">Open navigation menu</span>
+  <svg aria-hidden="true" class="fill-current h-8 w-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+</button><a class="hover:bg-gray-700 focus:bg-gray-700 focus:outline-none"
+   href="../../../index.html"
+   title="Back to homepage"><span class="hidden lg:inline-block shrink-0 font-medium text-gray-100 mx-5 leading-14 tracking-wider">svGPFA 0.0.1 documentation</span>
+</a></div><div class="flex justify-end items-center flex-1"><form
+  id="searchbox"
+  action="../../../search.html"
+  data-action="click->search#focusSearchInput"
+  method="get"
+  class="flex print:hidden justify-between items-center leading-14 md:ml-4 bg-gray-dark text-gray-300 focus-within:bg-gray-50 focus-within:text-gray-800 focus-within:absolute focus-within:inset-x-0 focus-within:top-0 md:focus-within:w-full md:focus-within:static z-10">
+
+  <button
+    class="text-inherit h-14 w-14"
+    aria-label="Get search results"
+    tabindex="-1"
+  >
+    <svg aria-hidden="true" class="fill-current stroke-current h-8 w-8" stroke-width="0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+  </button>
+
+  <input
+    name="q"
+    id="search-input"
+    data-search-target="searchInput"
+    type="search"
+    aria-label="Search the docs"
+    placeholder="Search the docs"
+    class="pr-2 bg-transparent text-inherit focus:outline-none w-0 md:w-auto focus:w-full transition-all duration-100"
+  />
+</form></div>
+</div>
+      </header>
+
+      
+<aside data-sidebar-target="sidebar" class="grid-area-sidebar h-full fixed pt-14 xl:relative inset-y-0 left-0 z-20 xl:z-0 print:hidden overflow-y-auto transition-all transform transform-gpu -translate-x-full opacity-0 duration-300 xl:translate-x-0 xl:opacity-100">
+  <nav
+  role="navigation"
+  class="h-full overflow-y-auto bg-white text-gray-600 pt-8 flex flex-col"
+>
+  <div class="nav-toc flex-1 pl-6"><p class="caption" role="heading"><span class="caption-text">General notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../highLevelInterface.html">2. High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lowLevelInterface.html">3. Low-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">4. Scripts for estimation and visualization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_simulation.html">4.1. Simulated data and default params</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_simulation.html#estimate-model">4.1.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_simulation.html#goodness-of-fit-gof">4.1.2. Goodness of fit (GOF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_simulation.html#plotting">4.1.3. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html">4.2. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#setup-environment">4.2.1. 1. Setup environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#epoch">4.2.2. 2. Epoch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#get-parameters">4.2.3. 3. Get parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#estimate-svgpfa-model">4.2.4. 4. Estimate svGPFA model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#goodness-of-fit-analysis">4.2.5. 5. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#plotting">4.2.6. 6. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_GPe.html">4.3. Basal ganglia recordings from a mouse performing a bandit task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_GPe.html#estimate-model">4.3.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_GPe.html#goodness-of-fit-gof">4.3.2. Goodness of fit (GOF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_GPe.html#plotting">4.3.3. Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataStructures.html">1. Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../objectOrientedDesign.html">2. Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../implementationNotes.html">3. Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../derivations.html">4. Derivations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#gpfa-model">4.1. GPFA model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#gpfa-with-inducing-points-model">4.2. GPFA with inducing points model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#svgpfa-variational-lower-bound">4.3. svGPFA variational lower bound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#variational-distribution-of-h-nr-cdot">4.4. Variational distribution of <span class="math notranslate nohighlight">\(h_{nr}(\cdot)\)</span></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../params.html">1. Parameters and their specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../params.html#data-structure-parameters">1.1. Data structure parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#trial-specific-format">1.1.1. Trial-specific format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#trial-common-format">1.1.2. Trial-common format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#defaults">1.1.3. Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../params.html#initial-values-of-model-parameters">1.2. Initial values of model parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#variational-parameters">1.2.1. Variational parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#embedding-parameters">1.2.2. Embedding parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#kernel-parameters">1.2.3. Kernel parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#inducing-points-locations-parameters">1.2.4. Inducing points locations parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../params.html#optimisation-parameters">1.3. Optimisation parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#id20">1.3.1. Defaults</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">2. References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../svGPFA.html">1. svGPFA package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../svGPFA.html#subpackages">1.1. Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.plot.html">1.1.1. svGPFA.plot package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.simulations.html">1.1.2. svGPFA.simulations package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.stats.html">1.1.3. svGPFA.stats package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.utils.html">1.1.4. svGPFA.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../svGPFA.html#module-svGPFA">1.2. Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+  <button
+      data-action="sidebar#close"
+      title="Close navigation menu"
+      class="text-4xl text-gray-800 p-4 bottom-0 hover:text-brand xl:hidden focus:text-brand self-center">
+    <span class="sr-only">Close navigation menu</span>
+    <svg aria-hidden="true" class="fill-current stroke-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+</nav>
+</aside>
+
+<main
+  class="px-4 pt-14 xl:ml-fluid grid-area-main overflow-y-auto flex flex-col flex-1 h-full mx-0 md:mx-auto xl:mr-0"
+><nav role="navigation"
+     aria-label="breadcrumbs"
+     class="print:hidden mt-12 text-sm text-gray-light">
+  <a class="text-gray-light text-sm hover:text-gray-dark font-medium focus:text-gray-dark" href="../../../index.html">svGPFA 0.0.1 documentation</a>
+  <span class="mr-1">/</span><a class="text-gray-light text-sm hover:text-gray-dark" href="../../index.html">Module code</a>
+    <span class="mr-1">/</span><span aria-current="page">svGPFA.stats.svEM</span>
+</nav>
+  <article role="main" class="flex-1">
+    
+  <h1>Source code for svGPFA.stats.svEM</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">scipy.optimize</span>
+
+<div class="viewcode-block" id="SVEM"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.SVEM">[docs]</a><span class="k">class</span> <span class="nc">SVEM</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SVEM.maximize"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.SVEM.maximize">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">maximize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ECM&quot;</span><span class="p">,</span> <span class="n">getIterationModelParamsFn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">printIterationModelParams</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">logLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">lowerBoundLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lowerBoundStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">latentsTimes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latentsLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latentsStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+                 <span class="n">savePartial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">savePartialFilenamePattern</span><span class="o">=</span><span class="s2">&quot;results/00000000_</span><span class="si">{:s}</span><span class="s2">_estimatedModel.pickle&quot;</span><span class="p">,</span>
+                <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Maximizes the sparse variational lower bound, Eq. 4 in Duncker and</span>
+<span class="sd">        Sahani, 2018.</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">            Only parameters **model**, **optim_params** and **method** should</span>
+<span class="sd">            be set by users. The remaining parameters are used to interface</span>
+<span class="sd">            :meth:`svGPFA.stats.svEM.SVEM.maximize` with the dashboard.</span>
+
+<span class="sd">        :param model: svGPFA model used to calculate the lower bound</span>
+<span class="sd">        :type  model: :class:`svGPFA.stats.svLowerBound.SVLowerBound`</span>
+<span class="sd">        :param optim_params: optimization parameters. The format of this dictionary is identical to the one described in :any:`optim_params`. It can be obtained at the key ``optim_params`` of the dictionary returned by :func:`svGPFA.utils.initUtils.getParamsAndKernelsTypes`.</span>
+<span class="sd">        :type  optim_params: dictionary</span>
+<span class="sd">        :param method: either ECM for Expectation Conditional Maximization or mECM for multicycle expectation conditional maximization. Refer to :cite:t:`mcLachlanAndKrishnan08` for details on these algorithms.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_eStep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_mStepEmbedding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_mStepKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_mStepIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+    <span class="k">def</span> <span class="nf">_writeToLockedLog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">logLock</span><span class="p">,</span> <span class="n">logStream</span><span class="p">,</span> <span class="n">logStreamFN</span><span class="p">):</span>
+        <span class="n">logStream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">logLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+            <span class="n">logLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">logStreamFN</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">logStream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span>
+            <span class="n">logLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+            <span class="n">logStream</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">logStream</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SVEM_PyTorch"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.SVEM_PyTorch">[docs]</a><span class="k">class</span> <span class="nc">SVEM_PyTorch</span><span class="p">(</span><span class="n">SVEM</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SVEM_PyTorch.maximize"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.SVEM_PyTorch.maximize">[docs]</a>    <span class="k">def</span> <span class="nf">maximize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;ECM&quot;</span><span class="p">,</span> <span class="n">getIterationModelParamsFn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">printIterationModelParams</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">logLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">lowerBoundLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lowerBoundStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">latentsTimes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latentsLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latentsStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+                 <span class="n">savePartial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">savePartialFilenamePattern</span><span class="o">=</span><span class="s2">&quot;results/00000000_</span><span class="si">{:s}</span><span class="s2">_estimatedModel.pickle&quot;</span><span class="p">,</span>
+                <span class="p">):</span>
+        <span class="k">if</span> <span class="n">latentsStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">latentsTimes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Please specify latentsTime if you want to save latents&quot;</span><span class="p">)</span>
+
+        <span class="nb">iter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">savePartial</span><span class="p">:</span>
+            <span class="n">savePartialFilename</span> <span class="o">=</span> <span class="n">savePartialFilenamePattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;initial&quot;</span><span class="p">)</span>
+            <span class="n">resultsToSave</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">savePartialFilename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">resultsToSave</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">lowerBound0</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">lowerBoundHist</span> <span class="o">=</span> <span class="p">[</span><span class="n">lowerBound0</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
+        <span class="n">elapsedTimeHist</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">lowerBoundLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lowerBoundStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+            <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lowerBoundStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lowerBoundHist</span><span class="p">))</span>
+            <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">latentsLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">latentsStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">latentsLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+            <span class="n">latentsLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="n">muK</span><span class="p">,</span> <span class="n">varK</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">newTimes</span><span class="o">=</span><span class="n">latentsTimes</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">latentsStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="n">latentsTimes</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">muK</span><span class="o">=</span><span class="n">muK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">varK</span><span class="o">=</span><span class="n">varK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+            <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+        <span class="n">logStream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;ecm&quot;</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;mecm&quot;</span><span class="p">:</span>
+            <span class="c1"># see McLachlan, G. J., &amp; Krishnan, T. (2007). The EM algorithm and</span>
+            <span class="c1"># extensions (Vol. 382). John Wiley &amp; Sons) Chapter 5</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">,</span> <span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid method=</span><span class="si">{:s}</span><span class="s2">. Supported values are ECM and mECM&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+        <span class="n">functions_for_steps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;estep&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eStep</span><span class="p">,</span>
+                               <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepEmbedding</span><span class="p">,</span>
+                               <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepKernels</span><span class="p">,</span>
+                               <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepIndPointsLocs</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">getIterationModelParamsFn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">iterationModelParams</span> <span class="o">=</span> <span class="n">getIterationModelParamsFn</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">printIterationModelParams</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">iterationModelParams</span><span class="p">)</span>
+            <span class="n">iterationsModelParams</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span>
+                                     <span class="nb">range</span><span class="p">(</span><span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span>
+            <span class="n">iterationsModelParams</span><span class="p">[</span><span class="nb">iter</span><span class="p">]</span> <span class="o">=</span> <span class="n">iterationModelParams</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iterationsModelParams</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">maxRes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">}</span>
+        <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="nb">iter</span> <span class="o">&lt;=</span> <span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_estimate&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">)]:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Iteration </span><span class="si">{:02d}</span><span class="s2">, </span><span class="si">{:s}</span><span class="s2"> start: </span><span class="si">{:f}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">iter</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_writeToLockedLog</span><span class="p">(</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                        <span class="n">logLock</span><span class="o">=</span><span class="n">logLock</span><span class="p">,</span>
+                        <span class="n">logStream</span><span class="o">=</span><span class="n">logStream</span><span class="p">,</span>
+                        <span class="n">logStreamFN</span><span class="o">=</span><span class="n">logStreamFN</span>
+                    <span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">maxRes</span> <span class="o">=</span> <span class="n">functions_for_steps</span><span class="p">[</span><span class="n">step</span><span class="p">](</span>
+                            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+                            <span class="n">optim_params</span><span class="o">=</span><span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_optim_params&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">step</span><span class="p">)])</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">stack_trace</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">stack_trace</span><span class="p">)</span>
+                        <span class="n">terminationInfo</span> <span class="o">=</span> <span class="n">ErrorTerminationInfo</span><span class="p">(</span>
+                            <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Error occured while processing </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> in iteration </span><span class="si">{</span><span class="nb">iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">stack_trace</span><span class="o">=</span><span class="n">stack_trace</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">lowerBoundHist</span><span class="p">,</span> <span class="n">elapsedTimeHist</span><span class="p">,</span> \
+                               <span class="n">terminationInfo</span><span class="p">,</span> <span class="n">iterationsModelParams</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Iteration </span><span class="si">{:02d}</span><span class="s2">, </span><span class="si">{:s}</span><span class="s2"> end: </span><span class="si">{:f}</span><span class="s2">, niter: </span><span class="si">{:d}</span><span class="s2">, nfeval: </span><span class="si">{:d}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">iter</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">],</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;niter&quot;</span><span class="p">],</span>
+                        <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;nfeval&quot;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_writeToLockedLog</span><span class="p">(</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                        <span class="n">logLock</span><span class="o">=</span><span class="n">logLock</span><span class="p">,</span>
+                        <span class="n">logStream</span><span class="o">=</span><span class="n">logStream</span><span class="p">,</span>
+                        <span class="n">logStreamFN</span><span class="o">=</span><span class="n">logStreamFN</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">savePartial</span><span class="p">:</span>
+                        <span class="n">savePartialFilename</span> <span class="o">=</span> \
+                            <span class="n">savePartialFilenamePattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="s2">&quot;</span><span class="si">{:s}{:03d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="nb">iter</span><span class="p">))</span>
+                        <span class="n">resultsToSave</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">}</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">savePartialFilename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">resultsToSave</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">getIterationModelParamsFn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">iterationModelParams</span> <span class="o">=</span> <span class="n">getIterationModelParamsFn</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">printIterationModelParams</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="n">iterationModelParams</span><span class="p">)</span>
+                        <span class="n">iterationsModelParams</span><span class="p">[</span><span class="nb">iter</span><span class="p">]</span> <span class="o">=</span> <span class="n">iterationModelParams</span>
+            <span class="n">elapsedTimeHist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">startTime</span><span class="p">)</span>
+            <span class="n">lowerBoundHist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+            <span class="k">if</span> <span class="n">lowerBoundLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+               <span class="n">lowerBoundStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+               <span class="ow">not</span> <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+                <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lowerBoundStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lowerBoundHist</span><span class="p">))</span>
+                <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">latentsLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+               <span class="n">latentsStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+               <span class="ow">not</span> <span class="n">latentsLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+                <span class="n">latentsLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="n">muK</span><span class="p">,</span> <span class="n">varK</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">newTimes</span><span class="o">=</span><span class="n">latentsTimes</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">latentsStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span>
+                             <span class="n">times</span><span class="o">=</span><span class="n">latentsTimes</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                             <span class="n">muK</span><span class="o">=</span><span class="n">muK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                             <span class="n">varK</span><span class="o">=</span><span class="n">varK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+            <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">terminationInfo</span> <span class="o">=</span> <span class="n">TerminationInfo</span><span class="p">(</span>
+            <span class="s2">&quot;Maximum number of iterations (</span><span class="si">{:d}</span><span class="s2">) reached&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">lowerBoundHist</span><span class="p">,</span> <span class="n">elapsedTimeHist</span><span class="p">,</span> <span class="n">terminationInfo</span><span class="p">,</span> \
+            <span class="n">iterationsModelParams</span></div>
+
+    <span class="k">def</span> <span class="nf">_eStep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getSVPosteriorOnIndPointsParams</span><span class="p">()</span>
+        <span class="n">evalFunc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">LBFGS</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupAndMaximizeStep</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">evalFunc</span><span class="o">=</span><span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_mStepEmbedding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getSVEmbeddingParams</span><span class="p">()</span>
+        <span class="n">svPosteriorOnLatentsStats</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">computeSVPosteriorOnLatentsStats</span><span class="p">()</span>
+        <span class="n">evalFunc</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">evalELLSumAcrossTrialsAndNeurons</span><span class="p">(</span><span class="n">svPosteriorOnLatentsStats</span><span class="o">=</span><span class="n">svPosteriorOnLatentsStats</span><span class="p">)</span>
+        <span class="c1"># evalFunc = model.eval</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">LBFGS</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupAndMaximizeStep</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">evalFunc</span><span class="o">=</span><span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_mStepKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getKernelsParams</span><span class="p">()</span>
+        <span class="n">prev_x</span> <span class="o">=</span> <span class="p">[</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">anx</span><span class="p">)</span> <span class="k">for</span> <span class="n">anx</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+        <span class="k">def</span> <span class="nf">evalFunc</span><span class="p">():</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">answer</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">LBFGS</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupAndMaximizeStep</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">evalFunc</span><span class="o">=</span><span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+            <span class="c1"># begin debug</span>
+            <span class="c1"># print(&quot;*** Updated kernels params ***&quot;)</span>
+            <span class="c1"># print(x)</span>
+            <span class="c1"># raise ValueError(&quot;Test error in _mStepKernels&quot;)</span>
+            <span class="c1"># end debug</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">anx</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span> <span class="k">for</span> <span class="n">anx</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">prev_x</span><span class="p">[</span><span class="n">i</span><span class="p">][:]</span>
+            <span class="k">raise</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_mStepIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getIndPointsLocs</span><span class="p">()</span>
+        <span class="k">def</span> <span class="nf">evalFunc</span><span class="p">():</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">answer</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">LBFGS</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setupAndMaximizeStep</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">evalFunc</span><span class="o">=</span><span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_setupAndMaximizeStep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">maxRes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maximizeStep</span><span class="p">(</span><span class="n">evalFunc</span><span class="o">=</span><span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+            <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">maxRes</span>
+
+    <span class="k">def</span> <span class="nf">_maximizeStep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evalFunc</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">closure</span><span class="p">():</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="n">curEval</span> <span class="o">=</span> <span class="o">-</span><span class="n">evalFunc</span><span class="p">()</span>
+            <span class="c1"># begin debug</span>
+            <span class="c1"># print(&quot;before -- eval {:f}, params &quot;.format(curEval), self._model.getKernelsParams())</span>
+            <span class="c1"># end debug</span>
+            <span class="n">curEval</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># begin debug</span>
+            <span class="c1"># with torch.no_grad():</span>
+            <span class="c1">#     auxEval = -evalFunc()</span>
+            <span class="c1"># print(&quot;after -- eval {:f}, params &quot;.format(auxEval), self._model.getKernelsParams())</span>
+            <span class="c1"># print(&quot;after -- params &quot;, self._model.getKernelsParams())</span>
+            <span class="c1"># end debug</span>
+            <span class="k">return</span> <span class="n">curEval</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">closure</span><span class="p">)</span>
+        <span class="n">lowerBound</span> <span class="o">=</span> <span class="n">evalFunc</span><span class="p">()</span>
+        <span class="n">stateOneEpoch</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">optimizer</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">nfeval</span> <span class="o">=</span> <span class="n">stateOneEpoch</span><span class="p">[</span><span class="s2">&quot;func_evals&quot;</span><span class="p">]</span>
+        <span class="n">niter</span> <span class="o">=</span> <span class="n">stateOneEpoch</span><span class="p">[</span><span class="s2">&quot;n_iter&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="s2">&quot;nfeval&quot;</span><span class="p">:</span> <span class="n">nfeval</span><span class="p">,</span> <span class="s2">&quot;niter&quot;</span><span class="p">:</span> <span class="n">niter</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="SVEM_SciPy"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.SVEM_SciPy">[docs]</a><span class="k">class</span> <span class="nc">SVEM_SciPy</span><span class="p">(</span><span class="n">SVEM</span><span class="p">):</span>
+
+<div class="viewcode-block" id="SVEM_SciPy.maximize"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.SVEM_SciPy.maximize">[docs]</a>    <span class="k">def</span> <span class="nf">maximize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;EM&quot;</span><span class="p">,</span> <span class="n">getIterationModelParamsFn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">printIterationModelParams</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">logLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">logStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">lowerBoundLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lowerBoundStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">latentsTimes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latentsLock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">latentsStreamFN</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+                 <span class="n">savePartial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">savePartialFilenamePattern</span><span class="o">=</span><span class="s2">&quot;00000000_</span><span class="si">{:s}</span><span class="s2">_estimatedModel.pickle&quot;</span><span class="p">,</span>
+                <span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">latentsStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">latentsTimes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Please specify latentsTime if you want to save latents&quot;</span><span class="p">)</span>
+
+        <span class="nb">iter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">savePartial</span><span class="p">:</span>
+            <span class="n">savePartialFilename</span> <span class="o">=</span> <span class="n">savePartialFilenamePattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;initial&quot;</span><span class="p">)</span>
+            <span class="n">resultsToSave</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">}</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">savePartialFilename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">resultsToSave</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">lowerBound0</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">lowerBoundHist</span> <span class="o">=</span> <span class="p">[</span><span class="n">lowerBound0</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span>
+        <span class="n">elapsedTimeHist</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span>
+        <span class="n">startTime</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">lowerBoundLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lowerBoundStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+            <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lowerBoundStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lowerBoundHist</span><span class="p">))</span>
+            <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">latentsLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">latentsStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">latentsLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+            <span class="n">latentsLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="n">muK</span><span class="p">,</span> <span class="n">varK</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">newTimes</span><span class="o">=</span><span class="n">latentsTimes</span><span class="p">)</span>
+
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">latentsStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="n">latentsTimes</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">muK</span><span class="o">=</span><span class="n">muK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">varK</span><span class="o">=</span><span class="n">varK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+            <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+        <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">logStream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s2">&quot;EM&quot;</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">]</span>
+            <span class="n">functions_for_steps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;estep&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eStep</span><span class="p">,</span> <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepEmbedding</span><span class="p">,</span> <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepKernels</span><span class="p">,</span> <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepIndPointsLocs</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="s2">&quot;mECM&quot;</span><span class="p">:</span>
+            <span class="n">steps</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">,</span> <span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">,</span> <span class="s2">&quot;estep&quot;</span><span class="p">,</span> <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">]</span>
+            <span class="n">functions_for_steps</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;estep&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eStep</span><span class="p">,</span> <span class="s2">&quot;mstep_embedding&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepEmbedding</span><span class="p">,</span> <span class="s2">&quot;estep&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eStep</span><span class="p">,</span> <span class="s2">&quot;mstep_kernels&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepKernels</span><span class="p">,</span> <span class="s2">&quot;estep&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eStep</span><span class="p">,</span> <span class="s2">&quot;mstep_indpointslocs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mStepIndPointsLocs</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid method=</span><span class="si">{:s}</span><span class="s2">. Supported values are EM and mECM&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">method</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">getIterationModelParamsFn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">initialModelsParams</span> <span class="o">=</span> <span class="n">getIterationModelParamsFn</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">iterationsModelParams</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">initialModelsParams</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+            <span class="n">iterationsModelParams</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">initialModelsParams</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">iterationsModelParams</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">maxRes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">}</span>
+        <span class="k">while</span> <span class="nb">iter</span><span class="o">&lt;</span><span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_estimate&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">)]:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Iteration </span><span class="si">{:02d}</span><span class="s2">, </span><span class="si">{:s}</span><span class="s2"> start: </span><span class="si">{:f}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_writeToLockedLog</span><span class="p">(</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                        <span class="n">logLock</span><span class="o">=</span><span class="n">logLock</span><span class="p">,</span>
+                        <span class="n">logStream</span><span class="o">=</span><span class="n">logStream</span><span class="p">,</span>
+                        <span class="n">logStreamFN</span><span class="o">=</span><span class="n">logStreamFN</span>
+                    <span class="p">)</span>
+                    <span class="n">maxRes</span> <span class="o">=</span> <span class="n">functions_for_steps</span><span class="p">[</span><span class="n">step</span><span class="p">](</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="o">=</span><span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_optim_params&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">)])</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Iteration </span><span class="si">{:02d}</span><span class="s2">, </span><span class="si">{:s}</span><span class="s2"> end: </span><span class="si">{:f}</span><span class="s2">, niter: </span><span class="si">{:d}</span><span class="s2">, nfeval: </span><span class="si">{:d}</span><span class="s2">, success: </span><span class="si">{:d}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">step</span><span class="p">,</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">],</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;niter&quot;</span><span class="p">],</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;nfeval&quot;</span><span class="p">],</span> <span class="n">maxRes</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_writeToLockedLog</span><span class="p">(</span>
+                        <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                        <span class="n">logLock</span><span class="o">=</span><span class="n">logLock</span><span class="p">,</span>
+                        <span class="n">logStream</span><span class="o">=</span><span class="n">logStream</span><span class="p">,</span>
+                        <span class="n">logStreamFN</span><span class="o">=</span><span class="n">logStreamFN</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">savePartial</span><span class="p">:</span>
+                        <span class="n">savePartialFilename</span> <span class="o">=</span> <span class="n">savePartialFilenamePattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:s}{:03d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="nb">iter</span><span class="p">))</span>
+                        <span class="n">resultsToSave</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="n">model</span><span class="p">}</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">savePartialFilename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">resultsToSave</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">getIterationModelParamsFn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">iterationsModelParams</span><span class="p">[</span><span class="nb">iter</span><span class="o">+</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">getIterationModelParamsFn</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">)</span>
+            <span class="n">elapsedTimeHist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">-</span><span class="n">startTime</span><span class="p">)</span>
+            <span class="n">lowerBoundHist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">maxRes</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">lowerBoundLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">lowerBoundStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+                <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">lowerBoundStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lowerBoundHist</span><span class="p">))</span>
+                <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">latentsLock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">latentsStreamFN</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">latentsLock</span><span class="o">.</span><span class="n">is_locked</span><span class="p">():</span>
+                <span class="n">latentsLock</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                <span class="n">muK</span><span class="p">,</span> <span class="n">varK</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">newTimes</span><span class="o">=</span><span class="n">latentsTimes</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">latentsStreamFN</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">savez</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">iteration</span><span class="o">=</span><span class="nb">iter</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="n">latentsTimes</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">muK</span><span class="o">=</span><span class="n">muK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">varK</span><span class="o">=</span><span class="n">varK</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+                <span class="n">lowerBoundLock</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+
+            <span class="nb">iter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">terminationInfo</span> <span class="o">=</span> <span class="n">TerminationInfo</span><span class="p">(</span><span class="s2">&quot;Maximum number of iterations (</span><span class="si">{:d}</span><span class="s2">) reached&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">optim_params</span><span class="p">[</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">lowerBoundHist</span><span class="p">,</span> <span class="n">elapsedTimeHist</span><span class="p">,</span> <span class="n">terminationInfo</span><span class="p">,</span> <span class="n">iterationsModelParams</span></div>
+
+    <span class="k">def</span> <span class="nf">_eStep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">eval_func</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">z</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">grad_list</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_flattened_svPosteriorOnIndPoints_params_grad</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grad_list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+        <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_flattened_svPosteriorOnIndPoints_params</span><span class="p">())</span>
+        <span class="n">optim_res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">eval_func</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z0</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">options</span><span class="o">=</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">optim_res</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">lowerBound</span> <span class="o">=</span> <span class="o">-</span><span class="n">optim_res</span><span class="o">.</span><span class="n">fun</span>
+        <span class="n">nfeval</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nfev</span>
+        <span class="n">niter</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nit</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">success</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="s2">&quot;nfeval&quot;</span><span class="p">:</span> <span class="n">nfeval</span><span class="p">,</span> <span class="s2">&quot;niter&quot;</span><span class="p">:</span> <span class="n">niter</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_eStep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">eval_func</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">z</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">grad_list</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_flattened_svPosteriorOnIndPoints_params_grad</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grad_list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+        <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_flattened_svPosteriorOnIndPoints_params</span><span class="p">())</span>
+        <span class="n">optim_res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">eval_func</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z0</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">options</span><span class="o">=</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_svPosteriorOnIndPoints_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">optim_res</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">lowerBound</span> <span class="o">=</span> <span class="o">-</span><span class="n">optim_res</span><span class="o">.</span><span class="n">fun</span>
+        <span class="n">nfeval</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nfev</span>
+        <span class="n">niter</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nit</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">success</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="s2">&quot;nfeval&quot;</span><span class="p">:</span> <span class="n">nfeval</span><span class="p">,</span> <span class="s2">&quot;niter&quot;</span><span class="p">:</span> <span class="n">niter</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_mStepEmbedding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">eval_func</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_svEmbedding_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">z</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_svEmbedding_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1">#             svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()</span>
+<span class="c1">#             value = -model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">grad_list</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_flattened_svEmbedding_params_grad</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grad_list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+        <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_flattened_svEmbedding_params</span><span class="p">())</span>
+        <span class="n">optim_res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">eval_func</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z0</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">options</span><span class="o">=</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_svEmbedding_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_svEmbedding_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">optim_res</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">lowerBound</span> <span class="o">=</span> <span class="o">-</span><span class="n">optim_res</span><span class="o">.</span><span class="n">fun</span>
+        <span class="n">nfeval</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nfev</span>
+        <span class="n">niter</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nit</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">success</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="s2">&quot;nfeval&quot;</span><span class="p">:</span> <span class="n">nfeval</span><span class="p">,</span> <span class="s2">&quot;niter&quot;</span><span class="p">:</span> <span class="n">niter</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_mStepKernels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">eval_func</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_kernels_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">z</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_kernels_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">grad_list</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_flattened_kernels_params_grad</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grad_list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+        <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_flattened_kernels_params</span><span class="p">())</span>
+        <span class="n">optim_res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">eval_func</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z0</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="c1"># bounds=scipy.optimize.Bounds(lb=0.1, ub=30.0),</span>
+                                            <span class="n">options</span><span class="o">=</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_kernels_params_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_kernels_params_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">optim_res</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">lowerBound</span> <span class="o">=</span> <span class="o">-</span><span class="n">optim_res</span><span class="o">.</span><span class="n">fun</span>
+        <span class="c1"># print(&quot;*** kernels parameters: {}&quot;.format(model.getKernelsParams()))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;*** kernels parameters: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">optim_res</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">nfeval</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nfev</span>
+        <span class="n">niter</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nit</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">success</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="s2">&quot;nfeval&quot;</span><span class="p">:</span> <span class="n">nfeval</span><span class="p">,</span> <span class="s2">&quot;niter&quot;</span><span class="p">:</span> <span class="n">niter</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">answer</span>
+
+    <span class="k">def</span> <span class="nf">_mStepIndPointsLocs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">optim_params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">eval_func</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_indPointsLocs_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">z</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">set_indPointsLocs_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">buildKernelsMatrices</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">value</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">grad_list</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_flattened_indPointsLocs_grad</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">grad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">grad_list</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">grad</span><span class="p">)</span>
+
+        <span class="n">z0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_flattened_indPointsLocs</span><span class="p">())</span>
+        <span class="n">optim_res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">fun</span><span class="o">=</span><span class="n">eval_func</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="n">z0</span><span class="p">,</span>
+                                            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">jac</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">options</span><span class="o">=</span><span class="n">optim_params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_indPointsLocs_requires_grad</span><span class="p">(</span><span class="n">requires_grad</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_indPointsLocs_from_flattened</span><span class="p">(</span><span class="n">flattened_params</span><span class="o">=</span><span class="n">optim_res</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+        <span class="n">lowerBound</span> <span class="o">=</span> <span class="o">-</span><span class="n">optim_res</span><span class="o">.</span><span class="n">fun</span>
+        <span class="n">nfeval</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nfev</span>
+        <span class="n">niter</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">nit</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">optim_res</span><span class="o">.</span><span class="n">success</span>
+        <span class="n">answer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;lowerBound&quot;</span><span class="p">:</span> <span class="n">lowerBound</span><span class="p">,</span> <span class="s2">&quot;nfeval&quot;</span><span class="p">:</span> <span class="n">nfeval</span><span class="p">,</span> <span class="s2">&quot;niter&quot;</span><span class="p">:</span> <span class="n">niter</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">answer</span></div>
+
+<div class="viewcode-block" id="TerminationInfo"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.TerminationInfo">[docs]</a><span class="k">class</span> <span class="nc">TerminationInfo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="n">message</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span></div>
+
+<div class="viewcode-block" id="ErrorTerminationInfo"><a class="viewcode-back" href="../../../svGPFA.stats.html#svGPFA.stats.svEM.ErrorTerminationInfo">[docs]</a><span class="k">class</span> <span class="nc">ErrorTerminationInfo</span><span class="p">(</span><span class="n">TerminationInfo</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error</span><span class="p">,</span> <span class="n">stack_trace</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error</span> <span class="o">=</span> <span class="n">error</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stack_trace</span> <span class="o">=</span> <span class="n">stack_trace</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stack_trace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stack_trace</span></div>
+
+</pre></div>
+
+  </article>
+
+  <footer>
+    
+      <div class="mt-20 mb-4 text-sm text-gray-700 print:mt-4">&copy; 2019, Lea Duncker and Maneesh Sahani&nbsp;Made with <a href="https://www.sphinx-doc.org">Sphinx 6.1.3</a></div>
+    
+  </footer></main>
+
+
+      <button
+  data-search-target="snackbar"
+  data-action="search#hideSnackbar"
+  class="fixed bottom-0 right-0 z-20 opacity-0 p-4 m-4 tracking-wide bg-gray-900 text-gray-100 transition transform transform-gpu duration-500 translate-y-full"
+>
+  Clear highlights
+</button><div
+  data-sidebar-target="screen"
+  data-action="click->sidebar#close"
+  class="fixed hidden inset-0 bg-black bg-opacity-50">
+</div>
+    </div>
+    
+      
+<script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+<script src="../../../_static/doctools.js"></script>
+<script src="../../../_static/sphinx_highlight.js"></script>
+<script src="../../../_static/proof.js"></script>
+<script src="../../../_static/theme.b62e1ded0c8c099a2d47.js"></script>
+    
+  </body>
+</html>

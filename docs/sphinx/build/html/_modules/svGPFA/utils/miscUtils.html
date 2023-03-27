@@ -1,0 +1,659 @@
+
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    
+    <title>svGPFA.utils.miscUtils | svGPFA 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../../_static/theme.39dcd091ff2d4f33bf46.css" />
+    <link rel="stylesheet" href="../../../_static/proof.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" href="../../../_static/sg_gallery-rendered-html.css" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+  </head>
+
+  <body class="antialiased text-gray scroll-smooth">
+    <div
+      id="page"
+      data-controller="sidebar search "
+      data-action="keydown@window->search#focus "
+      class="min-h-screen xl:h-screen flex flex-col xl:grid xl:grid-layout print:block print:h-auto"
+    >
+      <a class="block transition -translate-x-full focus:translate-x-0 opacity-0 focus:opacity-100 text-xl bg-white p-4 z-20 absolute top-0 left-0 h-14" href="#svgpfa-utils-miscutils" title="Skip navigation links">Skip to content</a>
+
+      <header class="grid-area-header z-10 h-14 fixed w-full top-0 print:hidden">
+        <div class="bg-gray-dark shadow-md flex items-center h-full xl:px-2 relative"><div class="flex items-center">
+      <button
+    data-action="sidebar#open"
+    data-sidebar-target="hamburger"
+    class="xl:hidden h-14 w-14 leading-14 text-gray-100 hover:bg-gray-700 hover:text-brand focus:outline-none focus:bg-gray-700 focus:text-brand">
+  <span class="sr-only">Open navigation menu</span>
+  <svg aria-hidden="true" class="fill-current h-8 w-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+</button><a class="hover:bg-gray-700 focus:bg-gray-700 focus:outline-none"
+   href="../../../index.html"
+   title="Back to homepage"><span class="hidden lg:inline-block shrink-0 font-medium text-gray-100 mx-5 leading-14 tracking-wider">svGPFA 0.0.1 documentation</span>
+</a></div><div class="flex justify-end items-center flex-1"><form
+  id="searchbox"
+  action="../../../search.html"
+  data-action="click->search#focusSearchInput"
+  method="get"
+  class="flex print:hidden justify-between items-center leading-14 md:ml-4 bg-gray-dark text-gray-300 focus-within:bg-gray-50 focus-within:text-gray-800 focus-within:absolute focus-within:inset-x-0 focus-within:top-0 md:focus-within:w-full md:focus-within:static z-10">
+
+  <button
+    class="text-inherit h-14 w-14"
+    aria-label="Get search results"
+    tabindex="-1"
+  >
+    <svg aria-hidden="true" class="fill-current stroke-current h-8 w-8" stroke-width="0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+  </button>
+
+  <input
+    name="q"
+    id="search-input"
+    data-search-target="searchInput"
+    type="search"
+    aria-label="Search the docs"
+    placeholder="Search the docs"
+    class="pr-2 bg-transparent text-inherit focus:outline-none w-0 md:w-auto focus:w-full transition-all duration-100"
+  />
+</form></div>
+</div>
+      </header>
+
+      
+<aside data-sidebar-target="sidebar" class="grid-area-sidebar h-full fixed pt-14 xl:relative inset-y-0 left-0 z-20 xl:z-0 print:hidden overflow-y-auto transition-all transform transform-gpu -translate-x-full opacity-0 duration-300 xl:translate-x-0 xl:opacity-100">
+  <nav
+  role="navigation"
+  class="h-full overflow-y-auto bg-white text-gray-600 pt-8 flex flex-col"
+>
+  <div class="nav-toc flex-1 pl-6"><p class="caption" role="heading"><span class="caption-text">General notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">1. Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../highLevelInterface.html">2. High-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../lowLevelInterface.html">3. Low-level interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">4. Scripts for estimation and visualization</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_simulation.html">4.1. Simulated data and default params</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_simulation.html#estimate-model">4.1.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_simulation.html#goodness-of-fit-gof">4.1.2. Goodness of fit (GOF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_simulation.html#plotting">4.1.3. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html">4.2. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#setup-environment">4.2.1. 1. Setup environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#epoch">4.2.2. 2. Epoch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#get-parameters">4.2.3. 3. Get parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#estimate-svgpfa-model">4.2.4. 4. Estimate svGPFA model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#goodness-of-fit-analysis">4.2.5. 5. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_striatum_ibl.html#plotting">4.2.6. 6. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_GPe.html">4.3. Basal ganglia recordings from a mouse performing a bandit task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_GPe.html#estimate-model">4.3.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_GPe.html#goodness-of-fit-gof">4.3.2. Goodness of fit (GOF)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_examples/plot_GPe.html#plotting">4.3.3. Plotting</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced notes:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataStructures.html">1. Data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../objectOrientedDesign.html">2. Object-oriented design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../implementationNotes.html">3. Implementation notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../derivations.html">4. Derivations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#gpfa-model">4.1. GPFA model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#gpfa-with-inducing-points-model">4.2. GPFA with inducing points model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#svgpfa-variational-lower-bound">4.3. svGPFA variational lower bound</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../derivations.html#variational-distribution-of-h-nr-cdot">4.4. Variational distribution of <span class="math notranslate nohighlight">\(h_{nr}(\cdot)\)</span></a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Appendix:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../params.html">1. Parameters and their specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../params.html#data-structure-parameters">1.1. Data structure parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#trial-specific-format">1.1.1. Trial-specific format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#trial-common-format">1.1.2. Trial-common format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#defaults">1.1.3. Defaults</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../params.html#initial-values-of-model-parameters">1.2. Initial values of model parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#variational-parameters">1.2.1. Variational parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#embedding-parameters">1.2.2. Embedding parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#kernel-parameters">1.2.3. Kernel parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#inducing-points-locations-parameters">1.2.4. Inducing points locations parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../params.html#optimisation-parameters">1.3. Optimisation parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../params.html#id20">1.3.1. Defaults</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">2. References</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Code:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../svGPFA.html">1. svGPFA package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../svGPFA.html#subpackages">1.1. Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.plot.html">1.1.1. svGPFA.plot package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.simulations.html">1.1.2. svGPFA.simulations package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.stats.html">1.1.3. svGPFA.stats package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../svGPFA.utils.html">1.1.4. svGPFA.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../svGPFA.html#module-svGPFA">1.2. Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+
+  <button
+      data-action="sidebar#close"
+      title="Close navigation menu"
+      class="text-4xl text-gray-800 p-4 bottom-0 hover:text-brand xl:hidden focus:text-brand self-center">
+    <span class="sr-only">Close navigation menu</span>
+    <svg aria-hidden="true" class="fill-current stroke-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  </button>
+</nav>
+</aside>
+
+<main
+  class="px-4 pt-14 xl:ml-fluid grid-area-main overflow-y-auto flex flex-col flex-1 h-full mx-0 md:mx-auto xl:mr-0"
+><nav role="navigation"
+     aria-label="breadcrumbs"
+     class="print:hidden mt-12 text-sm text-gray-light">
+  <a class="text-gray-light text-sm hover:text-gray-dark font-medium focus:text-gray-dark" href="../../../index.html">svGPFA 0.0.1 documentation</a>
+  <span class="mr-1">/</span><a class="text-gray-light text-sm hover:text-gray-dark" href="../../index.html">Module code</a>
+    <span class="mr-1">/</span><span aria-current="page">svGPFA.utils.miscUtils</span>
+</nav>
+  <article role="main" class="flex-1">
+    
+  <h1>Source code for svGPFA.utils.miscUtils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">scipy.io</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">sklearn.metrics</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="c1"># from . import my_globals</span>
+<span class="kn">import</span> <span class="nn">svGPFA.stats.kernels</span>
+<span class="kn">import</span> <span class="nn">gcnu_common.numerical_methods.utils</span>
+<span class="kn">import</span> <span class="nn">gcnu_common.stats.gaussianProcesses.eval</span>
+
+
+<div class="viewcode-block" id="separateNeuronsSpikeTimesByTrials"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.separateNeuronsSpikeTimesByTrials">[docs]</a><span class="k">def</span> <span class="nf">separateNeuronsSpikeTimesByTrials</span><span class="p">(</span><span class="n">neurons_spike_times</span><span class="p">,</span> <span class="n">epochs_times</span><span class="p">,</span>
+                                      <span class="n">trials_start_times_rel</span><span class="p">,</span>
+                                      <span class="n">trials_end_times_rel</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">epochs_times</span><span class="p">)</span>
+    <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neurons_spike_times</span><span class="p">)</span>
+    <span class="n">trials_spikes_times</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">trial_epoch_time</span> <span class="o">=</span> <span class="n">epochs_times</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+        <span class="n">trial_start_time_rel</span> <span class="o">=</span> <span class="n">trials_start_times_rel</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+        <span class="n">trial_end_time_rel</span> <span class="o">=</span> <span class="n">trials_end_times_rel</span><span class="p">[</span><span class="n">r</span><span class="p">]</span>
+        <span class="n">trial_spikes_times</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">):</span>
+            <span class="n">neuron_spikes_times_rel</span> <span class="o">=</span> <span class="n">neurons_spike_times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">-</span><span class="n">trial_epoch_time</span>
+            <span class="n">trial_neuron_spikes_times</span> <span class="o">=</span> <span class="n">neuron_spikes_times_rel</span><span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">trial_start_time_rel</span> <span class="o">&lt;=</span> <span class="n">neuron_spikes_times_rel</span><span class="p">,</span>
+                               <span class="n">neuron_spikes_times_rel</span> <span class="o">&lt;</span> <span class="n">trial_end_time_rel</span><span class="p">)]</span>
+            <span class="n">trial_spikes_times</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial_neuron_spikes_times</span>
+        <span class="n">trials_spikes_times</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">trial_spikes_times</span>
+    <span class="k">return</span> <span class="n">trials_spikes_times</span></div>
+
+
+<div class="viewcode-block" id="buildKernels"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.buildKernels">[docs]</a><span class="k">def</span> <span class="nf">buildKernels</span><span class="p">(</span><span class="n">kernels_types</span><span class="p">,</span> <span class="n">kernels_params</span><span class="p">):</span>
+    <span class="n">n_latents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kernels_types</span><span class="p">)</span>
+    <span class="n">kernels</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">kernel_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kernels_types</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">kernels_types</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;exponentialQuadratic&quot;</span><span class="p">:</span>
+            <span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">ExponentialQuadraticKernel</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">kernels_types</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;periodic&quot;</span><span class="p">:</span>
+            <span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kernels</span><span class="o">.</span><span class="n">PeriodicKernel</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid kernels type: </span><span class="si">{</span><span class="n">kernels_types</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">setParams</span><span class="p">(</span><span class="n">kernels_params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">kernels</span></div>
+
+
+<div class="viewcode-block" id="orthonormalizeLatentsMeans"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.orthonormalizeLatentsMeans">[docs]</a><span class="k">def</span> <span class="nf">orthonormalizeLatentsMeans</span><span class="p">(</span><span class="n">latents_means</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+    <span class="n">orthoMatrix</span> <span class="o">=</span> <span class="n">Vh</span><span class="o">.</span><span class="n">T</span><span class="o">*</span><span class="n">S</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latents_means</span><span class="p">)</span>
+    <span class="n">oLatentsMeans</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">oLatentsMeans</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">latents_means</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">orthoMatrix</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">oLatentsMeans</span></div>
+
+
+<div class="viewcode-block" id="getPropSamplesCovered"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getPropSamplesCovered">[docs]</a><span class="k">def</span> <span class="nf">getPropSamplesCovered</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">percent</span><span class="o">=</span><span class="mf">.95</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">percent</span><span class="o">==</span><span class="mf">.95</span><span class="p">:</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">1.96</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;percent=0.95 is the only option implemented at the moment&quot;</span><span class="p">)</span>
+    <span class="n">covered</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mean</span><span class="o">-</span><span class="n">factor</span><span class="o">*</span><span class="n">std</span><span class="o">&lt;=</span><span class="n">sample</span><span class="p">,</span> <span class="n">sample</span><span class="o">&lt;</span><span class="n">mean</span><span class="o">+</span><span class="n">factor</span><span class="o">*</span><span class="n">std</span><span class="p">)</span>
+    <span class="n">coverage</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">covered</span><span class="p">)</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">covered</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">coverage</span></div>
+
+<div class="viewcode-block" id="getCIFs"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getCIFs">[docs]</a><span class="k">def</span> <span class="nf">getCIFs</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">latents</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="n">latents</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="n">latents</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">nSamples</span> <span class="o">=</span> <span class="n">latents</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">nNeurons</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">,</span> <span class="n">nNeurons</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">embeddings</span><span class="p">[</span><span class="n">r</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">latents</span><span class="p">[</span><span class="n">r</span><span class="p">,:,:],</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">+</span><span class="n">d</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">CIFs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CIFs</span></div>
+
+
+<div class="viewcode-block" id="computeSpikeRates"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.computeSpikeRates">[docs]</a><span class="k">def</span> <span class="nf">computeSpikeRates</span><span class="p">(</span><span class="n">trials_times</span><span class="p">,</span> <span class="n">spikes_times</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes_times</span><span class="p">)</span>
+    <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes_times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">spikes_rates</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">trial_duration</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">trials_times</span><span class="p">[</span><span class="n">r</span><span class="p">])</span><span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">trials_times</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">):</span>
+            <span class="n">spikes_rates</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikes_times</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">n</span><span class="p">])</span><span class="o">/</span><span class="n">trial_duration</span>
+    <span class="k">return</span> <span class="n">spikes_rates</span></div>
+
+
+<div class="viewcode-block" id="saveDataForMatlabEstimations"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.saveDataForMatlabEstimations">[docs]</a><span class="k">def</span> <span class="nf">saveDataForMatlabEstimations</span><span class="p">(</span><span class="n">qMu</span><span class="p">,</span> <span class="n">qSVec</span><span class="p">,</span> <span class="n">qSDiag</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span>
+                                 <span class="n">indPointsLocs</span><span class="p">,</span>
+                                 <span class="n">legQuadPoints</span><span class="p">,</span> <span class="n">legQuadWeights</span><span class="p">,</span>
+                                 <span class="n">kernelsTypes</span><span class="p">,</span> <span class="n">kernelsParams</span><span class="p">,</span>
+                                 <span class="n">spikesTimes</span><span class="p">,</span>
+                                 <span class="n">indPointsLocsKMSRegEpsilon</span><span class="p">,</span> <span class="n">trialsLengths</span><span class="p">,</span>
+                                 <span class="n">latentsTrialsTimes</span><span class="p">,</span>
+                                 <span class="n">emMaxIter</span><span class="p">,</span> <span class="n">eStepMaxIter</span><span class="p">,</span> <span class="n">mStepEmbeddingMaxIter</span><span class="p">,</span>
+                                 <span class="n">mStepKernelsMaxIter</span><span class="p">,</span> <span class="n">mStepIndPointsMaxIter</span><span class="p">,</span>
+                                 <span class="n">saveFilename</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikesTimes</span><span class="p">)</span>
+    <span class="n">nNeurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spikesTimes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">qMu</span><span class="p">)</span>
+    <span class="c1"># indPointsLocsKMSEpsilon = np.array(indPointsLocsKMSEpsilon)</span>
+    <span class="n">mdict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">nNeurons</span><span class="o">=</span><span class="n">nNeurons</span><span class="p">,</span> <span class="n">nLatents</span><span class="o">=</span><span class="n">nLatents</span><span class="p">,</span>
+                 <span class="n">C</span><span class="o">=</span><span class="n">C</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">d</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">d</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                 <span class="n">legQuadPoints</span><span class="o">=</span><span class="n">legQuadPoints</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                 <span class="n">legQuadWeights</span><span class="o">=</span><span class="n">legQuadWeights</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                 <span class="n">indPointsLocsKMSRegEpsilon</span><span class="o">=</span><span class="n">indPointsLocsKMSRegEpsilon</span><span class="p">,</span>
+                 <span class="n">trialsLengths</span><span class="o">=</span><span class="n">trialsLengths</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
+                 <span class="n">emMaxIter</span><span class="o">=</span><span class="n">emMaxIter</span><span class="p">,</span> <span class="n">eStepMaxIter</span><span class="o">=</span><span class="n">eStepMaxIter</span><span class="p">,</span>
+                 <span class="n">mStepEmbeddingMaxIter</span><span class="o">=</span><span class="n">mStepEmbeddingMaxIter</span><span class="p">,</span>
+                 <span class="n">mStepKernelsMaxIter</span><span class="o">=</span><span class="n">mStepKernelsMaxIter</span><span class="p">,</span>
+                 <span class="n">mStepIndPointsMaxIter</span><span class="o">=</span><span class="n">mStepIndPointsMaxIter</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;kernelType_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">kernelsTypes</span><span class="p">[</span><span class="n">k</span><span class="p">]})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;qMu_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">qMu</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;qSVec_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">qSVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;qSDiag_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">qSDiag</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;kernelsParams_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">kernelsParams</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;indPointsLocs_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">indPointsLocs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;qMu_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">qMu</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;qSVec_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">qSVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;qSDiag_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">qSDiag</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+        <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;latentsTrialsTimes_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">):</span> <span class="n">latentsTrialsTimes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nNeurons</span><span class="p">):</span>
+            <span class="n">mdict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;spikesTimes_</span><span class="si">{:d}</span><span class="s2">_</span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span> <span class="n">spikesTimes</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)})</span>
+    <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">savemat</span><span class="p">(</span><span class="n">file_name</span><span class="o">=</span><span class="n">saveFilename</span><span class="p">,</span> <span class="n">mdict</span><span class="o">=</span><span class="n">mdict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="getCholFromVec"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getCholFromVec">[docs]</a><span class="k">def</span> <span class="nf">getCholFromVec</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">nIndPoints</span><span class="p">):</span>
+    <span class="n">chol</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nIndPoints</span><span class="p">,</span> <span class="n">nIndPoints</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="n">trilIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril_indices</span><span class="p">(</span><span class="n">nIndPoints</span><span class="p">,</span> <span class="n">nIndPoints</span><span class="p">)</span>
+    <span class="n">chol</span><span class="p">[</span><span class="n">trilIndices</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">trilIndices</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]]</span> <span class="o">=</span> <span class="n">vec</span>
+    <span class="k">return</span> <span class="n">chol</span></div>
+
+<div class="viewcode-block" id="buildCovsFromCholVecs"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.buildCovsFromCholVecs">[docs]</a><span class="k">def</span> <span class="nf">buildCovsFromCholVecs</span><span class="p">(</span><span class="n">cholVecs</span><span class="p">):</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cholVecs</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">cholVecs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">covs</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+        <span class="c1"># cholVecs[k] \in n_trials x Pk x 1</span>
+        <span class="c1"># Pk = ((nIndPointsK+1)*nIndPointsK)/2</span>
+        <span class="c1"># nIndPointsK = (-1+sqrt(1+8*Pk))/2</span>
+        <span class="n">Pk</span> <span class="o">=</span> <span class="n">cholVecs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nIndPointsK</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="o">+</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">8</span><span class="o">*</span><span class="n">Pk</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">covs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">R</span><span class="p">,</span> <span class="n">nIndPointsK</span><span class="p">,</span> <span class="n">nIndPointsK</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">R</span><span class="p">):</span>
+            <span class="n">cholKR</span> <span class="o">=</span> <span class="n">getCholFromVec</span><span class="p">(</span><span class="n">vec</span><span class="o">=</span><span class="n">cholVecs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">nIndPoints</span><span class="o">=</span><span class="n">nIndPointsK</span><span class="p">)</span>
+            <span class="n">covs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">cholKR</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">cholKR</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">covs</span></div>
+
+
+<div class="viewcode-block" id="getQSVecsAndQSDiagsFromQSCholVecs"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getQSVecsAndQSDiagsFromQSCholVecs">[docs]</a><span class="k">def</span> <span class="nf">getQSVecsAndQSDiagsFromQSCholVecs</span><span class="p">(</span><span class="n">qsCholVecs</span><span class="p">):</span>
+    <span class="c1"># qsCholVecs[k] \in nTrial x Pk</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">qsCholVecs</span><span class="p">)</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="n">qsCholVecs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">qSVec</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">)]</span>
+    <span class="n">qSDiag</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+        <span class="n">Pk</span> <span class="o">=</span> <span class="n">qsCholVecs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">nIndPointsK</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="o">-</span><span class="mf">1.0</span><span class="o">+</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">8</span><span class="o">*</span><span class="n">Pk</span><span class="p">))</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span>
+        <span class="n">qSVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">nIndPointsK</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="n">qSDiag</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">nIndPointsK</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+            <span class="n">qSRSigmaKR</span> <span class="o">=</span> <span class="n">getCholFromVec</span><span class="p">(</span><span class="n">vec</span><span class="o">=</span><span class="n">qsCholVecs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">nIndPoints</span><span class="o">=</span><span class="n">nIndPointsK</span><span class="p">)</span>
+            <span class="n">qSigmaKR</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">qSRSigmaKR</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">qSRSigmaKR</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">qSDiagKR</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">qSigmaKR</span><span class="p">)</span>
+            <span class="n">qSigmaKR</span> <span class="o">=</span> <span class="n">qSigmaKR</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">qSDiagKR</span><span class="p">)</span>
+            <span class="n">eValKR</span><span class="p">,</span> <span class="n">eVecKR</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">qSigmaKR</span><span class="p">,</span> <span class="n">eigenvectors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">maxEvalIKR</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">eValKR</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">qSVecKR</span> <span class="o">=</span> <span class="n">eVecKR</span><span class="p">[:,</span> <span class="n">maxEvalIKR</span><span class="p">]</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eValKR</span><span class="p">[</span><span class="n">maxEvalIKR</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">qSVec</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">qSVecKR</span>
+            <span class="n">qSDiag</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">qSDiagKR</span>
+    <span class="k">return</span> <span class="n">qSVec</span><span class="p">,</span> <span class="n">qSDiag</span></div>
+
+
+<div class="viewcode-block" id="clock"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.clock">[docs]</a><span class="k">def</span> <span class="nf">clock</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">clocked</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">t0</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">arg_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arg_str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kargs</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="n">karg_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">karg_str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">arg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">karg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">,</span><span class="si">%s</span><span class="s1">) -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">arg_str</span><span class="p">,</span> <span class="n">karg_str</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">arg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">) -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">arg_str</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">karg_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">) -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">karg_str</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%0.8f</span><span class="s1">s] </span><span class="si">%s</span><span class="s1">() -&gt; </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elapsed</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">return</span> <span class="n">clocked</span></div>
+
+<div class="viewcode-block" id="chol3D"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.chol3D">[docs]</a><span class="k">def</span> <span class="nf">chol3D</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+<span class="c1">#     if my_globals.raise_exception:</span>
+<span class="c1">#         raise ValueError(&quot;Test error in chol3D&quot;)</span>
+    <span class="n">Kchol</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">nTrial</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nTrial</span><span class="p">):</span>
+        <span class="n">Kchol</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:])</span>
+    <span class="k">return</span> <span class="n">Kchol</span></div>
+
+<div class="viewcode-block" id="pinv3D"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.pinv3D">[docs]</a><span class="k">def</span> <span class="nf">pinv3D</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="mf">1e-15</span><span class="p">):</span>
+    <span class="n">Kpinv</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">K</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">nTrial</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nTrial</span><span class="p">):</span>
+        <span class="n">Kpinv</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,:,:],</span> <span class="n">rcond</span><span class="o">=</span><span class="n">rcond</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Kpinv</span></div>
+
+
+<div class="viewcode-block" id="getLegQuadPointsAndWeights"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getLegQuadPointsAndWeights">[docs]</a><span class="k">def</span> <span class="nf">getLegQuadPointsAndWeights</span><span class="p">(</span><span class="n">n_quad</span><span class="p">,</span> <span class="n">trials_start_times</span><span class="p">,</span> <span class="n">trials_end_times</span><span class="p">,</span>
+                               <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trials_start_times</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="n">n_trials</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">trials_end_times</span><span class="p">))</span>
+    <span class="n">leg_quad_points</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_quad</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">leg_quad_weights</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_quad</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">leg_quad_points</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">leg_quad_weights</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">gcnu_common</span><span class="o">.</span><span class="n">numerical_methods</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">leggaussVarLimits</span><span class="p">(</span>
+                    <span class="n">n</span><span class="o">=</span><span class="n">n_quad</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">trials_start_times</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">b</span><span class="o">=</span><span class="n">trials_end_times</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">leg_quad_points</span><span class="p">,</span> <span class="n">leg_quad_weights</span></div>
+
+
+<div class="viewcode-block" id="getTrialsTimes"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getTrialsTimes">[docs]</a><span class="k">def</span> <span class="nf">getTrialsTimes</span><span class="p">(</span><span class="n">start_times</span><span class="p">,</span> <span class="n">end_times</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">start_times</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">end_times</span><span class="p">))</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">start_times</span><span class="p">)</span>
+    <span class="n">trials_times</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_steps</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">trials_times</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">start_times</span><span class="p">[</span><span class="n">r</span><span class="p">],</span> <span class="n">end_times</span><span class="p">[</span><span class="n">r</span><span class="p">],</span>
+                                               <span class="n">n_steps</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trials_times</span></div>
+
+
+<div class="viewcode-block" id="computeSpikeClassificationROC"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.computeSpikeClassificationROC">[docs]</a><span class="k">def</span> <span class="nf">computeSpikeClassificationROC</span><span class="p">(</span><span class="n">spikes_times</span><span class="p">,</span> <span class="n">cif_times</span><span class="p">,</span> <span class="n">cif_values</span><span class="p">,</span>
+                                  <span class="n">highres_bin_size</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="n">cif_times</span><span class="p">,</span> <span class="n">cif_values</span><span class="p">)</span>
+    <span class="n">cif_times_highres</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">cif_times</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cif_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                  <span class="n">highres_bin_size</span><span class="p">)</span>
+    <span class="n">cif_values_highres</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">cif_times_highres</span><span class="p">)</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">interval_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">cif_times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+                             <span class="n">end</span><span class="o">=</span><span class="n">cif_times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+                             <span class="n">periods</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">cif_times_highres</span><span class="p">))</span>
+    <span class="n">cut_res</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span><span class="n">spikes_times</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">retbins</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">cut_res</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">indicesMoreThanOneSpikes</span> <span class="o">=</span> <span class="p">(</span><span class="n">Y</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indicesMoreThanOneSpikes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Found more than one spike in </span><span class="si">{:d}</span><span class="s2"> bins&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">indicesMoreThanOneSpikes</span><span class="p">)))</span>
+        <span class="n">Y</span><span class="p">[</span><span class="n">indicesMoreThanOneSpikes</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">thresholds</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">roc_curve</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">cif_values_highres</span><span class="p">,</span>
+                                                     <span class="n">pos_label</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">auc</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">roc_auc</span></div>
+
+
+<div class="viewcode-block" id="getLatentsMeansAndSTDs"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getLatentsMeansAndSTDs">[docs]</a><span class="k">def</span> <span class="nf">getLatentsMeansAndSTDs</span><span class="p">(</span><span class="n">meansFuncs</span><span class="p">,</span> <span class="n">kernels</span><span class="p">,</span> <span class="n">trialsTimes</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">)</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span>
+    <span class="n">latents_means</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="n">latents_STDs</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">latents_means</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nLatents</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])))</span>
+        <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nLatents</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+            <span class="n">gp</span> <span class="o">=</span> <span class="n">gcnu_common</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">gaussianProcesses</span><span class="o">.</span><span class="n">eval</span><span class="o">.</span><span class="n">GaussianProcess</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">meansFuncs</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">kernel</span><span class="o">=</span><span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">latents_means</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+            <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">latents_means</span><span class="p">,</span> <span class="n">latents_STDs</span></div>
+
+<div class="viewcode-block" id="getLatentsSTDs"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getLatentsSTDs">[docs]</a><span class="k">def</span> <span class="nf">getLatentsSTDs</span><span class="p">(</span><span class="n">kernels</span><span class="p">,</span> <span class="n">trialsTimes</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">)</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span>
+    <span class="n">latents_STDs</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nLatents</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+            <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">buildKernelMatrixDiag</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">latents_STDs</span></div>
+
+<span class="c1"># def getLatentsMeanFuncsSamples(latents_meansFuncs, trialsTimes, dtype):</span>
+<span class="c1">#     n_trials = len(latents_meansFuncs)</span>
+<span class="c1">#     nLatents = len(latents_meansFuncs[0])</span>
+<span class="c1">#     latents_meansFuncsSamples = [[] for r in range(n_trials)]</span>
+<span class="c1">#     for r in range(n_trials):</span>
+<span class="c1">#         latents_meansFuncsSamples[r] = torch.empty((nLatents, len(trialsTimes[r])), dtype=dtype)</span>
+<span class="c1">#         for k in range(nLatents):</span>
+<span class="c1">#             latents_meansFuncsSamples[r][k,:] = latents_meansFuncs[r][k](t=trialsTimes[r])</span>
+
+<div class="viewcode-block" id="getLatentsSamplesMeansAndSTDsFromSampledMeans"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getLatentsSamplesMeansAndSTDsFromSampledMeans">[docs]</a><span class="k">def</span> <span class="nf">getLatentsSamplesMeansAndSTDsFromSampledMeans</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">sampledMeans</span><span class="p">,</span> <span class="n">kernels</span><span class="p">,</span> <span class="n">trialsTimes</span><span class="p">,</span> <span class="n">latentsGPRegularizationEpsilon</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span>
+    <span class="n">latents_samples</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="n">latents_means</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="n">latents_STDs</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+        <span class="n">latents_samples</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nLatents</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">latents_means</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nLatents</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nLatents</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Procesing trial </span><span class="si">{:d}</span><span class="s2"> and latent </span><span class="si">{:d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">sampledMeans</span><span class="p">[</span><span class="n">r</span><span class="p">,:,</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">kernels</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">buildKernelMatrix</span><span class="p">(</span><span class="n">trialsTimes</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">cov</span> <span class="o">+</span> <span class="n">latentsGPRegularizationEpsilon</span><span class="o">*</span><span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">cov</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">std</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">cov</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+            <span class="n">mn</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">cov</span><span class="p">)</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">mn</span><span class="o">.</span><span class="n">rvs</span><span class="p">())</span>
+            <span class="n">latents_samples</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">sample</span>
+            <span class="n">latents_means</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">mean</span>
+            <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">][</span><span class="n">k</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">std</span>
+            <span class="c1"># plt.plot(trialsTimes[r], mean, label=&quot;mean&quot;)</span>
+            <span class="c1"># plt.plot(trialsTimes[r], sample, label=&quot;sample&quot;)</span>
+            <span class="c1"># plt.xlabel(&quot;Time (sec)&quot;)</span>
+            <span class="c1"># plt.ylabel(&quot;Value&quot;)</span>
+            <span class="c1"># plt.title(&quot;Latent {:d}&quot;.format(k))</span>
+            <span class="c1"># plt.legend()</span>
+            <span class="c1"># plt.show()</span>
+    <span class="k">return</span> <span class="n">latents_samples</span><span class="p">,</span> <span class="n">latents_means</span><span class="p">,</span> <span class="n">latents_STDs</span></div>
+
+<div class="viewcode-block" id="getDiagIndicesIn3DArray"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getDiagIndicesIn3DArray">[docs]</a><span class="k">def</span> <span class="nf">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)):</span>
+    <span class="n">frameDiagIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">frameStartIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="n">M</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">*</span><span class="n">N</span><span class="o">**</span><span class="mi">2</span>
+    <span class="c1"># torch way of computing an outer sum</span>
+    <span class="n">diagIndices</span> <span class="o">=</span> <span class="p">(</span><span class="n">frameDiagIndices</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">frameStartIndices</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">answer</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">diagIndices</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+<div class="viewcode-block" id="build3DdiagFromDiagVector"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.build3DdiagFromDiagVector">[docs]</a><span class="k">def</span> <span class="nf">build3DdiagFromDiagVector</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">==</span><span class="n">N</span><span class="o">*</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">diagIndices</span> <span class="o">=</span> <span class="n">getDiagIndicesIn3DArray</span><span class="p">(</span><span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">M</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">M</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">v</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">D</span><span class="p">[</span><span class="n">diagIndices</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="n">reshapedD</span> <span class="o">=</span> <span class="n">D</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">reshapedD</span></div>
+
+<div class="viewcode-block" id="buildQSigmaFromQSVecAndQSDiag"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.buildQSigmaFromQSVecAndQSDiag">[docs]</a><span class="k">def</span> <span class="nf">buildQSigmaFromQSVecAndQSDiag</span><span class="p">(</span><span class="n">qSVec</span><span class="p">,</span> <span class="n">qSDiag</span><span class="p">):</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">qSVec</span><span class="p">)</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="n">qSVec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">qSigma</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+        <span class="n">nIndK</span> <span class="o">=</span> <span class="n">qSDiag</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># qq \in n_trials x nInd[k] x 1</span>
+        <span class="n">qq</span> <span class="o">=</span> <span class="n">qSVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">nIndK</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># dd \in n_trials x nInd[k] x 1</span>
+        <span class="n">nIndKVarRnkK</span> <span class="o">=</span> <span class="n">qSVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dd</span> <span class="o">=</span> <span class="n">build3DdiagFromDiagVector</span><span class="p">(</span><span class="n">v</span><span class="o">=</span><span class="p">(</span><span class="n">qSDiag</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">nIndKVarRnkK</span><span class="p">)</span>
+        <span class="c1"># qSigma[k] \in n_trials x nInd[k] x nInd[k]</span>
+        <span class="n">qSigma</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">qq</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">qq</span><span class="p">,</span> <span class="n">dim0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim1</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="n">dd</span>
+    <span class="k">return</span> <span class="n">qSigma</span></div>
+
+<div class="viewcode-block" id="getSRQSigmaVec"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getSRQSigmaVec">[docs]</a><span class="k">def</span> <span class="nf">getSRQSigmaVec</span><span class="p">(</span><span class="n">qSVec</span><span class="p">,</span> <span class="n">qSDiag</span><span class="p">):</span>
+    <span class="n">nLatents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">qSVec</span><span class="p">)</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="n">qSVec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">qSigma</span> <span class="o">=</span> <span class="n">buildQSigmaFromQSVecAndQSDiag</span><span class="p">(</span><span class="n">qSVec</span><span class="o">=</span><span class="n">qSVec</span><span class="p">,</span> <span class="n">qSDiag</span><span class="o">=</span><span class="n">qSDiag</span><span class="p">)</span>
+    <span class="n">srQSigmaVec</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nLatents</span><span class="p">):</span>
+        <span class="n">nIndPointsK</span> <span class="o">=</span> <span class="n">qSigma</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">Pk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">nIndPointsK</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nIndPointsK</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">srQSigmaVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">Pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+            <span class="n">cholKR</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">cholesky</span><span class="p">(</span><span class="n">qSigma</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,:,:])</span>
+            <span class="n">trilIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril_indices</span><span class="p">(</span><span class="n">nIndPointsK</span><span class="p">,</span> <span class="n">nIndPointsK</span><span class="p">)</span>
+            <span class="n">cholKRVec</span> <span class="o">=</span> <span class="n">cholKR</span><span class="p">[</span><span class="n">trilIndices</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="n">trilIndices</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]]</span>
+            <span class="n">srQSigmaVec</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cholKRVec</span>
+    <span class="k">return</span> <span class="n">srQSigmaVec</span></div>
+
+<span class="c1"># def getIndPointLocs0(nIndPointsPerLatent, trialsLengths, firstIndPointLoc):</span>
+<span class="c1">#     nLatents = len(nIndPointsPerLatent)</span>
+<span class="c1">#     n_trials = len(trialsLengths)</span>
+<span class="c1">#</span>
+<span class="c1">#     Z0 = [[] for k in range(nLatents)]</span>
+<span class="c1">#     for k in range(nLatents):</span>
+<span class="c1">#         Z0[k] = torch.empty((n_trials, nIndPointsPerLatent[k], 1), dtype=torch.double)</span>
+<span class="c1">#         for r in range(n_trials):</span>
+<span class="c1">#             Z0[k][r,:,0] = torch.linspace(firstIndPointLoc, trialsLengths[r], nIndPointsPerLatent[k])</span>
+<span class="c1">#     return Z0</span>
+
+
+<div class="viewcode-block" id="getEmbeddingSamples"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getEmbeddingSamples">[docs]</a><span class="k">def</span> <span class="nf">getEmbeddingSamples</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">latents_samples</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latents_samples</span><span class="p">)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">latents_samples</span><span class="p">[</span><span class="n">r</span><span class="p">])</span><span class="o">+</span><span class="n">d</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="getEmbeddingMeans"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getEmbeddingMeans">[docs]</a><span class="k">def</span> <span class="nf">getEmbeddingMeans</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">latents_means</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latents_means</span><span class="p">)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">latents_means</span><span class="p">[</span><span class="n">r</span><span class="p">])</span><span class="o">+</span><span class="n">d</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="getEmbeddingSTDs"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getEmbeddingSTDs">[docs]</a><span class="k">def</span> <span class="nf">getEmbeddingSTDs</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">latents_STDs</span><span class="p">):</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">latents_STDs</span><span class="p">)</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">C</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">latents_STDs</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+              <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="getSRQSigmaVecsFromKzz"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getSRQSigmaVecsFromKzz">[docs]</a><span class="k">def</span> <span class="nf">getSRQSigmaVecsFromKzz</span><span class="p">(</span><span class="n">Kzz</span><span class="p">):</span>
+    <span class="n">Kzz_chol</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">aKzz</span> <span class="ow">in</span> <span class="n">Kzz</span><span class="p">:</span>
+        <span class="n">Kzz_chol</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">svGPFA</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">miscUtils</span><span class="o">.</span><span class="n">chol3D</span><span class="p">(</span><span class="n">aKzz</span><span class="p">))</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="n">getVectorRepOfLowerTrianMatrices</span><span class="p">(</span><span class="n">lt_matrices</span><span class="o">=</span><span class="n">Kzz_chol</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">answer</span></div>
+
+
+<div class="viewcode-block" id="getVectorRepOfLowerTrianMatrices"><a class="viewcode-back" href="../../../svGPFA.utils.html#svGPFA.utils.miscUtils.getVectorRepOfLowerTrianMatrices">[docs]</a><span class="k">def</span> <span class="nf">getVectorRepOfLowerTrianMatrices</span><span class="p">(</span><span class="n">lt_matrices</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns vectors containing the lower-triangular elements of the input lower-triangular matrices.</span>
+
+<span class="sd">    :parameter lt_matrices: a list of length n_latents, with lt_matrices[k] a tensor of dimension n_trials x n_ind_points x n_ind_points, where lt_matrices[k][r, :, :] is a lower-triangular matrix.</span>
+<span class="sd">    :type lt_matrices: list</span>
+
+<span class="sd">    :return: a list vec_lt_matrices of length n_latents, whith vec_lt_matrices[k] a tensor of dimension (n_trials, n_ind_points*(n_ind_points+1)/2, 0), where vec_lt_matrices[k][r, :, 0] contains the vectorized lower-triangular elements of lt_matrices[k][r, :, :].</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_latents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lt_matrices</span><span class="p">)</span>
+    <span class="n">n_trials</span> <span class="o">=</span> <span class="n">lt_matrices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">srQSigmaVec</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_latents</span><span class="p">):</span>
+        <span class="n">nIndPointsK</span> <span class="o">=</span> <span class="n">lt_matrices</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">Pk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">nIndPointsK</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nIndPointsK</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">srQSigmaVec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">Pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">double</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
+            <span class="n">cholKR</span> <span class="o">=</span> <span class="n">lt_matrices</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+            <span class="n">trilIndices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril_indices</span><span class="p">(</span><span class="n">nIndPointsK</span><span class="p">,</span> <span class="n">nIndPointsK</span><span class="p">)</span>
+            <span class="n">cholKRVec</span> <span class="o">=</span> <span class="n">cholKR</span><span class="p">[</span><span class="n">trilIndices</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">trilIndices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]]</span>
+            <span class="n">srQSigmaVec</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">r</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cholKRVec</span>
+    <span class="k">return</span> <span class="n">srQSigmaVec</span></div>
+
+
+
+</pre></div>
+
+  </article>
+
+  <footer>
+    
+      <div class="mt-20 mb-4 text-sm text-gray-700 print:mt-4">&copy; 2019, Lea Duncker and Maneesh Sahani&nbsp;Made with <a href="https://www.sphinx-doc.org">Sphinx 6.1.3</a></div>
+    
+  </footer></main>
+
+
+      <button
+  data-search-target="snackbar"
+  data-action="search#hideSnackbar"
+  class="fixed bottom-0 right-0 z-20 opacity-0 p-4 m-4 tracking-wide bg-gray-900 text-gray-100 transition transform transform-gpu duration-500 translate-y-full"
+>
+  Clear highlights
+</button><div
+  data-sidebar-target="screen"
+  data-action="click->sidebar#close"
+  class="fixed hidden inset-0 bg-black bg-opacity-50">
+</div>
+    </div>
+    
+      
+<script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+<script src="../../../_static/doctools.js"></script>
+<script src="../../../_static/sphinx_highlight.js"></script>
+<script src="../../../_static/proof.js"></script>
+<script src="../../../_static/theme.b62e1ded0c8c099a2d47.js"></script>
+    
+  </body>
+</html>

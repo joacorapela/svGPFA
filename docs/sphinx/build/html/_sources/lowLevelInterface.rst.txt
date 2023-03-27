@@ -26,9 +26,7 @@ There is a one-to-one mapping between classes in the :mod:`svGPFA.stats` package
 * :class:`~svGPFA.stats.svEmbedding.SVEmbedding` uses :class:`~svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents`, which calculates the mean and variance of the latent variables, :math:`x_k^{(r)}` in ``Eq.1``. These means and variances are not described by their own equations in `Duncker and Sahani, 2018 <https://papers.nips.cc/paper/8245-temporal-alignment-and-latent-gaussian-process-factor-inference-in-population-spike-trains>`_, but are embedded in ``Eq.5``. They are 
 
     .. math::
-
-        \nu_k^{(r)}(t) &= \kappa_k(t,z_k)K_{zz}^{(k)^{-1}}m_k^{(r)}
-
+        \nu_k^{(r)}(t) &= \kappa_k(t,z_k)K_{zz}^{(k)^{-1}}m_k^{(r)}\\
         \sigma_k^{(r)}(t) &= \kappa_k(t,t)+\mathbf{\kappa}_k(t,\mathbf{z}_k)\left(K_{zz}^{(k)^{-1}}S_k^{(r)}K_{zz}^{(k)^{-1}}-K_{zz}^{(k)^{  -1}}\right)\mathbf{\kappa}_k(\mathbf{z}_k,t)
 
   :class:`~svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatents` is an abstract class. As above, two concrete subclasses are provided. :class:`~svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes` computes the means and variances in a grid of time points and :class:`~svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes` calculates these statistics at spike times.

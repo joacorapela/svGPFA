@@ -9,8 +9,8 @@ Brain Laboratory, epoch it, run svGPFA and plot its results.
 """
 
 #%%
-# 1. Setup environment
-# --------------------
+# Setup environment
+# -----------------
 
 #%%
 # Import required packages
@@ -59,8 +59,8 @@ est_init_config_filename_pattern = "../init/{:08d}_IBL_estimation_metaData.ini"
 model_save_filename = "../results/stiatum_ibl_model.pickle"
 
 #%%
-# 2. Epoch
-# --------
+# Epoch
+# -----
 
 #%%
 # Download data
@@ -187,8 +187,9 @@ except ValueError:
 print("Checks passed")
 
 #%%
-# 3. Get parameters
-# -----------------
+# Get parameters
+# --------------
+# Details on how to specify svGPFA parameters are provided `here <../params.html>`_
 
 #%%
 # Dynamic parameters specification
@@ -227,8 +228,8 @@ params, kernels_types = svGPFA.utils.initUtils.getParamsAndKernelsTypes(
     config_file_params_spec=config_file_params_spec)
 
 #%%
-# 4. Estimate svGPFA model
-# ------------------------
+# Estimate svGPFA model
+# ---------------------
 
 #%%
 # Create kernels, a model and set its initial parameters
@@ -274,7 +275,7 @@ model.setParamsAndData(
 #               method=params["optim_params"]["optim_method"], out=sys.stdout)
 # toc = time.perf_counter()
 # print(f"Elapsed time {toc - tic:0.4f} seconds")
-
+# 
 # resultsToSave = {"lowerBoundHist": lowerBoundHist,
 #                  "elapsedTimeHist": elapsedTimeHist,
 #                  "terminationInfo": terminationInfo,
@@ -285,12 +286,7 @@ model.setParamsAndData(
 # print("Saved results to {:s}".format(model_save_filename))
 
 #%%
-# .. with open(model_save_filename, "rb") as f:
-#        estResults = pickle.load(f)
-#    lowerBoundHist = estResults["lowerBoundHist"]
-#    elapsedTimeHist = estResults["elapsedTimeHist"]
-#    model = estResults["model"]
-
+# ..
 with open(model_save_filename, "rb") as f:
     estResults = pickle.load(f)
 lowerBoundHist = estResults["lowerBoundHist"]
@@ -298,13 +294,13 @@ elapsedTimeHist = estResults["elapsedTimeHist"]
 model = estResults["model"]
 
 #%%
-# 5. Goodness-of-fit analysis
-# ---------------------------
+# Goodness-of-fit analysis
+# ------------------------
 
 #%%
 # Set goodness-of-fit variables
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-ksTestGamma = 10
+ks_test_gamma = 10
 trial_for_gof = 0
 cluster_id_for_gof = 41
 n_time_steps_IF = 100
@@ -323,15 +319,12 @@ with torch.no_grad():
 cif_values_GOF = cif_values[trial_for_gof][cluster_id_for_gof_index]
 
 #%%
-# Perform a time-rescaling KS test (with numerical correction)
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# KS time-rescaling GOF test
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^
 trial_times_GOF = trials_times[trial_for_gof, :, 0]
 spikes_times_GOF = spikes_times[trial_for_gof][cluster_id_for_gof_index]
 if len(spikes_times_GOF) == 0:
     raise ValueError("No spikes found for goodness-of-fit analysis")
-
-title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(
-    trial_for_gof, cluster_id_for_gof, len(spikes_times_GOF))
 
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
@@ -339,32 +332,29 @@ with warnings.catch_warnings():
         gcnu_common.stats.pointProcesses.tests.\
         KSTestTimeRescalingNumericalCorrection(spikes_times=spikes_times_GOF,
             cif_times=trial_times_GOF, cif_values=cif_values_GOF,
-            gamma=ksTestGamma)
+            gamma=ks_test_gamma)
 
-#%%
-# Plot result of time-rescaling KS-test
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+title = "Trial {:d}, Neuron {:d} ({:d} spikes)".format(
+    trial_for_gof, cluster_id_for_gof, len(spikes_times_GOF))
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResKSTestTimeRescalingNumericalCorrection(diffECDFsX=diffECDFsX, diffECDFsY=diffECDFsY, estECDFx=estECDFx, estECDFy=estECDFy, simECDFx=simECDFx, simECDFy=simECDFy, cb=cb, title=title)
 fig
 
 #%%
-# Perform ROC predictive analysis
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-fpr, tpr, roc_auc = svGPFA.utils.miscUtils.computeSpikeClassificationROC(
-    spikes_times=spikes_times_GOF,
-    cif_times=trial_times_GOF,
-    cif_values=cif_values_GOF)
-
-#%%
-# Plot result of ROC predictive analysis
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ROC predictive analysis
+# ^^^^^^^^^^^^^^^^^^^^^^^
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    fpr, tpr, roc_auc = svGPFA.utils.miscUtils.computeSpikeClassificationROC(
+        spikes_times=spikes_times_GOF,
+        cif_times=trial_times_GOF,
+        cif_values=cif_values_GOF)
 fig = svGPFA.plot.plotUtilsPlotly.getPlotResROCAnalysis(
     fpr=fpr, tpr=tpr, auc=roc_auc, title=title)
 fig
 
 #%%
-# 6. Plotting
-# -----------
+# Plotting
+# --------
 
 #%%
 # Imports for plotting
@@ -372,7 +362,6 @@ fig
 
 import numpy as np
 import pandas as pd
-import svGPFA.plot.plotUtilsPlotly
 
 #%%
 # Set plotting variables
