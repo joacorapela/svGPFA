@@ -24,7 +24,7 @@ parameter ``param_name`` in group ``group_name``. It can be built:
 
     4. from a configuration file, with the utility function :func:`svGPFA.utils.initUtils.getParamsDictFromStringsDict`.
           
-    The `Colab <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`__ and `Jupyter <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ notebooks automatically build this list (1). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA_manualParamSpec.py>`__ demonstrates the manual construction of all parameters specifications (2). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ builds the parameters specification list from the command line and from this `configuration file <https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini>`__ (3, 4).
+    The `Colab <https://colab.research.google.com/github/joacorapela/svGPFA/blob/master/doc/ipynb/doEstimateAndPlot_collab.ipynb>`__ notebooks automatically builds this list (1). This `script <https://github.com/joacorapela/svGPFA/blob/master/examples/scripts/doEstimateSVGPFA.py>`__ builds the parameters specification list from the command line and from this `configuration file <https://github.com/joacorapela/svGPFA/blob/master/examples/params/00000545_estimation_metaData.ini>`__ (3, 4).
 
 Below we describe all svGPFA parameters and their specifications. Refer to the
 documentation of the above utility functions for details on how to use them.
@@ -520,10 +520,10 @@ The default inducing points locations for trial r and latent k are equidistant n
     .. code-block:: python
        :caption: default ``ind_points_locs_params0``
 
-       n_ind_points = (10, 10, 10)
-        params_spec["ind_points_locs_params0"] = {
-            "n_ind_points": n_ind_points,
-            "ind_points_locs0_layout": "equidistant",
+       common_n_ind_points = 10
+       params_spec["ind_points_locs_params0"] = {
+           "common_n_ind_points": common_n_ind_points,
+           "ind_points_locs0_layout": "equidistant",
         }
 
 .. _optim_params:
