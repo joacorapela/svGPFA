@@ -411,7 +411,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
             dynamic_params_spec=dynamic_params_spec,
             config_file_params_spec=config_file_params_spec,
             default_params_spec=default_params_spec)
-	if common_n_ind_points is not None:
+        if common_n_ind_points is not None:
             n_ind_points = [common_n_ind_points] * n_latents
 
     C0, d0 = getLinearEmbeddingParams0(
