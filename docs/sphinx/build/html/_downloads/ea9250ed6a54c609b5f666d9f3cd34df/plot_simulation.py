@@ -143,31 +143,30 @@ model.setParamsAndData(
 # (Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)
 #
 
-# svEM = svGPFA.stats.svEM.SVEM_PyTorch()
-# tic = time.perf_counter()
-# lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
-#     svEM.maximize(model=model, optim_params=params["optim_params"],
-#                   method=params["optim_params"]["optim_method"],
-#                   out=sys.stdout)
-# toc = time.perf_counter()
-# print(f"Elapsed time {toc - tic:0.4f} seconds")
-# 
-# resultsToSave = {"lowerBoundHist": lowerBoundHist,
-#                  "elapsedTimeHist": elapsedTimeHist,
-#                  "terminationInfo": terminationInfo,
-#                  "iterationModelParams": iterationsModelParams,
-#                  "model": model}
-# with open(model_save_filename, "wb") as f:
-#     pickle.dump(resultsToSave, f)
-# print("Saved results to {:s}".format(model_save_filename))
+svEM = svGPFA.stats.svEM.SVEM_PyTorch()
+tic = time.perf_counter()
+lowerBoundHist, elapsedTimeHist, terminationInfo, iterationsModelParams = \
+    svEM.maximize(model=model, optim_params=params["optim_params"],
+                  method=params["optim_params"]["optim_method"],
+                  out=sys.stdout)
+toc = time.perf_counter()
+print(f"Elapsed time {toc - tic:0.4f} seconds")
+
+resultsToSave = {"lowerBoundHist": lowerBoundHist,
+                 "elapsedTimeHist": elapsedTimeHist,
+                 "terminationInfo": terminationInfo,
+                 "iterationModelParams": iterationsModelParams,
+                 "model": model}
+with open(model_save_filename, "wb") as f:
+    pickle.dump(resultsToSave, f)
+print("Saved results to {:s}".format(model_save_filename))
 
 #%%
-# ..  
-with open(model_save_filename, "rb") as f:
-    load_res = pickle.load(f)
-lowerBoundHist = load_res["lowerBoundHist"]
-elapsedTimeHist = load_res["elapsedTimeHist"]
-model = load_res["model"]
+# ..  with open(model_save_filename, "rb") as f:
+#        load_res = pickle.load(f)
+#    lowerBoundHist = load_res["lowerBoundHist"]
+#    elapsedTimeHist = load_res["elapsedTimeHist"]
+#    model = load_res["model"]
 
 #%%
 # Goodness-of-fit analysis
