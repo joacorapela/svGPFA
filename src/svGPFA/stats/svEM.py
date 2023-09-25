@@ -14,7 +14,7 @@ import scipy.optimize
 class SVEM(abc.ABC):
 
     @abc.abstractmethod
-    def maximizeInSteps(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
+    def maximize(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
                  printIterationModelParams=True,
                  logLock=None, logStreamFN=None,
                  lowerBoundLock=None, lowerBoundStreamFN=None,
@@ -73,154 +73,15 @@ class SVEM(abc.ABC):
 
 class SVEM_PyTorch(SVEM):
 
-    def maximizeSimultaneously(self, model, optim_params, getIterationModelParamsFn=None,
-                               printIterationModelParams=True,
-                               logLock=None, logStreamFN=None,
-                               lowerBoundLock=None, lowerBoundStreamFN=None,
-                               latentsTimes=None, latentsLock=None, latentsStreamFN=None,
-                               verbose=True, out=sys.stdout,
-                               savePartial=False,
-                               savePartialFilenamePattern="results/00000000_{:s}_estimatedModel.pickle",
-                              ):
-        if latentsStreamFN is not None and latentsTimes is None:
-            raise RuntimeError("Please specify latentsTime if you want to save latents")
-
-        iter = 0
-        if savePartial:
-            savePartialFilename = savePartialFilenamePattern.format("initial")
-            resultsToSave = {"model": model}
-            with open(savePartialFilename, "wb") as f: pickle.dump(resultsToSave, f)
-        lowerBound0 = model.eval()
-        lowerBoundHist = [lowerBound0.item()]
-        elapsedTimeHist = [0.0]
-        startTime = time.time()
-
-        if lowerBoundLock is not None and lowerBoundStreamFN is not None and not lowerBoundLock.is_locked():
-            lowerBoundLock.lock()
-            with open(lowerBoundStreamFN, 'wb') as f:
-                np.save(f, np.array(lowerBoundHist))
-            lowerBoundLock.unlock()
-
-        if latentsLock is not None and latentsStreamFN is not None and not latentsLock.is_locked():
-            latentsLock.lock()
-            muK, varK = model.predictLatents(newTimes=latentsTimes)
-
-            with open(latentsStreamFN, 'wb') as f:
-                np.savez(f, iteration=iter, times=latentsTimes.detach().numpy(), muK=muK.detach().numpy(), varK=varK.detach().numpy())
-            lowerBoundLock.unlock()
-        logStream = io.StringIO()
-        if getIterationModelParamsFn is not None:
-            iterationModelParams = getIterationModelParamsFn(model=model)
-            if printIterationModelParams:
-                print(iterationModelParams)
-            iterationsModelParams = [None for i in
-                                     range(optim_params["em_max_iter"]+1)]
-            iterationsModelParams[iter] = iterationModelParams
-        else:
-            iterationsModelParams = None
-        maxRes = {"lowerBound": -math.inf}
-        iter += 1
-        while iter <= optim_params["em_max_iter"]:
-            message = "Iteration {:02d}, start: {:f}\n".format(
-                iter, maxRes["lowerBound"])
-            if verbose:
-                out.write(message)
-            self._writeToLockedLog(
-                message=message,
-                logLock=logLock,
-                logStream=logStream,
-                logStreamFN=logStreamFN
-            )
-            try:
-                maxRes = self._allSteps(
-                    model=model,
-                    optim_params=optim_params["allsteps_optim_params"])
-            except Exception as e:
-                stack_trace = traceback.format_exc()
-                print(e)
-                print(stack_trace)
-                terminationInfo = ErrorTerminationInfo(
-                    message=f"Error occured in iteration {iter}",
-                    error=e, stack_trace=stack_trace)
-                return lowerBoundHist, elapsedTimeHist, \
-                       terminationInfo, iterationsModelParams
-            message = "Iteration {:02d}, end: {:f}, niter: {:d}, nfeval: {:d}\n".format(
-                iter, maxRes["lowerBound"], maxRes["niter"],
-                maxRes["nfeval"])
-            if verbose:
-                out.write(message)
-                self._writeToLockedLog(
-                    message=message,
-                    logLock=logLock,
-                    logStream=logStream,
-                    logStreamFN=logStreamFN
-                )
-                if savePartial:
-                    savePartialFilename = \
-                        savePartialFilenamePattern.format(
-                            "{:s}{:03d}".format("allStpes", iter))
-                    resultsToSave = {"model": model}
-                    with open(savePartialFilename, "wb") as f:
-                        pickle.dump(resultsToSave, f)
-                if getIterationModelParamsFn is not None:
-                    iterationModelParams = getIterationModelParamsFn(model=model)
-                    if printIterationModelParams:
-                        print(iterationModelParams)
-                    iterationsModelParams[iter] = iterationModelParams
-            iter += 1
-        elapsedTimeHist.append(time.time()-startTime)
-        lowerBoundHist.append(maxRes["lowerBound"].item())
-
-        if lowerBoundLock is not None and \
-           lowerBoundStreamFN is not None and \
-           not lowerBoundLock.is_locked():
-            lowerBoundLock.lock()
-            with open(lowerBoundStreamFN, 'wb') as f:
-                np.save(f, np.array(lowerBoundHist))
-            lowerBoundLock.unlock()
-
-        if latentsLock is not None and \
-           latentsStreamFN is not None and \
-           not latentsLock.is_locked():
-            latentsLock.lock()
-            muK, varK = model.predictLatents(newTimes=latentsTimes)
-
-            with open(latentsStreamFN, 'wb') as f:
-                np.savez(f, iteration=iter,
-                         times=latentsTimes.detach().numpy(),
-                         muK=muK.detach().numpy(),
-                         varK=varK.detach().numpy())
-            lowerBoundLock.unlock()
-
-        iter += 1
-        terminationInfo = TerminationInfo(
-            "Maximum number of iterations ({:d}) reached".format(
-                optim_params["em_max_iter"]))
-        return lowerBoundHist, elapsedTimeHist, terminationInfo, \
-            iterationsModelParams
-
-    def _allSteps(self, model, optim_params):
-        x = []
-        x.extend(model.getSVPosteriorOnIndPointsParams())
-        x.extend(model.getSVEmbeddingParams())
-        x.extend(model.getKernelsParams())
-        x.extend(model.getIndPointsLocs())
-        def evalFunc():
-            model.buildKernelsMatrices()
-            answer = model.eval()
-            return answer
-        optimizer = torch.optim.LBFGS(x, **optim_params)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
-        return answer
-
-    def maximizeInSteps(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
-                        printIterationModelParams=True,
-                        logLock=None, logStreamFN=None,
-                        lowerBoundLock=None, lowerBoundStreamFN=None,
-                        latentsTimes=None, latentsLock=None, latentsStreamFN=None,
-                        verbose=True, out=sys.stdout,
-                        savePartial=False,
-                        savePartialFilenamePattern="results/00000000_{:s}_estimatedModel.pickle"):
+    def maximize(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
+                 printIterationModelParams=True,
+                 logLock=None, logStreamFN=None,
+                 lowerBoundLock=None, lowerBoundStreamFN=None,
+                 latentsTimes=None, latentsLock=None, latentsStreamFN=None,
+                 verbose=True, out=sys.stdout,
+                 savePartial=False,
+                 savePartialFilenamePattern="results/00000000_{:s}_estimatedModel.pickle",
+                ):
         if latentsStreamFN is not None and latentsTimes is None:
             raise RuntimeError("Please specify latentsTime if you want to save latents")
 

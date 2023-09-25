@@ -182,19 +182,18 @@ def getSpikesTimesPlotOneNeuron(spikes_times,
             marked_events_times_centered = marked_events_times[r]-align_event_times[r]
             n_marked_events = len(marked_events_times[r])
             for i in range(n_marked_events):
-                if not math.isnan(marked_events_times_centered[i]):
-                    trace_marker = go.Scatter(x=[marked_events_times_centered[i]],
-                                              y=[r],
-                                              marker=dict(color=marked_events_colors[r][i],
-                                                          symbol=marked_events_markers[r][i],
-                                                          size=marked_size),
-                                              name="trial {:s}".format(trial_label),
-                                            text=[trial_label],
-                                            hovertemplate="Time %{x}<br>" + "Trial %{text}",
-                                            mode="markers",
-                                            legendgroup=f"trial{trial_label}",
-                                            showlegend=False)
-                    fig.add_trace(trace_marker)
+                trace_marker = go.Scatter(x=[marked_events_times_centered[i]],
+                                          y=[r],
+                                          marker=dict(color=marked_events_colors[r][i],
+                                                      symbol=marked_events_markers[r][i],
+                                                      size=marked_size),
+                                          name="trial {:s}".format(trial_label),
+                                          text=[trial_label],
+                                          hovertemplate="Time %{x}<br>" + "Trial %{text}",
+                                          mode="markers",
+                                          legendgroup=f"trial{trial_label}",
+                                          showlegend=False)
+                fig.add_trace(trace_marker)
 
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
@@ -1674,20 +1673,19 @@ def getPlotOrthonormalizedLatentAcrossTrials(
             n_marked_events = len(marked_events_times[r])
             marked_events_times_centered = marked_events_times[r]-align_event_times[r]
             for i in range(n_marked_events):
-                if not math.isnan(marked_events_times_centered[i]):
-                    marked_index = np.argmin(np.abs(
-                        trials_times[r, :, 0]-marked_events_times_centered[i]))
+                marked_index = np.argmin(np.abs(
+                    trials_times[r, :, 0]-marked_events_times_centered[i]))
 
-                    trace_marker = go.Scatter(
-                        x=[trials_times[r, marked_index, 0]],
-                        y=[meanToPlot[marked_index]],
-                        marker=dict(color=marked_events_colors[r][i],
-                                    symbol=marked_events_markers[r][i],
-                                    size=marked_size),
-                        mode="markers",
-                        legendgroup="trial{:02d}".format(trials_ids[r]),
-                        showlegend=False)
-                    fig.add_trace(trace_marker)
+                trace_marker = go.Scatter(
+                    x=[trials_times[r, marked_index, 0]],
+                    y=[meanToPlot[marked_index]],
+                    marker=dict(color=marked_events_colors[r][i],
+                                symbol=marked_events_markers[r][i],
+                                size=marked_size),
+                    mode="markers",
+                    legendgroup="trial{:02d}".format(trials_ids[r]),
+                    showlegend=False)
+                fig.add_trace(trace_marker)
 
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel, range=ylim)
@@ -1702,7 +1700,7 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
         marked_events_times=None,
         marked_events_colors=None,
         marked_events_markers=None,
-        marked_size=10,
+        marked_size=3,
         trials_annotations=None,
         trials_colors=None, default_trial_color="gray",
         xyzLabelsPattern="Latent {:d}", title=""):
@@ -1753,21 +1751,20 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
             n_marked_events = len(marked_events_times[r])
             marked_events_times_centered = marked_events_times[r]-align_event_times[r]
             for i in range(n_marked_events):
-                if not math.isnan(marked_events_times_centered[i]):
-                    marked_index = np.argmin(np.abs(
-                        trials_times[r, :, 0]-marked_events_times_centered[i]))
+                marked_index = np.argmin(np.abs(
+                    trials_times[r, :, 0]-marked_events_times_centered[i]))
 
-                    trace_marker = go.Scatter3d(
-                        x=[oLatentsMeans[r][marked_index, latentsToPlot[0]]],
-                        y=[oLatentsMeans[r][marked_index, latentsToPlot[1]]],
-                        z=[oLatentsMeans[r][marked_index, latentsToPlot[2]]],
-                        marker=dict(color=marked_events_colors[r][i],
-                                    symbol=marked_events_markers[r][i],
-                                    size=marked_size),
-                        mode="markers",
-                        legendgroup="trial{:02d}".format(trials_ids[r]),
-                        showlegend=False)
-                    fig.add_trace(trace_marker)
+                trace_marker = go.Scatter3d(
+                    x=[oLatentsMeans[r][marked_index, latentsToPlot[0]]],
+                    y=[oLatentsMeans[r][marked_index, latentsToPlot[1]]],
+                    z=[oLatentsMeans[r][marked_index, latentsToPlot[2]]],
+                    marker=dict(color=marked_events_colors[r][i],
+                                symbol=marked_events_markers[r][i],
+                                size=marked_size),
+                    mode="markers",
+                    legendgroup="trial{:02d}".format(trials_ids[r]),
+                    showlegend=False)
+                fig.add_trace(trace_marker)
 
     fig.update_layout(scene=dict(
         xaxis_title=xyzLabelsPattern.format(latentsToPlot[0]),
@@ -2539,20 +2536,19 @@ def getPlotCIFsOneNeuronAllTrials(
             n_marked_events = len(marked_events_times[r])
             marked_events_times_centered = marked_events_times[r]-align_event_times[r]
             for i in range(n_marked_events):
-                if not math.isnan(marked_events_times_centered[i]):
-                    marked_index = np.argmin(
-                        np.abs(trials_times[r, :, 0]-marked_events_times_centered[i]))
+                marked_index = np.argmin(
+                    np.abs(trials_times[r, :, 0]-marked_events_times_centered[i]))
 
-                    trace_marker = go.Scatter(
-                        x=[trials_times[r, marked_index, 0]],
-                        y=[cifToPlot[marked_index]],
-                        marker=dict(color=marked_events_colors[r][i],
-                                    symbol=marked_events_markers[r][i],
-                                    size=marked_size),
-                        mode="markers",
-                        legendgroup="trial{:02d}".format(trials_ids[r]),
-                        showlegend=False)
-                    fig.add_trace(trace_marker)
+                trace_marker = go.Scatter(
+                    x=[trials_times[r, marked_index, 0]],
+                    y=[cifToPlot[marked_index]],
+                    marker=dict(color=marked_events_colors[r][i],
+                                symbol=marked_events_markers[r][i],
+                                size=marked_size),
+                    mode="markers",
+                    legendgroup="trial{:02d}".format(trials_ids[r]),
+                    showlegend=False)
+                fig.add_trace(trace_marker)
 
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel, range=ylim)

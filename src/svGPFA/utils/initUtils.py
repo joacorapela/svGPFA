@@ -66,21 +66,6 @@ def flatToHierarchicalOptimParams(flat_optim_params):
             "line_search_fn": flat_optim_params[
                 "mstep_indpointslocs_line_search_fn"],
         },
-        # allsteps_
-        "allsteps_estimate": flat_optim_params[
-            "allsteps_estimate"],
-        "allsteps_optim_params": {
-            "max_iter": flat_optim_params[
-                "allsteps_max_iter"],
-            "lr": flat_optim_params[
-                "allsteps_lr"],
-            "tolerance_grad": flat_optim_params[
-                "allsteps_tolerance_grad"],
-            "tolerance_change": flat_optim_params[
-                "allsteps_tolerance_change"],
-            "line_search_fn": flat_optim_params[
-                "allsteps_line_search_fn"],
-        },
     }
     return hierarchical_optim_params
 
@@ -309,13 +294,6 @@ def getArgsInfo():
                      "mstep_indpointslocs_tolerance_grad": float,
                      "mstep_indpointslocs_tolerance_change": float,
                      "mstep_indpointslocs_line_search_fn": str,
-                     #
-                     "allsteps_estimate": bool,
-                     "allsteps_max_iter": int,
-                     "allsteps_lr": float,
-                     "allsteps_tolerance_grad": float,
-                     "allsteps_tolerance_change": float,
-                     "allsteps_line_search_fn": str,
                  }}
     return args_info
 
