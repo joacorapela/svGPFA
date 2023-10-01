@@ -356,7 +356,10 @@ class SVEM_PyTorch(SVEM):
 
     def _eStep(self, model, optim_params):
         x = model.getSVPosteriorOnIndPointsParams()
-        evalFunc = model.eval
+        def evalFunc():
+            model.buildVariationalCov()
+            answer = model.eval()
+            return answer
         optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
