@@ -199,20 +199,6 @@ class SVEM_PyTorch(SVEM):
         return lowerBoundHist, elapsedTimeHist, terminationInfo, \
             iterationsModelParams
 
-    def _allSteps(self, model, optim_params):
-        x = []
-        x.extend(model.getSVPosteriorOnIndPointsParams())
-        x.extend(model.getSVEmbeddingParams())
-        x.extend(model.getKernelsParams())
-        x.extend(model.getIndPointsLocs())
-        def evalFunc():
-            model.buildKernelsMatrices()
-            answer = model.eval()
-            return answer
-        optimizer = torch.optim.LBFGS(x, **optim_params)
-        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
-        return answer
-
     def maximizeInSteps(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
                         printIterationModelParams=True,
                         logLock=None, logStreamFN=None,
@@ -353,6 +339,20 @@ class SVEM_PyTorch(SVEM):
                 optim_params["em_max_iter"]))
         return lowerBoundHist, elapsedTimeHist, terminationInfo, \
             iterationsModelParams
+
+    def _allSteps(self, model, optim_params):
+        x = []
+        x.extend(model.getSVPosteriorOnIndPointsParams())
+        x.extend(model.getSVEmbeddingParams())
+        x.extend(model.getKernelsParams())
+        x.extend(model.getIndPointsLocs())
+        def evalFunc():
+            model.buildKernelsMatrices()
+            answer = model.eval()
+            return answer
+        optimizer = torch.optim.LBFGS(x, **optim_params)
+        answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
+        return answer
 
     def _eStep(self, model, optim_params):
         x = model.getSVPosteriorOnIndPointsParams()
