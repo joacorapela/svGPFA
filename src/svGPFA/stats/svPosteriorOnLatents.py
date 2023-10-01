@@ -137,7 +137,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         Ktt = indPointsLocsAndAllTimesKMS.getKtt()
 
         qMu = self._svPosteriorOnIndPoints.getMean()
-        qSigma = self._svPosteriorOnIndPoints.buildCov()
+        qSigma = self._svPosteriorOnIndPoints.getCov()
 
         nLatents = len(Kzz)
         nTrials = Kzz[0].shape[0]
@@ -192,7 +192,7 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         qKVar = torch.empty((nTrials, nQuad, nLatent), dtype=Kzz[0].dtype,
                             device=Kzz[0].device)
 
-        qSigma = self._svPosteriorOnIndPoints.buildCov()
+        qSigma = self._svPosteriorOnIndPoints.getCov()
         for k in range(len(self._svPosteriorOnIndPoints.getMean())):
             # Ak \in nTrials x nInd[k] x 1
             Ak = self._indPointsLocsKMS.solveForLatent(
@@ -234,6 +234,9 @@ class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
         self._indPointsLocsKMS.buildKernelsMatrices()
         self._indPointsLocsAndTimesKMS.buildKernelsMatrices()
 
+    def buildVariationalCov(self):
+        self._svPosteriorOnIndPoints.buildCov()
+
     def setKernels(self, kernels):
         self._indPointsLocsKMS.setKernels(kernels=kernels)
         self._indPointsLocsAndTimesKMS.setKernels(kernels=kernels)
@@ -269,7 +272,7 @@ class SVPosteriorOnLatentsAssocTimes(SVPosteriorOnLatents):
         Ak = [self._indPointsLocsKMS.solveForLatent(
             input=self._svPosteriorOnIndPoints.getMean()[k], latentIndex=k)
             for k in range(nLatent)]
-        qSigma = self._svPosteriorOnIndPoints.buildCov()
+        qSigma = self._svPosteriorOnIndPoints.getCov()
         qKMu = [[None] for tr in range(nTrials)]
         qKVar = [[None] for tr in range(nTrials)]
         for trialIndex in range(nTrials):
