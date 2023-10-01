@@ -77,6 +77,9 @@ class SVLowerBound:
     def buildKernelsMatrices(self):
         self._eLL.buildKernelsMatrices()
 
+    def buildVariationalCov(self):
+        self._eLL.buildVariationalCov()
+
     def computeSVPosteriorOnLatentsStats(self):
         return self._eLL.computeSVPosteriorOnLatentsStats()
 
