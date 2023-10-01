@@ -23,6 +23,9 @@ class SVEmbedding(abc.ABC):
     def buildKernelsMatrices(self):
         self._svPosteriorOnLatents.buildKernelsMatrices()
 
+    def buildVariationalCov(self):
+        self._svPosteriorOnLatents.buildVariationalCov()
+
     @abc.abstractmethod
     def setInitialParams(self, initial_params):
         pass
