@@ -33,6 +33,7 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
         nLatents = len(initial_params["mean"])
         self._mean = [initial_params["mean"][k] for k in range(nLatents)]
         self._cholVecs = [initial_params["cholVecs"][k] for k in range(nLatents)]
+        self.buildCov()
 
     def getParams(self):
         listOfTensors = []
@@ -44,9 +45,11 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
     def getMean(self):
         return self._mean
 
+    def getCov(self):
+        return self._cov
+
     def buildCov(self):
-        qSigma = svGPFA.utils.miscUtils.buildCovsFromCholVecs(cholVecs=self._cholVecs)
-        return qSigma
+        self._cov = svGPFA.utils.miscUtils.buildCovsFromCholVecs(cholVecs=self._cholVecs)
 
 class SVPosteriorOnIndPointsCholWithGettersAndSetters(SVPosteriorOnIndPointsChol):
     def get_flattened_params(self):
