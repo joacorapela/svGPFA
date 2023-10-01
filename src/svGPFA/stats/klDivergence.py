@@ -17,7 +17,7 @@ class KLDivergence:
 
     def evalSumAcrossLatentsAndTrials(self):
         klDiv = 0
-        qSigma = self._svPosteriorOnIndPoints.buildCov()
+        qSigma = self._svPosteriorOnIndPoints.getCov()
         nLatents = len(qSigma)
         for k in range(nLatents):
             klDivK = self._evalSumAcrossTrials(
