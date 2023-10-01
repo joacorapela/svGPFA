@@ -22,6 +22,10 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
+    def buildVariationalCov(self):
+        pass
+
+    @abstractmethod
     def computeSVPosteriorOnLatentsStats(self):
         pass
 
@@ -137,6 +141,9 @@ class PointProcessELL(ExpectedLogLikelihood):
     def buildKernelsMatrices(self):
         self._svEmbeddingAllTimes.buildKernelsMatrices()
         self._svEmbeddingAssocTimes.buildKernelsMatrices()
+
+    def buildVariationalCov(self):
+        self._svEmbeddingAllTimes.buildVariationalCov()
 
     def computeSVPosteriorOnLatentsStats(self):
         allTimesStats = self._svEmbeddingAllTimes.\
