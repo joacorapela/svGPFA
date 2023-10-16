@@ -133,6 +133,13 @@ def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
 
 def getCholFromVec(vec, nIndPoints):
+    """Build Cholesky lower-triangular matrix from its vector representation.
+
+    :param vec: vector respresentation of the lower-triangular Cholesky factor
+    :type  vector: :class:`torch.Tensor`
+    :param nIndPoints: number of inucing opoints.
+    :type  nIndPoints: int
+    """
     chol = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
     trilIndices = torch.tril_indices(nIndPoints, nIndPoints)
     chol[trilIndices[0,:],trilIndices[1,:]] = vec
