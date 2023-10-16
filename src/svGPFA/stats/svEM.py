@@ -348,7 +348,11 @@ class SVEM_PyTorch(SVEM):
         x.extend(model.getIndPointsLocs())
         def evalFunc():
             model.buildKernelsMatrices()
+            model.buildVariationalCov()
             answer = model.eval()
+            # begin debug
+            # print(model.getSVPosteriorOnIndPointsParams()[2][0,:,0])
+            # end debug
             return answer
         optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
@@ -417,16 +421,7 @@ class SVEM_PyTorch(SVEM):
         def closure():
             optimizer.zero_grad()
             curEval = -evalFunc()
-            # begin debug
-            # print("before -- eval {:f}, params ".format(curEval), self._model.getKernelsParams())
-            # end debug
             curEval.backward(retain_graph=True)
-            # begin debug
-            # with torch.no_grad():
-            #     auxEval = -evalFunc()
-            # print("after -- eval {:f}, params ".format(auxEval), self._model.getKernelsParams())
-            # print("after -- params ", self._model.getKernelsParams())
-            # end debug
             return curEval
         optimizer.step(closure)
         lowerBound = evalFunc()
