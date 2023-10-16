@@ -2793,13 +2793,58 @@ def getPlotSmoothedSpikes(spikes_times, gf_std_secs,
     fig.update_layout(title=title)
     return fig
 
+def getPlotVariationalCovs(variational_covs, random_spread=0.5,
+                           xlabel="Random number",
+                           ylabel="Covariance coefficient value",
+                           title="",
+                          ):
+    fig = go.Figure()
+    n_latents = len(variational_covs)
+    n_trials = variational_covs[0].shape[0]
+    n_ind_points = variational_covs[0].shape[1]
+
+    all_var_covs_hover_text = []
+    all_var_covs = []
+    all_var_covs_xs = []
+    var_covs_index = 0
+    row_indices_matrix = np.outer(np.arange(n_ind_points, dtype=int),
+                                  np.ones(n_ind_points, dtype=int))
+    row_indices = row_indices_matrix.flatten()
+    col_indices_matrix = np.outer(np.ones(n_ind_points, dtype=int),
+                                  np.arange(n_ind_points, dtype=int))
+    col_indices = col_indices_matrix.flatten()
+    for k in range(n_latents):
+        var_covs_k = variational_covs[k]
+        for r in range(n_trials):
+            var_cov_kr_flattened = var_covs_k[r,:,:].flatten()
+            n_points_var_covs_kr = n_ind_points**2
+            all_var_covs.extend(var_cov_kr_flattened)
+            scatters = (torch.rand(n_points_var_covs_kr)-0.5)*random_spread
+            var_covs_xs = var_covs_index+scatters
+            all_var_covs_xs.extend(var_covs_xs)
+            hover_text = [
+                "x: {:02f}<br>y: {:02f}<br>k: {:02d}<br>r: {:02d}<br>row: {:d}<br>col: {:d}".format(
+                    var_covs_xs[i], var_cov_kr_flattened[i], k, r,
+                    row_indices[i], col_indices[i])
+                for i in range(n_points_var_covs_kr)
+            ]
+            all_var_covs_hover_text.extend(hover_text)
+    trace_var_covs = go.Scatter(x=all_var_covs_xs, y=all_var_covs,
+                                mode="markers", name="var_cov",
+                                hoverinfo="text", text=all_var_covs_hover_text)
+    fig.add_trace(trace_var_covs)
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title=title)
+    return fig
+
 def getPlotAllParams(variational_means, variational_covs, C, d, kernels_params,
                      ind_points_locs, random_spread=0.5):
     fig = go.Figure()
     n_latents = len(variational_means)
     n_trials = variational_means[0].shape[0]
 
-    all_var_means_hoover_text = []
+    all_var_means_hover_text = []
     all_var_means = []
     all_var_means_xs = []
     var_means_index = 0
@@ -2807,20 +2852,22 @@ def getPlotAllParams(variational_means, variational_covs, C, d, kernels_params,
         var_means_k = variational_means[k]
         for r in range(n_trials):
             n_points_var_means_kr = var_means_k.shape[1]
-            hover_text = [
-                "k: {:02d}<br>r: {:02d}<br>i: {:02d}".format(k, r, i)
-                for i in range(n_points_var_means_kr)
-            ]
-            all_var_means_hoover_text.extend(hover_text)
             all_var_means.extend(var_means_k[r,:,0])
             scatters = (torch.rand(n_points_var_means_kr)-0.5)*random_spread
-            all_var_means_xs.extend(var_means_index+scatters)
+            var_means_xs = var_means_index+scatters
+            all_var_means_xs.extend(var_means_xs)
+            hover_text = [
+                "x: {:02f}<br>y: {:02f}<br>k: {:02d}<br>r: {:02d}<br>i: {:02d}".format(
+                    var_means_xs[i], var_means_k[r,i,0], k, r, i)
+                for i in range(n_points_var_means_kr)
+            ]
+            all_var_means_hover_text.extend(hover_text)
     trace_var_means = go.Scatter(x=all_var_means_xs, y=all_var_means,
                                  mode="markers", name="var_mean",
-                                 hoverinfo="text", text=all_var_means_hoover_text)
+                                 hoverinfo="text", text=all_var_means_hover_text)
     fig.add_trace(trace_var_means)
 
-    all_var_covs_hoover_text = []
+    all_var_covs_hover_text = []
     all_var_covs = []
     all_var_covs_xs = []
     var_covs_index = 1
@@ -2828,70 +2875,79 @@ def getPlotAllParams(variational_means, variational_covs, C, d, kernels_params,
         var_covs_k = variational_covs[k]
         for r in range(n_trials):
             n_points_var_covs_kr = var_covs_k.shape[1]
-            hover_text = [
-                "k: {:02d}<br>r: {:02d}<br>i: {:02d}".format(k, r, i)
-                for i in range(n_points_var_covs_kr)
-            ]
-            all_var_covs_hoover_text.extend(hover_text)
             all_var_covs.extend(var_covs_k[r,:,0])
             scatters = (torch.rand(n_points_var_covs_kr)-0.5)*random_spread
-            all_var_covs_xs.extend(var_covs_index+scatters)
+            var_covs_xs = var_covs_index+scatters
+            all_var_covs_xs.extend(var_covs_xs)
+            hover_text = [
+                "x: {:02f}<br>y: {:02f}<br>k: {:02d}<br>r: {:02d}<br>i: {:02d}".format(
+                    var_covs_xs[i], var_covs_k[r,i,0], k, r, i)
+                for i in range(n_points_var_covs_kr)
+            ]
+            all_var_covs_hover_text.extend(hover_text)
     trace_var_covs = go.Scatter(x=all_var_covs_xs, y=all_var_covs,
                                 mode="markers", name="var_cov",
-                                hoverinfo="text", text=all_var_covs_hoover_text)
+                                hoverinfo="text", text=all_var_covs_hover_text)
     fig.add_trace(trace_var_covs)
 
-    all_C_hoover_text = []
+    all_C_hover_text = []
     all_C = []
     all_C_xs = []
     C_index = 2
     for k in range(n_latents):
         C_k = C[:, k]
         n_points_C_k = len(C_k)
-        hover_text = [
-            "k: {:02d}<br>n: {:02d}".format(k, n) for n in range(n_points_C_k)
-        ]
-        all_C_hoover_text.extend(hover_text)
         all_C.extend(C_k)
         scatters = (torch.rand(n_points_C_k)-0.5)*random_spread
-        all_C_xs.extend(C_index+scatters)
+        C_xs = C_index+scatters
+        all_C_xs.extend(C_xs)
+        hover_text = [
+            "x: {:02f}<br>y: {:02f}<br>k: {:02d}<br>i: {:02d}".format(
+                C_xs[i], C[i,k], k, i)
+            for i in range(n_points_C_k)
+        ]
+        all_C_hover_text.extend(hover_text)
     trace_C = go.Scatter(x=all_C_xs, y=all_C,
                                 mode="markers", name="C",
-                                hoverinfo="text", text=all_C_hoover_text)
+                                hoverinfo="text", text=all_C_hover_text)
     fig.add_trace(trace_C)
 
     d_index = 3
     n_points_d = len(d)
-    d_hoover_text = [
-        "n: {:02d}".format(n) for n in range(n_points_d)
-    ]
     scatters = (torch.rand(n_points_d)-0.5)*random_spread
     d_xs = d_index+scatters
+    d_hover_text = [
+        "x: {:02f}<br>y: {:02f}<br>n: {:02d}".format(
+            d_xs[n], d[n], n)
+        for n in range(n_points_d)
+    ]
     trace_d = go.Scatter(x=d_xs, y=d, mode="markers", name="d",
-                         hoverinfo="text", text=d_hoover_text)
+                         hoverinfo="text", text=d_hover_text)
     fig.add_trace(trace_d)
 
-    all_kernels_params_hoover_text = []
+    all_kernels_params_hover_text = []
     all_kernels_params = []
     all_kernels_params_xs = []
     kernels_params_index = 4
     for k in range(n_latents):
         kernels_params_k = kernels_params[k]
         n_points_kernels_params_k = len(kernels_params_k)
-        hover_text = [
-            "k: {:02d}<br>i: {:02d}".format(k, i) for i in range(n_points_kernels_params_k)
-        ]
-        all_kernels_params_hoover_text.extend(hover_text)
         all_kernels_params.extend(kernels_params_k)
         scatters = (torch.rand(n_points_kernels_params_k)-0.5)*random_spread
         all_kernels_params_xs.extend(kernels_params_index+scatters)
+        hover_text = [
+            "x: {:02f}<br>y: {:02f}<br>k: {:02d}<br>i: {:02d}".format(
+                all_kernels_params_xs[i], all_kernels_params[i], k, i)
+            for i in range(n_points_kernels_params_k)
+        ]
+        all_kernels_params_hover_text.extend(hover_text)
     trace_kernels_params = go.Scatter(x=all_kernels_params_xs, y=all_kernels_params,
                                       mode="markers", name="kernels_params",
                                       hoverinfo="text",
-                                      text=all_kernels_params_hoover_text)
+                                      text=all_kernels_params_hover_text)
     fig.add_trace(trace_kernels_params)
 
-    all_ind_points_locs_hoover_text = []
+    all_ind_points_locs_hover_text = []
     all_ind_points_locs = []
     all_ind_points_locs_xs = []
     ind_points_locs_index = 5
@@ -2899,17 +2955,18 @@ def getPlotAllParams(variational_means, variational_covs, C, d, kernels_params,
         ind_points_locs_k = ind_points_locs[k]
         for r in range(n_trials):
             n_points_ind_points_locs_kr = ind_points_locs_k.shape[1]
-            hover_text = [
-                "k: {:02d}<br>r: {:02d}<br>i: {:02d}".format(k, r, i)
-                for i in range(n_points_ind_points_locs_kr)
-            ]
-            all_ind_points_locs_hoover_text.extend(hover_text)
             all_ind_points_locs.extend(ind_points_locs_k[r,:,0])
             scatters = (torch.rand(n_points_ind_points_locs_kr)-0.5)*random_spread
             all_ind_points_locs_xs.extend(ind_points_locs_index+scatters)
+            hover_text = [
+                "x: {:02f}<br>y: {:02f}<br>k: {:02d}<br>r: {:02d}<br>i: {:02d}".format(
+                    all_ind_points_locs_xs[i], all_ind_points_locs[i], k, r, i)
+                for i in range(n_points_ind_points_locs_kr)
+            ]
+            all_ind_points_locs_hover_text.extend(hover_text)
     trace_ind_points_locs = go.Scatter(x=all_ind_points_locs_xs, y=all_ind_points_locs,
                                  mode="markers", name="ind_points_locs",
-                                 hoverinfo="text", text=all_ind_points_locs_hoover_text)
+                                 hoverinfo="text", text=all_ind_points_locs_hover_text)
     fig.add_trace(trace_ind_points_locs)
 
     return fig
