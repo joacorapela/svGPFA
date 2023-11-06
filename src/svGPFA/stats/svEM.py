@@ -85,6 +85,7 @@ class SVEM_PyTorch(SVEM):
         if latentsStreamFN is not None and latentsTimes is None:
             raise RuntimeError("Please specify latentsTime if you want to save latents")
 
+        self._model = model
         iter = 0
         if savePartial:
             savePartialFilename = savePartialFilenamePattern.format("initial")
@@ -120,6 +121,8 @@ class SVEM_PyTorch(SVEM):
             iterationsModelParams = None
         maxRes = {"lowerBound": -math.inf}
         iter += 1
+        nfeval = 0
+        niter = 0
         while iter <= optim_params["em_max_iter"]:
             message = "Iteration {:02d}, start: {:f}\n".format(
                 iter, maxRes["lowerBound"])
@@ -131,19 +134,11 @@ class SVEM_PyTorch(SVEM):
                 logStream=logStream,
                 logStreamFN=logStreamFN
             )
-            try:
-                maxRes = self._allSteps(
-                    model=model,
-                    optim_params=optim_params["allsteps_optim_params"])
-            except Exception as e:
-                stack_trace = traceback.format_exc()
-                print(e)
-                print(stack_trace)
-                terminationInfo = ErrorTerminationInfo(
-                    message=f"Error occured in iteration {iter}",
-                    error=e, stack_trace=stack_trace)
-                return lowerBoundHist, elapsedTimeHist, \
-                       terminationInfo, iterationsModelParams
+            maxRes = self._allSteps(
+                model=model,
+                optim_params=optim_params["allsteps_optim_params"])
+            nfeval += maxRes["nfeval"]
+            niter += maxRes["niter"]
             message = "Iteration {:02d}, end: {:f}, niter: {:d}, nfeval: {:d}\n".format(
                 iter, maxRes["lowerBound"], maxRes["niter"],
                 maxRes["nfeval"])
@@ -197,7 +192,7 @@ class SVEM_PyTorch(SVEM):
             "Maximum number of iterations ({:d}) reached".format(
                 optim_params["em_max_iter"]))
         return lowerBoundHist, elapsedTimeHist, terminationInfo, \
-            iterationsModelParams
+            iterationsModelParams, nfeval, niter
 
     def maximizeInSteps(self, model, optim_params, method="ECM", getIterationModelParamsFn=None,
                         printIterationModelParams=True,
@@ -421,6 +416,28 @@ class SVEM_PyTorch(SVEM):
         def closure():
             optimizer.zero_grad()
             curEval = -evalFunc()
+            # begin debug
+            # svPosteriorOnIndPointsCov = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cov
+            with torch.no_grad():
+                svPosteriorOnIndPointsCholVecs = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cholVecs
+                for k in range(len(svPosteriorOnIndPointsCholVecs)):
+                    for r in range(svPosteriorOnIndPointsCholVecs[k].shape[0]):
+                        # diag = torch.diag(svPosteriorOnIndPointsCov[k][r,:,:])
+
+                        Pk = svPosteriorOnIndPointsCholVecs[k].shape[1]
+                        nIndPointsK = int((-1+math.sqrt(1+8*Pk))/2)
+                        diag2 = torch.empty(nIndPointsK)
+                        index = 0
+                        for i in range(nIndPointsK):
+                            diag2[i] = svPosteriorOnIndPointsCholVecs[k][r,index,0].item()
+                            svPosteriorOnIndPointsCholVecs[k][r,index,0].clamp_(min=-1, max=1)
+                            index += i+2
+                        if not (diag2<1.0).all():
+                            import warnings
+                            warnings.warn(f"posterior variance is larger than the prior variance: k={k}, r={r}")
+                            print(diag2)
+                            # breakpoint()
+            # end debug
             curEval.backward(retain_graph=True)
             return curEval
         optimizer.step(closure)
