@@ -140,8 +140,9 @@ def getCholFromVec(vec, nIndPoints):
     :param nIndPoints: number of inucing opoints.
     :type  nIndPoints: int
     """
-    chol = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double)
-    trilIndices = torch.tril_indices(nIndPoints, nIndPoints)
+    chol = torch.zeros((nIndPoints, nIndPoints), dtype=torch.double,
+                       device=vec.device)
+    trilIndices = torch.tril_indices(nIndPoints, nIndPoints, device=vec.device)
     chol[trilIndices[0,:],trilIndices[1,:]] = vec
     return chol
 
@@ -155,7 +156,8 @@ def buildCovsFromCholVecs(cholVecs):
         # nIndPointsK = (-1+sqrt(1+8*Pk))/2
         Pk = cholVecs[k].shape[1]
         nIndPointsK = int((-1+math.sqrt(1+8*Pk))/2)
-        covs[k] = torch.empty((R, nIndPointsK, nIndPointsK), dtype=torch.double)
+        covs[k] = torch.empty((R, nIndPointsK, nIndPointsK),
+                              dtype=torch.double, device=cholVecs[k].device)
         for r in range(R):
             cholKR = getCholFromVec(vec=cholVecs[k][r,:,0], nIndPoints=nIndPointsK)
             covs[k][r,:,:] = torch.matmul(cholKR, torch.transpose(cholKR, 0, 1))

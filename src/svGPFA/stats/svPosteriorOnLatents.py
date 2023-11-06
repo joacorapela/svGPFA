@@ -52,6 +52,11 @@ class SVPosteriorOnLatents(ABC):
         self._indPointsLocsKMS.setRegParam(reg_param=priorCovRegParam)
 
 
+    def to(self, device):
+        self._indPointsLocsKMS.to(device=device)
+        self._indPointsLocsAndTimesKMS.to(device=device)
+        self._svPosteriorOnIndPoints.to(device=device)
+
 class SVPosteriorOnLatentsAllTimes(SVPosteriorOnLatents):
 
     def predict(self, times):

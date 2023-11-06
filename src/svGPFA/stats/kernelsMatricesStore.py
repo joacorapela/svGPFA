@@ -34,10 +34,14 @@ class KernelsMatricesStore(abc.ABC):
 
     def getKernelsParams(self):
         answer = []
-        for i in range(len(self._kernels)):
-            answer.append(self._kernels[i].getParams())
+        for k in range(len(self._kernels)):
+            answer.append(self._kernels[k].getParams())
         return answer
 
+    def to(self, device):
+        for k in range(len(self._kernels)):
+            self._kernels[k].to(device=device)
+            self._ind_points_locs[k] = self._ind_points_locs[k].to(device=device)
 
 class KernelMatricesStoreGettersAndSetters(abc.ABC):
     def get_flattened_kernels_params(self):
@@ -122,6 +126,14 @@ class IndPointsLocsKMS(KernelsMatricesStore):
     def getRegParam(self):
         return self._reg_param
 
+    def to(self, device):
+        super().to(device=device)
+
+        n_latents = len(self._kernels)
+        for k in range(n_latents):
+            self._Kzz[k] = self._Kzz[k].to(device=device)
+            self._Kzz_inv[k] = self._Kzz_inv[k].to(device=device)
+
 
 class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
 
@@ -196,11 +208,20 @@ class IndPointsLocsAndAllTimesKMS(IndPointsLocsAndTimesKMS):
 
     def buildKttKernelsMatrices(self):
         # t \in nTrials x nQuad x 1
-        n_latents = len(self._ind_points_locs)
+        n_latents = len(self._kernels)
         self._Ktt = [[None] for k in range(n_latents)]
 
         for k in range(n_latents):
             self._Ktt[k] = self._kernels[k].buildKernelMatrix(X1=self._t, X2=self._t)
+
+    def to(self, device):
+        self._t = self._t.to(device=device)
+
+        self._KttDiag = self._KttDiag.to(device=device)
+        n_latents = len(self._kernels)
+        for k in range(n_latents):
+            self._Ktz[k] = self._Ktz[k].to(device=device)
+
 
 
 class IndPointsLocsAndAssocTimesKMS(IndPointsLocsAndTimesKMS):
@@ -219,3 +240,14 @@ class IndPointsLocsAndAssocTimesKMS(IndPointsLocsAndTimesKMS):
                     X1=self._t[tr], X2=self._ind_points_locs[k][tr, :, :])
                 self._KttDiag[k][tr] = self._kernels[k].buildKernelMatrixDiag(
                     X=self._t[tr])
+
+    def to(self, device):
+        n_latents = len(self._kernels)
+        n_trials = self._ind_points_locs[0].shape[0]
+        for tr in range(n_trials):
+            self._t[tr] = self._t[tr].to(device=device)
+        for k in range(n_latents):
+            for tr in range(n_trials):
+                self._Ktz[k][tr] = self._Ktz[k][tr].to(device=device)
+                self._KttDiag[k][tr] = self._KttDiag[k][tr].to(device=device)
+

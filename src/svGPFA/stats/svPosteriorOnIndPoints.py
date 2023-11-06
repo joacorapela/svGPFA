@@ -24,6 +24,7 @@ class SVPosteriorOnIndPoints(ABC):
     def buildCov(self):
         pass
 
+
 class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
 
     def __init__(self):
@@ -50,6 +51,14 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
 
     def buildCov(self):
         self._cov = svGPFA.utils.miscUtils.buildCovsFromCholVecs(cholVecs=self._cholVecs)
+
+    def to(self, device):
+        n_latents = len(self._mean)
+        for k in range(n_latents):
+            self._mean[k] = self._mean[k].to(device=device)
+            self._cholVecs[k] = self._cholVecs[k].to(device=device)
+            self._cov[k] = self._cov[k].to(device=device)
+
 
 class SVPosteriorOnIndPointsCholWithGettersAndSetters(SVPosteriorOnIndPointsChol):
     def get_flattened_params(self):

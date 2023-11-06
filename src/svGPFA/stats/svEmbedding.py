@@ -59,6 +59,10 @@ class SVEmbedding(abc.ABC):
     def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
         pass
 
+    def to(self, device):
+        self._svPosteriorOnLatents.to(device=device)
+
+
 class LinearSVEmbedding(SVEmbedding):
 
     def setInitialParams(self, initial_params):
@@ -77,6 +81,11 @@ class LinearSVEmbedding(SVEmbedding):
 
     def getParams(self):
         return [self._C, self._d]
+
+    def to(self, device):
+        super().to(device=device)
+        self._C = self._C.to(device=device)
+        self._d = self._d.to(device=device)
 
 class LinearSVEmbeddingAllTimes(LinearSVEmbedding):
 

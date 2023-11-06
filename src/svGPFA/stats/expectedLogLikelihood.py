@@ -103,6 +103,10 @@ class ExpectedLogLikelihood(ABC):
     def setPriorCovRegParam(self, priorCovRegParam):
         self._svEmbeddingAllTimes.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
 
+    def to(self, device):
+        self._svEmbeddingAllTimes.to(device=device)
+        self._svEmbeddingAssocTimes.to(device=device)
+
 class PointProcessELL(ExpectedLogLikelihood):
     def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction):
         super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes, linkFunction=linkFunction)
@@ -202,6 +206,10 @@ class PointProcessELL(ExpectedLogLikelihood):
     @abstractmethod
     def _getELogLinkValues(self, eMean, eVar):
         pass
+
+    def to(self, device):
+        super().to(device=device)
+        self._legQuadWeights = self._legQuadWeights.to(device=device)
 
 class PointProcessELLExpLink(PointProcessELL):
     def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes):

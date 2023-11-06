@@ -122,6 +122,8 @@ class SVLowerBound:
     def predictEmbedding(self, times):
         return self._eLL.predictEmbedding(times=times)
 
+    def to(self, device):
+        self._eLL.to(device=device)
 
 class SVLowerBoundWithParamsGettersAndSetters(SVLowerBound):
 

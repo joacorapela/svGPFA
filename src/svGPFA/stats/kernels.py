@@ -24,6 +24,9 @@ class Kernel(ABC):
     def getNamedParams(self):
         pass
 
+    def to(self, device):
+        self._params = self._params.to(device=device)
+
 class ExponentialQuadraticKernel(Kernel):
 
     def __init__(self, scale=1.0, lengthscaleScale=1.0, dtype=torch.double):
@@ -63,6 +66,11 @@ class ExponentialQuadraticKernel(Kernel):
         scale, lengthscale = self._getAllParams()
         answer = {"scale": scale, "lengthscale": lengthscale}
         return answer
+
+    def to(self, device):
+        super().to(device=device)
+        self._scale = self._scale.to(device=device)
+
 
 class PeriodicKernel(Kernel):
     def __init__(self, scale=1.0, lengthscaleScale=1.0, periodScale=1.0, dtype=torch.double):
