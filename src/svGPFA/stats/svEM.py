@@ -416,6 +416,8 @@ class SVEM_PyTorch(SVEM):
         def closure():
             optimizer.zero_grad()
             curEval = -evalFunc()
+            if curEval.isnan():
+                raise RuntimeError("nan evaluation detected")
             if False:
                 # begin debug
                 # svPosteriorOnIndPointsCov = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cov
