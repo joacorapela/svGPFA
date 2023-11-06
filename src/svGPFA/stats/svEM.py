@@ -416,28 +416,29 @@ class SVEM_PyTorch(SVEM):
         def closure():
             optimizer.zero_grad()
             curEval = -evalFunc()
-            # begin debug
-            # svPosteriorOnIndPointsCov = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cov
-            with torch.no_grad():
-                svPosteriorOnIndPointsCholVecs = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cholVecs
-                for k in range(len(svPosteriorOnIndPointsCholVecs)):
-                    for r in range(svPosteriorOnIndPointsCholVecs[k].shape[0]):
-                        # diag = torch.diag(svPosteriorOnIndPointsCov[k][r,:,:])
+            if False:
+                # begin debug
+                # svPosteriorOnIndPointsCov = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cov
+                with torch.no_grad():
+                    svPosteriorOnIndPointsCholVecs = self._model._eLL._svEmbeddingAllTimes._svPosteriorOnLatents._svPosteriorOnIndPoints._cholVecs
+                    for k in range(len(svPosteriorOnIndPointsCholVecs)):
+                        for r in range(svPosteriorOnIndPointsCholVecs[k].shape[0]):
+                            # diag = torch.diag(svPosteriorOnIndPointsCov[k][r,:,:])
 
-                        Pk = svPosteriorOnIndPointsCholVecs[k].shape[1]
-                        nIndPointsK = int((-1+math.sqrt(1+8*Pk))/2)
-                        diag2 = torch.empty(nIndPointsK)
-                        index = 0
-                        for i in range(nIndPointsK):
-                            diag2[i] = svPosteriorOnIndPointsCholVecs[k][r,index,0].item()
-                            svPosteriorOnIndPointsCholVecs[k][r,index,0].clamp_(min=-1, max=1)
-                            index += i+2
-                        if not (diag2<1.0).all():
-                            import warnings
-                            warnings.warn(f"posterior variance is larger than the prior variance: k={k}, r={r}")
-                            print(diag2)
-                            # breakpoint()
-            # end debug
+                            Pk = svPosteriorOnIndPointsCholVecs[k].shape[1]
+                            nIndPointsK = int((-1+math.sqrt(1+8*Pk))/2)
+                            diag2 = torch.empty(nIndPointsK)
+                            index = 0
+                            for i in range(nIndPointsK):
+                                diag2[i] = svPosteriorOnIndPointsCholVecs[k][r,index,0].item()
+                                svPosteriorOnIndPointsCholVecs[k][r,index,0].clamp_(min=-1, max=1)
+                                index += i+2
+                            if not (diag2<1.0).all():
+                                import warnings
+                                warnings.warn(f"posterior variance is larger than the prior variance: k={k}, r={r}")
+                                print(diag2)
+                                # breakpoint()
+                # end debug
             curEval.backward(retain_graph=True)
             return curEval
         optimizer.step(closure)
