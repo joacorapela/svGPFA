@@ -4,9 +4,9 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
-    <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>4.2. Basal ganglia recordings from a mouse performing a bandit task | svGPFA 0.0.1 documentation</title>
+    <title>4.3. Basal ganglia recordings from a mouse performing a bandit task | svGPFA 0.0.1 documentation</title>
     <link rel="stylesheet" href="../_static/pygments.css" />
     <link rel="stylesheet" href="../_static/theme.39dcd091ff2d4f33bf46.css" />
     <link rel="stylesheet" href="../_static/proof.css" />
@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="next" title="4.3. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task" href="plot_striatum_ibl.html" />
-    <link rel="prev" title="4.1. Simulated data and default params" href="plot_simulation.html" />
+    <link rel="next" title="4.4. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task" href="plot_striatum_ibl.html" />
+    <link rel="prev" title="4.2. Recordings from the primary motor and dorsal premotor cortex striatum of a monkey performing a delayed-reach task" href="plot_mc_maze_small.html" />
   </head>
 
   <body class="antialiased text-gray scroll-smooth">
@@ -27,7 +27,7 @@
       data-action="keydown@window->search#focus "
       class="min-h-screen xl:h-screen flex flex-col xl:grid xl:grid-layout print:block print:h-auto"
     >
-      <a class="block transition -translate-x-full focus:translate-x-0 opacity-0 focus:opacity-100 text-xl bg-white p-4 z-20 absolute top-0 left-0 h-14" href="#span-class-section-number-4-2-span-basal-ganglia-recordings-from-a-mouse-performing-a-bandit-task" title="Skip navigation links">Skip to content</a>
+      <a class="block transition -translate-x-full focus:translate-x-0 opacity-0 focus:opacity-100 text-xl bg-white p-4 z-20 absolute top-0 left-0 h-14" href="#span-class-section-number-4-3-span-basal-ganglia-recordings-from-a-mouse-performing-a-bandit-task" title="Skip navigation links">Skip to content</a>
 
       <header class="grid-area-header z-10 h-14 fixed w-full top-0 print:hidden">
         <div class="bg-gray-dark shadow-md flex items-center h-full xl:px-2 relative"><div class="flex items-center">
@@ -86,19 +86,28 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_simulation.html#plotting">4.1.3. Plotting</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">4.2. Basal ganglia recordings from a mouse performing a bandit task</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#estimate-model">4.2.1. Estimate model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#goodness-of-fit-analysis">4.2.2. Goodness-of-fit analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#plotting">4.2.3. Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_mc_maze_small.html">4.2. Recordings from the primary motor and dorsal premotor cortex striatum of a monkey performing a delayed-reach task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_mc_maze_small.html#setup-environment">4.2.1. Setup environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mc_maze_small.html#epoch">4.2.2. Epoch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mc_maze_small.html#get-parameters">4.2.3. Get parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mc_maze_small.html#estimate-svgpfa-model">4.2.4. Estimate svGPFA model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mc_maze_small.html#goodness-of-fit-analysis">4.2.5. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mc_maze_small.html#plotting">4.2.6. Plotting</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="plot_striatum_ibl.html">4.3. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#setup-environment">4.3.1. Setup environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#epoch">4.3.2. Epoch</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#get-parameters">4.3.3. Get parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#estimate-svgpfa-model">4.3.4. Estimate svGPFA model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#goodness-of-fit-analysis">4.3.5. Goodness-of-fit analysis</a></li>
-<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#plotting">4.3.6. Plotting</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4.3. Basal ganglia recordings from a mouse performing a bandit task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estimate-model">4.3.1. Estimate model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#goodness-of-fit-analysis">4.3.2. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plotting">4.3.3. Plotting</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plot_striatum_ibl.html">4.4. IBL’s Recordings from the striatum of a mouse performing a visual discrimination task</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#setup-environment">4.4.1. Setup environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#epoch">4.4.2. Epoch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#get-parameters">4.4.3. Get parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#estimate-svgpfa-model">4.4.4. Estimate svGPFA model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#goodness-of-fit-analysis">4.4.5. Goodness-of-fit analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_striatum_ibl.html#plotting">4.4.6. Plotting</a></li>
 </ul>
 </li>
 </ul>
@@ -174,7 +183,7 @@
      class="print:hidden mt-12 text-sm text-gray-light">
   <a class="text-gray-light text-sm hover:text-gray-dark font-medium focus:text-gray-dark" href="../index.html">svGPFA 0.0.1 documentation</a>
   <span class="mr-1">/</span><a class="text-gray-light text-sm hover:text-gray-dark" href="index.html"><span class="section-number">4. </span>Scripts for estimation and visualization</a>
-    <span class="mr-1">/</span><span aria-current="page"><span class="section-number">4.2. </span>Basal ganglia recordings from a mouse performing a bandit task</span>
+    <span class="mr-1">/</span><span aria-current="page"><span class="section-number">4.3. </span>Basal ganglia recordings from a mouse performing a bandit task</span>
 </nav>
   <article role="main" class="flex-1">
     
@@ -184,13 +193,13 @@
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="basal-ganglia-recordings-from-a-mouse-performing-a-bandit-task">
-<span id="sphx-glr-auto-examples-plot-gpe-py"></span><h1><span class="section-number">4.2. </span>Basal ganglia recordings from a mouse performing a bandit task<a class="headerlink" href="#basal-ganglia-recordings-from-a-mouse-performing-a-bandit-task" title="Permalink to this heading"><span>#</span></a></h1>
+<span id="sphx-glr-auto-examples-plot-gpe-py"></span><h1><span class="section-number">4.3. </span>Basal ganglia recordings from a mouse performing a bandit task<a class="headerlink" href="#basal-ganglia-recordings-from-a-mouse-performing-a-bandit-task" title="Permalink to this heading"><span>#</span></a></h1>
 <p>In this notebook we use data recorded from the basal ganglia of a mouse
 performing a bandit task from the to estimate an svGPFA model</p>
 <section id="estimate-model">
-<h2><span class="section-number">4.2.1. </span>Estimate model<a class="headerlink" href="#estimate-model" title="Permalink to this heading"><span>#</span></a></h2>
+<h2><span class="section-number">4.3.1. </span>Estimate model<a class="headerlink" href="#estimate-model" title="Permalink to this heading"><span>#</span></a></h2>
 <section id="import-required-packages">
-<h3><span class="section-number">4.2.1.1. </span>Import required packages<a class="headerlink" href="#import-required-packages" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.1. </span>Import required packages<a class="headerlink" href="#import-required-packages" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -211,7 +220,7 @@ performing a bandit task from the to estimate an svGPFA model</p>
 </div>
 </section>
 <section id="get-spikes-times">
-<h3><span class="section-number">4.2.1.2. </span>Get spikes times<a class="headerlink" href="#get-spikes-times" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.2. </span>Get spikes times<a class="headerlink" href="#get-spikes-times" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block_types_indices</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">region_spikes_times_filename_pattern</span> <span class="o">=</span> <span class="s2">&quot;../data/00000000_regionGPe_blockTypeIndices0_spikes_times_epochedaligned__last_center_out.</span><span class="si">{:s}</span><span class="s2">&quot;</span>
 <span class="n">min_nSpikes_perNeuron_perTrial</span> <span class="o">=</span> <span class="mi">1</span>
@@ -244,9 +253,9 @@ performing a bandit task from the to estimate an svGPFA model</p>
 </div>
 </section>
 <section id="check-that-spikes-have-been-epoched-correctly">
-<h3><span class="section-number">4.2.1.3. </span>Check that spikes have been epoched correctly<a class="headerlink" href="#check-that-spikes-have-been-epoched-correctly" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.3. </span>Check that spikes have been epoched correctly<a class="headerlink" href="#check-that-spikes-have-been-epoched-correctly" title="Permalink to this heading"><span>#</span></a></h3>
 <section id="plot-spikes">
-<h4><span class="section-number">4.2.1.3.1. </span>Plot spikes<a class="headerlink" href="#plot-spikes" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.3.1. </span>Plot spikes<a class="headerlink" href="#plot-spikes" title="Permalink to this heading"><span>#</span></a></h4>
 <p>Plot the spikes of all trials of a randomly chosen neuron. Most trials should
 contain at least one spike.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neuron_to_plot_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
@@ -265,7 +274,7 @@ contain at least one spike.</p>
 <br />
 <br /></section>
 <section id="run-some-simple-checks-on-spikes">
-<h4><span class="section-number">4.2.1.3.2. </span>Run some simple checks on spikes<a class="headerlink" href="#run-some-simple-checks-on-spikes" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.3.2. </span>Run some simple checks on spikes<a class="headerlink" href="#run-some-simple-checks-on-spikes" title="Permalink to this heading"><span>#</span></a></h4>
 <p>The function <code class="docutils literal notranslate"><span class="pre">checkEpochedSpikesTimes</span></code> tests that:</p>
 <blockquote>
 <div><ol class="loweralpha simple">
@@ -292,7 +301,7 @@ passed message should be printed.</p>
 </section>
 </section>
 <section id="set-estimation-hyperparameters">
-<h3><span class="section-number">4.2.1.4. </span>Set estimation hyperparameters<a class="headerlink" href="#set-estimation-hyperparameters" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.4. </span>Set estimation hyperparameters<a class="headerlink" href="#set-estimation-hyperparameters" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_latents</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">em_max_iter_dyn</span> <span class="o">=</span> <span class="mi">200</span>
 <span class="n">est_init_number</span> <span class="o">=</span> <span class="mi">40</span>
@@ -302,16 +311,16 @@ passed message should be printed.</p>
 </div>
 </section>
 <section id="get-parameters">
-<h3><span class="section-number">4.2.1.5. </span>Get parameters<a class="headerlink" href="#get-parameters" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.5. </span>Get parameters<a class="headerlink" href="#get-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <p>Details on how to specify svGPFA parameters are provided <a class="reference external" href="../params.html">here</a></p>
 <section id="dynamic-parameters-specification">
-<h4><span class="section-number">4.2.1.5.1. </span>Dynamic parameters specification<a class="headerlink" href="#dynamic-parameters-specification" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.5.1. </span>Dynamic parameters specification<a class="headerlink" href="#dynamic-parameters-specification" title="Permalink to this heading"><span>#</span></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dynamic_params_spec</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;optim_params&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;em_max_iter&quot;</span><span class="p">:</span> <span class="n">em_max_iter_dyn</span><span class="p">}}</span>
 </pre></div>
 </div>
 </section>
 <section id="config-file-parameters-specification">
-<h4><span class="section-number">4.2.1.5.2. </span>Config file parameters specification<a class="headerlink" href="#config-file-parameters-specification" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.5.2. </span>Config file parameters specification<a class="headerlink" href="#config-file-parameters-specification" title="Permalink to this heading"><span>#</span></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">args_info</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">initUtils</span><span class="o">.</span><span class="n">getArgsInfo</span><span class="p">()</span>
 <span class="n">est_init_config_filename</span> <span class="o">=</span> <span class="n">est_init_config_filename_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
     <span class="n">est_init_number</span><span class="p">)</span>
@@ -328,7 +337,7 @@ passed message should be printed.</p>
 </div>
 </section>
 <section id="finally-get-the-parameters-from-the-dynamic-and-configuration-file-parameter-specifications">
-<h4><span class="section-number">4.2.1.5.3. </span>Finally, get the parameters from the dynamic and configuration file parameter specifications<a class="headerlink" href="#finally-get-the-parameters-from-the-dynamic-and-configuration-file-parameter-specifications" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.5.3. </span>Finally, get the parameters from the dynamic and configuration file parameter specifications<a class="headerlink" href="#finally-get-the-parameters-from-the-dynamic-and-configuration-file-parameter-specifications" title="Permalink to this heading"><span>#</span></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="p">,</span> <span class="n">kernels_types</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">initUtils</span><span class="o">.</span><span class="n">getParamsAndKernelsTypes</span><span class="p">(</span>
     <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">n_neurons</span><span class="o">=</span><span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_latents</span><span class="o">=</span><span class="n">n_latents</span><span class="p">,</span>
     <span class="n">trials_start_times</span><span class="o">=</span><span class="n">trials_start_times</span><span class="p">,</span>
@@ -379,9 +388,9 @@ Extracted config_file_params_spec[optim_params][mstep_indpointslocs_line_search_
 </section>
 </section>
 <section id="create-kernels-a-model-and-set-its-initial-parameters">
-<h3><span class="section-number">4.2.1.6. </span>Create kernels, a model and set its initial parameters<a class="headerlink" href="#create-kernels-a-model-and-set-its-initial-parameters" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.6. </span>Create kernels, a model and set its initial parameters<a class="headerlink" href="#create-kernels-a-model-and-set-its-initial-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <section id="build-kernels">
-<h4><span class="section-number">4.2.1.6.1. </span>Build kernels<a class="headerlink" href="#build-kernels" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.6.1. </span>Build kernels<a class="headerlink" href="#build-kernels" title="Permalink to this heading"><span>#</span></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kernels_params0</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;initial_params&quot;</span><span class="p">][</span><span class="s2">&quot;posterior_on_latents&quot;</span><span class="p">][</span><span class="s2">&quot;kernels_matrices_store&quot;</span><span class="p">][</span><span class="s2">&quot;kernels_params0&quot;</span><span class="p">]</span>
 <span class="n">kernels</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">miscUtils</span><span class="o">.</span><span class="n">buildKernels</span><span class="p">(</span>
     <span class="n">kernels_types</span><span class="o">=</span><span class="n">kernels_types</span><span class="p">,</span> <span class="n">kernels_params</span><span class="o">=</span><span class="n">kernels_params0</span><span class="p">)</span>
@@ -389,7 +398,7 @@ Extracted config_file_params_spec[optim_params][mstep_indpointslocs_line_search_
 </div>
 </section>
 <section id="create-model">
-<h4><span class="section-number">4.2.1.6.2. </span>Create model<a class="headerlink" href="#create-model" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.6.2. </span>Create model<a class="headerlink" href="#create-model" title="Permalink to this heading"><span>#</span></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kernelMatrixInvMethod</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">svGPFAModelFactory</span><span class="o">.</span><span class="n">kernelMatrixInvChol</span>
 <span class="n">indPointsCovRep</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">svGPFAModelFactory</span><span class="o">.</span><span class="n">indPointsCovChol</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">svGPFAModelFactory</span><span class="o">.</span><span class="n">SVGPFAModelFactory</span><span class="o">.</span><span class="n">buildModelPyTorch</span><span class="p">(</span>
@@ -402,7 +411,7 @@ Extracted config_file_params_spec[optim_params][mstep_indpointslocs_line_search_
 </div>
 </section>
 <section id="set-initial-parameters">
-<h4><span class="section-number">4.2.1.6.3. </span>Set initial parameters<a class="headerlink" href="#set-initial-parameters" title="Permalink to this heading"><span>#</span></a></h4>
+<h4><span class="section-number">4.3.1.6.3. </span>Set initial parameters<a class="headerlink" href="#set-initial-parameters" title="Permalink to this heading"><span>#</span></a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">setParamsAndData</span><span class="p">(</span>
     <span class="n">measurements</span><span class="o">=</span><span class="n">spikes_times</span><span class="p">,</span>
     <span class="n">initial_params</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;initial_params&quot;</span><span class="p">],</span>
@@ -413,7 +422,7 @@ Extracted config_file_params_spec[optim_params][mstep_indpointslocs_line_search_
 </section>
 </section>
 <section id="maximize-the-lower-bound">
-<h3><span class="section-number">4.2.1.7. </span>Maximize the Lower Bound<a class="headerlink" href="#maximize-the-lower-bound" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.1.7. </span>Maximize the Lower Bound<a class="headerlink" href="#maximize-the-lower-bound" title="Permalink to this heading"><span>#</span></a></h3>
 <p>(Warning: with the parameters above, this step takes around 5 minutes for 30 em_max_iter)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">svEM</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">svEM</span><span class="o">.</span><span class="n">SVEM_PyTorch</span><span class="p">()</span>
 <span class="n">tic</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
@@ -2040,9 +2049,9 @@ Saved results to ../results/basal_ganglia_model.pickle
 </section>
 </section>
 <section id="goodness-of-fit-analysis">
-<h2><span class="section-number">4.2.2. </span>Goodness-of-fit analysis<a class="headerlink" href="#goodness-of-fit-analysis" title="Permalink to this heading"><span>#</span></a></h2>
+<h2><span class="section-number">4.3.2. </span>Goodness-of-fit analysis<a class="headerlink" href="#goodness-of-fit-analysis" title="Permalink to this heading"><span>#</span></a></h2>
 <section id="set-goodness-of-fit-variables">
-<h3><span class="section-number">4.2.2.1. </span>Set goodness-of-fit variables<a class="headerlink" href="#set-goodness-of-fit-variables" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.2.1. </span>Set goodness-of-fit variables<a class="headerlink" href="#set-goodness-of-fit-variables" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ks_test_gamma</span> <span class="o">=</span> <span class="mi">10</span>
 <span class="n">trial_for_gof</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">cluster_id_for_gof</span> <span class="o">=</span> <span class="mi">1</span>
@@ -2057,7 +2066,7 @@ Saved results to ../results/basal_ganglia_model.pickle
 </div>
 </section>
 <section id="calculate-expected-intensity-function-values-for-ks-test-and-if-plots">
-<h3><span class="section-number">4.2.2.2. </span>Calculate expected intensity function values (for KS test and IF plots)<a class="headerlink" href="#calculate-expected-intensity-function-values-for-ks-test-and-if-plots" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.2.2. </span>Calculate expected intensity function values (for KS test and IF plots)<a class="headerlink" href="#calculate-expected-intensity-function-values-for-ks-test-and-if-plots" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">cif_values</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">computeExpectedPosteriorCIFs</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">trials_times</span><span class="p">)</span>
 <span class="n">cif_values_GOF</span> <span class="o">=</span> <span class="n">cif_values</span><span class="p">[</span><span class="n">trial_for_gof</span><span class="p">][</span><span class="n">cluster_id_for_gof_index</span><span class="p">]</span>
@@ -2065,7 +2074,7 @@ Saved results to ../results/basal_ganglia_model.pickle
 </div>
 </section>
 <section id="ks-time-rescaling-gof-test">
-<h3><span class="section-number">4.2.2.3. </span>KS time-rescaling GOF test<a class="headerlink" href="#ks-time-rescaling-gof-test" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.2.3. </span>KS time-rescaling GOF test<a class="headerlink" href="#ks-time-rescaling-gof-test" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">trial_times_GOF</span> <span class="o">=</span> <span class="n">trials_times</span><span class="p">[</span><span class="n">trial_for_gof</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
 <span class="n">spikes_times_GOF</span> <span class="o">=</span> <span class="n">spikes_times</span><span class="p">[</span><span class="n">trial_for_gof</span><span class="p">][</span><span class="n">cluster_id_for_gof_index</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 
@@ -2106,7 +2115,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="roc-predictive-analysis">
-<h3><span class="section-number">4.2.2.4. </span>ROC predictive analysis<a class="headerlink" href="#roc-predictive-analysis" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.2.4. </span>ROC predictive analysis<a class="headerlink" href="#roc-predictive-analysis" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
     <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">miscUtils</span><span class="o">.</span><span class="n">computeSpikeClassificationROC</span><span class="p">(</span>
@@ -2126,16 +2135,16 @@ Processing iter 9/9
 <br /></section>
 </section>
 <section id="plotting">
-<h2><span class="section-number">4.2.3. </span>Plotting<a class="headerlink" href="#plotting" title="Permalink to this heading"><span>#</span></a></h2>
+<h2><span class="section-number">4.3.3. </span>Plotting<a class="headerlink" href="#plotting" title="Permalink to this heading"><span>#</span></a></h2>
 <section id="imports-for-and-plotting">
-<h3><span class="section-number">4.2.3.1. </span>Imports for and plotting<a class="headerlink" href="#imports-for-and-plotting" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.1. </span>Imports for and plotting<a class="headerlink" href="#imports-for-and-plotting" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
 </section>
 <section id="set-plotting-parameters">
-<h3><span class="section-number">4.2.3.2. </span>Set plotting parameters<a class="headerlink" href="#set-plotting-parameters" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.2. </span>Set plotting parameters<a class="headerlink" href="#set-plotting-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">latent_to_plot</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">trial_to_plot</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">ortho_latents_to_plot</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -2179,7 +2188,7 @@ Processing iter 9/9
 </div>
 </section>
 <section id="lower-bound-history">
-<h3><span class="section-number">4.2.3.3. </span>Lower bound history<a class="headerlink" href="#lower-bound-history" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.3. </span>Lower bound history<a class="headerlink" href="#lower-bound-history" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plotUtilsPlotly</span><span class="o">.</span><span class="n">getPlotLowerBoundHist</span><span class="p">(</span>
     <span class="n">lowerBoundHist</span><span class="o">=</span><span class="n">lowerBoundHist</span><span class="p">)</span>
 <span class="n">fig</span>
@@ -2192,7 +2201,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="latent-across-trials">
-<h3><span class="section-number">4.2.3.4. </span>Latent across trials<a class="headerlink" href="#latent-across-trials" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.4. </span>Latent across trials<a class="headerlink" href="#latent-across-trials" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">testMuK</span><span class="p">,</span> <span class="n">testVarK</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">trials_times</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plotUtilsPlotly</span><span class="o">.</span><span class="n">getPlotLatentAcrossTrials</span><span class="p">(</span>
     <span class="n">times</span><span class="o">=</span><span class="n">trials_times</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span>
@@ -2212,7 +2221,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="orthonormalized-latent-across-trials">
-<h3><span class="section-number">4.2.3.5. </span>Orthonormalized latent across trials<a class="headerlink" href="#orthonormalized-latent-across-trials" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.5. </span>Orthonormalized latent across trials<a class="headerlink" href="#orthonormalized-latent-across-trials" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">testMuK</span><span class="p">,</span> <span class="n">testVarK</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictLatents</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">trials_times</span><span class="p">)</span>
 <span class="n">testMuK_np</span> <span class="o">=</span> <span class="p">[</span><span class="n">testMuK</span><span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">testMuK</span><span class="p">))]</span>
 <span class="n">estimatedC</span><span class="p">,</span> <span class="n">estimatedD</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getSVEmbeddingParams</span><span class="p">()</span>
@@ -2238,7 +2247,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="joint-evolution-of-first-three-orthonormalized-latents">
-<h3><span class="section-number">4.2.3.6. </span>Joint evolution of first three orthonormalized latents<a class="headerlink" href="#joint-evolution-of-first-three-orthonormalized-latents" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.6. </span>Joint evolution of first three orthonormalized latents<a class="headerlink" href="#joint-evolution-of-first-three-orthonormalized-latents" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plotUtilsPlotly</span><span class="o">.</span><span class="n">get3DPlotOrthonormalizedLatentsAcrossTrials</span><span class="p">(</span>
     <span class="n">trials_times</span><span class="o">=</span><span class="n">trials_times</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">latentsMeans</span><span class="o">=</span><span class="n">testMuK_np</span><span class="p">,</span>
     <span class="n">C</span><span class="o">=</span><span class="n">estimatedC_np</span><span class="p">,</span> <span class="n">latentsToPlot</span><span class="o">=</span><span class="n">ortho_latents_to_plot</span><span class="p">,</span>
@@ -2257,7 +2266,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="embedding">
-<h3><span class="section-number">4.2.3.7. </span>Embedding<a class="headerlink" href="#embedding" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.7. </span>Embedding<a class="headerlink" href="#embedding" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">embeddingMeans</span><span class="p">,</span> <span class="n">embeddingVars</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predictEmbedding</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">trials_times</span><span class="p">)</span>
 <span class="n">embeddingMeans</span> <span class="o">=</span> <span class="n">embeddingMeans</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
 <span class="n">embeddingVars</span> <span class="o">=</span> <span class="n">embeddingVars</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -2278,7 +2287,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="intensity-function">
-<h3><span class="section-number">4.2.3.8. </span>Intensity function<a class="headerlink" href="#intensity-function" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.8. </span>Intensity function<a class="headerlink" href="#intensity-function" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
     <span class="n">cif_values</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">computeExpectedPosteriorCIFs</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">trials_times</span><span class="p">)</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plotUtilsPlotly</span><span class="o">.</span><span class="n">getPlotCIFsOneNeuronAllTrials</span><span class="p">(</span>
@@ -2299,7 +2308,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="embedding-parameters">
-<h3><span class="section-number">4.2.3.9. </span>Embedding parameters<a class="headerlink" href="#embedding-parameters" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.9. </span>Embedding parameters<a class="headerlink" href="#embedding-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">estimatedC</span><span class="p">,</span> <span class="n">estimatedD</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getSVEmbeddingParams</span><span class="p">()</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plotUtilsPlotly</span><span class="o">.</span><span class="n">getPlotOrthonormalizedEmbeddingParams</span><span class="p">(</span>
     <span class="n">C</span><span class="o">=</span><span class="n">estimatedC</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">d</span><span class="o">=</span><span class="n">estimatedD</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
@@ -2313,7 +2322,7 @@ Processing iter 9/9
 <br />
 <br /></section>
 <section id="kernels-parameters">
-<h3><span class="section-number">4.2.3.10. </span>Kernels parameters<a class="headerlink" href="#kernels-parameters" title="Permalink to this heading"><span>#</span></a></h3>
+<h3><span class="section-number">4.3.3.10. </span>Kernels parameters<a class="headerlink" href="#kernels-parameters" title="Permalink to this heading"><span>#</span></a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kernelsParams</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">getKernelsParams</span><span class="p">()</span>
 <span class="n">kernelsTypes</span> <span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">kernel</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">kernel</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">getKernels</span><span class="p">()]</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">svGPFA</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plotUtilsPlotly</span><span class="o">.</span><span class="n">getPlotKernelsParams</span><span class="p">(</span>
