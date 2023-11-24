@@ -6,15 +6,15 @@ import torch
 
 class ExpectedLogLikelihood(ABC):
 
-    def __init__(self, svEmbeddingAllTimes, linkFunction):
-        self._svEmbeddingAllTimes = svEmbeddingAllTimes
+    def __init__(self, preIntensityQuadTimes, linkFunction):
+        self._preIntensityQuadTimes = preIntensityQuadTimes
         self._linkFunction = linkFunction
 
-    def get_svEmbeddingAllTimes(self):
-        return self._svEmbeddingAllTimes
+    def getPreIntensityQuadTimes(self):
+        return self._preIntensityQuadTimes
 
     @abstractmethod
-    def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
+    def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
         pass
 
     @abstractmethod
@@ -49,27 +49,15 @@ class ExpectedLogLikelihood(ABC):
     def setELLCalculationParams(self, eLLCalculationParams):
         pass
 
-    def sampleCIFs(self, times, nudget=1e-3):
-        h = self._svEmbeddingAllTimes.sample(times=times, nudget=nudget)
+    def sampleIFs(self, times, nudget=1e-3):
+        h = self._preIntensityQuadTimes.sample(times=times, nudget=nudget)
         nTrials = len(h)
         answer = [self._linkFunction(h[r]) for r in range(nTrials)]
         return answer
 
-#     def computeCIFsMeans(self, times):
-#         # h \in nTrials x times x nNeurons
-#         h = self._svEmbeddingAllTimes.computeMeans(times=times)
-#         nTrials = h.shape[0]
-#         nNeurons = h.shape[2]
-#         answer = [[self._linkFunction(h[r,:,n]) for n in range(nNeurons)] for r in range(nTrials)]
-#         return answer
-# 
-    def computeExpectedPosteriorCIFs(self, times):
+    def computeExpectedPosteriorIFs(self, times):
         # h \in nTrials x times x nNeurons
-        # eMean, eVar = self._svEmbeddingAllTimes.computeMeansAndVars(times=times)
-        # answer = self._getELinkValues(eMean=eMean, eVar=eVar)
-        # return answer
-
-        eMean, eVar = self._svEmbeddingAllTimes.predict(times=times)
+        eMean, eVar = self._preIntensityQuadTimes.predict(times=times)
         nTrials = eMean.shape[0]
         nNeurons = eMean.shape[2]
         answer = [[self._linkFunction(eMean[r, :, n]+0.5*eVar[r, :, n])
@@ -77,88 +65,87 @@ class ExpectedLogLikelihood(ABC):
         return answer
 
     def getSVPosteriorOnIndPointsParams(self):
-        return self._svEmbeddingAllTimes.getSVPosteriorOnIndPointsParams()
+        return self._preIntensityQuadTimes.getSVPosteriorOnIndPointsParams()
 
     def getSVEmbeddingParams(self):
-        return self._svEmbeddingAllTimes.getParams()
+        return self._preIntensityQuadTimes.getParams()
 
     def computeEmbeddingsMeansAndVarsAtTimes(self, times):
-        return self._svEmbeddingAllTimes.computeMeansAndVarsAtTimes(times)
+        return self._preIntensityQuadTimes.computeMeansAndVarsAtTimes(times)
 
     def getIndPointsLocs(self):
-        return self._svEmbeddingAllTimes.getIndPointsLocs()
+        return self._preIntensityQuadTimes.getIndPointsLocs()
 
     def getKernels(self):
-        return self._svEmbeddingAllTimes.getKernels()
+        return self._preIntensityQuadTimes.getKernels()
 
     def getKernelsParams(self):
-        return self._svEmbeddingAllTimes.getKernelsParams()
+        return self._preIntensityQuadTimes.getKernelsParams()
 
     def predictLatents(self, times):
-        return self._svEmbeddingAllTimes.predictLatents(times=times)
+        return self._preIntensityQuadTimes.predictLatents(times=times)
 
     def predictEmbedding(self, times):
-        return self._svEmbeddingAllTimes.predict(times=times)
+        return self._preIntensityQuadTimes.predict(times=times)
 
     def setPriorCovRegParam(self, priorCovRegParam):
-        self._svEmbeddingAllTimes.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
+        self._preIntensityQuadTimes.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
 
 class PointProcessELL(ExpectedLogLikelihood):
-    def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction):
-        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes, linkFunction=linkFunction)
-        self._svEmbeddingAssocTimes = svEmbeddingAssocTimes
+    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes, linkFunction):
+        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes, linkFunction=linkFunction)
+        self._preIntensitySpikesTimes = preIntensitySpikesTimes
 
-    def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
-        if svPosteriorOnLatentsStats is not None:
-            svPosteriorOnLatentsStatsAllTimes = \
-             svPosteriorOnLatentsStats["allTimes"]
-            svPosteriorOnLatentsStatsAssocTimes = \
-             svPosteriorOnLatentsStats["assocTimes"]
+    def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
+        if posteriorOnLatentsStats is not None:
+            posteriorOnLatentsStatsQuadTimes = \
+             posteriorOnLatentsStats["quadTimes"]
+            posteriorOnLatentsStatsSpikesTimes = \
+             posteriorOnLatentsStats["spikesTimes"]
         else:
-            svPosteriorOnLatentsStatsAllTimes = None
-            svPosteriorOnLatentsStatsAssocTimes = None
-        eMeanAllTimes, eVarAllTimes = \
-            self._svEmbeddingAllTimes.computeMeansAndVars(
-                svPosteriorOnLatentsStats=svPosteriorOnLatentsStatsAllTimes)
-        eMeanAssocTimes, eVarAssocTimes = \
-            self._svEmbeddingAssocTimes.computeMeansAndVars(
-                svPosteriorOnLatentsStats=svPosteriorOnLatentsStatsAssocTimes)
-        eLinkValues = self._getELinkValues(eMean=eMeanAllTimes,
-                                           eVar=eVarAllTimes)
-        eLogLinkValues = self._getELogLinkValues(eMean=eMeanAssocTimes,
-                                                 eVar=eVarAssocTimes)
-        # self._legQuadWeights \in nTrials x nQuadHerm x 1
-        # aux0 \in nTrials x 1 x nQuadHerm
-        aux0 = torch.transpose(input=self._legQuadWeights, dim0=1, dim1=2)
-        # eLinkValues \in  nTrials x nQuadHerm x nNeurons
-        # aux1 \in  nTrials x 1 x nNeurons
-        aux1 = torch.matmul(aux0, eLinkValues)
-        sELLTerm1 = torch.sum(aux1)
+            posteriorOnLatentsStatsQuadTimes = None
+            posteriorOnLatentsStatsSpikesTimes = None
+        eMeanQuadTimes, eVarQuadTimes = \
+            self._preIntensityQuadTimes.computeMeansAndVars(
+                posteriorOnLatentsStats=posteriorOnLatentsStatsQuadTimes)
+        eMeanSpikesTimes, eVarSpikesTimes = \
+            self._preIntensitySpikesTimes.computeMeansAndVars(
+                posteriorOnLatentsStats=posteriorOnLatentsStatsSpikesTimes)
+        nTrials = len(eMeanQuadTimes)
+        eLinkValues = self._getELinkValues(eMean=eMeanQuadTimes,
+                                           eVar=eVarQuadTimes)
+        eLogLinkValues = self._getELogLinkValues(eMean=eMeanSpikesTimes,
+                                                 eVar=eVarSpikesTimes)
+        # self._legQuadWeights[r] \in nQuadHerm x 1
+        # eLinkValues[r] \in  nQuadHerm x nNeurons
+        # aux1[r] \in  1 x nNeurons
+        aux1 = [torch.matmul(self._leqQuadWeights[r].T, eLinkValues[r]) for r in range(nTrials)]
+        sELLTerm1 = torch.sum(torch.cat([aux1[r] for r in range(nTrials)]))
         sELLTerm2 = torch.sum(eLogLinkValues)
         answer = -sELLTerm1+sELLTerm2
         return answer
 
     def buildKernelsMatrices(self):
-        self._svEmbeddingAllTimes.buildKernelsMatrices()
-        self._svEmbeddingAssocTimes.buildKernelsMatrices()
+        self._preIntensityQuadTimes.buildKernelsMatrices()
+        self._preIntensitySpikesTimes.buildKernelsMatrices()
 
     def buildVariationalCov(self):
-        self._svEmbeddingAllTimes.buildVariationalCov()
+        self._preIntensityQuadTimes.buildVariationalCov()
 
     def computeSVPosteriorOnLatentsStats(self):
-        allTimesStats = self._svEmbeddingAllTimes.\
+        quadTimesStats = self._preIntensityQuadTimes.\
             computeSVPosteriorOnLatentsStats()
-        assocTimesStats = self._svEmbeddingAssocTimes.\
+        spikesTimesStats = self._preIntensitySpikesTimes.\
             computeSVPosteriorOnLatentsStats()
-        answer = {"allTimes": allTimesStats, "assocTimes": assocTimesStats}
+        answer = {"quadTimes": quadTimesStats, "spikesTimes": spikesTimesStats}
         return answer
 
     def setMeasurements(self, measurements):
 
         stackedSpikeTimes, neuronForSpikeIndex = \
             self.__stackSpikeTimes(spikeTimes=measurements)
-        self._svEmbeddingAssocTimes.setTimes(times=stackedSpikeTimes)
-        self._svEmbeddingAssocTimes.setNeuronForSpikeIndex(neuronForSpikeIndex=
+        self._preIntensitySpikesTimes.setTimes(times=stackedSpikeTimes)
+        self._preIntensitySpikesTimes.setNeuronForSpikeIndex(neuronForSpikeIndex=
                                                             neuronForSpikeIndex)
 
     def __stackSpikeTimes(self, spikeTimes):
@@ -180,19 +167,19 @@ class PointProcessELL(ExpectedLogLikelihood):
         return stackedSpikeTimes, neuronForSpikeIndex
 
     def setIndPointsLocs(self, locs):
-        self._svEmbeddingAllTimes.setIndPointsLocs(locs=locs)
-        self._svEmbeddingAssocTimes.setIndPointsLocs(locs=locs)
+        self._preIntensityQuadTimes.setIndPointsLocs(locs=locs)
+        self._preIntensitySpikesTimes.setIndPointsLocs(locs=locs)
 
     def setKernels(self, kernels):
-        self._svEmbeddingAllTimes.setKernels(kernels=kernels)
-        self._svEmbeddingAssocTimes.setKernels(kernels=kernels)
+        self._preIntensityQuadTimes.setKernels(kernels=kernels)
+        self._preIntensitySpikesTimes.setKernels(kernels=kernels)
 
     def setInitialParams(self, initial_params):
-        self._svEmbeddingAllTimes.setInitialParams(initial_params=initial_params)
-        self._svEmbeddingAssocTimes.setInitialParams(initial_params=initial_params)
+        self._preIntensityQuadTimes.setInitialParams(initial_params=initial_params)
+        self._preIntensitySpikesTimes.setInitialParams(initial_params=initial_params)
 
     def setELLCalculationParams(self, eLLCalculationParams):
-        self._svEmbeddingAllTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
+        self._preIntensityQuadTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
         self._legQuadWeights = eLLCalculationParams["leg_quad_weights"]
 
     @abstractmethod
@@ -204,26 +191,26 @@ class PointProcessELL(ExpectedLogLikelihood):
         pass
 
 class PointProcessELLExpLink(PointProcessELL):
-    def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes):
-        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
-                         svEmbeddingAssocTimes=svEmbeddingAssocTimes,
+    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes):
+        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
+                         preIntensitySpikesTimes=preIntensitySpikesTimes,
                          linkFunction=torch.exp)
 
     def _getELinkValues(self, eMean, eVar):
-        # eLinkValues \in nTrials x nQuadLeg x nNeurons
-        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
+        # eLinkValues[r] \in nQuadLeg x nNeurons
+        eLinkValues[r] = [self._linkFunction(input=eMean[r]+0.5*eVar[r])
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
         # eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
-        eLogLink = torch.cat([eMean[trial] for trial in range(len(eMean))])
+        eLogLink = torch.cat([eMean[r] for r in range(len(eMean))])
         return eLogLink
 
 class PointProcessELLQuad(PointProcessELL):
 
-    def __init__(self, svEmbeddingAllTimes, svEmbeddingAssocTimes, linkFunction):
-        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
-                         svEmbeddingAssocTimes=svEmbeddingAssocTimes,
+    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes, linkFunction):
+        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
+                         preIntensitySpikesTimes=preIntensitySpikesTimes,
                         linkFunction=linkFunction)
 
     def setELLCalculationParams(self, eLLCalculationParams):
@@ -267,15 +254,15 @@ class PoissonELL(ExpectedLogLikelihood):
     def setELLCalculationParams(self, eLLCalculationParams):
         times = eLLCalculationParams["binTimes"]
         self._binWidth = times[0,1,0]-times[0,0,0]
-        self._svEmbeddingAllTimes.setTimes(times=times)
+        self._preIntensityQuadTimes.setTimes(times=times)
 
     def computeSVPosteriorOnLatentsStats(self):
-        answer = self._svEmbeddingAllTimes.computeSVPosteriorOnLatentsStats()
+        answer = self._preIntensityQuadTimes.computeSVPosteriorOnLatentsStats()
         return answer
 
-    def evalSumAcrossTrialsAndNeurons(self, svPosteriorOnLatentsStats=None):
-        eMean, eVar= self._svEmbeddingAllTimes.\
-            computeMeansAndVars(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
+    def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
+        eMean, eVar= self._preIntensityQuadTimes.\
+            computeMeansAndVars(posteriorOnLatentsStats=posteriorOnLatentsStats)
         eLinkValues, eLogLinkValues = \
                 self._getELinkAndELogLinkValues(eMean=eMean, eVar=eVar)
         sELLTerm1 = self._binWidth*eLinkValues.sum()
@@ -285,10 +272,10 @@ class PoissonELL(ExpectedLogLikelihood):
         return answer
 
     def buildKernelsMatrices(self):
-        self._svEmbeddingAllTimes.buildKernelsMatrices()
+        self._preIntensityQuadTimes.buildKernelsMatrices()
 
     def computeSVPostOnLatentsStats(self):
-        answer = self._svEmbeddingAllTimes.computeSVPostOnLatentsStats()
+        answer = self._preIntensityQuadTimes.computeSVPostOnLatentsStats()
         return answer
 
     def setMeasurements(self, measurements):
@@ -296,15 +283,15 @@ class PoissonELL(ExpectedLogLikelihood):
         self._measurements = measurements
 
     def setIndPointsLocs(self, locs):
-        self._svEmbeddingAllTimes.setIndPointsLocs(locs=locs)
-        self._svEmbeddingAssocTimes.setIndPointsLocs(locs=locs)
+        self._preIntensityQuadTimes.setIndPointsLocs(locs=locs)
+        self._preIntensitySpikesTimes.setIndPointsLocs(locs=locs)
 
     def setKernels(self, kernels):
-        self._svEmbeddingAllTimes.\
+        self._preIntensityQuadTimes.\
             setKernels(kernels=kernels)
 
     def setInitialParams(self, initial_params):
-        self._svEmbeddingAllTimes.\
+        self._preIntensityQuadTimes.\
             setInitialParams(initial_params=initial_params)
 
     @abstractmethod
@@ -313,8 +300,8 @@ class PoissonELL(ExpectedLogLikelihood):
 
 class PoissonELLExpLink(PoissonELL):
 
-    def __init__(self, svEmbeddingAllTimes):
-        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
+    def __init__(self, preIntensityQuadTimes):
+        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
                          linkFunction=torch.exp)
 
     def _getELinkAndELogLinkValues(self, eMean, eVar):
@@ -325,8 +312,8 @@ class PoissonELLExpLink(PoissonELL):
 
 class PoissonELLQuad(PoissonELL):
 
-    def __init__(self, svEmbeddingAllTimes, linkFunction):
-        super().__init__(svEmbeddingAllTimes=svEmbeddingAllTimes,
+    def __init__(self, preIntensityQuadTimes, linkFunction):
+        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
                          linkFunction=linkFunction)
 
     def _getELinkAndELogLinkValues(self, eMean, eVar):
