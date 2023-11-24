@@ -31,7 +31,8 @@ docs/ipynb/.ipynb_checkpoints/*
 # !/docs/sphinx/build/
 
 # !/docs/design/
-# /docs/design/*
+/docs/design/*
+!/docs/design/svGPFA.vpp
 # !/docs/design/svGPFA.vpp
 
 # !/docs/ipynb/
