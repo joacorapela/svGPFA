@@ -82,6 +82,8 @@ class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
         return Kzz_inv
 
     def solveForLatent(self, input, latentIndex):
+        # input \in (nTrials, nIndPoints[k], 1)
+        # self._Kzz_inv \ in (nTrials, nIndPoints[k], nIndPoints[k])
         solve = torch.cholesky_solve(input, self._Kzz_inv[latentIndex])
         return solve
 
@@ -109,7 +111,7 @@ class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
 class IndPointsLocsAndTimesKMS(KernelsMatricesStore):
 
     def setTimes(self, times):
-        # times \in nTrials x nQuad x 1
+        # times[r] \in nTimes x 1
         self._t = times
 
     def getKtz(self):
