@@ -6,7 +6,7 @@ import torch
 
 import svGPFA.utils.miscUtils
 
-class SVPosteriorOnIndPoints(ABC):
+class VariationalDist(ABC):
 
     @abstractmethod
     def setInitialParams(self, initial_params):
@@ -24,10 +24,10 @@ class SVPosteriorOnIndPoints(ABC):
     def buildCov(self):
         pass
 
-class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
+class VariationalDistChol(VariationalDist):
 
     def __init__(self):
-        super(SVPosteriorOnIndPoints, self).__init__()
+        super(VariationalDist, self).__init__()
 
     def setInitialParams(self, initial_params):
         nLatents = len(initial_params["mean"])
@@ -51,45 +51,10 @@ class SVPosteriorOnIndPointsChol(SVPosteriorOnIndPoints):
     def buildCov(self):
         self._cov = svGPFA.utils.miscUtils.buildCovsFromCholVecs(cholVecs=self._cholVecs)
 
-class SVPosteriorOnIndPointsCholWithGettersAndSetters(SVPosteriorOnIndPointsChol):
-    def get_flattened_params(self):
-        flattened_params = []
-        for k in range(len(self._mean)):
-            flattened_params.extend(self._mean[k].flatten().tolist())
-        for k in range(len(self._cholVecs)):
-            flattened_params.extend(self._cholVecs[k].flatten().tolist())
-        return flattened_params
-
-    def get_flattened_params_grad(self):
-        flattened_params_grad = []
-        for k in range(len(self._mean)):
-            flattened_params_grad.extend(self._mean[k].grad.flatten().tolist())
-        for k in range(len(self._cholVecs)):
-            flattened_params_grad.extend(self._cholVecs[k].grad.flatten().tolist())
-        return flattened_params_grad
-
-    def set_params_from_flattened(self, flattened_params):
-        for k in range(len(self._mean)):
-            flattened_param = flattened_params[:self._mean[k].numel()]
-            self._mean[k] = torch.tensor(flattened_param, dtype=torch.double).reshape(self._mean[k].shape)
-            flattened_params = flattened_params[self._mean[k].numel():]
-        for k in range(len(self._cholVecs)):
-            flattened_param = flattened_params[:self._cholVecs[k].numel()]
-            self._cholVecs[k] = torch.tensor(flattened_param,
-                                                   dtype=torch.double).reshape(self._cholVecs[k].shape)
-            flattened_params = flattened_params[self._cholVecs[k].numel():]
-
-    def set_params_requires_grad(self, requires_grad):
-        for k in range(len(self._mean)):
-            self._mean[k].requires_grad = requires_grad
-        for k in range(len(self._cholVecs)):
-            self._cholVecs[k].requires_grad = requires_grad
-
-
-class SVPosteriorOnIndPointsRank1PlusDiag(SVPosteriorOnIndPoints):
+class VariationalDistRank1PlusDiag(VariationalDist):
 
     def __init__(self):
-        super(SVPosteriorOnIndPoints, self).__init__()
+        super(VariationalDist, self).__init__()
 
     def setInitialParams(self, initial_params):
         self._mean = initial_params["mean"]
