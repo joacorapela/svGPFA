@@ -34,7 +34,7 @@ indPointsCovRank1PlusDiag = 100000
 indPointsCovChol = 100001
 
 
-class SVGPFAModelFactory:
+class ModelFactory:
 
     @staticmethod
     def buildModelPyTorch(kernels, conditionalDist=PointProcess,
@@ -46,9 +46,9 @@ class SVGPFAModelFactory:
 
         :param kernels: list of kernels (:mod:`svGPFA.stats.kernel`) to be used in the model
         :type kernels: list of instances from subclass of (:class:`svGPFA.stats.kernel.Kernel`)
-        :param conditionalDist: likelihood distribution (e.g., svGPFA.stats.SVGPFAModelFactory.PointProcess or svGPFA.stats.SVGPFAModelFactory.Gaussian)
+        :param conditionalDist: likelihood distribution (e.g., svGPFA.stats.ModelFactory.PointProcess or svGPFA.stats.ModelFactory.Gaussian)
         :type conditionalDist: int
-        :param embeddingType: type of embedding (e.g., svGPFA.stats.SVGPFAModelFactory.LinearEmbedding)
+        :param embeddingType: type of embedding (e.g., svGPFA.stats.ModelFactory.LinearEmbedding)
         :type embeddingType: int
 
         :return: an unitialized model. Parameters and data need to be set (by calling :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData`) before invoking :meth:`svGPFA.stats.svEM.SVEM.maximize`.
