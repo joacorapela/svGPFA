@@ -55,14 +55,15 @@ def test_getParamsDictFromArgs_1(n_latents=3, n_trials=10,
 
 
 def test_getParamsDictFromArgs_2(n_latents=3, n_trials=2,
-                                 true_variational_means_str="1.0 2.0 3.0",
-                                 true_variational_covs_str="1.0 0.0 0.0; "
-                                                           "0.0 1.0 0.0; "
-                                                           "0.0 0.0 1.0"
+                                 true_variational_means_str="1.0,2.0,3.0",
+                                 true_variational_covs_str="1.0,0.0,0.0; "
+                                                           "0.0,1.0,0.0; "
+                                                           "0.0,0.0,1.0"
                                 ):
     args = {"variational_means0": true_variational_means_str,
             "variational_covs0": true_variational_covs_str}
     args_info = svGPFA.utils.initUtils.getArgsInfo()
+
     params_dict = svGPFA.utils.initUtils.getParamsDictFromArgs(
         n_latents=n_latents, n_trials=n_trials, args=args, args_info=args_info)
     true_variational_means = svGPFA.utils.initUtils.strTo1DDoubleTensor(aString=true_variational_means_str)
