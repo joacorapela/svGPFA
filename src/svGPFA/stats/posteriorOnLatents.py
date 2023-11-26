@@ -62,7 +62,7 @@ class PosteriorOnLatents(ABC):
     def setTimes(self, times):
         self._indPointsLocsAndTimesKMS.setTimes(times=times)
 
-    def getPosteriorOnIndPointsParams(self):
+    def getVariationalDistParams(self):
         return self._variationalDist.getParams()
 
     def getKernels(self):
@@ -94,9 +94,9 @@ class PosteriorOnLatents(ABC):
 class PosteriorOnLatentsQuadTimes(PosteriorOnLatents):
 
     def predict(self, times):
-        times \in n_trials x n_times x 1
-        Note: forcing all trials to have the same number of time samples is a
-        limitation of the current version of the code
+        # times \in n_trials x n_times x 1
+        # Note: forcing all trials to have the same number of time samples is a
+        # limitation of the current version of the code
 
         kernels = self._indPointsLocsKMS.getKernels()
 
@@ -175,19 +175,19 @@ class PosteriorOnLatentsQuadTimes(PosteriorOnLatents):
                 qMurk = qMu[k][r, :, :]
                 qSigmark = qSigma[k][r, :, :]
 
-                begin compute mean #
-                b = torch.cholesky_solve(qMurk, KzzInvrk)
+                # begin compute mean #
+                # b = torch.cholesky_solve(qMurk, KzzInvrk)
                 b = self._indPointsLocsKMS.solveForLatentAndTrial(
                     input=qMurk, latentIndex=k, trialIndex=r)
                 meanrk = torch.squeeze(Ktzrk.matmul(b)).detach().numpy()
-                end compute mean #
+                # end compute mean #
 
-                being compute covar #
-                B = torch.cholesky_solve(torch.t(Ktzrk), KzzInvrk)
+                # being compute covar #
+                # B = torch.cholesky_solve(torch.t(Ktzrk), KzzInvrk)
                 B = self._indPointsLocsKMS.solveForLatentAndTrial(
                     input=torch.t(Ktzrk), latentIndex=k, trialIndex=r)
                 covarrk = Kttrk+torch.t(B).matmul(qSigmark-Kzzrk).matmul(B)
-                end compute covar #
+                # end compute covar #
 
                 covarrk += torch.eye(covarrk.shape[0])*nudget
                 covarrk = covarrk.detach().numpy()
