@@ -9,10 +9,10 @@ import torch
 import svGPFA.utils.miscUtils
 import svGPFA.stats.kernels
 import svGPFA.stats.kernelsMatricesStore
-import svGPFA.stats.svPosteriorOnIndPoints
-import svGPFA.stats.svPosteriorOnLatents
+import svGPFA.stats.variationalDist
+import svGPFA.stats.posteriorOnLatents
 
-def test_computeMeansAndVars_allTimes():
+def test_computeMeansAndVars_quadTimes():
     tol = 5e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
@@ -45,13 +45,12 @@ def test_computeMeansAndVars_allTimes():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    indPointsLocsAndTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-    qK = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(svPosteriorOnIndPoints=qU,
-                                      indPointsLocsKMS=indPointsLocsKMS,
-                                      indPointsLocsAndTimesKMS=
-                                       indPointsLocsAndTimesKMS)
+    indPointsLocsAndTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatentsQuadTimes(
+        variationalDist=qU, indPointsLocsKMS=indPointsLocsKMS,
+        indPointsLocsAndTimesKMS=indPointsLocsAndTimesKMS)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
     kmsParams0 = {"kernels_params0": kernelsParams0,
@@ -71,12 +70,13 @@ def test_computeMeansAndVars_allTimes():
 
     qKMu, qKVar = qK.computeMeansAndVars()
 
-    qKMuError = math.sqrt(((mu_k-qKMu)**2).mean())
-    assert(qKMuError<tol)
-    qKVarError = math.sqrt(((var_k-qKVar)**2).mean())
-    assert(qKVarError<tol)
+    for r in range(len(qKMu)):
+        qKMuError = math.sqrt(((mu_k[r,:,:] - qKMu[r])**2).mean())
+        assert(qKMuError<tol)
+        qKVarError = math.sqrt(((var_k[r,:,:]-qKVar[r])**2).mean())
+        assert(qKVarError<tol)
 
-def test_computeMeansAndVars_assocTimes():
+def test_computeMeansAndVars_spikesTimes():
     tol = 5e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
@@ -109,13 +109,13 @@ def test_computeMeansAndVars_assocTimes():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    indPointsLocsAndTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-    qK = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(svPosteriorOnIndPoints=qU,
-                                        indPointsLocsKMS=indPointsLocsKMS,
-                                        indPointsLocsAndTimesKMS=
-                                         indPointsLocsAndTimesKMS)
+    indPointsLocsAndTimesKMS = \
+        svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatentsSpikesTimes(
+        variationalDist=qU, indPointsLocsKMS=indPointsLocsKMS,
+        indPointsLocsAndTimesKMS=indPointsLocsAndTimesKMS)
 
     # qSigma0[k] \in nTrials x nInd[k] x nInd[k]
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
@@ -142,5 +142,5 @@ def test_computeMeansAndVars_assocTimes():
         assert(qKVarError<tol)
 
 if __name__=="__main__":
-    test_computeMeansAndVars_allTimes()
-    test_computeMeansAndVars_assocTimes()
+    test_computeMeansAndVars_quadTimes()
+    test_computeMeansAndVars_spikesTimes()

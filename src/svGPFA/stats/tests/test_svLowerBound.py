@@ -8,9 +8,9 @@ import torch
 import svGPFA.utils.miscUtils
 import svGPFA.stats.kernels
 import svGPFA.stats.kernelsMatricesStore
-import svGPFA.stats.svPosteriorOnIndPoints
-import svGPFA.stats.svPosteriorOnLatents
-import svGPFA.stats.svEmbedding
+import svGPFA.stats.variationalDist
+import svGPFA.stats.posteriorOnLatents
+import svGPFA.stats.preIntensity
 import svGPFA.stats.expectedLogLikelihood
 import svGPFA.stats.klDivergence
 import svGPFA.stats.svLowerBound
@@ -61,25 +61,26 @@ def test_eval_pointProcess():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-    qKAllTimes = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(
-        svPosteriorOnIndPoints=qU,
+    indPointsLocsAndQuadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    qKQuadTimes = svGPFA.stats.posteriorOnLatents.PosteriorOnLatentsQuadTimes(
+        variationalDist=qU,
         indPointsLocsKMS=indPointsLocsKMS,
-        indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-    qKAssocTimes = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(
-        svPosteriorOnIndPoints=qU,
+        indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
+    qKSpikesTimes = svGPFA.stats.posteriorOnLatents.PosteriorOnLatentsSpikesTimes(
+        variationalDist=qU,
         indPointsLocsKMS=indPointsLocsKMS,
-        indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-    qHAllTimes = svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qKAllTimes)
-    qHAssocTimes = svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=
-                                               qKAssocTimes)
-    eLL = svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink(svEmbeddingAllTimes=qHAllTimes,
-                                 svEmbeddingAssocTimes=qHAssocTimes)
+        indPointsLocsAndTimesKMS=indPointsLocsAndSpikesTimesKMS)
+    qHQuadTimes = svGPFA.stats.preIntensity.LinearPreIntensityQuadTimes(posteriorOnLatents=qKQuadTimes)
+    qHSpikesTimes = svGPFA.stats.preIntensity.LinearPreIntensitySpikesTimes(
+        posteriorOnLatents=qKSpikesTimes)
+    eLL = svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink(
+        preIntensityQuadTimes=qHQuadTimes,
+        preIntensitySpikesTimes=qHSpikesTimes)
     klDiv = svGPFA.stats.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
-                         svPosteriorOnIndPoints=qU)
+                         variationalDist=qU)
     svlb = svGPFA.stats.svLowerBound.SVLowerBound(eLL=eLL, klDiv=klDiv)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
@@ -143,9 +144,9 @@ def test_eval_pointProcess():
 # 
 #     qU = InducingPointsPrior(qMu=qMu, qSVec=qSVec, qSDiag=qSDiag, varRnk=torch.ones(3,dtype=torch.uint8))
 #     kernelsMatricesStore = KernelMatricesStore(kernels=kernels, Z=Z, t=t, Y=Y)
-#     qH = ApproxPosteriorForHForAllNeuronsAllTimes(C=C, d=b, inducingPointsPrior=qU, kernelsMatricesStore=kernelsMatricesStore)
+#     qH = ApproxPosteriorForHForAllNeuronsQuadTimes(C=C, d=b, inducingPointsPrior=qU, kernelsMatricesStore=kernelsMatricesStore)
 # 
-#     eLL = PoissonExpectedLogLikelihood(approxPosteriorForHForAllNeuronsAllTimes=qH, hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction, Y=Y, binWidth=binWidth)
+#     eLL = PoissonExpectedLogLikelihood(approxPosteriorForHForAllNeuronsQuadTimes=qH, hermQuadPoints=hermQuadPoints, hermQuadWeights=hermQuadWeights, linkFunction=linkFunction, Y=Y, binWidth=binWidth)
 #     klDiv = KLDivergence(kernelsMatricesStore=kernelsMatricesStore, inducingPointsPrior=qU)
 #     svlb = SparseVariationalLowerBound(eLL=eLL, klDiv=klDiv)
 #     lbEval = svlb.eval()

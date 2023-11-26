@@ -2,7 +2,7 @@ import sys
 import os
 from scipy.io import loadmat
 import torch
-import svGPFA.stats.svPosteriorOnIndPoints
+import svGPFA.stats.variationalDist
 import svGPFA.utils.miscUtils
 
 # def test_get_flattened_params():
@@ -20,9 +20,9 @@ import svGPFA.utils.miscUtils
 #     for k in range(nLatents):
 #         true_flattened_params.extend(srQSigma0Vecs[k].flatten().tolist())
 # 
-#     svPosteriorOnIndPoints = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
-#     svPosteriorOnIndPoints.setInitialParams(initial_params=initial_params)
-#     flattened_params = svPosteriorOnIndPoints.get_flattened_params()
+#     variationalDist = stats.svGPFA.variationalDist.VariationalDistChol()
+#     variationalDist.setInitialParams(initial_params=initial_params)
+#     flattened_params = variationalDist.get_flattened_params()
 # 
 #     assert(flattened_params==true_flattened_params)
 # 
@@ -35,17 +35,17 @@ import svGPFA.utils.miscUtils
 #     qMu0_1 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
 #     srQSigma0Vecs_1 = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
 #     initial_params_1 = {"qMu0": qMu0_1, "srQSigma0Vecs": srQSigma0Vecs_1}
-#     svPosteriorOnIndPoints_1 = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
-#     svPosteriorOnIndPoints_1.setInitialParams(initial_params=initial_params_1)
-#     flattened_params_1 = svPosteriorOnIndPoints_1.get_flattened_params()
+#     variationalDist_1 = stats.svGPFA.variationalDist.VariationalDistChol()
+#     variationalDist_1.setInitialParams(initial_params=initial_params_1)
+#     flattened_params_1 = variationalDist_1.get_flattened_params()
 # 
 #     qMu0_2 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
 #     srQSigma0Vecs_2 = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
 #     initial_params_2 = {"qMu0": qMu0_2, "srQSigma0Vecs": srQSigma0Vecs_2}
-#     svPosteriorOnIndPoints_2 = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
-#     svPosteriorOnIndPoints_2.setInitialParams(initial_params=initial_params_2)
-#     svPosteriorOnIndPoints_2.set_params_from_flattened(flattened_params=flattened_params_1)
-#     flattened_params_2 = svPosteriorOnIndPoints_2.get_flattened_params()
+#     variationalDist_2 = stats.svGPFA.variationalDist.VariationalDistChol()
+#     variationalDist_2.setInitialParams(initial_params=initial_params_2)
+#     variationalDist_2.set_params_from_flattened(flattened_params=flattened_params_1)
+#     flattened_params_2 = variationalDist_2.get_flattened_params()
 # 
 #     assert(flattened_params_1==flattened_params_2)
 # 
@@ -58,15 +58,15 @@ import svGPFA.utils.miscUtils
 #     qMu0 = [torch.rand((nTrials, nIndPoints[k], 1), dtype=torch.double) for k in range(nLatents)]
 #     srQSigma0Vecs = [torch.rand((nTrials, int(((nIndPoints[k]+1)*nIndPoints[k])/2), 1), dtype=torch.double) for k in range(nLatents)]
 #     initial_params = {"qMu0": qMu0, "srQSigma0Vecs": srQSigma0Vecs}
-#     svPosteriorOnIndPoints = stats.svGPFA.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
-#     svPosteriorOnIndPoints.setInitialParams(initial_params=initial_params)
-#     svPosteriorOnIndPoints.set_params_requires_grad(requires_grad=True)
-#     params = svPosteriorOnIndPoints.getParams()
+#     variationalDist = stats.svGPFA.variationalDist.VariationalDistChol()
+#     variationalDist.setInitialParams(initial_params=initial_params)
+#     variationalDist.set_params_requires_grad(requires_grad=True)
+#     params = variationalDist.getParams()
 #     for param in params:
 #         assert(param.requires_grad)
 # 
-#     svPosteriorOnIndPoints.set_params_requires_grad(requires_grad=False)
-#     params = svPosteriorOnIndPoints.getParams()
+#     variationalDist.set_params_requires_grad(requires_grad=False)
+#     params = variationalDist.getParams()
 #     for param in params:
 #         assert(not param.requires_grad)
 
@@ -84,9 +84,10 @@ def test_buildCov():
     qMu0 = [[] for i in range(nLatents)]
 
     params0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     qU.setInitialParams(initial_params=params0)
-    qSigma = qU.buildCov();
+    qU.buildCov();
+    qSigma = qU.getCov();
 
     error = torch.tensor([(qSigma[k]-q_sigma[k]).norm() for k in range(len(qSigma))]).sum()
 

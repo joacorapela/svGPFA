@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import svGPFA.utils.miscUtils
 import svGPFA.stats.kernels
-import svGPFA.stats.svPosteriorOnIndPoints
+import svGPFA.stats.variationalDist
 import svGPFA.stats.kernelsMatricesStore
 import svGPFA.stats.klDivergence
 
@@ -46,9 +46,9 @@ def test_evalSumAcrossLatentsTrials():
                   "inducing_points_locs0": Z0}
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     klDiv = svGPFA.stats.klDivergence.KLDivergence(indPointsLocsKMS=indPointsLocsKMS,
-                         svPosteriorOnIndPoints=qU)
+                                                   variationalDist=qU)
 
     qU.setInitialParams(initial_params=qUParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)

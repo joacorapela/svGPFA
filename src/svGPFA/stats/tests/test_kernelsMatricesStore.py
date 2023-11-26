@@ -42,7 +42,7 @@ def test_eval_IndPointsLocsKMS():
 
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices_fromSpikes.mat")
     mat = loadmat(dataFilename)
-    Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
+    Y = [torch.from_numpy(mat['Y'][r,0]).type(torch.DoubleTensor) for r in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
@@ -67,7 +67,7 @@ def test_eval_IndPointsLocsKMS():
         assert(error<tolKzzi)
     '''
 
-def test_eval_IndPointsLocsAndAllTimesKMS():
+def test_eval_IndPointsLocsAndQuadTimesKMS():
     tol = 1e-5
     tolKzzi = 6e-2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
@@ -101,29 +101,29 @@ def test_eval_IndPointsLocsAndAllTimesKMS():
 
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices_fromSpikes.mat")
     mat = loadmat(dataFilename)
-    Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
+    Y = [torch.from_numpy(mat['Y'][r,0]).type(torch.DoubleTensor) for r in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
     kmsParams0 = {"kernels_params0": kernelsParams0,
                   "inducing_points_locs0": Z0}
 
-    indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-    indPointsLocsAndAllTimesKMS.setKernels(kernels=kernels)
-    indPointsLocsAndAllTimesKMS.setTimes(times=t)
-    indPointsLocsAndAllTimesKMS.setInitialParams(initial_params=kmsParams0)
-    indPointsLocsAndAllTimesKMS.buildKernelsMatrices()
+    indPointsLocsAndQuadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    indPointsLocsAndQuadTimesKMS.setKernels(kernels=kernels)
+    indPointsLocsAndQuadTimesKMS.setTimes(times=t)
+    indPointsLocsAndQuadTimesKMS.setInitialParams(initial_params=kmsParams0)
+    indPointsLocsAndQuadTimesKMS.buildKernelsMatrices()
 
-    Ktz_allTimes = indPointsLocsAndAllTimesKMS.getKtz()
-    for k in range(len(Ktz_allTimes)):
-        error = math.sqrt(((Ktz_allTimes[k]-leasKtz[k])**2).flatten().mean())
-        assert(error<tol)
+    Ktz_quadTimes = indPointsLocsAndQuadTimesKMS.getKtz()
+    KttDiag_quadTimes = indPointsLocsAndQuadTimesKMS.getKttDiag()
+    for k in range(nLatents):
+        for r in range(nTrials):
+            error = math.sqrt(((Ktz_quadTimes[k][r]-leasKtz[k][r,:,:])**2).flatten().mean())
+            assert(error<tol)
+            error = math.sqrt(((KttDiag_quadTimes[k][r]-leasKttDiag[r,:,k])**2).flatten().mean())
+            assert(error<tol)
 
-    KttDiag_allTimes = indPointsLocsAndAllTimesKMS.getKttDiag()
-    error = math.sqrt(((KttDiag_allTimes-leasKttDiag)**2).flatten().mean())
-    assert(error<tol)
-
-def test_eval_IndPointsLocsAndAssocTimesKMS():
+def test_eval_IndPointsLocsAndSpikesTimesKMS():
     tol = 1e-5
     tolKzzi = 6e-2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
@@ -157,32 +157,32 @@ def test_eval_IndPointsLocsAndAssocTimesKMS():
 
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices_fromSpikes.mat")
     mat = loadmat(dataFilename)
-    Y = [torch.from_numpy(mat['Y'][tr,0]).type(torch.DoubleTensor) for tr in range(nTrials)]
+    Y = [torch.from_numpy(mat['Y'][r,0]).type(torch.DoubleTensor) for r in range(nTrials)]
     leasKtz_spikes = [[torch.from_numpy(mat['Ktz'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
     leasKttDiag_spikes = [[torch.from_numpy(mat['Ktt'][i,j]).type(torch.DoubleTensor) for j in range(nTrials)] for i in range(nLatents)]
 
     kmsParams0 = {"kernels_params0": kernelsParams0,
                   "inducing_points_locs0": Z0}
 
-    indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-    indPointsLocsAndAssocTimesKMS.setKernels(kernels=kernels)
-    indPointsLocsAndAssocTimesKMS.setTimes(times=Y)
-    indPointsLocsAndAssocTimesKMS.setInitialParams(initial_params=kmsParams0)
-    indPointsLocsAndAssocTimesKMS.buildKernelsMatrices()
+    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    indPointsLocsAndSpikesTimesKMS.setKernels(kernels=kernels)
+    indPointsLocsAndSpikesTimesKMS.setTimes(times=Y)
+    indPointsLocsAndSpikesTimesKMS.setInitialParams(initial_params=kmsParams0)
+    indPointsLocsAndSpikesTimesKMS.buildKernelsMatrices()
 
-    Ktz_associatedTimes = indPointsLocsAndAssocTimesKMS.getKtz()
+    Ktz_spikesTimes = indPointsLocsAndSpikesTimesKMS.getKtz()
     for k in range(nLatents):
-        for tr in range(nTrials):
-            error = math.sqrt(((Ktz_associatedTimes[k][tr]-leasKtz_spikes[k][tr])**2).flatten().mean())
+        for r in range(nTrials):
+            error = math.sqrt(((Ktz_spikesTimes[k][r]-leasKtz_spikes[k][r])**2).flatten().mean())
         assert(error<tol)
 
-    KttDiag_associatedTimes = indPointsLocsAndAssocTimesKMS.getKttDiag()
+    KttDiag_spikesTimes = indPointsLocsAndSpikesTimesKMS.getKttDiag()
     for k in range(nLatents):
-        for tr in range(nTrials):
-            error = math.sqrt(((KttDiag_associatedTimes[k][tr]-leasKttDiag_spikes[k][tr])**2).flatten().mean())
+        for r in range(nTrials):
+            error = math.sqrt(((KttDiag_spikesTimes[k][r]-leasKttDiag_spikes[k][r])**2).flatten().mean())
             assert(error<tol)
 
 if __name__=='__main__':
     test_eval_IndPointsLocsKMS()
-    test_eval_IndPointsLocsAndAllTimesKMS()
-    test_eval_IndPointsLocsAndAssocTimesKMS()
+    test_eval_IndPointsLocsAndQuadTimesKMS()
+    test_eval_IndPointsLocsAndSpikesTimesKMS()

@@ -8,11 +8,11 @@ import torch
 import svGPFA.utils.miscUtils
 import svGPFA.stats.kernels
 import svGPFA.stats.kernelsMatricesStore
-import svGPFA.stats.svPosteriorOnIndPoints
-import svGPFA.stats.svPosteriorOnLatents
-import svGPFA.stats.svEmbedding
+import svGPFA.stats.variationalDist
+import svGPFA.stats.posteriorOnLatents
+import svGPFA.stats.preIntensity
 
-def test_computeMeansAndVars_allTimes():
+def test_computeMeansAndVars_quadTimes():
     tol = 5e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
@@ -48,14 +48,13 @@ def test_computeMeansAndVars_allTimes():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    indPointsLocsAndAllTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-    qK = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAllTimes(svPosteriorOnIndPoints=qU, 
-                                      indPointsLocsKMS=indPointsLocsKMS, 
-                                      indPointsLocsAndTimesKMS=
-                                       indPointsLocsAndAllTimesKMS)
-    qH = svGPFA.stats.svEmbedding.LinearSVEmbeddingAllTimes(svPosteriorOnLatents=qK)
+    indPointsLocsAndQuadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatentsQuadTimes(
+        variationalDist=qU, indPointsLocsKMS=indPointsLocsKMS,
+        indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
+    qH = svGPFA.stats.preIntensity.LinearPreIntensityQuadTimes(posteriorOnLatents=qK)
     qH.setKernels(kernels=kernels)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
@@ -72,12 +71,14 @@ def test_computeMeansAndVars_allTimes():
     qH.buildKernelsMatrices()
     qHMu, qHVar = qH.computeMeansAndVars()
 
-    qHMuError = math.sqrt(((mu_h-qHMu)**2).mean())
-    assert(qHMuError<tol)
-    qHVarError = math.sqrt(((var_h-qHVar)**2).mean())
-    assert(qHVarError<tol)
+    n_trials = len(qHMu)
+    for r in range(n_trials):
+        qHMuError = math.sqrt(((mu_h[r,:,:]-qHMu[k])**2).mean())
+        assert(qHMuError<tol)
+        qHVarError = math.sqrt(((var_h[r,:,:]-qHVar[k])**2).mean())
+        assert(qHVarError<tol)
 
-def test_computeMeansAndVars_assocTimes():
+def test_computeMeansAndVars_spikesTimes():
     tol = 5e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
@@ -114,14 +115,13 @@ def test_computeMeansAndVars_assocTimes():
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    qU = svGPFA.stats.svPosteriorOnIndPoints.SVPosteriorOnIndPointsChol()
+    qU = svGPFA.stats.variationalDist.VariationalDistChol()
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol()
-    indPointsLocsAndAssocTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-    qK = svGPFA.stats.svPosteriorOnLatents.SVPosteriorOnLatentsAssocTimes(svPosteriorOnIndPoints=qU, 
-                                        indPointsLocsKMS=indPointsLocsKMS, 
-                                        indPointsLocsAndTimesKMS=
-                                         indPointsLocsAndAssocTimesKMS)
-    qH = svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes(svPosteriorOnLatents=qK)
+    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+    qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatentsSpikesTimes(
+        variationalDist=qU, indPointsLocsKMS=indPointsLocsKMS,
+        indPointsLocsAndTimesKMS=indPointsLocsAndSpikesTimesKMS)
+    qH = svGPFA.stats.preIntensity.LinearPreIntensitySpikesTimes(posteriorOnLatents=qK)
     qH.setKernels(kernels=kernels)
 
     qUParams0 = {"mean": qMu0, "cholVecs": srQSigma0Vecs}
@@ -137,16 +137,16 @@ def test_computeMeansAndVars_assocTimes():
     qH.setTimes(times=Y)
     qH.setNeuronForSpikeIndex(neuronForSpikeIndex=index)
 
-    # begin patches because we are not using SVPosteriorOnLatentsAssocTimes in 
-    # conjunction with SVPosteriorOnLatentsAllTimes
+    # begin patches because we are not using PosteriorOnLatentsSpikesTimes in 
+    # conjunction with PosteriorOnLatentsQuadTimes
     qU.setInitialParams(initial_params=qUParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setInitialParams(initial_params=kmsParams0)
     indPointsLocsKMS.setKernels(kernels=kernels)
     indPointsLocsKMS.setRegParam(reg_param=1e-5) # Fix: need to read indPointsLocsKMSRegEpsilon from Matlab's CI test data
     indPointsLocsKMS.buildKernelsMatrices()
-    # end patches because we are not using SVPosteriorOnLatentsAssocTimes in 
-    # conjunction with SVPosteriorOnLatentsAllTimes
+    # end patches because we are not using PosteriorOnLatentsSpikesTimes in 
+    # conjunction with PosteriorOnLatentsQuadTimes
 
     qH.buildKernelsMatrices()
     qHMu, qHVar = qH.computeMeansAndVars()
@@ -159,5 +159,5 @@ def test_computeMeansAndVars_assocTimes():
         assert(qHVarError<tol)
 
 if __name__=="__main__":
-    test_computeMeansAndVars_allTimes()
-    test_computeMeansAndVars_assocTimes()
+    test_computeMeansAndVars_quadTimes()
+    test_computeMeansAndVars_spikesTimes()
