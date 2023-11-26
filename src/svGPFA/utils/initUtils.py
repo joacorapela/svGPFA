@@ -106,11 +106,14 @@ def getOptimParams(dynamic_params_spec, config_file_params_spec,
 
 
 def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
-                         n_ind_points=None, common_n_ind_points=10, n_quad=200,
+                         n_ind_points=None, common_n_ind_points=10,
+                         n_quad=None, common_n_quad=200,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
                          lengthscale=1.0, em_max_iter=50):
     if n_ind_points is None:
         n_ind_points = [common_n_ind_points] * n_latents
+    if n_quad is None:
+        n_quad = [common_n_quad] * n_latents
     var_mean0 = [torch.zeros((n_trials, n_ind_points[k], 1),
                              dtype=torch.double)
                  for k in range(n_latents)]
@@ -176,7 +179,14 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
             "mstep_indpointslocs_lr": 1.0,
             "mstep_indpointslocs_tolerance_grad": 1e-7,
             "mstep_indpointslocs_tolerance_change": 1e-9,
-            "mstep_indpointslocs_line_search_fn": "strong_wolfe"}
+            "mstep_indpointslocs_line_search_fn": "strong_wolfe",
+            #
+            "allsteps_estimate": True,
+            "allsteps_max_iter": 20,
+            "allsteps_lr": 1.0,
+            "allsteps_tolerance_grad": 1e-7,
+            "allsteps_tolerance_change": 1e-9,
+            "allsteps_line_search_fn": "strong_wolfe"}
     }
     return params_dict
 
@@ -276,7 +286,7 @@ def getArgsInfo():
                      "ind_points_locs0_filename_latent{:d}_trial{:d}": str,
                  },
                  "optim_params": {
-                     "n_quad": int,
+                     "n_quad": strTo1DIntTensor,
                      "prior_cov_reg_param": float,
                      "optim_method": str,
                      "em_max_iter": int,
