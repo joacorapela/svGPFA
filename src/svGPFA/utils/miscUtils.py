@@ -234,14 +234,14 @@ def getLegQuadPointsAndWeights(n_quad, trials_start_times, trials_end_times,
                                dtype=torch.double):
     n_trials = len(trials_start_times)
     assert(n_trials == len(trials_end_times))
-    leg_quad_points = [torch.empty((n_quad, 1), dtype=dtype)
+    leg_quad_points = [torch.empty((n_quad[r], 1), dtype=dtype)
                        for r in range(n_trials)]
-    leg_quad_weights = [torch.empty((n_quad, 1), dtype=dtype)
+    leg_quad_weights = [torch.empty((n_quad[r], 1), dtype=dtype)
                         for r in range(n_trials)]
     for r in range(n_trials):
         leg_quad_points[r][:, 0], leg_quad_weights[r][:, 0] = \
                 gcnu_common.numerical_methods.utils.leggaussVarLimits(
-                    n=n_quad, a=trials_start_times[r], b=trials_end_times[r])
+                    n=n_quad[r], a=trials_start_times[r], b=trials_end_times[r])
     return leg_quad_points, leg_quad_weights
 
 
