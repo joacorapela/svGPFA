@@ -26,7 +26,7 @@ class ExpectedLogLikelihood(ABC):
         pass
 
     @abstractmethod
-    def computeSVPosteriorOnLatentsStats(self):
+    def computePosteriorOnLatentsStats(self):
         pass
 
     @abstractmethod
@@ -64,10 +64,10 @@ class ExpectedLogLikelihood(ABC):
                    for n in range(nNeurons)] for r in range(nTrials)]
         return answer
 
-    def getSVPosteriorOnIndPointsParams(self):
-        return self._preIntensityQuadTimes.getSVPosteriorOnIndPointsParams()
+    def getVariationalDistParams(self):
+        return self._preIntensityQuadTimes.getVariationalDistParams()
 
-    def getSVEmbeddingParams(self):
+    def getPreIntensityParams(self):
         return self._preIntensityQuadTimes.getParams()
 
     def computeEmbeddingsMeansAndVarsAtTimes(self, times):
@@ -119,7 +119,7 @@ class PointProcessELL(ExpectedLogLikelihood):
         # self._legQuadWeights[r] \in nQuadHerm x 1
         # eLinkValues[r] \in  nQuadHerm x nNeurons
         # aux1[r] \in  1 x nNeurons
-        aux1 = [torch.matmul(self._leqQuadWeights[r].T, eLinkValues[r]) for r in range(nTrials)]
+        aux1 = [torch.matmul(self._legQuadWeights[r].T, eLinkValues[r]) for r in range(nTrials)]
         sELLTerm1 = torch.sum(torch.cat([aux1[r] for r in range(nTrials)]))
         sELLTerm2 = torch.sum(eLogLinkValues)
         answer = -sELLTerm1+sELLTerm2
@@ -132,11 +132,11 @@ class PointProcessELL(ExpectedLogLikelihood):
     def buildVariationalCov(self):
         self._preIntensityQuadTimes.buildVariationalCov()
 
-    def computeSVPosteriorOnLatentsStats(self):
+    def computePosteriorOnLatentsStats(self):
         quadTimesStats = self._preIntensityQuadTimes.\
-            computeSVPosteriorOnLatentsStats()
+            computePosteriorOnLatentsStats()
         spikesTimesStats = self._preIntensitySpikesTimes.\
-            computeSVPosteriorOnLatentsStats()
+            computePosteriorOnLatentsStats()
         answer = {"quadTimes": quadTimesStats, "spikesTimes": spikesTimesStats}
         return answer
 
@@ -198,7 +198,9 @@ class PointProcessELLExpLink(PointProcessELL):
 
     def _getELinkValues(self, eMean, eVar):
         # eLinkValues[r] \in nQuadLeg x nNeurons
-        eLinkValues[r] = [self._linkFunction(input=eMean[r]+0.5*eVar[r])
+        n_trials = len(eMean)
+        eLinkValues = [self._linkFunction(input=eMean[r]+0.5*eVar[r])
+                       for r in range(n_trials)]
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
@@ -219,8 +221,9 @@ class PointProcessELLQuad(PointProcessELL):
         self._hermQuadPoints = eLLCalculationParams["hermQuadPoints"]
 
     def _getELinkValues(self, eMean, eVar):
-        # aux2 \in  nTrials x nQuadLeg x nNeurons
-        aux2 = torch.sqrt(2*eVar)
+        n_trials = len(eMean)
+        # aux2[r] \in  nQuadLeg x nNeurons
+        aux2 = [torch.sqrt(2*eVar[r]) for r in range(n_trials)]
         # aux3 \in nTrials x nQuadLeg x nNeurons x nQuadLeg
         aux3 = torch.einsum('ijk,l->ijkl', aux2, torch.squeeze(self._hermQuadPoints))
         # aux4 \in nQuad x nQuadLeg x nTrials x nQuadLeg
@@ -256,8 +259,8 @@ class PoissonELL(ExpectedLogLikelihood):
         self._binWidth = times[0,1,0]-times[0,0,0]
         self._preIntensityQuadTimes.setTimes(times=times)
 
-    def computeSVPosteriorOnLatentsStats(self):
-        answer = self._preIntensityQuadTimes.computeSVPosteriorOnLatentsStats()
+    def computePosteriorOnLatentsStats(self):
+        answer = self._preIntensityQuadTimes.computePosteriorOnLatentsStats()
         return answer
 
     def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
