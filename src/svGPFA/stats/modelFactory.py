@@ -1,8 +1,8 @@
 
 import svGPFA.stats.kernelsMatricesStore
-import svGPFA.stats.svPosteriorOnIndPoints
-import svGPFA.stats.svPosteriorOnLatents
-import svGPFA.stats.svEmbedding
+import svGPFA.stats.variationalDist
+import svGPFA.stats.posteriorOnLatents
+import svGPFA.stats.preIntensity
 import svGPFA.stats.expectedLogLikelihood
 import svGPFA.stats.klDivergence
 import svGPFA.stats.svLowerBound
@@ -16,7 +16,7 @@ Gaussian = 2
 
 
 #:
-LinearEmbedding = 100
+LinearPreIntensity = 100
 
 #:
 ExponentialLink = 1000
@@ -39,7 +39,7 @@ class ModelFactory:
     @staticmethod
     def buildModelPyTorch(kernels, conditionalDist=PointProcess,
                           linkFunction=ExponentialLink,
-                          embeddingType=LinearEmbedding,
+                          preIntensityType=LinearPreIntensity,
                           kernelMatrixInvMethod=kernelMatrixInvChol,
                           indPointsCovRep=indPointsCovChol):
         """Creates an svGPFA model. :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setInitialDataAndParams` should be invoked before using the created model as argument to :meth:`svGPFA.stats.svEM.SVEM.maximize`.
@@ -48,8 +48,8 @@ class ModelFactory:
         :type kernels: list of instances from subclass of (:class:`svGPFA.stats.kernel.Kernel`)
         :param conditionalDist: likelihood distribution (e.g., svGPFA.stats.ModelFactory.PointProcess or svGPFA.stats.ModelFactory.Gaussian)
         :type conditionalDist: int
-        :param embeddingType: type of embedding (e.g., svGPFA.stats.ModelFactory.LinearEmbedding)
-        :type embeddingType: int
+        :param preIntensityType: type of preIntensity (e.g., svGPFA.stats.ModelFactory.LinearPreIntensity)
+        :type preIntensityType: int
 
         :return: an unitialized model. Parameters and data need to be set (by calling :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData`) before invoking :meth:`svGPFA.stats.svEM.SVEM.maximize`.
         :rtype: an instance of :class:`svGPFA.stats.svLowerBound.SVLowerBound`.
@@ -57,14 +57,14 @@ class ModelFactory:
         """
 
         if conditionalDist == PointProcess:
-            if embeddingType == LinearEmbedding:
+            if preIntensityType == LinearPreIntensity:
                 if linkFunction == ExponentialLink:
                     if indPointsCovRep == indPointsCovChol:
-                        qU = svGPFA.stats.svPosteriorOnIndPoints.\
-                                SVPosteriorOnIndPointsChol()
+                        qU = svGPFA.stats.variationalDist.\
+                                VariationalDistChol()
                     elif indPointsCovRep == indPointsCovRank1PlusDiag:
-                        qU = svGPFA.stats.svPosteriorOnIndPoints.\
-                                SVPosteriorOnIndPointsRank1PlusDiag()
+                        qU = svGPFA.stats.variationalDist.\
+                                VariationalDistRank1PlusDiag()
                     else:
                         raise ValueError("Invalid indPointsCovRep")
                     if kernelMatrixInvMethod == kernelMatrixInvChol:
@@ -75,32 +75,32 @@ class ModelFactory:
                                 IndPointsLocsKMS_PInv()
                     else:
                         raise ValueError("Invalid kernelMatrixInvMethod")
-                    indPointsLocsAndAllTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-                    indPointsLocsAndAssocTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-                    qKAllTimes = svGPFA.stats.svPosteriorOnLatents.\
-                        SVPosteriorOnLatentsAllTimes(
-                            svPosteriorOnIndPoints=qU,
+                    indPointsLocsAndQuadTimesKMS = svGPFA.stats.\
+                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+                    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.\
+                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+                    qKQuadTimes = svGPFA.stats.posteriorOnLatents.\
+                        PosteriorOnLatentsQuadTimes(
+                            variationalDist=qU,
                             indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-                    qKAssocTimes = svGPFA.stats.svPosteriorOnLatents.\
-                        SVPosteriorOnLatentsAssocTimes(
-                            svPosteriorOnIndPoints=qU,
+                            indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
+                    qKSpikesTimes = svGPFA.stats.posteriorOnLatents.\
+                        PosteriorOnLatentsSpikesTimes(
+                            variationalDist=qU,
                             indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-                    qHAllTimes = svGPFA.stats.svEmbedding.\
-                        LinearSVEmbeddingAllTimes(
-                            svPosteriorOnLatents=qKAllTimes)
-                    qHAssocTimes = svGPFA.stats.svEmbedding.\
-                        LinearSVEmbeddingAssocTimes(
-                            svPosteriorOnLatents=qKAssocTimes)
+                            indPointsLocsAndTimesKMS=indPointsLocsAndSpikesTimesKMS)
+                    qHQuadTimes = svGPFA.stats.preIntensity.\
+                        LinearPreIntensityQuadTimes(
+                            posteriorOnLatents=qKQuadTimes)
+                    qHSpikesTimes = svGPFA.stats.preIntensity.\
+                        LinearPreIntensitySpikesTimes(
+                            posteriorOnLatents=qKSpikesTimes)
                     eLL = svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink(
-                        svEmbeddingAllTimes=qHAllTimes,
-                        svEmbeddingAssocTimes=qHAssocTimes)
+                        preIntensityQuadTimes=qHQuadTimes,
+                        preIntensitySpikesTimes=qHSpikesTimes)
                     klDiv = svGPFA.stats.klDivergence.KLDivergence(
                         indPointsLocsKMS=indPointsLocsKMS,
-                        svPosteriorOnIndPoints=qU)
+                        variationalDist=qU)
                     svlb = svGPFA.stats.svLowerBound.SVLowerBound(eLL=eLL,
                                                                   klDiv=klDiv)
                     svlb.setKernels(kernels=kernels)
@@ -108,13 +108,13 @@ class ModelFactory:
                     raise ValueError("Invalid linkFunction={:s}".
                                      format(repr(linkFunction)))
             else:
-                raise ValueError("Invalid embeddingType={:s}".
-                                 format(repr(embeddingType)))
+                raise ValueError("Invalid preIntensityType={:s}".
+                                 format(repr(preIntensityType)))
         elif conditionalDist == Poisson:
-            if embeddingType == LinearEmbedding:
+            if preIntensityType == LinearPreIntensity:
                 if linkFunction == ExponentialLink:
-                    qU = svGPFA.stats.svPosteriorOnIndPoints.\
-                            SVPosteriorOnIndPoints()
+                    qU = svGPFA.stats.variationalDist.\
+                            VariationalDist()
                     if kernelMatrixInvMethod == kernelMatrixInvChol:
                         indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.\
                                 IndPointsLocsKMS_Chol()
@@ -123,21 +123,21 @@ class ModelFactory:
                                 IndPointsLocsKMS_Pinv()
                     else:
                         raise ValueError("Invalid kernelMatrixInvMethod")
-                    indPointsLocsAndAllTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-                    qKAllTimes = svGPFA.stats.svPosteriorOnLatents.\
-                        SVPosteriorOnLatentsAllTimes(
-                            svPosteriorOnIndPoints=qU,
+                    indPointsLocsAndQuadTimesKMS = svGPFA.stats.\
+                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+                    qKQuadTimes = svGPFA.stats.posteriorOnLatents.\
+                        PosteriorOnLatentsQuadTimes(
+                            variationalDist=qU,
                             indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-                    qHAllTimes = svGPFA.stats.svEmbedding.\
-                        LinearSVEmbeddingAllTimes(
-                            svPosteriorOnLatents=qKAllTimes)
+                            indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
+                    qHQuadTimes = svGPFA.stats.preIntensity.\
+                        LinearPreIntensityQuadTimes(
+                            posteriorOnLatents=qKQuadTimes)
                     eLL = svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink(
-                        svEmbeddingAllTimes=qHAllTimes)
+                        preIntensityQuadTimes=qHQuadTimes)
                     klDiv = svGPFA.stats.klDivergence.KLDivergence(
                         indPointsLocsKMS=indPointsLocsKMS,
-                        svPosteriorOnIndPoints=qU)
+                        variationalDist=qU)
                     svlb = svGPFA.stats.svLowerBound.SVLowerBound(eLL=eLL,
                                                                   klDiv=klDiv)
                     svlb.setKernels(kernels=kernels)
@@ -148,18 +148,18 @@ class ModelFactory:
         return svlb
 
     @staticmethod
-    def buildModelSciPy(conditionalDist, linkFunction, embeddingType, kernels,
+    def buildModelSciPy(conditionalDist, linkFunction, preIntensityType, kernels,
                         kernelMatrixInvMethod, indPointsCovRep):
 
         if conditionalDist == PointProcess:
-            if embeddingType == LinearEmbedding:
+            if preIntensityType == LinearPreIntensity:
                 if linkFunction == ExponentialLink:
                     if indPointsCovRep == indPointsCovChol:
-                        qU = svGPFA.stats.svPosteriorOnIndPoints.\
-                            SVPosteriorOnIndPointsCholWithGettersAndSetters()
+                        qU = svGPFA.stats.variationalDist.\
+                            VariationalDistCholWithGettersAndSetters()
                     elif indPointsCovRep == indPointsCovRank1PlusDiag:
-                        qU = svGPFA.stats.svPosteriorOnIndPoints.\
-                            SVPosteriorOnIndPointsRank1PlusDiagWithGettersAndSetters()
+                        qU = svGPFA.stats.variationalDist.\
+                            VariationalDistRank1PlusDiagWithGettersAndSetters()
                     else:
                         raise ValueError("Invalid indPointsCovRep")
                     if kernelMatrixInvMethod == kernelMatrixInvChol:
@@ -170,31 +170,31 @@ class ModelFactory:
                             IndPointsLocsKMS_PInvWithGettersAndSetters()
                     else:
                         raise ValueError("Invalid kernelMatrixInvMethod")
-                    indPointsLocsAndAllTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-                    indPointsLocsAndAssocTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndAssocTimesKMS()
-                    qKAllTimes = svGPFA.stats.svPosteriorOnLatents.\
-                        SVPosteriorOnLatentsAllTimes(
-                            svPosteriorOnIndPoints=qU,
+                    indPointsLocsAndQuadTimesKMS = svGPFA.stats.\
+                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+                    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.\
+                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+                    qKQuadTimes = svGPFA.stats.posteriorOnLatents.\
+                        PosteriorOnLatentsQuadTimes(
+                            variationalDist=qU,
                             indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-                    qKAssocTimes = svGPFA.stats.svPosteriorOnLatents.\
-                            SVPosteriorOnLatentsAssocTimes(
-                                svPosteriorOnIndPoints=qU,
+                            indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
+                    qKSpikesTimes = svGPFA.stats.posteriorOnLatents.\
+                            PosteriorOnLatentsSpikesTimes(
+                                variationalDist=qU,
                                 indPointsLocsKMS=indPointsLocsKMS,
-                                indPointsLocsAndTimesKMS=indPointsLocsAndAssocTimesKMS)
-                    qHAllTimes = svGPFA.stats.svEmbedding.\
-                            LinearSVEmbeddingAllTimesWithParamsGettersAndSetters(
-                                svPosteriorOnLatents=qKAllTimes)
-                    qHAssocTimes = svGPFA.stats.svEmbedding.LinearSVEmbeddingAssocTimes(
-                        svPosteriorOnLatents=qKAssocTimes)
+                                indPointsLocsAndTimesKMS=indPointsLocsAndSpikesTimesKMS)
+                    qHQuadTimes = svGPFA.stats.preIntensity.\
+                            LinearPreIntensityQuadTimesWithParamsGettersAndSetters(
+                                posteriorOnLatents=qKQuadTimes)
+                    qHSpikesTimes = svGPFA.stats.preIntensity.LinearPreIntensitySpikesTimes(
+                        posteriorOnLatents=qKSpikesTimes)
                     eLL = svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink(
-                        svEmbeddingAllTimes=qHAllTimes,
-                        svEmbeddingAssocTimes=qHAssocTimes)
+                        preIntensityQuadTimes=qHQuadTimes,
+                        preIntensitySpikesTimes=qHSpikesTimes)
                     klDiv = svGPFA.stats.klDivergence.KLDivergence(
                         indPointsLocsKMS=indPointsLocsKMS,
-                        svPosteriorOnIndPoints=qU)
+                        variationalDist=qU)
                     svlb = svGPFA.stats.svLowerBound.\
                         SVLowerBoundWithParamsGettersAndSetters(eLL=eLL,
                                                                 klDiv=klDiv)
@@ -203,13 +203,13 @@ class ModelFactory:
                     raise ValueError("Invalid linkFunction={:s}".
                                      format(repr(linkFunction)))
             else:
-                raise ValueError("Invalid embeddingType={:s}".
-                                 format(repr(embeddingType)))
+                raise ValueError("Invalid preIntensityType={:s}".
+                                 format(repr(preIntensityType)))
         elif conditionalDist == Poisson:
-            if embeddingType == LinearEmbedding:
+            if preIntensityType == LinearPreIntensity:
                 if linkFunction == ExponentialLink:
-                    qU = svGPFA.stats.svPosteriorOnIndPoints.\
-                        SVPosteriorOnIndPoints()
+                    qU = svGPFA.stats.variationalDist.\
+                        VariationalDist()
                     if kernelMatrixInvMethod == kernelMatrixInvChol:
                         indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.\
                             IndPointsLocsKMS_Chol()
@@ -218,21 +218,21 @@ class ModelFactory:
                             IndPointsLocsKMS_Pinv()
                     else:
                         raise ValueError("Invalid kernelMatrixInvMethod")
-                    indPointsLocsAndAllTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndAllTimesKMS()
-                    qKAllTimes = svGPFA.stats.svPosteriorOnLatents.\
-                        SVPosteriorOnLatentsAllTimes(
-                            svPosteriorOnIndPoints=qU,
+                    indPointsLocsAndQuadTimesKMS = svGPFA.stats.\
+                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
+                    qKQuadTimes = svGPFA.stats.posteriorOnLatents.\
+                        PosteriorOnLatentsQuadTimes(
+                            variationalDist=qU,
                             indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndAllTimesKMS)
-                    qHAllTimes = svGPFA.stats.svEmbedding.\
-                        LinearSVEmbeddingAllTimes(
-                            svPosteriorOnLatents=qKAllTimes)
+                            indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
+                    qHQuadTimes = svGPFA.stats.preIntensity.\
+                        LinearPreIntensityQuadTimes(
+                            posteriorOnLatents=qKQuadTimes)
                     eLL = svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink(
-                        svEmbeddingAllTimes=qHAllTimes)
+                        preIntensityQuadTimes=qHQuadTimes)
                     klDiv = svGPFA.stats.klDivergence.KLDivergence(
                         indPointsLocsKMS=indPointsLocsKMS,
-                        svPosteriorOnIndPoints=qU)
+                        variationalDist=qU)
                     svlb = svGPFA.stats.svLowerBound.SVLowerBound(
                         eLL=eLL, klDiv=klDiv)
                     svlb.setKernels(kernels=kernels)
