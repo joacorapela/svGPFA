@@ -4,25 +4,25 @@ import torch
 
 class KLDivergence:
 
-    def __init__(self, indPointsLocsKMS, svPosteriorOnIndPoints):
+    def __init__(self, indPointsLocsKMS, variationalDist):
         super(KLDivergence, self).__init__()
         self._indPointsLocsKMS = indPointsLocsKMS
-        self._svPosteriorOnIndPoints = svPosteriorOnIndPoints
+        self._variationalDist = variationalDist
 
     def get_indPointsLocsKMS(self):
         return self._indPointsLocsKMS
 
-    def get_svPosteriorOnIndPoints(self):
-        return self._svPosteriorOnIndPoints
+    def get_variationalDist(self):
+        return self._variationalDist
 
     def evalSumAcrossLatentsAndTrials(self):
         klDiv = 0
-        qSigma = self._svPosteriorOnIndPoints.getCov()
+        qSigma = self._variationalDist.getCov()
         nLatents = len(qSigma)
         for k in range(nLatents):
             klDivK = self._evalSumAcrossTrials(
                 Kzz=self._indPointsLocsKMS.getKzz()[k],
-                qMu=self._svPosteriorOnIndPoints.getMean()[k],
+                qMu=self._variationalDist.getMean()[k],
                 qSigma=qSigma[k],
                 latentIndex=k)
             klDiv += klDivK
