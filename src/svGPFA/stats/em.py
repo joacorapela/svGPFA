@@ -46,7 +46,7 @@ class EM(abc.ABC):
 
 
     @abc.abstractmethod
-    def _mStepEmbedding(self, model, optim_params):
+    def _mStepPreIntensity(self, model, optim_params):
         pass
 
 
@@ -245,7 +245,7 @@ class EM_PyTorch(EM):
         else:
             raise ValueError("Invalid method={:s}. Supported values are ECM and mECM".format(method))
         functions_for_steps = {"estep": self._eStep,
-                               "mstep_embedding": self._mStepEmbedding,
+                               "mstep_embedding": self._mStepPreIntensity,
                                "mstep_kernels": self._mStepKernels,
                                "mstep_indpointslocs": self._mStepIndPointsLocs}
         if getIterationModelParamsFn is not None:
@@ -342,8 +342,8 @@ class EM_PyTorch(EM):
 
     def _allSteps(self, model, optim_params):
         x = []
-        x.extend(model.getSVPosteriorOnIndPointsParams())
-        x.extend(model.getSVEmbeddingParams())
+        x.extend(model.getVariationalDistParams())
+        x.extend(model.getPreIntensityParams())
         x.extend(model.getKernelsParams())
         x.extend(model.getIndPointsLocs())
         def evalFunc():
@@ -351,7 +351,7 @@ class EM_PyTorch(EM):
             model.buildVariationalCov()
             answer = model.eval()
             # begin debug
-            # print(model.getSVPosteriorOnIndPointsParams()[2][0,:,0])
+            # print(model.getVariationalDistParams()[2][0,:,0])
             # end debug
             return answer
         optimizer = torch.optim.LBFGS(x, **optim_params)
@@ -359,7 +359,7 @@ class EM_PyTorch(EM):
         return answer
 
     def _eStep(self, model, optim_params):
-        x = model.getSVPosteriorOnIndPointsParams()
+        x = model.getVariationalDistParams()
         def evalFunc():
             model.buildVariationalCov()
             answer = model.eval()
@@ -368,10 +368,10 @@ class EM_PyTorch(EM):
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
         return answer
 
-    def _mStepEmbedding(self, model, optim_params):
-        x = model.getSVEmbeddingParams()
-        svPosteriorOnLatentsStats = model.computeSVPosteriorOnLatentsStats()
-        evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(svPosteriorOnLatentsStats=svPosteriorOnLatentsStats)
+    def _mStepPreIntensity(self, model, optim_params):
+        x = model.getPreIntensityParams()
+        posteriorOnLatentsStats = model.computePosteriorOnLatentsStats()
+        evalFunc = lambda: model.evalELLSumAcrossTrialsAndNeurons(posteriorOnLatentsStats=posteriorOnLatentsStats)
         # evalFunc = model.eval
         optimizer = torch.optim.LBFGS(x, **optim_params)
         answer = self._setupAndMaximizeStep(x=x, evalFunc=evalFunc, optimizer=optimizer)
@@ -429,3 +429,25 @@ class EM_PyTorch(EM):
         nfeval = stateOneEpoch["func_evals"]
         niter = stateOneEpoch["n_iter"]
         return {"lowerBound": lowerBound, "nfeval": nfeval, "niter": niter}
+
+class TerminationInfo:
+    def __init__(self, message):
+        self._message = message
+
+    @property
+    def message(self):
+        return self._message
+
+class ErrorTerminationInfo(TerminationInfo):
+    def __init__(self, message, error, stack_trace):
+        super().__init__(message=message)
+        self._error = error
+        self._stack_trace = stack_trace
+
+    @property
+    def error(self):
+        return self._error
+
+    @property
+    def stack_trace(self):
+        return self._stack_trace
