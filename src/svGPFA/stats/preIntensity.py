@@ -12,12 +12,12 @@ class PreIntensity(abc.ABC):
         if posteriorOnLatentsStats is None:
             posteriorOnLatentsStats = \
                 self._posteriorOnLatents.computeMeansAndVars()
-        means, vars = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(
+        means, vars = self._computeMeansAndVarsGivenPosteriorOnLatentsStats(
             means=posteriorOnLatentsStats[0],
             vars=posteriorOnLatentsStats[1])
         return means, vars
 
-    def computeSVPosteriorOnLatentsStats(self):
+    def computePosteriorOnLatentsStats(self):
         return self._posteriorOnLatents.computeMeansAndVars()
 
     def buildKernelsMatrices(self):
@@ -43,8 +43,8 @@ class PreIntensity(abc.ABC):
     def getParams(self):
         pass
 
-    def getSVPosteriorOnIndPointsParams(self):
-        return self._posteriorOnLatents.getSVPosteriorOnIndPointsParams()
+    def getVariationalDistParams(self):
+        return self._posteriorOnLatents.getVariationalDistParams()
 
     def getIndPointsLocs(self):
         return self._posteriorOnLatents.getIndPointsLocs()
@@ -56,7 +56,7 @@ class PreIntensity(abc.ABC):
         return self._posteriorOnLatents.getKernelsParams()
 
     @abc.abstractmethod
-    def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
+    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(self, means, vars):
         pass
 
 class LinearPreIntensity(PreIntensity):
@@ -80,14 +80,15 @@ class LinearPreIntensity(PreIntensity):
 
 class LinearPreIntensityQuadTimes(LinearPreIntensity):
 
-    def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
+    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(self, means, vars):
         # means[r], vars[r] \in nQuad[r] x nLatents 
         # emb_post_mean[r], emb_post_var[r] \in nQuad[r] x nNeurons
-        nTrials = len(means)
-        emb_post_mean = [[] for r in nTrials]
-        emb_post_var = [[] for r in nTrials]
-        for r in range(nTrials):
-            emb_post_mean[r] = torch.matmul(means[r], torch.t(self._C)) + self._d.T # using broadcasting
+        n_trials = len(means)
+        n_neurons = self._C.shape[0]
+        emb_post_mean = [[] for r in range(n_trials)]
+        emb_post_var = [[] for r in range(n_trials)]
+        for r in range(n_trials):
+            emb_post_mean[r] = torch.matmul(means[r], torch.t(self._C)) + torch.reshape(self._d, (1, n_neurons)) # using broadcasting
             emb_post_var[r] = torch.matmul(vars[r], self._C.T**2)
         return emb_post_mean, emb_post_var
 
@@ -96,12 +97,12 @@ class LinearPreIntensityQuadTimes(LinearPreIntensity):
 
     def predict(self, times):
         qKMu, qKVar = self._posteriorOnLatents.predict(times=times)
-        answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
+        answer = self._computeMeansAndVarsGivenPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
         return answer
 
     def computeMeansAndVarsAtTimes(self, times):
         qKMu, qKVar = self._posteriorOnLatents.computeMeansAndVarsAtTimes(times=times)
-        answer = self._computeMeansAndVarsGivenSVPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
+        answer = self._computeMeansAndVarsGivenPosteriorOnLatentsStats(means=qKMu, vars=qKVar)
         return answer
 
     def setPriorCovRegParam(self, priorCovRegParam):
@@ -112,13 +113,13 @@ class LinearPreIntensitySpikesTimes(LinearPreIntensity):
     def setNeuronForSpikeIndex(self, neuronForSpikeIndex):
         self._neuronForSpikeIndex = neuronForSpikeIndex
 
-    def _computeMeansAndVarsGivenSVPosteriorOnLatentsStats(self, means, vars):
+    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(self, means, vars):
         # means[r], vars[r] \in nQuad[r] x nLatents 
         # emb_post_mean[r], emb_post_var[r] \in nSpikesFromAllNeuronsInTrial[r]
-        nTrials = len(self._neuronForSpikeIndex)
-        emb_post_mean = [[None] for tr in range(nTrials)]
-        emb_post_var = [[None] for tr in range(nTrials)]
-        for r in range(nTrials):
+        n_trials = len(self._neuronForSpikeIndex)
+        emb_post_mean = [[None] for tr in range(n_trials)]
+        emb_post_var = [[None] for tr in range(n_trials)]
+        for r in range(n_trials):
             emb_post_mean[r] = torch.sum(means[r]*self._C[(self._neuronForSpikeIndex[r]).tolist(),:], dim=1)+self._d[(self._neuronForSpikeIndex[r]).tolist()].squeeze()
             emb_post_var[r] = torch.sum(vars[r]*(self._C[(self._neuronForSpikeIndex[r]).tolist(),:])**2, dim=1)
         return emb_post_mean, emb_post_var
