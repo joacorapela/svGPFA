@@ -1,6 +1,5 @@
 
-import pdb
-import torch
+import jax.numpy as jnp
 import warnings
 
 class SVLowerBound:
@@ -44,13 +43,20 @@ class SVLowerBound:
         self.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
         self.buildKernelsMatrices()
 
-    def eval(self):
-        eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons()
-        klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials()
+    def eval(self, variational_mean, variational_cov, C, d, kernels_matrices):
+        eLLEval = self._eLL.evalSumAcrossTrialsAndNeurons(
+            variational_mean=variational_mean, variational_cov=variational_cov,
+            C=C, d=d, kernels_matrices=kernels_matrices,
+        )
+        klDivEval = self._klDiv.evalSumAcrossLatentsAndTrials(
+            variational_mean=variational_mean, variational_cov=variational_cov,
+            prior_cov=kernels_matrices["Kzz"],
+            prior_cov_inv=kernels_matrices["Kzz_inv"],
+        )
         theEval = eLLEval-klDivEval
-        if torch.isinf(theEval):
+#         if not jnp.isfinite(theEval):
             # raise RuntimeError("infinity lower bound detected")
-            warnings.warn("infinity lower bound detected")
+#             warnings.warn("infinity lower bound detected")
         return theEval
 
     def sampleCIFs(self, times, nudget=1e-3):
