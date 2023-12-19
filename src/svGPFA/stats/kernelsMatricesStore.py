@@ -1,27 +1,23 @@
 
-import pdb
-import torch
+from functools import partial
+from jax import jit
+import jax
+import jax.numpy as jnp
 import abc
 import svGPFA.utils.miscUtils
 
 
 class KernelsMatricesStore(abc.ABC):
 
-    @abc.abstractmethod
-    def buildKernelsMatrices(self):
-        pass
+#     @abc.abstractmethod
+#     def buildKernelsMatrices(self):
+#         pass
 
-    def setKernels(self, kernels):
+    def __init__(self, kernels):
         self._kernels = kernels
 
-    def setInitialParams(self, initial_params):
-        self.setIndPointsLocs(
-            ind_points_locs=initial_params["inducing_points_locs0"])
-        self.setKernelsParams(kernels_params=initial_params["kernels_params0"])
-
-    def setKernelsParams(self, kernels_params):
-        for k in range(len(self._kernels)):
-            self._kernels[k].setParams(kernels_params[k])
+#     def setKernels(self, kernels):
+#         self._kernels = kernels
 
     def setIndPointsLocs(self, ind_points_locs):
         self._ind_points_locs = ind_points_locs
@@ -32,63 +28,43 @@ class KernelsMatricesStore(abc.ABC):
     def getKernels(self):
         return self._kernels
 
-    def getKernelsParams(self):
-        answer = []
-        for i in range(len(self._kernels)):
-            answer.append(self._kernels[i].getParams())
-        return answer
-
 
 class IndPointsLocsKMS(KernelsMatricesStore):
-
-    def setRegParam(self, reg_param):
-        self._reg_param = reg_param
 
     # @abc.abstractmethod
     def _invertKzz3D(self, Kzz):
         pass
 
-    @abc.abstractmethod
-    def solveForLatent(self, input, latentIndex):
+#     @abc.abstractmethod
+#     def solveForLatent(self, Kzz_inv, input, latent_index):
         pass
 
-    @abc.abstractmethod
-    def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
+#     @abc.abstractmethod
+#     def solveForLatentAndTrial(self, Kzz_inv, input, latent_index, trial_index):
         pass
 
-    def buildKernelsMatrices(self):
-        n_latents = len(self._kernels)
-        self._Kzz = [[None] for k in range(n_latents)]
-        self._Kzz_inv = [[None] for k in range(n_latents)]
+    def buildKernelsMatrices(self, kernels_params, ind_points_locs, reg_param):
+        n_latents = len(kernels_params)
+        Kzz = [[None] for k in range(n_latents)]
+        Kzz_inv = [[None] for k in range(n_latents)]
 
         for k in range(n_latents):
-            self._Kzz[k] = (self._kernels[k].buildKernelMatrix(X1=self._ind_points_locs[k])+
-                            self._reg_param*torch.eye(n=self._ind_points_locs[k].shape[1],
-                                                      dtype=self._ind_points_locs[k].dtype,
-                                                      device=self._ind_points_locs[k].device))
-            self._Kzz_inv[k] = self._invertKzz3D(self._Kzz[k]) # O(n^3)
-
-    def getKzz(self):
-        return self._Kzz
-
-    def getRegParam(self):
-        return self._reg_param
+            Kzz[k] = (self._kernels[k].buildKernelMatrixX1(X1=ind_points_locs[k],
+                                                     params=kernels_params[k]) +
+                      reg_param * jnp.eye(N=ind_points_locs[k].shape[1],
+                                          dtype=ind_points_locs[k].dtype))
+            Kzz_inv[k] = self._invertKzz3D(Kzz[k]) # O(n^3)
+        return Kzz, Kzz_inv
 
 
 class IndPointsLocsKMS_Chol(IndPointsLocsKMS):
 
     def _invertKzz3D(self, Kzz):
-        Kzz_inv = svGPFA.utils.miscUtils.chol3D(Kzz)  # O(n^3)
-        return Kzz_inv
+        Kzz_chol = jnp.linalg.cholesky(Kzz) # O(n^3)
+        return Kzz_chol
 
-    def solveForLatent(self, input, latentIndex):
-        # input \in (nTrials, nIndPoints[k], 1)
-        # self._Kzz_inv \ in (nTrials, nIndPoints[k], nIndPoints[k])
-        solve = torch.cholesky_solve(input, self._Kzz_inv[latentIndex])
-        return solve
-
-    def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
-        solve = torch.cholesky_solve(input, self._Kzz_inv[latentIndex][trialIndex, :, :])
+    def solve(self, Kzz_inv, input):
+        solve = jax.scipy.linalg.cho_solve((Kzz_inv, True), input)
         return solve
 
 
@@ -98,12 +74,12 @@ class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
         Kzz_inv = svGPFA.utils.miscUtils.pinv3D(Kzz)  # O(n^3)
         return Kzz_inv
 
-    def solveForLatent(self, input, latentIndex):
-        solve = torch.matmul(self._Kzz_inv[latentIndex], input)
+    def solveForLatent(self, input, latent_index):
+        solve = torch.matmul(self._Kzz_inv[latent_index], input)
         return solve
 
-    def solveForLatentAndTrial(self, input, latentIndex, trialIndex):
-        solve = torch.matmul(self._Kzz_inv[latentIndex][trialIndex, :, :],
+    def solveForLatentAndTrial(self, input, latent_index, trial_index):
+        solve = torch.matmul(self._Kzz_inv[latent_index][trial_index, :, :],
                              input)
         return solve
 
@@ -123,17 +99,35 @@ class IndPointsLocsAndTimesKMS(KernelsMatricesStore):
     def getKttDiag(self):
         return self._KttDiag
 
-    def buildKernelsMatrices(self):
-        n_latents = len(self._ind_points_locs)
-        n_trials = self._ind_points_locs[0].shape[0]
-        self._Ktz = [[[None] for tr in range(n_trials)]
+#     def buildKernelsMatrices(self):
+#         n_latents = len(self._ind_points_locs)
+#         n_trials = self._ind_points_locs[0].shape[0]
+#         self._Ktz = [[[None] for tr in range(n_trials)]
+#                      for k in range(n_latents)]
+#         self._KttDiag = [[[None] for tr in range(n_trials)] for k in
+#                          range(n_latents)]
+# 
+#         for k in range(n_latents):
+#             for tr in range(n_trials):
+#                 self._Ktz[k][tr] = self._kernels[k].buildKernelMatrixX1X2(
+#                     X1=self._t[tr], X2=self._ind_points_locs[k][tr, :, :])
+#                 self._KttDiag[k][tr] = self._kernels[k].buildKernelMatrixDiag(
+#                     X=self._t[tr])
+
+    def buildKernelsMatrices(self, kernels_params, ind_points_locs):
+        n_latents = len(ind_points_locs)
+        n_trials = ind_points_locs[0].shape[0]
+        Ktz = [[[None] for tr in range(n_trials)]
                      for k in range(n_latents)]
-        self._KttDiag = [[[None] for tr in range(n_trials)] for k in
+        KttDiag = [[[None] for tr in range(n_trials)] for k in
                          range(n_latents)]
 
         for k in range(n_latents):
             for tr in range(n_trials):
-                self._Ktz[k][tr] = self._kernels[k].buildKernelMatrix(
-                    X1=self._t[tr], X2=self._ind_points_locs[k][tr, :, :])
-                self._KttDiag[k][tr] = self._kernels[k].buildKernelMatrixDiag(
-                    X=self._t[tr])
+                Ktz[k][tr] = self._kernels[k].buildKernelMatrixX1X2(
+                    X1=self._t[tr], X2=ind_points_locs[k][tr, :, :],
+                    params=kernels_params[k])
+                KttDiag[k][tr] = self._kernels[k].buildKernelMatrixDiag(
+                    X=self._t[tr], params=kernels_params[k])
+
+        return Ktz, KttDiag
