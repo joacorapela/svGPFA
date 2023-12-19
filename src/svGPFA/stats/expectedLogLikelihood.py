@@ -1,7 +1,8 @@
 
 import pdb
 from abc import ABC, abstractmethod
-import torch
+import jax
+import jax.numpy as jnp
 # import warnings
 
 class ExpectedLogLikelihood(ABC):
@@ -10,20 +11,10 @@ class ExpectedLogLikelihood(ABC):
         self._preIntensityQuadTimes = preIntensityQuadTimes
         self._linkFunction = linkFunction
 
-    def getPreIntensityQuadTimes(self):
-        return self._preIntensityQuadTimes
-
     @abstractmethod
     def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
         pass
 
-    @abstractmethod
-    def buildKernelsMatrices(self):
-        pass
-
-    @abstractmethod
-    def buildVariationalCov(self):
-        pass
 
     @abstractmethod
     def computePosteriorOnLatentsStats(self):
@@ -96,21 +87,24 @@ class PointProcessELL(ExpectedLogLikelihood):
         super().__init__(preIntensityQuadTimes=preIntensityQuadTimes, linkFunction=linkFunction)
         self._preIntensitySpikesTimes = preIntensitySpikesTimes
 
-    def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
-        if posteriorOnLatentsStats is not None:
-            posteriorOnLatentsStatsQuadTimes = \
-             posteriorOnLatentsStats["quadTimes"]
-            posteriorOnLatentsStatsSpikesTimes = \
-             posteriorOnLatentsStats["spikesTimes"]
-        else:
-            posteriorOnLatentsStatsQuadTimes = None
-            posteriorOnLatentsStatsSpikesTimes = None
+    def evalSumAcrossTrialsAndNeurons(self, variational_mean, variational_cov,
+                                      C, d, kernels_matrices):
         eMeanQuadTimes, eVarQuadTimes = \
             self._preIntensityQuadTimes.computeMeansAndVars(
-                posteriorOnLatentsStats=posteriorOnLatentsStatsQuadTimes)
+                variational_mean=variational_mean,
+                variational_cov=variational_cov, C=C, d=d,
+                Kzz=kernels_matrices["Kzz"],
+                Kzz_inv=kernels_matrices["Kzz_inv"],
+                Ktz=kernels_matrices["Ktz_quad"],
+                KttDiag=kernels_matrices["KttDiag_quad"])
         eMeanSpikesTimes, eVarSpikesTimes = \
             self._preIntensitySpikesTimes.computeMeansAndVars(
-                posteriorOnLatentsStats=posteriorOnLatentsStatsSpikesTimes)
+                variational_mean=variational_mean,
+                variational_cov=variational_cov, C=C, d=d,
+                Kzz=kernels_matrices["Kzz"],
+                Kzz_inv=kernels_matrices["Kzz_inv"],
+                Ktz=kernels_matrices["Ktz_spike"],
+                KttDiag=kernels_matrices["KttDiag_spike"])
         nTrials = len(eMeanQuadTimes)
         eLinkValues = self._getELinkValues(eMean=eMeanQuadTimes,
                                            eVar=eVarQuadTimes)
@@ -119,18 +113,12 @@ class PointProcessELL(ExpectedLogLikelihood):
         # self._legQuadWeights[r] \in nQuadHerm x 1
         # eLinkValues[r] \in  nQuadHerm x nNeurons
         # aux1[r] \in  1 x nNeurons
-        aux1 = [torch.matmul(self._legQuadWeights[r].T, eLinkValues[r]) for r in range(nTrials)]
-        sELLTerm1 = torch.sum(torch.cat([aux1[r] for r in range(nTrials)]))
-        sELLTerm2 = torch.sum(eLogLinkValues)
+        aux1 = [jnp.matmul(self._legQuadWeights[r].T, eLinkValues[r]) for r in range(nTrials)]
+        # sELLTerm1 = jnp.sum(jnp.cat([aux1[r] for r in range(nTrials)]))
+        sELLTerm1 = jnp.sum(jnp.concatenate([aux1[r] for r in range(nTrials)]))
+        sELLTerm2 = jnp.sum(eLogLinkValues)
         answer = -sELLTerm1+sELLTerm2
         return answer
-
-    def buildKernelsMatrices(self):
-        self._preIntensityQuadTimes.buildKernelsMatrices()
-        self._preIntensitySpikesTimes.buildKernelsMatrices()
-
-    def buildVariationalCov(self):
-        self._preIntensityQuadTimes.buildVariationalCov()
 
     def computePosteriorOnLatentsStats(self):
         quadTimesStats = self._preIntensityQuadTimes.\
@@ -144,7 +132,7 @@ class PointProcessELL(ExpectedLogLikelihood):
 
         stackedSpikeTimes, neuronForSpikeIndex = \
             self.__stackSpikeTimes(spikeTimes=measurements)
-        self._preIntensitySpikesTimes.setTimes(times=stackedSpikeTimes)
+        # self._preIntensitySpikesTimes.setTimes(times=stackedSpikeTimes)
         self._preIntensitySpikesTimes.setNeuronForSpikeIndex(neuronForSpikeIndex=
                                                             neuronForSpikeIndex)
 
@@ -157,13 +145,11 @@ class PointProcessELL(ExpectedLogLikelihood):
             aList = [spikeTime
                      for neuronIndex in range(len(spikeTimes[trialIndex]))
                      for spikeTime in spikeTimes[trialIndex][neuronIndex]]
-            stackedSpikeTimes[trialIndex] = torch.tensor(aList)
-            # stackedSpikeTimes[trialIndex] = torch.unsqueeze(
-            #     stackedSpikeTimes[trialIndex], 1)
+            stackedSpikeTimes[trialIndex] = jnp.array(aList)
             aList = [neuronIndex
                      for neuronIndex in range(len(spikeTimes[trialIndex]))
                      for spikeTime in spikeTimes[trialIndex][neuronIndex]]
-            neuronForSpikeIndex[trialIndex] = torch.tensor(aList)
+            neuronForSpikeIndex[trialIndex] = jnp.array(aList)
         return stackedSpikeTimes, neuronForSpikeIndex
 
     def setIndPointsLocs(self, locs):
@@ -179,7 +165,7 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._preIntensitySpikesTimes.setInitialParams(initial_params=initial_params)
 
     def setELLCalculationParams(self, eLLCalculationParams):
-        self._preIntensityQuadTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
+        # self._preIntensityQuadTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
         self._legQuadWeights = eLLCalculationParams["leg_quad_weights"]
 
     @abstractmethod
@@ -194,18 +180,19 @@ class PointProcessELLExpLink(PointProcessELL):
     def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes):
         super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
                          preIntensitySpikesTimes=preIntensitySpikesTimes,
-                         linkFunction=torch.exp)
+                         linkFunction=jnp.exp)
 
     def _getELinkValues(self, eMean, eVar):
         # eLinkValues[r] \in nQuadLeg x nNeurons
         n_trials = len(eMean)
-        eLinkValues = [self._linkFunction(input=eMean[r]+0.5*eVar[r])
+        eLinkValues = [self._linkFunction(eMean[r]+0.5*eVar[r])
                        for r in range(n_trials)]
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
-        # eLogLink = torch.cat([torch.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
-        eLogLink = torch.cat([eMean[r] for r in range(len(eMean))])
+        # eLogLink = jnp.cat([jnp.squeeze(input=eMean[trial]) for trial in range(len(eMean))])
+        # eLogLink = jnp.cat([eMean[r] for r in range(len(eMean))])
+        eLogLink = jnp.concatenate([eMean[r] for r in range(len(eMean))])
         return eLogLink
 
 class PointProcessELLQuad(PointProcessELL):
@@ -223,15 +210,15 @@ class PointProcessELLQuad(PointProcessELL):
     def _getELinkValues(self, eMean, eVar):
         n_trials = len(eMean)
         # aux2[r] \in  nQuadLeg x nNeurons
-        aux2 = [torch.sqrt(2*eVar[r]) for r in range(n_trials)]
+        aux2 = [jnp.sqrt(2*eVar[r]) for r in range(n_trials)]
         # aux3 \in nTrials x nQuadLeg x nNeurons x nQuadLeg
-        aux3 = torch.einsum('ijk,l->ijkl', aux2, torch.squeeze(self._hermQuadPoints))
+        aux3 = jnp.einsum('ijk,l->ijkl', aux2, jnp.squeeze(self._hermQuadPoints))
         # aux4 \in nQuad x nQuadLeg x nTrials x nQuadLeg
-        aux4 = torch.add(input=aux3, other=eMean.unsqueeze(dim=3))
+        aux4 = jnp.add(input=aux3, other=eMean.unsqueeze(dim=3))
         # aux5 \in nQuad x nQuadLeg x nTrials x nQuadLeg
-        aux5 = self._linkFunction(input=aux4)
+        aux5 = self._linkFunction(aux4)
         # intval \in  nTrials x nQuadHerm x nNeurons
-        eLinkValues = torch.einsum('ijkl,l->ijk', aux5, self._hermQuadWeights.squeeze())
+        eLinkValues = jnp.einsum('ijkl,l->ijk', aux5, self._hermQuadWeights.squeeze())
         return eLinkValues
 
     def _getELogLinkValues(self, eMean, eVar):
@@ -239,16 +226,17 @@ class PointProcessELLQuad(PointProcessELL):
         # aux1[trial] \in nSpikes[trial]
         aux1 = [2*eVar[trial] for trial in range(len(eVar))]
         # aux2[trial] \in nSpikes[trial] x nQuadLeg
-        aux2 = [torch.einsum('i,j->ij', aux1[trial].squeeze(), self._hermQuadPoints.squeeze()) for trial in range(len(aux1))]
+        aux2 = [jnp.einsum('i,j->ij', aux1[trial].squeeze(), self._hermQuadPoints.squeeze()) for trial in range(len(aux1))]
         # aux3[trial] \in nSpikes[trial] x nQuadLeg
-        aux3 = [torch.add(input=aux2[trial],
-                          other=torch.unsqueeze(input=eMean[trial], dim=1))
+        aux3 = [jnp.add(input=aux2[trial],
+                          other=jnp.unsqueeze(input=eMean[trial], dim=1))
                 for trial in range(len(aux2))]
         # aux4[trial] \in nSpikes[trial] x nQuadLeg
-        aux4 = [torch.log(input=self._linkFunction(x=aux3[trial])) for trial in range(len(aux3))]
+        aux4 = [jnp.log(input=self._linkFunction(aux3[trial])) for trial in range(len(aux3))]
         # aux5[trial] \in nSpikes[trial] x 1
-        aux5 = [torch.tensordot(a=aux4[trial], b=self._hermQuadWeights, dims=([1], [0])) for trial in range(len(aux4))]
-        eLogLinkValues = torch.cat(tensors=aux5)
+        aux5 = [jnp.tensordot(a=aux4[trial], b=self._hermQuadWeights, dims=([1], [0])) for trial in range(len(aux4))]
+        # eLogLinkValues = jnp.cat(tensors=aux5)
+        eLogLinkValues = jnp.concatenate(tensors=aux5)
         return eLogLinkValues
 
 
@@ -305,11 +293,11 @@ class PoissonELLExpLink(PoissonELL):
 
     def __init__(self, preIntensityQuadTimes):
         super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
-                         linkFunction=torch.exp)
+                         linkFunction=jnp.exp)
 
     def _getELinkAndELogLinkValues(self, eMean, eVar):
         # intval \in nTrials x nBins x nNeurons
-        eLinkValues = self._linkFunction(input=eMean+0.5*eVar)
+        eLinkValues = self._linkFunction(eMean+0.5*eVar)
         eLogLinkValues = eMean
         return eLinkValues, eLogLinkValues
 
@@ -323,16 +311,16 @@ class PoissonELLQuad(PoissonELL):
         # intval = permute(mtimesx(m.wwHerm',permute(m.link(qHmeanAtQuad + sqrt(2*qHMVarAtQuad).*permute(m.xxHerm,[2 3 4 1])),[4 1 2 3])),[2 3 4 1]);
 
         # aux2 \in  nTrials x maxNBins x nNeurons
-        aux2 = torch.sqrt(2*eVar)
+        aux2 = jnp.sqrt(2*eVar)
         # aux3 \in nTrials x maxNBins x nNeurons x nQuadLeg
-        aux3 = torch.einsum('ijk,l->ijkl', aux2, torch.squeeze(self._hermQuadPoints))
+        aux3 = jnp.einsum('ijk,l->ijkl', aux2, jnp.squeeze(self._hermQuadPoints))
         # aux4 \in maxNTrials x maxNBins x nNeurons x nQuadLeg
-        aux4 = torch.add(input=aux3, other=eMean.unsqueeze(dim=3))
+        aux4 = jnp.add(input=aux3, other=eMean.unsqueeze(dim=3))
         # aux5a \in maxNTrials x maxNBins x nNeurons x nQuadLeg
-        aux5a = self._linkFunction(input=aux4)
+        aux5a = self._linkFunction(aux4)
         aux5b = aux5a.log()
         # intval \in  maxNTrials x maxNBins x nQuadLeg
-        eLinkValues = torch.einsum('ijkl,l->ijk', aux5b, self._hermQuadWeights.squeeze())
-        eLoglinkValues = torch.einsum('ijkl,l->ijk', aux5a, self._hermQuadWeights.squeeze())
+        eLinkValues = jnp.einsum('ijkl,l->ijk', aux5b, self._hermQuadWeights.squeeze())
+        eLoglinkValues = jnp.einsum('ijkl,l->ijk', aux5a, self._hermQuadWeights.squeeze())
         return eLinkValues, eLogLinkValues
 
