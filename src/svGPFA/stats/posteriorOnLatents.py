@@ -1,94 +1,42 @@
 
 from abc import ABC, abstractmethod
-import torch
+import jax
+import jax.numpy as jnp
 import scipy.stats
 import svGPFA.stats.kernelsMatricesStore
 
 
-class PosteriorOnLatents(ABC):
+class PosteriorOnLatents:
 
-    def __init__(self, variationalDist, indPointsLocsKMS,
-                 indPointsLocsAndTimesKMS):
-        self._variationalDist = variationalDist
-        self._indPointsLocsKMS = indPointsLocsKMS
-        self._indPointsLocsAndTimesKMS = indPointsLocsAndTimesKMS
-
-    def computeMeansAndVars(self):
-        Kzz = self._indPointsLocsKMS.getKzz()
-        Ktz = self._indPointsLocsAndTimesKMS.getKtz()
-        KttDiag = self._indPointsLocsAndTimesKMS.getKttDiag()
-        answer = self.__computeMeansAndVarsGivenKernelMatrices(Kzz=Kzz,
-                                                               Ktz=Ktz,
-                                                               KttDiag=KttDiag)
-        return answer
-
-    def __computeMeansAndVarsGivenKernelMatrices(self, Kzz, Ktz, KttDiag):
+    def computeMeansAndVars(self, variational_mean, variational_cov,
+                            Kzz, Kzz_inv, Ktz, KttDiag):
         nTrials = len(KttDiag[0])
-        nLatent = len(self._variationalDist.getMean())
+        nLatent = len(variational_mean)
         # Ak[k] \in nTrial x nInd[k] x 1
-        Ak = [self._indPointsLocsKMS.solveForLatent(
-            input=self._variationalDist.getMean()[k], latentIndex=k)
-            for k in range(nLatent)]
-        qSigma = self._variationalDist.getCov()
+        Ak = [jax.scipy.linalg.cho_solve((Kzz_inv[k], True),
+                                         variational_mean[k])
+              for k in range(nLatent)]
         qKMu = [[None] for tr in range(nTrials)]
         qKVar = [[None] for tr in range(nTrials)]
-        for trialIndex in range(nTrials):
-            nTimesForTrial = KttDiag[0][trialIndex].shape[0]
-            # qKMu[trialIndex] \in nTimesForTrial[trialIndex] x nLatent
-            qKMu[trialIndex] = torch.empty((nTimesForTrial, nLatent),
-                                           dtype=Kzz[0].dtype,
-                                           device=Kzz[0].device)
-            qKVar[trialIndex] = torch.empty((nTimesForTrial, nLatent),
-                                            dtype=Kzz[0].dtype,
-                                            device=Kzz[0].device)
+        for r in range(nTrials):
+            nTimesForTrial = KttDiag[0][r].shape[0]
+            # qKMu[r] \in nTimesForTrial[r] x nLatent
+            qKMu[r] = jnp.empty((nTimesForTrial, nLatent))
+            qKVar[r] = jnp.empty((nTimesForTrial, nLatent))
             for k in range(nLatent):
-                qKMu[trialIndex][:, k] = torch.squeeze(
-                    torch.mm(input=Ktz[k][trialIndex],
-                             mat2=Ak[k][trialIndex, :, :]))
-                # Bfk \in nInd[k] x nTimesForTrial[trialIndex]
-                Bfk = self._indPointsLocsKMS.solveForLatentAndTrial(
-                    input=Ktz[k][trialIndex].transpose(dim0=0, dim1=1),
-                    latentIndex=k, trialIndex=trialIndex)
-                # mm1f \in nInd[k] x nTimesForTrial[trialIndex]
-                diff = qSigma[k][trialIndex, :, :]-Kzz[k][trialIndex, :, :]
-                mm1f = torch.matmul(diff, Bfk)
-                # qKVar[trialIndex] \in nTimesForTrial[trialIndex] x nLatent
-                qKVar[trialIndex][:, k] = \
-                    torch.squeeze(KttDiag[k][trialIndex]) + \
-                    torch.sum(a=Bfk*mm1f, axis=0)
+                qKMu[r] = qKMu[r].at[:, k].set(jnp.squeeze(jnp.matmul(Ktz[k][r],
+                                                           Ak[k][r, :, :])))
+                # Bfk \in nInd[k] x nTimesForTrial[r]
+                Bfk = jax.scipy.linalg.cho_solve((Kzz_inv[k][r,:,:], True),
+                                                 Ktz[k][r].transpose((1, 0)))
+                # mm1f \in nInd[k] x nTimesForTrial[r]
+                diff = variational_cov[k][r, :, :]-Kzz[k][r, :, :]
+                mm1f = jnp.matmul(diff, Bfk)
+                # qKVar[r] \in nTimesForTrial[r] x nLatent
+                qKVar[r] = qKVar[r].at[:, k].set(jnp.squeeze(KttDiag[k][r]) +
+                                                 jnp.sum(a=Bfk*mm1f, axis=0))
 
         return qKMu, qKVar
-
-    def setTimes(self, times):
-        self._indPointsLocsAndTimesKMS.setTimes(times=times)
-
-    def getVariationalDistParams(self):
-        return self._variationalDist.getParams()
-
-    def getKernels(self):
-        return self._indPointsLocsKMS.getKernels()
-
-    def getKernelsParams(self):
-        return self._indPointsLocsKMS.getKernelsParams()
-
-    def getIndPointsLocs(self):
-        return self._indPointsLocsKMS.getIndPointsLocs()
-
-    @abstractmethod
-    def buildKernelsMatrices(self):
-        pass
-
-    @abstractmethod
-    def setKernels(self, kernels):
-        pass
-
-    @abstractmethod
-    def setInitialParams(self, initial_params):
-        pass
-
-    @abstractmethod
-    def setIndPointsLocs(self, indPointsLocs):
-        pass
 
 
 class PosteriorOnLatentsQuadTimes(PosteriorOnLatents):
