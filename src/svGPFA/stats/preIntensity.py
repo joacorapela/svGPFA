@@ -1,20 +1,25 @@
 
 import pdb
 import abc
-import torch
+import jax.numpy as jnp
 
 class PreIntensity(abc.ABC):
 
     def __init__(self, posteriorOnLatents):
         self._posteriorOnLatents = posteriorOnLatents
 
-    def computeMeansAndVars(self, posteriorOnLatentsStats=None):
-        if posteriorOnLatentsStats is None:
-            posteriorOnLatentsStats = \
-                self._posteriorOnLatents.computeMeansAndVars()
+    def computeMeansAndVars(self, variational_mean, variational_cov, C, d,
+                            Kzz, Kzz_inv, Ktz, KttDiag):
+        posteriorOnLatentsStats = \
+            self._posteriorOnLatents.computeMeansAndVars(
+                variational_mean=variational_mean,
+                variational_cov=variational_cov,
+                Kzz=Kzz, Kzz_inv=Kzz_inv, Ktz=Ktz, KttDiag=KttDiag)
         means, vars = self._computeMeansAndVarsGivenPosteriorOnLatentsStats(
-            means=posteriorOnLatentsStats[0],
-            vars=posteriorOnLatentsStats[1])
+            posterior_on_latents_means=posteriorOnLatentsStats[0],
+            posterior_on_latents_vars=posteriorOnLatentsStats[1],
+            C=C, d=d,
+        )
         return means, vars
 
     def computePosteriorOnLatentsStats(self):
@@ -80,16 +85,18 @@ class LinearPreIntensity(PreIntensity):
 
 class LinearPreIntensityQuadTimes(LinearPreIntensity):
 
-    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(self, means, vars):
+    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(
+        self, posterior_on_latents_means, posterior_on_latents_vars, C, d):
         # means[r], vars[r] \in nQuad[r] x nLatents 
         # emb_post_mean[r], emb_post_var[r] \in nQuad[r] x nNeurons
-        n_trials = len(means)
-        n_neurons = self._C.shape[0]
+        n_trials = len(posterior_on_latents_means)
+        n_neurons = C.shape[0]
         emb_post_mean = [[] for r in range(n_trials)]
         emb_post_var = [[] for r in range(n_trials)]
         for r in range(n_trials):
-            emb_post_mean[r] = torch.matmul(means[r], torch.t(self._C)) + torch.reshape(self._d, (1, n_neurons)) # using broadcasting
-            emb_post_var[r] = torch.matmul(vars[r], self._C.T**2)
+            emb_post_mean[r] = (jnp.matmul(posterior_on_latents_means[r], C.T) +
+                                jnp.reshape(d, (1, n_neurons))) # using broadcasting
+            emb_post_var[r] = jnp.matmul(posterior_on_latents_vars[r], C.T**2)
         return emb_post_mean, emb_post_var
 
     def predictLatents(self, times):
@@ -113,14 +120,17 @@ class LinearPreIntensitySpikesTimes(LinearPreIntensity):
     def setNeuronForSpikeIndex(self, neuronForSpikeIndex):
         self._neuronForSpikeIndex = neuronForSpikeIndex
 
-    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(self, means, vars):
+    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(
+        self, posterior_on_latents_means, posterior_on_latents_vars, C, d):
         # means[r], vars[r] \in nQuad[r] x nLatents 
         # emb_post_mean[r], emb_post_var[r] \in nSpikesFromAllNeuronsInTrial[r]
         n_trials = len(self._neuronForSpikeIndex)
         emb_post_mean = [[None] for tr in range(n_trials)]
         emb_post_var = [[None] for tr in range(n_trials)]
         for r in range(n_trials):
-            emb_post_mean[r] = torch.sum(means[r]*self._C[(self._neuronForSpikeIndex[r]).tolist(),:], dim=1)+self._d[(self._neuronForSpikeIndex[r]).tolist()].squeeze()
-            emb_post_var[r] = torch.sum(vars[r]*(self._C[(self._neuronForSpikeIndex[r]).tolist(),:])**2, dim=1)
+#             emb_post_mean[r] = jnp.sum(posterior_on_latents_means[r]*C[(self._neuronForSpikeIndex[r]).tolist(),:], axis=1)+d[(self._neuronForSpikeIndex[r]).tolist()].squeeze()
+#             emb_post_var[r] = torch.sum(posterior_on_latents_vars[r]*(C[(self._neuronForSpikeIndex[r]).tolist(),:])**2, dim=1)
+            emb_post_mean[r] = jnp.sum(posterior_on_latents_means[r]*C[self._neuronForSpikeIndex[r],:], axis=1)+d[self._neuronForSpikeIndex[r]].squeeze()
+            emb_post_var[r] = jnp.sum(posterior_on_latents_vars[r]*(C[self._neuronForSpikeIndex[r],:])**2, axis=1)
         return emb_post_mean, emb_post_var
 
