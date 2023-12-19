@@ -1,44 +1,45 @@
 
-import pdb
-import torch
+import jax
+import jax.numpy as jnp
 
 class KLDivergence:
 
-    def __init__(self, indPointsLocsKMS, variationalDist):
-        super(KLDivergence, self).__init__()
+    def __init__(self, indPointsLocsKMS):
         self._indPointsLocsKMS = indPointsLocsKMS
-        self._variationalDist = variationalDist
 
-    def get_indPointsLocsKMS(self):
-        return self._indPointsLocsKMS
-
-    def get_variationalDist(self):
-        return self._variationalDist
-
-    def evalSumAcrossLatentsAndTrials(self):
+    def evalSumAcrossLatentsAndTrials(self, variational_mean, variational_cov,
+                                      prior_cov, prior_cov_inv):
         klDiv = 0
-        qSigma = self._variationalDist.getCov()
-        nLatents = len(qSigma)
+        nLatents = len(variational_cov)
         for k in range(nLatents):
             klDivK = self._evalSumAcrossTrials(
-                Kzz=self._indPointsLocsKMS.getKzz()[k],
-                qMu=self._variationalDist.getMean()[k],
-                qSigma=qSigma[k],
-                latentIndex=k)
+                prior_cov=prior_cov[k],
+                prior_cov_inv=prior_cov_inv[k],
+                variational_mean=variational_mean[k],
+                variational_cov=variational_cov[k],
+                latent_index=k)
             klDiv += klDivK
         return klDiv
 
-    def _evalSumAcrossTrials(self, Kzz, qMu, qSigma, latentIndex):
-        # ESS \in nTrials x nInd x nInd
-        ESS = qSigma + torch.matmul(qMu, qMu.permute(0,2,1))
-        nTrials = qMu.shape[0]
+    def _evalSumAcrossTrials(self, prior_cov, prior_cov_inv,
+                             variational_mean, variational_cov,
+                             latent_index):
+        # ESS \in n_trials x nInd x nInd
+        ESS = variational_cov + jnp.matmul(variational_mean,
+                                           variational_mean.transpose(0,2,1))
+        n_trials = variational_mean.shape[0]
         answer = 0
-        for trialIndex in range(nTrials):
-            _, logdetKzz = Kzz[trialIndex,:,:].slogdet() # O(n^3)
-            _, logdetQSigma = qSigma[trialIndex,:,:].slogdet() # O(n^3)
-            # traceTerm = torch.trace(torch.cholesky_solve(ESS[trialIndex,:,:],
-            # KzzInv[trialIndex,:,:]))
-            traceTerm = torch.trace(self._indPointsLocsKMS.solveForLatentAndTrial(ESS[trialIndex,:,:], latentIndex=latentIndex, trialIndex=trialIndex))
-            trialKL = .5*(traceTerm+logdetKzz-logdetQSigma-ESS.shape[1])
+        for trial_index in range(n_trials):
+            _, prior_cov_logdet = jnp.linalg.slogdet(prior_cov[trial_index,:,:]) # O(n^3)
+            _, variatioal_cov_logdet = jnp.linalg.slogdet(variational_cov[trial_index,:,:]) # O(n^3)
+#             solve_term = self._indPointsLocsKMS.solveForLatentAndTrial(
+#                 Kzz_inv=prior_cov_inv[trial_index,:,:],
+#                 input=ESS[trial_index,:,:])
+            solve_term = jax.scipy.linalg.cho_solve(
+                (prior_cov_inv[trial_index,:,:], True), ESS[trial_index,:,:]
+            )
+            trace_term = jnp.trace(solve_term)
+            trialKL = .5 * (trace_term + prior_cov_logdet -
+                            variatioal_cov_logdet - ESS.shape[1])
             answer += trialKL
         return answer
