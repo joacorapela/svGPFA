@@ -11,6 +11,30 @@ import numpy as np
 import torch
 import scipy.optimize
 
+class EM_JAX:
+
+    def __init__(self, ind_points_locs_KMS, quad_times_KMS, spike_times_KMS):
+        self._ind_points_locs_KMS = ind_points_locs_KMS
+        self._quad_times_KMS =quad_times_KMS
+        self._spike_times_KMS = spike_times_KMS
+
+    def eval_func(self, variational_mean, variational_chol_vecs, C, d,
+                  kernels_params, ind_points_locs):
+        Kzz, Kzz_inv = self._ind_points_locs_KMS.buildKernelMatrices(
+            kernels_params=kernels_params, ind_points_locs=ind_points_locs,
+            reg_param=self._reg_param)
+        Ktz_quad, KttDiag_quad = self._quad_times_KMS.buildKernelMatrices(
+            kernels_params=kernels_params, ind_points_locs=ind_points_locs)
+        Ktz_spike, KttDiag_spike = self._spike_times_KMS.buildKernelMatrices(
+            kernels_params=kernels_params, ind_points_locs=ind_points_locs)
+        kernels_matrices = dict(Kzz=Kzz, Kzz_inv=Kzz_inv,
+                                Ktz_quad=Ktz_quad, KttDiag_quad=KttDiag_quad, 
+                                Ktz_spike=Ktz_spike, KttDiag_spike=KttDiag_spike)
+        variational_cov = miscUtils.buildCovsFromCholVecs(variational_chol_vecs)
+        answer = self._model.eval(variational_mean=variational_mean,
+                                  variational_cov=variational_cov,
+                                  C=C, d=d, kernels_matrices=kernels_matrices)
+
 class EM(abc.ABC):
 
     @abc.abstractmethod
