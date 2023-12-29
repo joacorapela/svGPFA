@@ -2,28 +2,61 @@ import sys
 import os
 import math
 from scipy.io import loadmat
+import jax
 import numpy as np
-import torch
 import svGPFA.stats.kernels
 
-def test_exponentialQuadraticKernel():
+jax.config.update("jax_enable_x64", True)
+
+def test_exponentialQuadraticKernel_buildKernelMatrixX1():
     tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/rbfKernel.mat")
 
     mat = loadmat(dataFilename)
-    Z = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
-    leasK = torch.from_numpy(mat['G']).type(torch.DoubleTensor).permute(2,0,1)
-    lengthScale = float(mat['lengthscale'][0,0])
+    Z = mat['X1'].astype("float64").transpose((2,0,1))
+    leasK = mat['G'].astype("float64").transpose((2,0,1))
+    lengthscale = float(mat['lengthscale'][0,0])
     scale = 1.0
-    params = torch.tensor([lengthScale])
+    lengthscaleScale = 1.0
+    params = {"scale": scale, "lengthscale": lengthscale,
+              "lengthscaleScale": lengthscaleScale}
 
-    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale) 
-    kernel.setParams(params=params)
+    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel()
 
-    K = kernel.buildKernelMatrix(X1=Z)
-
+    K = kernel.buildKernelMatrixX1(X1=Z, params=params)
     error = math.sqrt(((K-leasK)**2).flatten().mean())
+    assert(error<tol)
 
+    K = kernel.buildKernelMatrixX1_jitted(X1=Z, params=params)
+    error = math.sqrt(((K-leasK)**2).flatten().mean())
+    assert(error<tol)
+
+
+def test_exponentialQuadraticKernel_buildKernelMatrixX1X2():
+    tol = 1e-6
+    k = 2
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
+
+    mat = loadmat(dataFilename)
+    assert(mat["kernelNames"][0, k][0] == "rbfKernel")
+
+    Z = mat['Z'][k, 0].astype("float64").transpose((2,0,1))
+    tt = mat['tt'].astype("float64").transpose((2,0,1))
+    leasKtz = mat['Ktz'][k, 0].astype("float64").transpose((2,0,1))
+    lengthscale = float(mat['hprs'][k][0][0,0])
+    scale = 1.0
+    lengthscaleScale = 1.0
+    params = {"scale": scale, "lengthscale": lengthscale,
+              "lengthscaleScale": lengthscaleScale}
+
+    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+
+    Ktz = kernel.buildKernelMatrixX1X2(X1=tt, X2=Z, params=params)
+    error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
+    assert(error<tol)
+
+    Ktz = kernel.buildKernelMatrixX1X2_jitted(X1=tt, X2=Z, params=params)
+    error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
     assert(error<tol)
 
 def test_exponentialQuadraticKernelDiag():
@@ -31,40 +64,78 @@ def test_exponentialQuadraticKernelDiag():
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Kdiag_rbfKernel.mat")
 
     mat = loadmat(dataFilename)
-    t = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
-    leasKDiag = torch.from_numpy(mat['Gdiag']).type(torch.DoubleTensor).permute(2,0,1)
-    lengthScale = float(mat['lengthscale'][0,0])
+    t = mat['X1'].astype("float64").transpose(2,0,1)
+    leasKDiag = mat['Gdiag'].astype("float64").transpose(2,0,1)
+    lengthscale = float(mat['lengthscale'][0,0])
     scale = float(mat['variance'][0,0])
-    params = torch.tensor([lengthScale])
+    lengthscaleScale = 1.0
+    params = {"scale": scale, "lengthscale": lengthscale,
+              "lengthscaleScale": lengthscaleScale}
 
-    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale)
-    kernel.setParams(params=params)
+    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel()
 
-    KDiag = kernel.buildKernelMatrixDiag(X=t)
-
+    KDiag = kernel.buildKernelMatrixDiag(X=t, params=params)
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
-
     assert(error<tol)
 
-def test_periodicKernel():
+    KDiag = kernel.buildKernelMatrixDiag_jitted(X=t, params=params)
+    error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
+    assert(error<tol)
+
+def test_periodicKernel_buildKernelMatrixX1():
     tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/PeriodicKernel.mat")
 
     mat = loadmat(dataFilename)
-    Z = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
-    leasK = torch.from_numpy(mat['G']).type(torch.DoubleTensor).permute(2,0,1)
-    lengthScale = float(mat['lengthscale'][0,0])
+    Z = mat['X1'].astype("float64").transpose(2,0,1)
+    leasK = mat['G'].astype("float64").transpose(2,0,1)
+    lengthscale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
     scale = 1.0
-    params = torch.tensor([lengthScale, period])
+    lengthscaleScale = 1.0
+    periodScale = 1.0
+    params = {"scale": scale,
+              "lengthscale": lengthscale, "lengthscaleScale": lengthscaleScale,
+              "period": period, "periodScale": periodScale}
 
-    kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
-    kernel.setParams(params=params)
+    kernel = svGPFA.stats.kernels.PeriodicKernel()
 
-    K = kernel.buildKernelMatrix(X1=Z)
-
+    K = kernel.buildKernelMatrixX1(X1=Z, params=params)
     error = math.sqrt(((K-leasK)**2).flatten().mean())
+    assert(error<tol)
 
+    K = kernel.buildKernelMatrixX1_jitted(X1=Z, params=params)
+    error = math.sqrt(((K-leasK)**2).flatten().mean())
+    assert(error<tol)
+
+def test_periodicKernel_buildKernelMatrixX1X2():
+    tol = 1e-6
+    k = 0
+    dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
+
+    mat = loadmat(dataFilename)
+    assert(mat["kernelNames"][0, k][0] == "PeriodicKernel")
+
+    Z = mat['Z'][k, 0].astype("float64").transpose((2,0,1))
+    tt = mat['tt'].astype("float64").transpose((2,0,1))
+    leasKtz = mat['Ktz'][k, 0].astype("float64").transpose((2,0,1))
+    lengthscale = float(mat['hprs'][k][0][0,0])
+    period = float(mat['hprs'][k][0][1,0])
+    scale = 1.0
+    lengthscaleScale = 1.0
+    periodScale = 1.0
+    params = {"scale": scale,
+              "lengthscale": lengthscale, "lengthscaleScale": lengthscaleScale,
+              "period": period, "periodScale": periodScale}
+
+    kernel = svGPFA.stats.kernels.PeriodicKernel()
+
+    Ktz = kernel.buildKernelMatrixX1X2(X1=tt, X2=Z, params=params)
+    error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
+    assert(error<tol)
+
+    Ktz = kernel.buildKernelMatrixX1X2_jitted(X1=tt, X2=Z, params=params)
+    error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
     assert(error<tol)
 
 def test_periodicKernelDiag():
@@ -72,25 +143,32 @@ def test_periodicKernelDiag():
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Kdiag_PeriodicKernel.mat")
 
     mat = loadmat(dataFilename)
-    t = torch.from_numpy(mat['X1']).type(torch.DoubleTensor).permute(2,0,1)
-    leasKDiag = torch.from_numpy(mat['Gdiag']).type(torch.DoubleTensor).permute(2,0,1)
-    lengthScale = float(mat['lengthscale'][0,0])
+    t = mat['X1'].astype("float64").transpose(2,0,1)
+    leasKDiag = mat['Gdiag'].astype("float64").transpose(2,0,1)
+    lengthscale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
     scale = float(mat['variance'][0,0])
-    params = torch.tensor([lengthScale, period])
+    lengthscaleScale = 1.0
+    periodScale = 1.0
+    params = {"scale": scale,
+              "lengthscale": lengthscale, "lengthscaleScale": lengthscaleScale,
+              "period": period, "periodScale": periodScale}
 
-    kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
-    kernel.setParams(params=params)
+    kernel = svGPFA.stats.kernels.PeriodicKernel()
 
-    KDiag = kernel.buildKernelMatrixDiag(X=t)
-
+    KDiag = kernel.buildKernelMatrixDiag(X=t, params=params)
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
+    assert(error<tol)
 
+    KDiag = kernel.buildKernelMatrixDiag_jitted(X=t, params=params)
+    error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
     assert(error<tol)
 
 if __name__=="__main__":
-    test_exponentialQuadraticKernel()
+    test_exponentialQuadraticKernel_buildKernelMatrixX1()
+    test_exponentialQuadraticKernel_buildKernelMatrixX1X2()
     test_exponentialQuadraticKernelDiag()
-    test_periodicKernel()
+    test_periodicKernel_buildKernelMatrixX1()
+    test_periodicKernel_buildKernelMatrixX1X2()
     test_periodicKernelDiag()
 
