@@ -36,10 +36,6 @@ class ExpectedLogLikelihood(ABC):
     def setInitialParams(self, initial_params):
         pass
 
-    @abstractmethod
-    def setELLCalculationParams(self, eLLCalculationParams):
-        pass
-
     def sampleIFs(self, times, nudget=1e-3):
         h = self._preIntensityQuadTimes.sample(times=times, nudget=nudget)
         nTrials = len(h)
@@ -83,9 +79,11 @@ class ExpectedLogLikelihood(ABC):
         self._preIntensityQuadTimes.setPriorCovRegParam(priorCovRegParam=priorCovRegParam)
 
 class PointProcessELL(ExpectedLogLikelihood):
-    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes, linkFunction):
+    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes,
+                 linkFunction, legQuadWeights):
         super().__init__(preIntensityQuadTimes=preIntensityQuadTimes, linkFunction=linkFunction)
         self._preIntensitySpikesTimes = preIntensitySpikesTimes
+        self._legQuadWeights = legQuadWeights
 
     def evalSumAcrossTrialsAndNeurons(self, variational_mean, variational_cov,
                                       C, d, kernels_matrices):
@@ -136,22 +134,6 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._preIntensitySpikesTimes.setNeuronForSpikeIndex(neuronForSpikeIndex=
                                                             neuronForSpikeIndex)
 
-    def __stackSpikeTimes(self, spikeTimes):
-        # spikeTimes list[nTrials][nNeurons][nSpikes]
-        nTrials = len(spikeTimes)
-        stackedSpikeTimes = [[] for i in range(nTrials)]
-        neuronForSpikeIndex = [[] for i in range(nTrials)]
-        for trialIndex in range(nTrials):
-            aList = [spikeTime
-                     for neuronIndex in range(len(spikeTimes[trialIndex]))
-                     for spikeTime in spikeTimes[trialIndex][neuronIndex]]
-            stackedSpikeTimes[trialIndex] = jnp.array(aList)
-            aList = [neuronIndex
-                     for neuronIndex in range(len(spikeTimes[trialIndex]))
-                     for spikeTime in spikeTimes[trialIndex][neuronIndex]]
-            neuronForSpikeIndex[trialIndex] = jnp.array(aList)
-        return stackedSpikeTimes, neuronForSpikeIndex
-
     def setIndPointsLocs(self, locs):
         self._preIntensityQuadTimes.setIndPointsLocs(locs=locs)
         self._preIntensitySpikesTimes.setIndPointsLocs(locs=locs)
@@ -164,10 +146,6 @@ class PointProcessELL(ExpectedLogLikelihood):
         self._preIntensityQuadTimes.setInitialParams(initial_params=initial_params)
         self._preIntensitySpikesTimes.setInitialParams(initial_params=initial_params)
 
-    def setELLCalculationParams(self, eLLCalculationParams):
-        # self._preIntensityQuadTimes.setTimes(times=eLLCalculationParams["leg_quad_points"])
-        self._legQuadWeights = eLLCalculationParams["leg_quad_weights"]
-
     @abstractmethod
     def _getELinkValues(self, eMean, eVar):
         pass
@@ -177,10 +155,11 @@ class PointProcessELL(ExpectedLogLikelihood):
         pass
 
 class PointProcessELLExpLink(PointProcessELL):
-    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes):
+    def __init__(self, preIntensityQuadTimes, preIntensitySpikesTimes,
+                 legQuadWeights):
         super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
                          preIntensitySpikesTimes=preIntensitySpikesTimes,
-                         linkFunction=jnp.exp)
+                         linkFunction=jnp.exp, legQuadWeights=legQuadWeights)
 
     def _getELinkValues(self, eMean, eVar):
         # eLinkValues[r] \in nQuadLeg x nNeurons
@@ -201,11 +180,6 @@ class PointProcessELLQuad(PointProcessELL):
         super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
                          preIntensitySpikesTimes=preIntensitySpikesTimes,
                         linkFunction=linkFunction)
-
-    def setELLCalculationParams(self, eLLCalculationParams):
-        super().setELLCalculationParams(eLLCalculationParams=eLLCalculationParams)
-        self._hermQuadWeights = eLLCalculationParams["hermQuadWeights"]
-        self._hermQuadPoints = eLLCalculationParams["hermQuadPoints"]
 
     def _getELinkValues(self, eMean, eVar):
         n_trials = len(eMean)
@@ -239,88 +213,4 @@ class PointProcessELLQuad(PointProcessELL):
         eLogLinkValues = jnp.concatenate(tensors=aux5)
         return eLogLinkValues
 
-
-class PoissonELL(ExpectedLogLikelihood):
-
-    def setELLCalculationParams(self, eLLCalculationParams):
-        times = eLLCalculationParams["binTimes"]
-        self._binWidth = times[0,1,0]-times[0,0,0]
-        self._preIntensityQuadTimes.setTimes(times=times)
-
-    def computePosteriorOnLatentsStats(self):
-        answer = self._preIntensityQuadTimes.computePosteriorOnLatentsStats()
-        return answer
-
-    def evalSumAcrossTrialsAndNeurons(self, posteriorOnLatentsStats=None):
-        eMean, eVar= self._preIntensityQuadTimes.\
-            computeMeansAndVars(posteriorOnLatentsStats=posteriorOnLatentsStats)
-        eLinkValues, eLogLinkValues = \
-                self._getELinkAndELogLinkValues(eMean=eMean, eVar=eVar)
-        sELLTerm1 = self._binWidth*eLinkValues.sum()
-        # sELLTerm2 = (self._measurements*eLogLinkValues.permute(0, 2, 1)).sum()
-        sELLTerm2 = (self._measurements*eLogLinkValues).sum()
-        answer = -sELLTerm1+sELLTerm2
-        return answer
-
-    def buildKernelsMatrices(self):
-        self._preIntensityQuadTimes.buildKernelsMatrices()
-
-    def computeSVPostOnLatentsStats(self):
-        answer = self._preIntensityQuadTimes.computeSVPostOnLatentsStats()
-        return answer
-
-    def setMeasurements(self, measurements):
-        # measurements \in nTrials x nNeurons x maxNBins
-        self._measurements = measurements
-
-    def setIndPointsLocs(self, locs):
-        self._preIntensityQuadTimes.setIndPointsLocs(locs=locs)
-        self._preIntensitySpikesTimes.setIndPointsLocs(locs=locs)
-
-    def setKernels(self, kernels):
-        self._preIntensityQuadTimes.\
-            setKernels(kernels=kernels)
-
-    def setInitialParams(self, initial_params):
-        self._preIntensityQuadTimes.\
-            setInitialParams(initial_params=initial_params)
-
-    @abstractmethod
-    def _getELinkAndELogLinkValues(self, eMean, eVar):
-        pass
-
-class PoissonELLExpLink(PoissonELL):
-
-    def __init__(self, preIntensityQuadTimes):
-        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
-                         linkFunction=jnp.exp)
-
-    def _getELinkAndELogLinkValues(self, eMean, eVar):
-        # intval \in nTrials x nBins x nNeurons
-        eLinkValues = self._linkFunction(eMean+0.5*eVar)
-        eLogLinkValues = eMean
-        return eLinkValues, eLogLinkValues
-
-class PoissonELLQuad(PoissonELL):
-
-    def __init__(self, preIntensityQuadTimes, linkFunction):
-        super().__init__(preIntensityQuadTimes=preIntensityQuadTimes,
-                         linkFunction=linkFunction)
-
-    def _getELinkAndELogLinkValues(self, eMean, eVar):
-        # intval = permute(mtimesx(m.wwHerm',permute(m.link(qHmeanAtQuad + sqrt(2*qHMVarAtQuad).*permute(m.xxHerm,[2 3 4 1])),[4 1 2 3])),[2 3 4 1]);
-
-        # aux2 \in  nTrials x maxNBins x nNeurons
-        aux2 = jnp.sqrt(2*eVar)
-        # aux3 \in nTrials x maxNBins x nNeurons x nQuadLeg
-        aux3 = jnp.einsum('ijk,l->ijkl', aux2, jnp.squeeze(self._hermQuadPoints))
-        # aux4 \in maxNTrials x maxNBins x nNeurons x nQuadLeg
-        aux4 = jnp.add(input=aux3, other=eMean.unsqueeze(dim=3))
-        # aux5a \in maxNTrials x maxNBins x nNeurons x nQuadLeg
-        aux5a = self._linkFunction(aux4)
-        aux5b = aux5a.log()
-        # intval \in  maxNTrials x maxNBins x nQuadLeg
-        eLinkValues = jnp.einsum('ijkl,l->ijk', aux5b, self._hermQuadWeights.squeeze())
-        eLoglinkValues = jnp.einsum('ijkl,l->ijk', aux5a, self._hermQuadWeights.squeeze())
-        return eLinkValues, eLogLinkValues
 
