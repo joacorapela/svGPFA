@@ -8,32 +8,49 @@ import math
 import copy
 import pickle
 import numpy as np
-import torch
-import scipy.optimize
+import jaxopt
+
+from ..utils.miscUtils import buildCovsFromCholVecs
 
 class EM_JAX:
 
-    def __init__(self, ind_points_locs_KMS, quad_times_KMS, spike_times_KMS):
+    def __init__(self, model, ind_points_locs_KMS, quad_times_KMS,
+                 spike_times_KMS, reg_param):
+        self._model = model
         self._ind_points_locs_KMS = ind_points_locs_KMS
         self._quad_times_KMS =quad_times_KMS
         self._spike_times_KMS = spike_times_KMS
+        self._reg_param = reg_param
 
-    def eval_func(self, variational_mean, variational_chol_vecs, C, d,
-                  kernels_params, ind_points_locs):
-        Kzz, Kzz_inv = self._ind_points_locs_KMS.buildKernelMatrices(
+    def maximize(self, params0, optim_params):
+        solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
+        res = solver.run(params0)
+        return res
+
+    def _eval_func(self, params):
+        variational_mean = params["variational_mean"]
+        variational_chol_vecs = params["variational_chol_vecs"]
+        C = params["C"]
+        d = params["d"]
+        kernels_params = params["kernels_params"]
+        ind_points_locs = params["ind_points_locs"]
+
+        Kzz, Kzz_inv = self._ind_points_locs_KMS.buildKernelsMatrices(
             kernels_params=kernels_params, ind_points_locs=ind_points_locs,
             reg_param=self._reg_param)
-        Ktz_quad, KttDiag_quad = self._quad_times_KMS.buildKernelMatrices(
+        Ktz_quad, KttDiag_quad = self._quad_times_KMS.buildKernelsMatrices(
             kernels_params=kernels_params, ind_points_locs=ind_points_locs)
-        Ktz_spike, KttDiag_spike = self._spike_times_KMS.buildKernelMatrices(
+        Ktz_spike, KttDiag_spike = self._spike_times_KMS.buildKernelsMatrices(
             kernels_params=kernels_params, ind_points_locs=ind_points_locs)
         kernels_matrices = dict(Kzz=Kzz, Kzz_inv=Kzz_inv,
                                 Ktz_quad=Ktz_quad, KttDiag_quad=KttDiag_quad, 
                                 Ktz_spike=Ktz_spike, KttDiag_spike=KttDiag_spike)
-        variational_cov = miscUtils.buildCovsFromCholVecs(variational_chol_vecs)
-        answer = self._model.eval(variational_mean=variational_mean,
+        variational_cov = buildCovsFromCholVecs(variational_chol_vecs)
+        answer = -1*self._model.eval(variational_mean=variational_mean,
                                   variational_cov=variational_cov,
                                   C=C, d=d, kernels_matrices=kernels_matrices)
+        # print(f"lower bound={-answer}")
+        return answer
 
 class EM(abc.ABC):
 
