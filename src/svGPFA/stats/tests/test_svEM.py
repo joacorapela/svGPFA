@@ -613,11 +613,11 @@ def test_maximize_pointProcess_PyTorch():
     assert(lowerBoundHist[-1]>leasLowerBound)
 
 if __name__=='__main__':
-    test_eStep_pointProcess_PyTorch() # passed
+    # test_eStep_pointProcess_PyTorch() # passed
     # # test_eStep_poisson() # not tested
-    test_mStepModelParams_pointProcess_PyTorch()
-    test_mStepKernelParams_pointProcess_PyTorch() # passed
-    test_mStepIndPoints_pointProcess_PyTorch() # passed
+    # test_mStepModelParams_pointProcess_PyTorch()
+    # test_mStepKernelParams_pointProcess_PyTorch() # passed
+    # test_mStepIndPoints_pointProcess_PyTorch() # passed
 
     t0 = time.perf_counter()
     test_maximize_pointProcess_PyTorch() # passed
