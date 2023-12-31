@@ -86,8 +86,8 @@ class IndPointsLocsKMS_PInv(IndPointsLocsKMS):
 
 class IndPointsLocsAndTimesKMS(KernelsMatricesStore):
 
-    def setTimes(self, times):
-        # times[r] \in nTimes x 1
+    def __init__(self, kernels, times):
+        super().__init__(kernels=kernels)
         self._t = times
 
     def getKtz(self):
