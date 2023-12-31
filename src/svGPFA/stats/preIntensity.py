@@ -117,6 +117,10 @@ class LinearPreIntensityQuadTimes(LinearPreIntensity):
 
 class LinearPreIntensitySpikesTimes(LinearPreIntensity):
 
+    def __init__(self, posteriorOnLatents, neuronForSpikeIndex):
+        super().__init__(posteriorOnLatents=posteriorOnLatents)
+        self._neuronForSpikeIndex = neuronForSpikeIndex
+
     def setNeuronForSpikeIndex(self, neuronForSpikeIndex):
         self._neuronForSpikeIndex = neuronForSpikeIndex
 
