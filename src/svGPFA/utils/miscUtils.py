@@ -13,6 +13,22 @@ import gcnu_common.numerical_methods.utils
 import gcnu_common.stats.gaussianProcesses.eval
 
 
+def stackSpikeTimes(spikeTimes):
+    # spikeTimes list[nTrials][nNeurons][nSpikes]
+    nTrials = len(spikeTimes)
+    stackedSpikeTimes = [[] for i in range(nTrials)]
+    neuronForSpikeIndex = [[] for i in range(nTrials)]
+    for trialIndex in range(nTrials):
+        aList = [spikeTime
+                 for neuronIndex in range(len(spikeTimes[trialIndex]))
+                 for spikeTime in spikeTimes[trialIndex][neuronIndex]]
+        stackedSpikeTimes[trialIndex] = jnp.array(aList)
+        aList = [neuronIndex
+                 for neuronIndex in range(len(spikeTimes[trialIndex]))
+                 for spikeTime in spikeTimes[trialIndex][neuronIndex]]
+        neuronForSpikeIndex[trialIndex] = jnp.array(aList)
+    return stackedSpikeTimes, neuronForSpikeIndex
+
 def separateNeuronsSpikeTimesByTrials(neurons_spike_times, epochs_times,
                                       trials_start_times_rel,
                                       trials_end_times_rel):
@@ -194,6 +210,14 @@ def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
             qSVec[k][r, :, 0] = qSVecKR
             qSDiag[k][r, :, 0] = qSDiagKR
     return qSVec, qSDiag
+
+
+def getCholVecsFromCov(cov):
+    cov_chol = []
+    for aCov in cov:
+        cov_chol.append(svGPFA.utils.miscUtils.chol3D(aCov))
+    chol_vecs = getVectorRepOfLowerTrianMatrices(lt_matrices=cov_chol)
+    return chol_vecs
 
 
 def clock(func):
@@ -427,14 +451,6 @@ def getEmbeddingSTDs(C, latents_STDs):
     answer = [jnp.matmul(C**2, latents_STDs[r]**2).sqrt()
               for r in range(n_trials)]
     return answer
-
-
-def getCholVecsFromCov(cov):
-    cov_chol = []
-    for aCov in cov:
-        cov_chol.append(svGPFA.utils.miscUtils.chol3D(aCov))
-    chol_vecs = getVectorRepOfLowerTrianMatrices(lt_matrices=cov_chol)
-    return chol_vecs
 
 
 def getVectorRepOfLowerTrianMatrices(lt_matrices):
