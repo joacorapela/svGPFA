@@ -2,8 +2,9 @@ import sys
 import os
 import math
 from scipy.io import loadmat
-import jax
 import numpy as np
+import jax
+import jax.numpy as jnp
 import svGPFA.stats.kernels
 
 jax.config.update("jax_enable_x64", True)
@@ -16,10 +17,7 @@ def test_exponentialQuadraticKernel_buildKernelMatrixX1():
     Z = mat['X1'].astype("float64").transpose((2,0,1))
     leasK = mat['G'].astype("float64").transpose((2,0,1))
     lengthscale = float(mat['lengthscale'][0,0])
-    scale = 1.0
-    lengthscaleScale = 1.0
-    params = {"scale": scale, "lengthscale": lengthscale,
-              "lengthscaleScale": lengthscaleScale}
+    params = jnp.array([lengthscale])
 
     kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel()
 
@@ -27,7 +25,8 @@ def test_exponentialQuadraticKernel_buildKernelMatrixX1():
     error = math.sqrt(((K-leasK)**2).flatten().mean())
     assert(error<tol)
 
-    K = kernel.buildKernelMatrixX1_jitted(X1=Z, params=params)
+    kernel_buildKernelMatrixX1_jitted = jax.jit(kernel.buildKernelMatrixX1)
+    K = kernel_buildKernelMatrixX1_jitted(X1=Z, params=params)
     error = math.sqrt(((K-leasK)**2).flatten().mean())
     assert(error<tol)
 
@@ -44,10 +43,7 @@ def test_exponentialQuadraticKernel_buildKernelMatrixX1X2():
     tt = mat['tt'].astype("float64").transpose((2,0,1))
     leasKtz = mat['Ktz'][k, 0].astype("float64").transpose((2,0,1))
     lengthscale = float(mat['hprs'][k][0][0,0])
-    scale = 1.0
-    lengthscaleScale = 1.0
-    params = {"scale": scale, "lengthscale": lengthscale,
-              "lengthscaleScale": lengthscaleScale}
+    params = jnp.array([lengthscale])
 
     kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel()
 
@@ -68,11 +64,9 @@ def test_exponentialQuadraticKernelDiag():
     leasKDiag = mat['Gdiag'].astype("float64").transpose(2,0,1)
     lengthscale = float(mat['lengthscale'][0,0])
     scale = float(mat['variance'][0,0])
-    lengthscaleScale = 1.0
-    params = {"scale": scale, "lengthscale": lengthscale,
-              "lengthscaleScale": lengthscaleScale}
+    params = jnp.array([lengthscale])
 
-    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+    kernel = svGPFA.stats.kernels.ExponentialQuadraticKernel(scale=scale)
 
     KDiag = kernel.buildKernelMatrixDiag(X=t, params=params)
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
@@ -91,12 +85,7 @@ def test_periodicKernel_buildKernelMatrixX1():
     leasK = mat['G'].astype("float64").transpose(2,0,1)
     lengthscale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
-    scale = 1.0
-    lengthscaleScale = 1.0
-    periodScale = 1.0
-    params = {"scale": scale,
-              "lengthscale": lengthscale, "lengthscaleScale": lengthscaleScale,
-              "period": period, "periodScale": periodScale}
+    params = jnp.array([lengthscale, period])
 
     kernel = svGPFA.stats.kernels.PeriodicKernel()
 
@@ -121,12 +110,7 @@ def test_periodicKernel_buildKernelMatrixX1X2():
     leasKtz = mat['Ktz'][k, 0].astype("float64").transpose((2,0,1))
     lengthscale = float(mat['hprs'][k][0][0,0])
     period = float(mat['hprs'][k][0][1,0])
-    scale = 1.0
-    lengthscaleScale = 1.0
-    periodScale = 1.0
-    params = {"scale": scale,
-              "lengthscale": lengthscale, "lengthscaleScale": lengthscaleScale,
-              "period": period, "periodScale": periodScale}
+    params = jnp.array([lengthscale, period])
 
     kernel = svGPFA.stats.kernels.PeriodicKernel()
 
@@ -148,13 +132,9 @@ def test_periodicKernelDiag():
     lengthscale = float(mat['lengthscale'][0,0])
     period = float(mat['period'][0,0])
     scale = float(mat['variance'][0,0])
-    lengthscaleScale = 1.0
-    periodScale = 1.0
-    params = {"scale": scale,
-              "lengthscale": lengthscale, "lengthscaleScale": lengthscaleScale,
-              "period": period, "periodScale": periodScale}
+    params = jnp.array([lengthscale, period])
 
-    kernel = svGPFA.stats.kernels.PeriodicKernel()
+    kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
 
     KDiag = kernel.buildKernelMatrixDiag(X=t, params=params)
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
