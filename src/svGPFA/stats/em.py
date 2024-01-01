@@ -24,6 +24,14 @@ class EM_JAX:
 
     def maximize(self, params0, optim_params):
         solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
+#         solver = jaxopt.ScipyMinimize(fun=self._eval_func,
+#                                       method="L-BFGS-B",
+#                                       callback=mycallback,
+#                                       **optim_params)
+#         def mycallback(params):
+#             lb = -1*self._eval_func(params)
+#             print(f"lower bound: {lb}")
+
         res = solver.run(params0)
         return res
 
