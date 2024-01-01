@@ -37,6 +37,65 @@ indPointsCovChol = 100001
 class ModelFactory:
 
     @staticmethod
+    def buildModelJAX(kernels, legQuadWeights,
+                      neuronForSpikeIndex,
+                      conditionalDist=PointProcess,
+                      linkFunction=ExponentialLink,
+                      preIntensityType=LinearPreIntensity,
+                      indPointsCovRep=indPointsCovChol):
+        """Creates an svGPFA model. :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setInitialDataAndParams` should be invoked before using the created model as argument to :meth:`svGPFA.stats.svEM.SVEM.maximize`.
+
+        :param kernels: list of kernels (:mod:`svGPFA.stats.kernel`) to be used in the model
+        :type kernels: list of instances from subclass of (:class:`svGPFA.stats.kernel.Kernel`)
+        :param conditionalDist: likelihood distribution (e.g., svGPFA.stats.ModelFactory.PointProcess or svGPFA.stats.ModelFactory.Gaussian)
+        :type conditionalDist: int
+        :param preIntensityType: type of preIntensity (e.g., svGPFA.stats.ModelFactory.LinearPreIntensity)
+        :type preIntensityType: int
+
+        :return: an unitialized model. Parameters and data need to be set (by calling :meth:`svGPFA.stats.svLowerBound.SVLowerBound.setParamsAndData`) before invoking :meth:`svGPFA.stats.svEM.SVEM.maximize`.
+        :rtype: an instance of :class:`svGPFA.stats.svLowerBound.SVLowerBound`.
+
+        """
+
+        if conditionalDist == PointProcess:
+            if preIntensityType == LinearPreIntensity:
+                if linkFunction == ExponentialLink:
+                    if indPointsCovRep == indPointsCovChol:
+                        pass
+#                         qU = svGPFA.stats.variationalDist.\
+#                                 VariationalDistChol()
+                    elif indPointsCovRep == indPointsCovRank1PlusDiag:
+                        raise NotImplmentedError()
+                    else:
+                        raise ValueError("Invalid indPointsCovRep")
+                    qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents()
+                    qHQuadTimes = svGPFA.stats.preIntensity.\
+                        LinearPreIntensityQuadTimes(posteriorOnLatents=qK)
+                    qHSpikesTimes = svGPFA.stats.preIntensity.\
+                        LinearPreIntensitySpikesTimes(
+                            posteriorOnLatents=qK,
+                            neuronForSpikeIndex=neuronForSpikeIndex)
+                    eLL = svGPFA.stats.expectedLogLikelihood.PointProcessELLExpLink(
+                        preIntensityQuadTimes=qHQuadTimes,
+                        preIntensitySpikesTimes=qHSpikesTimes,
+                        legQuadWeights=legQuadWeights,
+                    )
+                    klDiv = svGPFA.stats.klDivergence.KLDivergence()
+                    svlb = svGPFA.stats.svLowerBound.SVLowerBound(eLL=eLL,
+                                                                  klDiv=klDiv)
+                else:
+                    raise ValueError("Invalid linkFunction={:s}".
+                                     format(repr(linkFunction)))
+            else:
+                raise ValueError("Invalid preIntensityType={:s}".
+                                 format(repr(preIntensityType)))
+        else:
+            raise ValueError("Invalid conditionalDist=%s"%
+                             repr(conditionalDist))
+
+        return svlb
+
+    @staticmethod
     def buildModelPyTorch(kernels, conditionalDist=PointProcess,
                           linkFunction=ExponentialLink,
                           preIntensityType=LinearPreIntensity,
@@ -110,37 +169,6 @@ class ModelFactory:
             else:
                 raise ValueError("Invalid preIntensityType={:s}".
                                  format(repr(preIntensityType)))
-        elif conditionalDist == Poisson:
-            if preIntensityType == LinearPreIntensity:
-                if linkFunction == ExponentialLink:
-                    qU = svGPFA.stats.variationalDist.\
-                            VariationalDist()
-                    if kernelMatrixInvMethod == kernelMatrixInvChol:
-                        indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.\
-                                IndPointsLocsKMS_Chol()
-                    elif kernelMatrixInvMethod == kernelMatrixInvPInv:
-                        indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.\
-                                IndPointsLocsKMS_Pinv()
-                    else:
-                        raise ValueError("Invalid kernelMatrixInvMethod")
-                    indPointsLocsAndQuadTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
-                    qKQuadTimes = svGPFA.stats.posteriorOnLatents.\
-                        PosteriorOnLatentsQuadTimes(
-                            variationalDist=qU,
-                            indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
-                    qHQuadTimes = svGPFA.stats.preIntensity.\
-                        LinearPreIntensityQuadTimes(
-                            posteriorOnLatents=qKQuadTimes)
-                    eLL = svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink(
-                        preIntensityQuadTimes=qHQuadTimes)
-                    klDiv = svGPFA.stats.klDivergence.KLDivergence(
-                        indPointsLocsKMS=indPointsLocsKMS,
-                        variationalDist=qU)
-                    svlb = svGPFA.stats.svLowerBound.SVLowerBound(eLL=eLL,
-                                                                  klDiv=klDiv)
-                    svlb.setKernels(kernels=kernels)
         else:
             raise ValueError("Invalid conditionalDist=%s"%
                              repr(conditionalDist))
@@ -205,37 +233,6 @@ class ModelFactory:
             else:
                 raise ValueError("Invalid preIntensityType={:s}".
                                  format(repr(preIntensityType)))
-        elif conditionalDist == Poisson:
-            if preIntensityType == LinearPreIntensity:
-                if linkFunction == ExponentialLink:
-                    qU = svGPFA.stats.variationalDist.\
-                        VariationalDist()
-                    if kernelMatrixInvMethod == kernelMatrixInvChol:
-                        indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.\
-                            IndPointsLocsKMS_Chol()
-                    elif kernelMatrixInvMethod == kernelMatrixInvPInv:
-                        indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.\
-                            IndPointsLocsKMS_Pinv()
-                    else:
-                        raise ValueError("Invalid kernelMatrixInvMethod")
-                    indPointsLocsAndQuadTimesKMS = svGPFA.stats.\
-                        kernelsMatricesStore.IndPointsLocsAndTimesKMS()
-                    qKQuadTimes = svGPFA.stats.posteriorOnLatents.\
-                        PosteriorOnLatentsQuadTimes(
-                            variationalDist=qU,
-                            indPointsLocsKMS=indPointsLocsKMS,
-                            indPointsLocsAndTimesKMS=indPointsLocsAndQuadTimesKMS)
-                    qHQuadTimes = svGPFA.stats.preIntensity.\
-                        LinearPreIntensityQuadTimes(
-                            posteriorOnLatents=qKQuadTimes)
-                    eLL = svGPFA.stats.expectedLogLikelihood.PoissonELLExpLink(
-                        preIntensityQuadTimes=qHQuadTimes)
-                    klDiv = svGPFA.stats.klDivergence.KLDivergence(
-                        indPointsLocsKMS=indPointsLocsKMS,
-                        variationalDist=qU)
-                    svlb = svGPFA.stats.svLowerBound.SVLowerBound(
-                        eLL=eLL, klDiv=klDiv)
-                    svlb.setKernels(kernels=kernels)
         else:
             raise ValueError("Invalid conditionalDist={:s}".
                              format(repr(conditionalDist)))
