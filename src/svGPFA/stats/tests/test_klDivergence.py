@@ -34,18 +34,11 @@ def test_evalSumAcrossLatentsTrials():
     for k in range(nLatents):
         if kernelNames[0,k][0] == "PeriodicKernel":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
-            kernels_params0[k] = {"scale": 1.0,
-                                  "lengthscale": hprs[k,0][0].item(),
-                                  "lengthscaleScale": 1.0,
-                                  "period": hprs[k,0][1].item(),
-                                  "periodScale": 1.0,
-                                 }
+            kernels_params0[k] = jnp.array([float(hprs[k,0][0].item()),
+                                            float(hprs[k,0][1].item())])
         elif kernelNames[0,k][0] == "rbfKernel":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
-            kernels_params0[k] = {"scale": 1.0,
-                                  "lengthscale": hprs[k,0][0].item(),
-                                  "lengthscaleScale": 1.0,
-                                 }
+            kernels_params0[k] = jnp.array([float(hprs[k,0][0].item())])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
