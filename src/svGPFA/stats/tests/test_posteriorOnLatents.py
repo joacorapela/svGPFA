@@ -39,31 +39,24 @@ def test_computeMeansAndVars_quadTimes():
     for k in range(nLatents):
         if kernelNames[0,k][0] == "PeriodicKernel":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
-            scale = 1.0
             lengthscale = hprs[k,0][0].item() 
             period = hprs[k,0][1].item()
-            lengthscaleScale = 1.0
-            periodScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale,
-                                  "period": period, "periodScale": periodScale}
+            kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
-            scale = 1.0
             lengthscale = hprs[k,0][0].item()
-            lengthscaleScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale}
+            kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol(kernels=kernels)
-    quadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(kernels=kernels)
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol(
+        kernels=kernels)
+    quadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(
+        kernels=kernels, times=t)
     qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents()
 
     Kzz, Kzz_inv = indPointsLocsKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0, reg_param=reg_param)
-    quadTimesKMS.setTimes(times=t)
     Ktz, KttDiag = quadTimesKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0)
 
@@ -103,31 +96,23 @@ def test_computeMeansAndVars_spikesTimes():
     for k in range(nLatents):
         if kernelNames[0,k][0] == "PeriodicKernel":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
-            scale = 1.0
             lengthscale = hprs[k,0][0].item() 
             period = hprs[k,0][1].item()
-            lengthscaleScale = 1.0
-            periodScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale,
-                                  "period": period, "periodScale": periodScale}
+            kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
-            scale = 1.0
             lengthscale = hprs[k,0][0].item()
-            lengthscaleScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale}
+            kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol(kernels=kernels)
-    spikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(kernels=kernels)
+    spikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(
+        kernels=kernels, times=Y)
     qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents()
 
     Kzz, Kzz_inv = indPointsLocsKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0, reg_param=reg_param)
-    spikesTimesKMS.setTimes(times=Y)
     Ktz, KttDiag = spikesTimesKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0)
 
@@ -143,5 +128,5 @@ def test_computeMeansAndVars_spikesTimes():
         assert(qKVarError<tol)
 
 if __name__=="__main__":
-    # test_computeMeansAndVars_quadTimes()
+    test_computeMeansAndVars_quadTimes()
     test_computeMeansAndVars_spikesTimes()
