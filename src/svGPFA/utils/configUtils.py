@@ -1,7 +1,6 @@
 
 import math
 import numpy as np
-import torch
 import svGPFA.stats.kernels
 
 
