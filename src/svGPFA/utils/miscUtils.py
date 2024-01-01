@@ -61,7 +61,6 @@ def buildKernels(kernels_types, kernels_params):
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
         else:
             raise ValueError(f"Invalid kernels type: {kernels_types[k]}")
-        kernels[k].setParams(kernels_params[k])
     return kernels
 
 
@@ -267,14 +266,16 @@ def pinv3D(K, rcond=1e-15):
 def getLegQuadPointsAndWeights(n_quad, trials_start_times, trials_end_times):
     n_trials = len(trials_start_times)
     assert(n_trials == len(trials_end_times))
-    leg_quad_points = [jnp.empty((n_quad[r], 1), dtype=dtype)
+    leg_quad_points = [jnp.empty((n_quad[r], 1), dtype=jnp.double)
                        for r in range(n_trials)]
-    leg_quad_weights = [jnp.empty((n_quad[r], 1), dtype=dtype)
+    leg_quad_weights = [jnp.empty((n_quad[r], 1), dtype=jnp.double)
                         for r in range(n_trials)]
     for r in range(n_trials):
-        leg_quad_points[r][:, 0], leg_quad_weights[r][:, 0] = \
+        points, weights = \
                 gcnu_common.numerical_methods.utils.leggaussVarLimits(
-                    n=n_quad[r], a=trials_start_times[r], b=trials_end_times[r])
+                    n=n_quad[r].item(), a=trials_start_times[r], b=trials_end_times[r])
+        leg_quad_points[r] = leg_quad_points[r].at[:, 0].set(points)
+        leg_quad_weights[r] = leg_quad_weights[r].at[:, 0].set(weights)
     return leg_quad_points, leg_quad_weights
 
 
