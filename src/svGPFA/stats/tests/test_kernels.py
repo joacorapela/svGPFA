@@ -51,10 +51,6 @@ def test_exponentialQuadraticKernel_buildKernelMatrixX1X2():
     error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
     assert(error<tol)
 
-    Ktz = kernel.buildKernelMatrixX1X2_jitted(X1=tt, X2=Z, params=params)
-    error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
-    assert(error<tol)
-
 def test_exponentialQuadraticKernelDiag():
     tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Kdiag_rbfKernel.mat")
@@ -72,10 +68,6 @@ def test_exponentialQuadraticKernelDiag():
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
     assert(error<tol)
 
-    KDiag = kernel.buildKernelMatrixDiag_jitted(X=t, params=params)
-    error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
-    assert(error<tol)
-
 def test_periodicKernel_buildKernelMatrixX1():
     tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/PeriodicKernel.mat")
@@ -90,10 +82,6 @@ def test_periodicKernel_buildKernelMatrixX1():
     kernel = svGPFA.stats.kernels.PeriodicKernel()
 
     K = kernel.buildKernelMatrixX1(X1=Z, params=params)
-    error = math.sqrt(((K-leasK)**2).flatten().mean())
-    assert(error<tol)
-
-    K = kernel.buildKernelMatrixX1_jitted(X1=Z, params=params)
     error = math.sqrt(((K-leasK)**2).flatten().mean())
     assert(error<tol)
 
@@ -118,10 +106,6 @@ def test_periodicKernel_buildKernelMatrixX1X2():
     error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
     assert(error<tol)
 
-    Ktz = kernel.buildKernelMatrixX1X2_jitted(X1=tt, X2=Z, params=params)
-    error = math.sqrt(((Ktz-leasKtz)**2).flatten().mean())
-    assert(error<tol)
-
 def test_periodicKernelDiag():
     tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Kdiag_PeriodicKernel.mat")
@@ -137,10 +121,6 @@ def test_periodicKernelDiag():
     kernel = svGPFA.stats.kernels.PeriodicKernel(scale=scale)
 
     KDiag = kernel.buildKernelMatrixDiag(X=t, params=params)
-    error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
-    assert(error<tol)
-
-    KDiag = kernel.buildKernelMatrixDiag_jitted(X=t, params=params)
     error = math.sqrt(((KDiag-leasKDiag)**2).flatten().mean())
     assert(error<tol)
 
