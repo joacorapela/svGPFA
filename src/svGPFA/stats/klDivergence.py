@@ -4,9 +4,6 @@ import jax.numpy as jnp
 
 class KLDivergence:
 
-    def __init__(self, indPointsLocsKMS):
-        self._indPointsLocsKMS = indPointsLocsKMS
-
     def evalSumAcrossLatentsAndTrials(self, variational_mean, variational_cov,
                                       prior_cov, prior_cov_inv):
         klDiv = 0
