@@ -1,6 +1,9 @@
 
+import datetime
 import numpy as np
-import torch
+import jax
+import jax.numpy as jnp
+
 import svGPFA.stats.kernelsMatricesStore
 import svGPFA.utils.miscUtils
 
@@ -114,16 +117,17 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
         n_ind_points = [common_n_ind_points] * n_latents
     if n_quad is None:
         n_quad = [common_n_quad] * n_latents
-    var_mean0 = [torch.zeros((n_trials, n_ind_points[k], 1),
-                             dtype=torch.double)
+    var_mean0 = [jnp.zeros((n_trials, n_ind_points[k], 1),
+                             dtype=jnp.double)
                  for k in range(n_latents)]
     var_cov0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
-        var_cov0[k] = torch.empty((n_trials, n_ind_points[k], n_ind_points[k]),
-                                  dtype=torch.double)
+        var_cov0[k] = jnp.empty((n_trials, n_ind_points[k], n_ind_points[k]),
+                                  dtype=jnp.double)
         for r in range(n_trials):
-            var_cov0[k][r, :, :] = torch.eye(n_ind_points[k]) * \
-                    diag_var_cov0_value
+            var_cov0[k] = var_cov0[k].at[r, :, :].set(
+                jnp.eye(n_ind_points[k]) * diag_var_cov0_value
+            )
 
     params_dict = {
         "variational_params0": {
@@ -195,33 +199,33 @@ def strTo1DTensor(aString, dtype=np.float64, sep=","):
     if aString[0] in "[(" and aString[-1] in "])":
         aString = aString[1:-1]
     an_np_array = np.fromstring(aString, sep=sep, dtype=dtype)
-    a_tensor = torch.from_numpy(an_np_array)
+    a_tensor = jnp.asarray(an_np_array)
     return a_tensor
 
 
-def strTo2DTensor(aString, dtype=torch.double):
-    if dtype == torch.double:
+def strTo2DTensor(aString, dtype=jnp.double):
+    if dtype == jnp.double:
         dtype_np = np.float64
-    elif dtype == torch.int:
-        dtype_np = np.int32
+    elif dtype == jnp.int:
+        dtype_np = np.int64
     else:
         raise ValueError(f"Invalid dtype={dtype}")
 
     an_np_matrix = np.matrix(aString, dtype=dtype_np)
-    a_tensor = torch.from_numpy(an_np_matrix)
+    a_tensor = jnp.asarray(an_np_matrix)
     return a_tensor
 
 
 def strTo2DDoubleTensor(aString):
-    return strTo2DTensor(aString=aString, dtype=torch.double)
+    return strTo2DTensor(aString=aString, dtype=jnp.double)
 
 
 def strTo2DIntTensor(aString):
-    return strTo2DTensor(aString=aString, dtype=torch.int)
+    return strTo2DTensor(aString=aString, dtype=jnp.int64)
 
 
 def strTo1DDoubleTensor(aString):
-    return strTo1DTensor(aString=aString, dtype=np.float64)
+    return strTo1DTensor(aString=aString, dtype=jnp.double)
 
 
 def strTo1DIntTensor(aString):
@@ -559,8 +563,8 @@ def getLinearEmbeddingParams0(n_neurons, n_latents, dynamic_params_spec=None,
             dynamic_params_spec=dynamic_params_spec,
             config_file_params_spec=config_file_params_spec,
             default_params_spec=default_params_spec)
-    C = C.contiguous()
-    d = d.contiguous()
+    # C = C.contiguous()
+    # # d = d.contiguous()
     return C, d
 
 
@@ -610,7 +614,7 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
             f"{param_label}_filename" in params_dict[section_name]:
         param_filename = params_dict[section_name][f"{param_label}_filename"]
         param_np = np.genfromtxt(param_filename, delimiter=delimiter)
-        param = torch.from_numpy(param_np).type(torch.double)
+        param = jnp.asarray(param_np).type(jnp.double)
         print(f"Extracted from {params_dict_type} {param_label}_filename")
     # random
     elif section_name in params_dict and \
@@ -621,18 +625,17 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
             param_random_seed = \
                 params_dict[section_name][f"{param_label}_random_seed"]
         else:
-            param_random_seed = None
-        # If param_random_seed was specified for replicability
-        if param_random_seed is not None:
-            torch.random.manual_seed(param_random_seed)
+            param_random_seed = datetime.datetime.now().timestamp()
+        key = jax.random.PRNGKey(int(param_random_seed))
         if param_distribution == "Normal":
             if f"{param_label}_loc" in params_dict[section_name] and \
                f"{param_label}_scale" in params_dict[section_name]:
                 param_loc = params_dict[section_name][f"{param_label}_loc"]
                 param_scale = params_dict[section_name][f"{param_label}_scale"]
-                param = torch.distributions.normal.Normal(
-                    param_loc, param_scale).sample(
-                        sample_shape=[n_rows, n_cols]).type(torch.double)
+                key, subkey = jax.random.split(key)
+                param = jax.random.normal(subkey, shape=(n_rows, n_cols),
+                                          dtype=jnp.double) * param_scale + \
+                        param_loc
                 print(f"Extracted from {params_dict_type} "
                       f"{param_label}_distribution={param_distribution}, "
                       f"{param_label}_loc={param_loc}, "
@@ -649,9 +652,10 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
                f"{param_label}_high" in params_dict[section_name]:
                 param_low = params_dict[section_name][f"{param_label}_low"]
                 param_high = params_dict[section_name][f"{param_label}_high"]
-                param = torch.distributions.uniform.Uniform(
-                    low=param_low, high=param_high).sample(
-                        sample_shape=[n_rows, n_cols]).type(torch.double)
+                key, subkey = jax.random.split(key)
+                param = jax.random.uniform(subkey, shape=(n_rows, n_cols),
+                                           dtype=jnp.double, minval=param_low,
+                                           maxval=param_high)
                 print(f"Extracted from {params_dict_type} "
                     f"{param_label}_distribution={param_distribution}, "
                     f"{param_label}_low={param_low}, "
@@ -665,9 +669,6 @@ def getLinearEmbeddingParam0InDict(param_label, params_dict,
         else:
             raise ValueError(
                 f"Invalid param_distribution={param_distribution}")
-        # If param_random_seed was specified for replicability
-        if param_random_seed is not None:
-            torch.random.seed()
     else:
         param = None
 
@@ -724,7 +725,7 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
                                  f"in {params_dict_type}, then "
                                  "k_lengthscales0 should also be specified in "
                                  f"{params_dict_type}")
-            params0 = [torch.DoubleTensor([lengthscales0])
+            params0 = [jnp.asarray([lengthscales0], dtype=jnp.double)
                        for k in range(n_latents)]
             print(f"Extracted from {params_dict_type} "
                   "k_type=exponentialQuadratic and "
@@ -746,7 +747,7 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
                                  f"in {params_dict_type}, then k_periods0 "
                                  "should also be specified in "
                                  f"{params_dict_type}")
-            params0 = [torch.DoubleTensor([lengthscales0, periods0])
+            params0 = [jnp.asarray([lengthscales0, periods0], dtype=jnp.double)
                        for k in range(n_latents)]
             print(f"Extracted from {params_dict_type} "
                   f"k_types=periodic, k_lengthsales0={lengthscales0} "
@@ -769,7 +770,7 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
                                      f"then k_lengthscale0_latent{k} "
                                      "should also be specified in "
                                      f"{params_dict_type}")
-                params0.append(torch.DoubleTensor([lengthscale0]))
+                params0.append(jnp.asarray([lengthscale0], dtype=jnp.double))
                 print(f"Extracted from  {params_dict_type} "
                       f"k_type_latent{k}=exponentialQuadratic and "
                       f"k_lengthsale0_latent0{k}={lengthscale0}")
@@ -793,7 +794,8 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
                                      f"then k_period0_latent{k} "
                                      "should also be specified in "
                                      f"{params_dict_type}")
-                params0.append(torch.DoubleTensor([lengthscale0, period0]))
+                params0.append(jnp.asarray([lengthscale0, period0],
+                                           dtype=jnp.double))
                 print(f"Extracted from {params_dict_type} "
                       f"k_type_latent{k}=periodic, "
                       f"k_lengthsale0_latent{k}={lengthscale0} and "
@@ -902,13 +904,12 @@ def getSameAcrossLatentsAndTrialsIndPointsLocs0(
         n_latents, n_trials, ind_points_locs0_filename, delimiter=","):
     Z0_np = np.genfromtxt(ind_points_locs0_filename,
                           delimiter=delimiter).flatten()
-    Z0 = torch.from_numpy(Z0_np)
+    Z0 = jnp.asarray(Z0_np, dtype=jnp.double)
     Z0s = [[] for k in range(n_latents)]
     nIndPointsForLatent = len(Z0)
     for k in range(n_latents):
-        Z0s[k] = torch.empty((n_trials, nIndPointsForLatent, 1),
-                             dtype=torch.double)
-        Z0s[k][:, :, 0] = Z0
+        Z0s[k] = jnp.empty((n_trials, nIndPointsForLatent, 1), dtype=jnp.double)
+        Z0s[k] = Z0s[k].at[:, :, 0].set(Z0)
     return Z0s
 
 
@@ -925,11 +926,11 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
               f"{item_name}={ind_points_locs0_filename}")
         Z0_k_r0_np = np.genfromtxt(ind_points_locs0_filename,
                                    delimiter=delimiter)
-        Z0_k_r0 = torch.from_numpy(Z0_k_r0_np).flatten()
+        Z0_k_r0 = jnp.asarray(Z0_k_r0_np, dtypes=jnp.double).flatten()
         nIndPointsForLatent = len(Z0_k_r0)
-        Z0[k] = torch.empty((n_trials, nIndPointsForLatent, 1),
-                            dtype=torch.double)
-        Z0[k][0, :, 0] = Z0_k_r0
+        Z0[k] = jnp.empty((n_trials, nIndPointsForLatent, 1),
+                            dtype=jnp.double)
+        Z0[k] = Z0[k].at[0, :, 0].set(Z0_k_r0)
         for r in range(1, n_trials):
             item_name = item_name_pattern.format(k, r)
             ind_points_locs0_filename = params_dict[section_name][item_name]
@@ -937,8 +938,8 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
                   f"{item_name}={ind_points_locs0_filename}")
             Z0_k_r_np = np.genfromtxt(ind_points_locs0_filename,
                                       delimiter=delimiter)
-            Z0_k_r = torch.from_numpy(Z0_k_r_np).flatten()
-            Z0[k][r, :, 0] = Z0_k_r
+            Z0_k_r = jnp.asarray(Z0_k_r_np).flatten()
+            Z0[k] = Z0[k].at[r, :, 0].set(Z0_k_r)
     return Z0
 
 
@@ -946,12 +947,12 @@ def buildEquidistantIndPointsLocs0(n_latents, n_trials, n_ind_points,
                                    trials_start_times, trials_end_times):
     Z0s = [[] for k in range(n_latents)]
     for k in range(n_latents):
-        Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1),
-                             dtype=torch.double)
+        Z0s[k] = jnp.empty((n_trials, n_ind_points[k], 1),
+                             dtype=jnp.double)
         for r in range(n_trials):
-            Z0 = torch.linspace(trials_start_times[r], trials_end_times[r],
-                                n_ind_points[k])
-            Z0s[k][r, :, 0] = Z0
+            Z0 = jnp.linspace(trials_start_times[r], trials_end_times[r],
+                              n_ind_points[k])
+            Z0s[k] = Z0s[k].at[r, :, 0].set(Z0)
     return Z0s
 
 
@@ -959,14 +960,19 @@ def buildUniformIndPointsLocs0(n_latents, n_trials, n_ind_points,
                                trials_start_times, trials_end_times):
     Z0s = [[] for k in range(n_latents)]
     for k in range(n_latents):
-        Z0s[k] = torch.empty((n_trials, n_ind_points[k], 1),
-                             dtype=torch.double)
+        Z0s[k] = jnp.empty((n_trials, n_ind_points[k], 1),
+                           dtype=jnp.double)
+        random_seed = datetime.datetime.now().timestamp()
+        param_random_seed = datetime.datetime.now().timestamp()
+        key = jax.random.PRNGKey(int(param_random_seed))
         for r in range(n_trials):
+            key, subkey = jax.random.split(key)
             Z0 = trials_start_times[r] + \
-                 torch.rand(n_ind_points[k]) * \
+                 jax.random.uniform(subkey, shape=(n_ind_points[k],),
+                                           dtype=jnp.double) * \
                  (trials_end_times[r]-trials_start_times[r])
-            Z0_sorted, _ = Z0.sort()
-            Z0s[k][r, :, 0] = Z0_sorted
+            Z0_sorted = Z0.sort()
+            Z0s[k] = Z0s[k].at[r, :, 0].set(Z0_sorted)
     return Z0s
 
 
@@ -1024,8 +1030,8 @@ def getVariationalMean0InDict(
         # make sure all latents have the same number of inducing points
         for k in range(1, len(n_ind_points)):
             assert(n_ind_points[0] == n_ind_points[k])
-        a_variational_mean0 = torch.ones(n_ind_points[0],
-                                         dtype=torch.double) * constant_value
+        a_variational_mean0 = jnp.ones(n_ind_points[0],
+                                         dtype=jnp.double) * constant_value
         print(f"Extracted from {params_dict_type} "
               f"{constant_value_item_name}={constant_value}")
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
@@ -1041,7 +1047,7 @@ def getVariationalMean0InDict(
         a_variational_mean0_np = np.genfromtxt(variational_mean0_filename,
                                                delimiter=delimiter)
         a_variational_mean0 = \
-            torch.from_numpy(a_variational_mean0_np).flatten()
+            jnp.asarray(a_variational_mean0_np).flatten()
         variational_mean0 = getSameAcrossLatentsAndTrialsVariationalMean0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_mean0=a_variational_mean0)
@@ -1064,9 +1070,10 @@ def getSameAcrossLatentsAndTrialsVariationalMean0(n_latents, n_trials,
     n_ind_points = len(a_variational_mean0)
     variational_mean0 = [[] for r in range(n_latents)]
     for k in range(n_latents):
-        variational_mean0[k] = torch.empty((n_trials, n_ind_points, 1),
-                                           dtype=torch.double)
-        variational_mean0[k][:, :, 0] = a_variational_mean0
+        variational_mean0[k] = jnp.empty((n_trials, n_ind_points, 1),
+                                         dtype=jnp.double)
+        variational_mean0[k] = variational_mean0[k].at[:, :, 0].set(
+            a_variational_mean0)
     return variational_mean0
 
 
@@ -1084,10 +1091,10 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
         variational_mean0_k0_np = np.genfromtxt(variational_mean0_filename,
                                                 delimiter=delimiter)
         variational_mean0_k0 = \
-            torch.from_numpy(variational_mean0_k0_np).flatten()
+            jnp.asarray(variational_mean0_k0_np).flatten()
         nIndPointsK = len(variational_mean0_k0)
-        variational_mean0[k] = torch.empty((n_trials, nIndPointsK, 1),
-                                           dtype=torch.double)
+        variational_mean0[k] = jnp.empty((n_trials, nIndPointsK, 1),
+                                           dtype=jnp.double)
         variational_mean0[k][0, :, 0] = variational_mean0_k0
         for r in range(1, n_trials):
             variational_mean0_filename = \
@@ -1098,8 +1105,9 @@ def getDiffAcrossLatentsAndTrialsVariationalMean0(
             variational_mean0_kr = np.genfromtxt(variational_mean0_filename,
                                                  delimiter=delimiter)
             variational_mean0_kr = \
-                torch.from_numpy(variational_mean0_kr).flatten()
-            variational_mean0[k][r, :, 0] = variational_mean0_kr
+                jnp.asarray(variational_mean0_kr).flatten()
+            variational_mean0[k] = variational_mean0[k].at[r, :, 0].set(
+                variational_mean0_kr)
     return variational_mean0
 
 
@@ -1158,8 +1166,8 @@ def getVariationalCov0InDict(
         # make sure all latents have the same number of inducing points
         for k in range(1, len(n_ind_points)):
             assert(n_ind_points[0] == n_ind_points[k])
-        a_variational_cov0 = diag_value * torch.eye(n_ind_points[0],
-                                                    dtype=torch.double)
+        a_variational_cov0 = diag_value * jnp.eye(n_ind_points[0],
+                                                    dtype=jnp.double)
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_cov0=a_variational_cov0,
@@ -1173,7 +1181,7 @@ def getVariationalCov0InDict(
               f"{common_filename_item_name}={variational_cov0_filename}")
         a_variational_cov0_np = np.genfromtxt(variational_cov0_filename,
                                               delimiter=delimiter)
-        a_variational_cov0 = torch.from_numpy(a_variational_cov0_np)
+        a_variational_cov0 = jnp.asarray(a_variational_cov0_np)
         variational_cov0 = getSameAcrossLatentsAndTrialsVariationalCov0(
             n_latents=n_latents, n_trials=n_trials,
             a_variational_cov0=a_variational_cov0,
@@ -1196,9 +1204,10 @@ def getSameAcrossLatentsAndTrialsVariationalCov0(
     variational_cov0 = [[] for r in range(n_latents)]
     n_ind_points = a_variational_cov0.shape[0]
     for k in range(n_latents):
-        variational_cov0[k] = torch.empty((n_trials, n_ind_points,
-                                           n_ind_points), dtype=torch.double)
-        variational_cov0[k][:, :, :] = a_variational_cov0
+        variational_cov0[k] = jnp.empty((n_trials, n_ind_points,
+                                         n_ind_points), dtype=jnp.double)
+        variational_cov0[k] = variational_cov0[k].at[:, :, :].set(
+            a_variational_cov0)
     return variational_cov0
 
 
@@ -1215,11 +1224,12 @@ def getDiffAcrossLatentsAndTrialsVariationalCov0(
               f"{item_name}={variational_cov_filename}")
         variational_cov0_k0_np = np.genfromtxt(variational_cov_filename,
                                                delimiter=delimiter)
-        variational_cov0_k0 = torch.from_numpy(variational_cov0_k0_np)
+        variational_cov0_k0 = jnp.asarray(variational_cov0_k0_np)
         nIndPointsK = variational_cov0_k0.shape[0]
-        variational_cov0[k] = torch.empty((n_trials, nIndPointsK, nIndPointsK),
-                                          dtype=torch.double)
-        variational_cov0[k][0, :, :] = variational_cov0_k0
+        variational_cov0[k] = jnp.empty((n_trials, nIndPointsK, nIndPointsK),
+                                        dtype=jnp.double)
+        variational_cov0[k] = variational_cov0[k].at[0, :, :].set(
+            variational_cov0_k0)
         for r in range(1, n_trials):
             item_name = item_name_pattern.format(k, r)
             variational_cov_filename = params_dict[section_name][item_name]
@@ -1227,19 +1237,25 @@ def getDiffAcrossLatentsAndTrialsVariationalCov0(
                   f"{item_name}={variational_cov_filename}")
             variational_cov0_kr_np = np.genfromtxt(variational_cov_filename,
                                                    delimiter=delimiter)
-            variational_cov0_kr = torch.from_numpy(variational_cov0_kr_np)
-            variational_cov0[k][r, :, :] = variational_cov0_kr
+            variational_cov0_kr = jnp.asarray(variational_cov0_kr_np)
+            variational_cov0[k] = variational_cov0[k].at[r, :, :].set(
+                variational_cov0_kr)
     return variational_cov0
 
 
 def getUniformIndPointsMeans(n_trials, n_latents, nIndPointsPerLatent,
                              min=-1, max=1):
+    random_seed = datetime.datetime.now().timestamp()
+    param_random_seed = datetime.datetime.now().timestamp()
+    key = jax.random.PRNGKey(int(param_random_seed))
     ind_points_means = [[] for r in range(n_trials)]
     for r in range(n_trials):
         ind_points_means[r] = [[] for k in range(n_latents)]
         for k in range(n_latents):
+            key, subkey = jax.random.split(key)
             ind_points_means[r][k] = \
-                torch.rand(nIndPointsPerLatent[k], 1)*(max - min)+min
+                jax.random.uniform(subkey, shape=(nIndPointsPerLatent[k], 1),
+                                   dtype=jnp.double, minval=min, maxval=max)
     return ind_points_means
 
 
@@ -1250,8 +1266,8 @@ def getConstantIndPointsMeans(constantValue, n_trials, n_latents,
         ind_points_means[r] = [[] for k in range(n_latents)]
         for k in range(n_latents):
             ind_points_means[r][k] = \
-                    constantValue*torch.ones(nIndPointsPerLatent[k], 1,
-                                             dtype=torch.double)
+                    constantValue*jnp.ones(shape=(nIndPointsPerLatent[k], 1),
+                                           dtype=jnp.double)
     return ind_points_means
 
 
@@ -1271,11 +1287,11 @@ def getScaledIdentityQSigma0(scale, n_trials, nIndPointsPerLatent):
     qSigma0 = [[None] for k in range(nLatent)]
 
     for k in range(nLatent):
-        qSigma0[k] = torch.empty((n_trials, nIndPointsPerLatent[k],
-                                  nIndPointsPerLatent[k]), dtype=torch.double)
+        qSigma0[k] = jnp.empty((n_trials, nIndPointsPerLatent[k],
+                                  nIndPointsPerLatent[k]), dtype=jnp.double)
         for r in range(n_trials):
-            qSigma0[k][r, :, :] = scale*torch.eye(nIndPointsPerLatent[k],
-                                                  dtype=torch.double)
+            qSigma0[k] = qSigma0[k].at[r, :, :].set(scale*jnp.eye(
+                nIndPointsPerLatent[k], dtype=jnp.double))
     return qSigma0
 
 
@@ -1285,12 +1301,11 @@ def getSVPosteriorOnIndPointsParams0(nIndPointsPerLatent, n_latents, n_trials,
     qSVec0 = [[] for k in range(n_latents)]
     qSDiag0 = [[] for k in range(n_latents)]
     for k in range(n_latents):
-        qMu0[k] = torch.zeros(n_trials, nIndPointsPerLatent[k], 1,
-                              dtype=torch.double)
-        qSVec0[k] = scale*torch.eye(nIndPointsPerLatent[k], 1,
-                                    dtype=torch.double).repeat(n_trials, 1, 1)
-        qSDiag0[k] = scale*torch.ones(nIndPointsPerLatent[k], 1,
-                                      dtype=torch.double).repeat(
+        qMu0[k] = jnp.zeros((n_trials, nIndPointsPerLatent[k], 1), dtype=jnp.double)
+        qSVec0[k] = scale*jnp.eye(nIndPointsPerLatent[k], 1,
+                                    dtype=jnp.double).repeat(n_trials, 1, 1)
+        qSDiag0[k] = scale*jnp.ones(nIndPointsPerLatent[k], 1,
+                                      dtype=jnp.double).repeat(
                                           n_trials, 1, 1)
     return qMu0, qSVec0, qSDiag0
 
@@ -1299,17 +1314,27 @@ def getKernelsParams0(kernels, noiseSTD):
     n_latents = len(kernels)
     kernelsParams0 = [kernels[k].getParams() for k in range(n_latents)]
     if noiseSTD > 0.0:
+        random_seed = datetime.datetime.now().timestamp()
+        key = jax.random.PRNGKey(int(param_random_seed))
+        key, subkey = jax.random.split(key)
         kernelsParams0 = [kernelsParams0[0] +
-                          noiseSTD*torch.randn(len(kernelsParams0[k]))
+                          jax.random.uniform(subkey,
+                                             shape=(len(kernelsParams0[k]),)) \
+                          * noiseSTD
                           for k in range(n_latents)]
     return kernelsParams0
 
 
-def getKernelsScaledParams0(kernels, noiseSTD):
-    n_latents = len(kernels)
-    kernelsParams0 = [kernels[k].getScaledParams() for k in range(n_latents)]
-    if noiseSTD > 0.0:
-        kernelsParams0 = [kernelsParams0[0] +
-                          noiseSTD*torch.randn(len(kernelsParams0[k]))
-                          for k in range(n_latents)]
-    return kernelsParams0
+# def getKernelsScaledParams0(kernels, noiseSTD):
+#     n_latents = len(kernels)
+#     kernelsParams0 = [kernels[k].getScaledParams() for k in range(n_latents)]
+#     if noiseSTD > 0.0:
+#         random_seed = datetime.datetime.now().timestamp()
+#         key = jax.random.PRNGKey(random_seed)
+#         key, subkey = jax.random.split(key)
+#         kernelsParams0 = [kernelsParams0[0] +
+#                           jax.random.uniform(subkey,
+#                                              shape=len(kernelsParams0[k])) \
+#                           * noiseSTD
+#                           for k in range(n_latents)]
+#     return kernelsParams0
