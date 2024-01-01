@@ -591,14 +591,9 @@ def test_emJAX__eval_func():
 #     maxRes = em._mStepIndPointsLocs(model=svlb, optim_params=optim_params)
 #     assert(maxRes["lowerBound"]>(-nLowerBound))
 
-def test_maximize_pointProcess_JAX():
-    reg_param = 1e-5
-    maxiter=3750
-    max_stepsize = 200.0
-    tol = 1e-5
-    jit=False
-    verbose=True
-
+def test_maximize_pointProcess_JAX(reg_param = 1e-5, maxiter=3750,
+                                   max_stepsize=200.0, tol = 1e-5, jit=False,
+                                   verbose=True):
     yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
@@ -642,7 +637,7 @@ def test_maximize_pointProcess_JAX():
         if kernelNames[0,k][0] == "PeriodicKernel":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
             lengthscale = float(hprs[k,0][0].item())
-            period = hprs[k,0][1].item()
+            period = float(hprs[k,0][1].item())
             kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
@@ -691,10 +686,10 @@ def test_maximize_pointProcess_JAX():
                                )
     optim_params = dict(
         maxiter=maxiter,
-        tol=tol,
-        max_stepsize=max_stepsize,
+        # tol=tol,
+        # max_stepsize=max_stepsize,
         jit=jit,
-        verbose=verbose,
+        # verbose=verbose,
     )
 
     start_time = time.time()
@@ -716,7 +711,9 @@ if __name__=='__main__':
     # test_mStepIndPoints_pointProcess_PyTorch() # passed
 
     # t0 = time.perf_counter()
-    test_maximize_pointProcess_JAX() # passed
+    test_maximize_pointProcess_JAX(reg_param = 1e-5, maxiter=4000,
+                                   max_stepsize=200.0, tol = 1e-5, jit=True,
+                                   verbose=False)
     # elapsed = time.perf_counter()-t0
     # print(elapsed)
 
