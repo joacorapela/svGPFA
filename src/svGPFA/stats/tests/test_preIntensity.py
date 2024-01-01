@@ -42,29 +42,21 @@ def test_computeMeansAndVars_quadTimes():
     for k in range(nLatents):
         if kernelNames[0,k][0] == "PeriodicKernel":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
-            scale = 1.0
-            lengthscale = hprs[k,0][0].item() 
-            period = hprs[k,0][1].item()
-            lengthscaleScale = 1.0
-            periodScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale,
-                                  "period": period, "periodScale": periodScale}
+            lengthscale = float(hprs[k,0][0].item())
+            period = float(hprs[k,0][1].item())
+            kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
-            scale = 1.0
-            lengthscale = hprs[k,0][0].item()
-            lengthscaleScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale}
+            lengthscale = float(hprs[k,0][0].item())
+            kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol(kernels=kernels)
-    quadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(kernels=kernels)
+    quadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(
+        kernels=kernels, times=t)
     Kzz, Kzz_inv = indPointsLocsKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0, reg_param=reg_param)
-    quadTimesKMS.setTimes(times=t)
     Ktz, KttDiag = quadTimesKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0)
 
@@ -112,36 +104,27 @@ def test_computeMeansAndVars_spikesTimes():
     for k in range(nLatents):
         if kernelNames[0,k][0] == "PeriodicKernel":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
-            scale = 1.0
-            lengthscale = hprs[k,0][0].item() 
-            period = hprs[k,0][1].item()
-            lengthscaleScale = 1.0
-            periodScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale,
-                                  "period": period, "periodScale": periodScale}
+            lengthscale = float(hprs[k,0][0].item())
+            period = float(hprs[k,0][1].item())
+            kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
-            scale = 1.0
-            lengthscale = hprs[k,0][0].item()
-            lengthscaleScale = 1.0
-            kernels_params0[k] = {"scale": scale, "lengthscale": lengthscale,
-                                  "lengthscaleScale": lengthscaleScale}
+            lengthscale = float(hprs[k,0][0].item())
+            kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
     indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol(kernels=kernels)
-    spikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(kernels=kernels)
+    spikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(
+        kernels=kernels, times=Y)
     Kzz, Kzz_inv = indPointsLocsKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0, reg_param=reg_param)
-    spikesTimesKMS.setTimes(times=Y)
     Ktz, KttDiag = spikesTimesKMS.buildKernelsMatrices(
         kernels_params=kernels_params0, ind_points_locs=Z0)
 
     qK = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents()
     qH = svGPFA.stats.preIntensity.LinearPreIntensitySpikesTimes(
-        posteriorOnLatents=qK)
-    qH.setNeuronForSpikeIndex(neuronForSpikeIndex=index)
+        posteriorOnLatents=qK, neuronForSpikeIndex=index)
     qHMu, qHVar = qH.computeMeansAndVars(variational_mean=qMu0,
                                          variational_cov=qSigma0, C=C0, d=b0,
                                          Kzz=Kzz, Kzz_inv=Kzz_inv,
