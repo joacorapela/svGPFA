@@ -13,16 +13,23 @@ def test_getPropSamplesCovered():
     N = 100
     tol = .1
 
-    mean = np.rand(size=(N,))*2-1
-    std = np.rand(size=(N,))*0.3
-    sample = np.normal(mean=mean, std=std)
+    seed = 1234
+    key = jax.random.PRNGKey(seed)
+    key, subkey = jax.random.split(key)
+    mean = jax.random.uniform(key, shape=(N,))*2-1
+    key, subkey = jax.random.split(key)
+    std = jax.random.uniform(key, shape=(N,))*0.3
+    key, subkey = jax.random.split(key)
+    std = jax.random.uniform(key, shape=(N,))*0.3
+    key, subkey = jax.random.split(key)
+    sample = jax.random.normal(key, shape=mean.shape) * std + mean
     propSamplesCovered = svGPFA.utils.miscUtils.getPropSamplesCovered(sample=sample, mean=mean, std=std, percent=.95)
     assert(.95-tol<propSamplesCovered and propSamplesCovered<tol+.95)
 
 def test_getDiagIndicesIn3DArray():
     N = 3
     M = 2
-    trueDiagIndices = np.array([0, 4, 8, 9, 13, 17])
+    trueDiagIndices = jnp.array([0, 4, 8, 9, 13, 17])
 
     diagIndices = svGPFA.utils.miscUtils.getDiagIndicesIn3DArray(N=N, M=M)
     assert(((trueDiagIndices-diagIndices)**2).sum()==0)
@@ -30,18 +37,13 @@ def test_getDiagIndicesIn3DArray():
 def test_build3DdiagFromDiagVector():
     N = 3
     M = 2
-    v = np.arange(M*N, dtype=np.double)
+    v = jnp.arange(M*N, dtype=jnp.double)
     D = svGPFA.utils.miscUtils.build3DdiagFromDiagVector(v=v, N=N, M=M)
-    trueD = np.array([[[0,0,0],[0,1,0],[0,0,2]],[[3,0,0],[0,4,0],[0,0,5]]],
-                      dtype=np.double)
+    trueD = jnp.array([[[0,0,0],[0,1,0],[0,0,2]],[[3,0,0],[0,4,0],[0,0,5]]],
+                      dtype=jnp.double)
     assert(((trueD-D)**2).sum()==0)
 
-def test_cholVecs():
-    tol = 1e-6
-    n_latents = 3
-    n_trials = 5
-    n_ind_points = 10
-
+def test_cholVecs(tol=1e-6, n_latents=3, n_trials=5, n_ind_points=10):
     M = int(n_ind_points * (n_ind_points + 1) / 2)
     tril_indices = jnp.tril_indices(n_ind_points)
     chols = [None] * n_latents
@@ -81,5 +83,5 @@ if __name__=="__main__":
     # test_getDiagIndicesIn3DArray()
     # test_build3DdiagFromDiagVector()
     # # test_j_cholesky()
-    # test_getPropSamplesCovered()
-    test_cholVecs()
+    test_getPropSamplesCovered()
+    # test_cholVecs()
