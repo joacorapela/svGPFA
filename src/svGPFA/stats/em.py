@@ -23,7 +23,6 @@ class EM_JAX:
         self._reg_param = reg_param
 
     def maximize(self, params0, optim_params):
-        solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
 #         solver = jaxopt.ScipyMinimize(fun=self._eval_func,
 #                                       method="L-BFGS-B",
 #                                       callback=mycallback,
@@ -32,6 +31,7 @@ class EM_JAX:
 #             lb = -1*self._eval_func(params)
 #             print(f"lower bound: {lb}")
 
+        solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
         res = solver.run(params0)
         return res
 
@@ -55,8 +55,8 @@ class EM_JAX:
                                 Ktz_spike=Ktz_spike, KttDiag_spike=KttDiag_spike)
         variational_cov = buildCovsFromCholVecs(variational_chol_vecs)
         answer = -1*self._model.eval(variational_mean=variational_mean,
-                                  variational_cov=variational_cov,
-                                  C=C, d=d, kernels_matrices=kernels_matrices)
+                                     variational_cov=variational_cov, C=C, d=d,
+                                     kernels_matrices=kernels_matrices)
         # print(f"lower bound={-answer}")
         return answer
 
