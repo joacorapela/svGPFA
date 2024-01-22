@@ -8,7 +8,9 @@ import math
 import copy
 import pickle
 import numpy as np
+import jax
 import jaxopt
+import scipy.optimize
 
 from ..utils.miscUtils import buildCovsFromCholVecs
 
@@ -31,9 +33,63 @@ class EM_JAX:
 #             lb = -1*self._eval_func(params)
 #             print(f"lower bound: {lb}")
 
+        eval0 = self._eval_func(params=params0)
+        assert(math.isfinite(eval0))
+
         solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
         res = solver.run(params0)
         return res
+
+    def maximize_scipy(self, params0, optim_params):
+        eval_func_jitted = jax.jit(self._eval_func)
+        eval_func_grad_jitted = jax.jit(jax.grad(self._eval_func))
+
+        eval0 = eval_func_jitted(params=params0)
+        assert(math.isfinite(eval0))
+
+        def mycallback(params):
+            lb = -1*self._eval_func(params)
+            print(f"lower bound: {lb}")
+
+        res = scipy.optimize.minimize(fun=eval_func_jitted,
+                                      x0=params0,
+                                      jac=eval_func_grad_jitted,
+                                      method="L-BFGS-B",
+                                      callback=mycallback,
+                                      **optim_params)
+        return res
+
+    def maximize_jaxopt_scipy(self, params0, optim_params):
+        eval_func_jitted = jax.jit(self._eval_func)
+        eval0 = eval_func_jitted(params=params0)
+        assert(math.isfinite(eval0))
+
+        def mycallback(params):
+            lb = -1*self._eval_func(params)
+            print(f"lower bound: {lb}")
+
+        solver = jaxopt.ScipyMinimize(fun=eval_func_jitted,
+                                      method="L-BFGS-B",
+                                      callback=mycallback,
+                                      **optim_params)
+        # solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
+        res = solver.run(params0)
+        return res
+
+    def maximizeInSteps(self, params0, optim_params):
+        eval_func_jitted = jax.jit(self._eval_func)
+        solver = jaxopt.LBFGS(fun=eval_func_jitted, **optim_params)
+        # solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
+        params = params0
+        print("About to call solver.init_state(params)")
+        state = solver.init_state(params)
+        print("Call solver.init_state(params) done")
+
+        for step in range(optim_params["maxiter"]):
+            params, state = solver.update(params=params, state=state)
+            lower_bound = -state.value
+            print(f"Iteration {step}: {lower_bound}")
+        return state
 
     def _eval_func(self, params):
         variational_mean = params["variational_mean"]
