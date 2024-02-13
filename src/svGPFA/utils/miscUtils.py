@@ -159,10 +159,10 @@ def getCholFromVec(vec):
     :type  nIndPoints: int
     """
     Pk = len(vec)
-    nindPoints = int((math.sqrt(1 + 8 * Pk) - 1) / 2)
+    nIndPoints = int((math.sqrt(1 + 8 * Pk) - 1) / 2)
     chol = jnp.zeros((nIndPoints, nIndPoints), dtype=jnp.double)
     tril_indices = jnp.tril_indices(nIndPoints)
-    chol[tril_indices[0],tril_indices[1]] = vec
+    chol = chol.at[tril_indices[0], tril_indices[1]].set(vec)
     return chol
 
 def buildCovsFromCholVecs(chol_vecs):
@@ -170,21 +170,20 @@ def buildCovsFromCholVecs(chol_vecs):
     descompositions.
 
     :param chol_vecs: vector respresentations of the lower-triangular Cholesky factors
-    :type  list of length n_latents shuch that chol_vecs[k] \in (n_trials, Pk, 1) where Pk=(n_ind_points[k] * (n_ind_points[k] + 1)) / 2
+    :type  jax.Array \in (n_latents, n_trials, Pk, 1) where Pk=(n_ind_points[k] * (n_ind_points[k] + 1)) / 2
     """
     # Pk = (n_ind_points * (n_ind_points + 1)) / 2 then
     # n_ind_points = (math.sqrt(1 + 8 * M) - 1) / 2
-    n_latents = len(chol_vecs)
-    n_trials = chol_vecs[0].shape[0]
-    covs = [None] * n_latents
+    n_latents = chol_vecs.shape[0]
+    n_trials = chol_vecs.shape[1]
+    Pk = chol_vecs.shape[2]
+    n_ind_points = int((math.sqrt(1 + 8 * Pk) - 1) / 2)
+    tril_indices = jnp.tril_indices(n_ind_points)
+    chols = jnp.zeros((n_latents, n_trials, n_ind_points, n_ind_points), dtype=jnp.double)
     for k in range(n_latents):
-        Pk = chol_vecs[k].shape[1]
-        n_ind_points_k = int((math.sqrt(1 + 8 * Pk) - 1) / 2)
-        tril_indices_k = jnp.tril_indices(n_ind_points_k)
-        chols_k = jnp.zeros((n_trials, n_ind_points_k, n_ind_points_k), dtype=jnp.double)
         for r in range(n_trials):
-            chols_k = chols_k.at[r, tril_indices_k[0], tril_indices_k[1]].set(chol_vecs[k][r, :, 0])
-        covs[k] = jnp.matmul(chols_k, jnp.transpose(chols_k, (0, 2, 1)))
+            chols = chols.at[k, r, tril_indices[0], tril_indices[1]].set(chol_vecs[k, r, :, 0])
+    covs = jnp.matmul(chols, jnp.transpose(chols, (0, 1, 3, 2)))
     return covs
 
 def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
@@ -212,9 +211,7 @@ def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
 
 
 def getCholVecsFromCov(cov):
-    cov_chol = []
-    for aCov in cov:
-        cov_chol.append(svGPFA.utils.miscUtils.chol3D(aCov))
+    cov_chol = chol3D(cov)
     chol_vecs = getVectorRepOfLowerTrianMatrices(lt_matrices=cov_chol)
     return chol_vecs
 
@@ -266,16 +263,14 @@ def pinv3D(K, rcond=1e-15):
 def getLegQuadPointsAndWeights(n_quad, trials_start_times, trials_end_times):
     n_trials = len(trials_start_times)
     assert(n_trials == len(trials_end_times))
-    leg_quad_points = [jnp.empty((n_quad[r], 1), dtype=jnp.double)
-                       for r in range(n_trials)]
-    leg_quad_weights = [jnp.empty((n_quad[r], 1), dtype=jnp.double)
-                        for r in range(n_trials)]
+    leg_quad_points = jnp.empty((n_trials, n_quad, 1), dtype=jnp.double)
+    leg_quad_weights = jnp.empty((n_trials, n_quad, 1), dtype=jnp.double)
     for r in range(n_trials):
         points, weights = \
                 gcnu_common.numerical_methods.utils.leggaussVarLimits(
-                    n=n_quad[r].item(), a=trials_start_times[r], b=trials_end_times[r])
-        leg_quad_points[r] = leg_quad_points[r].at[:, 0].set(points)
-        leg_quad_weights[r] = leg_quad_weights[r].at[:, 0].set(weights)
+                    n=n_quad, a=trials_start_times[r], b=trials_end_times[r])
+        leg_quad_points  = leg_quad_points.at[r, :, 0].set(points)
+        leg_quad_weights = leg_quad_weights.at[r, :, 0].set(points)
     return leg_quad_points, leg_quad_weights
 
 
@@ -457,27 +452,24 @@ def getEmbeddingSTDs(C, latents_STDs):
 def getVectorRepOfLowerTrianMatrices(lt_matrices):
     """Returns vectors containing the lower-triangular elements of the input lower-triangular matrices.
 
-    :parameter lt_matrices: a list of length n_latents, with lt_matrices[k] a tensor of dimension n_trials x n_ind_points x n_ind_points, where lt_matrices[k][r, :, :] is a lower-triangular matrix.
-    :type lt_matrices: list
+    :parameter lt_matrices: a tensor of dimension n_latents x n_trials x n_ind_points x n_ind_points, where lt_matrices[k, r, :, :] is a lower-triangular matrix.
+    :type lt_matrices: jax.Array
 
-    :return: a list vec_lt_matrices of length n_latents, whith vec_lt_matrices[k] a tensor of dimension (n_trials, n_ind_points*(n_ind_points+1)/2, 0), where vec_lt_matrices[k][r, :, 0] contains the vectorized lower-triangular elements of lt_matrices[k][r, :, :].
+    :return: a jax.Array of dimension (n_latents, n_trials, n_ind_points*(n_ind_points+1)/2, 0), where vec_lt_matrices[k, r, :, 0] contains the vectorized lower-triangular elements of lt_matrices[k, r, :, :].
 
     """
 
-    n_latents = len(lt_matrices)
-    n_trials = lt_matrices[0].shape[0]
+    n_latents = lt_matrices.shape[0]
+    n_trials = lt_matrices.shape[1]
+    n_ind_points = lt_matrices.shape[2]
+    tril_indices = jnp.tril_indices(n_ind_points)
 
-    cholVecs = [[None] for k in range(n_latents)]
+    Pk = int((n_ind_points+1)*n_ind_points/2)
+    cholVecs = jnp.empty((n_latents, n_trials, Pk, 1))
     for k in range(n_latents):
-        nIndPointsK = lt_matrices[k].shape[1]
-        tril_indices = jnp.tril_indices(nIndPointsK)
-        Pk = int((nIndPointsK+1)*nIndPointsK/2)
-        # cholVecs[k] = jnp.empty((n_trials, Pk, 1), dtype=np.float64)
-        cholVecs[k] = jnp.empty((n_trials, Pk, 1))
         for r in range(n_trials):
-            cholKR = lt_matrices[k][r, :, :]
+            cholKR = lt_matrices[k, r, :, :]
             cholKRVec = cholKR[tril_indices[0], tril_indices[1]]
-            # cholVecs[k][r, :, 0] = cholKRVec
-            cholVecs[k] = cholVecs[k].at[r, :, 0].set(cholKRVec)
+            cholVecs = cholVecs.at[k, r, :, 0].set(cholKRVec)
     return cholVecs
 
