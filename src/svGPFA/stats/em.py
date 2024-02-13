@@ -40,24 +40,30 @@ class EM_JAX:
         res = solver.run(params0)
         return res
 
-    def maximize_scipy(self, params0, optim_params):
-        eval_func_jitted = jax.jit(self._eval_func)
-        eval_func_grad_jitted = jax.jit(jax.grad(self._eval_func))
-
-        eval0 = eval_func_jitted(params=params0)
-        assert(math.isfinite(eval0))
-
-        def mycallback(params):
-            lb = -1*self._eval_func(params)
-            print(f"lower bound: {lb}")
-
-        res = scipy.optimize.minimize(fun=eval_func_jitted,
-                                      x0=params0,
-                                      jac=eval_func_grad_jitted,
-                                      method="L-BFGS-B",
-                                      callback=mycallback,
-                                      **optim_params)
-        return res
+#     def maximize_scipy(self, params0, optim_params):
+#         print("Jitting optim functions")
+#         eval_func_jitted = jax.jit(self._eval_func)
+#         eval_func_grad_jitted = jax.jit(jax.grad(self._eval_func))
+#         print("Jitting optim functions done")
+# 
+#         print("Evaluating optimisation function once")
+#         eval0 = eval_func_jitted(params=params0)
+#         assert(math.isfinite(eval0))
+#         print(f"Evaluating optimisation function done with value {eval0}")
+# 
+#         def mycallback(params):
+#             lb = -1*self._eval_func(params)
+#             print(f"lower bound: {lb}")
+# 
+#         print("Starting minimization")
+#         res = scipy.optimize.minimize(fun=eval_func_jitted,
+#                                       x0=params0,
+#                                       jac=eval_func_grad_jitted,
+#                                       method="L-BFGS-B",
+#                                       callback=mycallback,
+#                                       options=optim_params)
+#         print("minimization done")
+#         return res
 
     def maximize_jaxopt_scipy(self, params0, optim_params):
         eval_func_jitted = jax.jit(self._eval_func)
