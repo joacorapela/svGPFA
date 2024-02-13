@@ -290,7 +290,7 @@ def getArgsInfo():
                      "ind_points_locs0_filename_latent{:d}_trial{:d}": str,
                  },
                  "optim_params": {
-                     "n_quad": strTo1DIntTensor,
+                     "n_quad": int,
                      "prior_cov_reg_param": float,
                      "optim_method": str,
                      "em_max_iter": int,
@@ -490,11 +490,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
         config_file_params_spec=config_file_params_spec,
         default_params_spec=default_params_spec,
         n_ind_points=n_ind_points)
-    var_cov0_chol = [svGPFA.utils.miscUtils.chol3D(var_cov0[k])
-                     for k in range(n_latents)]
-    var_cov0_chol_vecs = \
-        svGPFA.utils.miscUtils.getVectorRepOfLowerTrianMatrices(
-            lt_matrices=var_cov0_chol)
+    var_cov0_chol_vecs = svGPFA.utils.miscUtils.getCholVecsFromCov(var_cov0)
 
     optim_params = getOptimParams(
         dynamic_params_spec=dynamic_params_spec,
@@ -945,34 +941,47 @@ def getDiffAcrossLatentsAndTrialsIndPointsLocs0(
 
 def buildEquidistantIndPointsLocs0(n_latents, n_trials, n_ind_points,
                                    trials_start_times, trials_end_times):
-    Z0s = [[] for k in range(n_latents)]
+    Z0s = jnp.empty((n_latents, n_trials, n_ind_points[0], 1), dtype=jnp.double)
     for k in range(n_latents):
-        Z0s[k] = jnp.empty((n_trials, n_ind_points[k], 1),
-                             dtype=jnp.double)
         for r in range(n_trials):
             Z0 = jnp.linspace(trials_start_times[r], trials_end_times[r],
-                              n_ind_points[k])
-            Z0s[k] = Z0s[k].at[r, :, 0].set(Z0)
+                              n_ind_points[0])
+            Z0s = Z0s.at[k, r, :, 0].set(Z0)
     return Z0s
 
 
 def buildUniformIndPointsLocs0(n_latents, n_trials, n_ind_points,
-                               trials_start_times, trials_end_times):
-    Z0s = [[] for k in range(n_latents)]
+                               trials_start_times, trials_end_times, key):
+    Z0s = jnp.empty((n_latents, n_trials, n_ind_points, 1), dtype=jnp.double)
     for k in range(n_latents):
-        Z0s[k] = jnp.empty((n_trials, n_ind_points[k], 1),
-                           dtype=jnp.double)
-        random_seed = datetime.datetime.now().timestamp()
-        param_random_seed = datetime.datetime.now().timestamp()
-        key = jax.random.PRNGKey(int(param_random_seed))
         for r in range(n_trials):
             key, subkey = jax.random.split(key)
             Z0 = trials_start_times[r] + \
-                 jax.random.uniform(subkey, shape=(n_ind_points[k],),
+                 jax.random.uniform(subkey, shape=(n_ind_points,),
                                            dtype=jnp.double) * \
                  (trials_end_times[r]-trials_start_times[r])
             Z0_sorted = Z0.sort()
-            Z0s[k] = Z0s[k].at[r, :, 0].set(Z0_sorted)
+            Z0s = Z0s.at[k, r, :, 0].set(Z0_sorted)
+    return Z0s
+
+def buildUniformIndPointsLocs0VMapped(n_latents, n_trials, n_ind_points,
+                                      trials_start_times, trials_end_times, key):
+    def _buildUniformIndPointsLocs0(trial_start_time, trial_end_time,
+                                   n_ind_points, key):
+        Z0 = trial_start_time + \
+             jax.random.uniform(key, shape=(n_ind_points, 1),
+                                dtype=jnp.double) * \
+             (trial_end_time-trial_start_time)
+        Z0_sorted = Z0.sort()
+        return Z0_sorted
+
+    buildFunAcrossTrials = jax.vmap(_buildUniformIndPointsLocs0,
+                                     in_axes=(0, 0, None, 0))
+    buildFunAcrossLatents = jax.vmap(buildFunAcrossTrials,
+                                    in_axes=(None, None, None, 0))
+    keys = jax.random.split(key, (n_latents, n_trials))
+    Z0s = buildFunAcrossLatents(trials_start_times, trials_end_times,
+                                n_ind_points, keys)
     return Z0s
 
 
@@ -1068,12 +1077,9 @@ def getVariationalMean0InDict(
 def getSameAcrossLatentsAndTrialsVariationalMean0(n_latents, n_trials,
                                                   a_variational_mean0):
     n_ind_points = len(a_variational_mean0)
-    variational_mean0 = [[] for r in range(n_latents)]
-    for k in range(n_latents):
-        variational_mean0[k] = jnp.empty((n_trials, n_ind_points, 1),
-                                         dtype=jnp.double)
-        variational_mean0[k] = variational_mean0[k].at[:, :, 0].set(
-            a_variational_mean0)
+    variational_mean0 = jnp.empty((n_latents, n_trials, n_ind_points, 1),
+                                  dtype=jnp.double)
+    variational_mean0 = variational_mean0.at[:,:,:,0].set(a_variational_mean0)
     return variational_mean0
 
 
@@ -1152,6 +1158,7 @@ def getVariationalCov0InDict(
         different_filename_item_name_pattern="variational_cov0_filename_latent{:d}_trial{:d}",
         diag_value_item_name="variational_cov0_diag_value",
         delimiter=","):
+
     # binary variational mean and cov
     if section_name in params_dict and \
        binary_item_name in params_dict[section_name]:
@@ -1201,13 +1208,10 @@ def getVariationalCov0InDict(
 def getSameAcrossLatentsAndTrialsVariationalCov0(
         n_latents, n_trials, a_variational_cov0,
         section_name="variational_params0"):
-    variational_cov0 = [[] for r in range(n_latents)]
     n_ind_points = a_variational_cov0.shape[0]
-    for k in range(n_latents):
-        variational_cov0[k] = jnp.empty((n_trials, n_ind_points,
-                                         n_ind_points), dtype=jnp.double)
-        variational_cov0[k] = variational_cov0[k].at[:, :, :].set(
-            a_variational_cov0)
+    variational_cov0 = jnp.empty((n_latents, n_trials, n_ind_points,
+                                  n_ind_points), dtype=jnp.double)
+    variational_cov0 = variational_cov0.at[:, :, :, :].set(a_variational_cov0)
     return variational_cov0
 
 
