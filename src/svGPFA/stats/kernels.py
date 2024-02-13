@@ -25,24 +25,14 @@ class ExponentialQuadraticKernel(Kernel):
     def __init__(self, scale=1.0):
         self._scale = scale
 
+    # @jax.jit
     def buildKernelMatrixX1(self, X1, params):
-        lengthscale = params[0]
-
-        X2 = X1
-        if X1.ndim==3:
-            distance = (X1-X2.transpose((0, 2, 1)))**2
-        else:
-            distance = (X1.reshape(-1,1)-X2.reshape(1,-1))**2
-        covMatrix = self._scale**2*jnp.exp(-.5*distance/lengthscale**2)
-        return covMatrix
+        return self.buildKernelMatrixX1X2(X1=X1, X2=X1, params=params)
 
     def buildKernelMatrixX1X2(self, X1, X2, params):
         lengthscale = params[0]
 
-        if X1.ndim==3:
-            distance = (X1-X2.transpose((0, 2, 1)))**2
-        else:
-            distance = (X1.reshape(-1,1)-X2.reshape(1,-1))**2
+        distance = (X1-jnp.swapaxes(X2, -1, -2))**2
         covMatrix = self._scale**2*jnp.exp(-.5*distance/lengthscale**2)
         return covMatrix
 
