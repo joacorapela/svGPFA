@@ -10,6 +10,7 @@ import svGPFA.stats.kernelsMatricesStore
 
 class PosteriorOnLatentsQuad:
 
+    @functools.partial(jax.jit, static_argnums=0)
     def computeMeansAndSTDsJAX(self, variational_mean, variational_cov,
                                Kzz, Kzz_inv, Ktz, KttDiag=1.0):
         # variational_mean \in nLatents x nTrials x nIndPoints x 1
@@ -25,7 +26,8 @@ class PosteriorOnLatentsQuad:
             return a
 
         computeA_vmTrials = jax.vmap(computeA, in_axes=(0, 0), out_axes=0)
-        computeA_vmLatents = jax.vmap(computeA_vmTrials, in_axes=(0, 0), out_axes=0)
+        computeA_vmLatents = jax.vmap(computeA_vmTrials, in_axes=(0, 0),
+                                      out_axes=0)
 
         # A \in nLatents x nTrials x nIndPoints x 1
         A = computeA_vmLatents(Kzz_inv, variational_mean)
@@ -35,7 +37,8 @@ class PosteriorOnLatentsQuad:
             return answer
         computeMeans_vmQuad = jax.vmap(computeMean, in_axes=(0, None))
         computeMeans_vmTrials = jax.vmap(computeMeans_vmQuad, in_axes=(0, 0))
-        computeMeans_vmLatents = jax.vmap(computeMeans_vmTrials, in_axes=(0, 0))
+        computeMeans_vmLatents = jax.vmap(computeMeans_vmTrials,
+                                          in_axes=(0, 0))
         means = computeMeans_vmLatents(Ktz, A)
 
         def computeSTDs(variational_cov, Kzz, Kzz_inv, Ktz, KttDiag):
