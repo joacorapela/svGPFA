@@ -165,6 +165,8 @@ def getCholFromVec(vec):
     chol = chol.at[tril_indices[0], tril_indices[1]].set(vec)
     return chol
 
+
+@jax.jit
 def buildCovsFromCholVecs(chol_vecs):
     """Build covariances from vector respresntations of their Cholesky
     descompositions.
@@ -174,15 +176,24 @@ def buildCovsFromCholVecs(chol_vecs):
     """
     # Pk = (n_ind_points * (n_ind_points + 1)) / 2 then
     # n_ind_points = (math.sqrt(1 + 8 * M) - 1) / 2
-    n_latents = chol_vecs.shape[0]
-    n_trials = chol_vecs.shape[1]
+    # n_latents = chol_vecs.shape[0]
+    # n_trials = chol_vecs.shape[1]
     Pk = chol_vecs.shape[2]
     n_ind_points = int((math.sqrt(1 + 8 * Pk) - 1) / 2)
     tril_indices = jnp.tril_indices(n_ind_points)
-    chols = jnp.zeros((n_latents, n_trials, n_ind_points, n_ind_points), dtype=jnp.double)
-    for k in range(n_latents):
-        for r in range(n_trials):
-            chols = chols.at[k, r, tril_indices[0], tril_indices[1]].set(chol_vecs[k, r, :, 0])
+    # chols = jnp.zeros((n_latents, n_trials, n_ind_points, n_ind_points), dtype=jnp.double)
+    # for k in range(n_latents):
+    #     for r in range(n_trials):
+    #         chols = chols.at[k, r, tril_indices[0], tril_indices[1]].set(chol_vecs[k, r, :, 0])
+
+    def set_chol_elems(chol_vec):
+        chol_matrix = jnp.zeros((n_ind_points, n_ind_points))
+        chol_matrix = chol_matrix.at[tril_indices[0],
+                                     tril_indices[1]].set(chol_vec[:, 0])
+        return chol_matrix
+    set_chol_elems_trials = jax.vmap(set_chol_elems)
+    set_chol_elems_latents = jax.vmap(set_chol_elems_trials)
+    chols = set_chol_elems_latents(chol_vecs)
     covs = jnp.matmul(chols, jnp.transpose(chols, (0, 1, 3, 2)))
     return covs
 
