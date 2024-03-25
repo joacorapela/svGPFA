@@ -1,5 +1,6 @@
 
 import functools
+import itertools
 import jax
 import jax.numpy as jnp
 import abc
@@ -122,8 +123,8 @@ class IndPointsLocsAndQuadTimesKMS(IndPointsLocsAndTimesKMS):
 
     @functools.partial(jax.jit, static_argnums=0)
     def buildKernelsMatrices(self, kernels_params, ind_points_locs):
-        # ind_points_locs \in nLatents x nTrials x nIndPoints x 1
-        # return \in nLatexts x nTrials x nQuadPoints x nIndPoints
+        # ind_points_locs \in nLatents x n_trials x n_ind_points x 1
+        # return \in nLatexts x n_trials x nQuadPoints x n_ind_points
         n_latents = ind_points_locs.shape[0]
         n_trials = ind_points_locs.shape[1]
         n_ind_points = ind_points_locs.shape[2]
@@ -133,11 +134,13 @@ class IndPointsLocsAndQuadTimesKMS(IndPointsLocsAndTimesKMS):
                                n_ind_points), dtype=jnp.double)
         for k in range(n_latents):
             def calculateKtz(quad_points, ind_points_locs):
+                # n_quad_points, n_ind_points -> [n_quad_points, n_ind_points]
                 Ktz = self._kernels[k].buildKernelMatrixX1X2(
                     X1=quad_points, X2=ind_points_locs,
                     params=kernels_params[k],
                 )
                 return Ktz
+            # [n_trials, n_quad_points], [n_trials, n_ind_points, 1] -> [n_trials, n_quad_points, n_ind_points]
             calculateKtzVMapped = jax.vmap(calculateKtz, in_axes=(0, 0))
             Ktz_k = calculateKtzVMapped(self._t, ind_points_locs[k, :, :, :])
             Ktz = Ktz.at[k, :, :, :].set(Ktz_k)
@@ -150,18 +153,31 @@ class IndPointsLocsAndSpikesTimesKMS(IndPointsLocsAndTimesKMS):
 
     # don't jit due to the problem of unrollling of the trials loop
     def buildKernelsMatrices(self, kernels_params, ind_points_locs):
+        # ind_points_locs \in n_latents x n_ind_points x 1
+        # Ktz[r] \in n_latents x n_spikes_all_neurons[r] x n_ind_points
         n_latents = ind_points_locs.shape[0]
         n_trials = ind_points_locs.shape[1]
-        n_ind_points = ind_points_locs.shape[2]
+        n_ind_points = ind_points_locs.shape[1]
 
-        Ktz = [None for r in len(n_trials)]
+        t = jnp.expand_dims(
+                jnp.array(list(itertools.chain.from_iterable(self._t))),
+                1)
+        Ktzc = jnp.empty(shape=(n_latents, len(t), n_ind_points),
+                         dtype=jnp.double)
+        for k in range(n_latents):
+            ind_points_locsk = ind_points_locs[k, :, :]
+            Ktzc_k = self._kernels[k].buildKernelMatrixX1X2(
+                X1=t,
+                X2=ind_points_locsk,
+                params=kernels_params[k],
+            )
+            Ktzc = Ktzc.at[k, :, :].set(Ktzc_k)
+
+        Ktz = [None for r in range(n_trials)]
+        base_index = 0
         for r in range(n_trials):
-            n_spikes_r = len(self._t[r])
-            Ktz[r] = jnp.empty(shape=(n_latents, n_spikes_r, n_ind_points),
-                               dtype=jnp.double)
-            for k in range(n_latents):
-                Ktz_kr = self._kernels[k].buildKernelMatrixX1X2(
-                    X1=self._t[r], X2=ind_points_locs[k, r, :],
-                )
-                Ktz[r] = Ktz[r].at[k, :, :].set(Ktz_kr)
+            Ktz[r] = Ktzc[:,
+                          base_index+range(0, len(self._t[r])),
+                          :]
+            base_index += len(self._t[r])
         return Ktz
