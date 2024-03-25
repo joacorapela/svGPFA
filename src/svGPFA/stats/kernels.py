@@ -1,74 +1,31 @@
 
-from abc import ABC, abstractmethod
-import math
-import jax
 import jax.numpy as jnp
 
 
-class Kernel(ABC):
+class ExponentialQuadraticKernel:
 
-    @abstractmethod
-    def buildKernelMatrixX1(self, X1):
-        pass
+    def buildKernelMatrixX1(X1, params, scale=1.0):
+        return ExponentialQuadraticKernel.buildKernelMatrixX1X2(
+            X1=X1, X2=X1, params=params, scale=scale)
 
-    @abstractmethod
-    def buildKernelMatrixX1X2(self, X1, X2):
-        pass
-
-    @abstractmethod
-    def buildKernelMatrixDiag(self, X):
-        pass
-
-
-class ExponentialQuadraticKernel(Kernel):
-
-    def __init__(self, scale=1.0):
-        self._scale = scale
-
-    # @jax.jit
-    def buildKernelMatrixX1(self, X1, params):
-        return self.buildKernelMatrixX1X2(X1=X1, X2=X1, params=params)
-
-    def buildKernelMatrixX1X2(self, X1, X2, params):
+    def buildKernelMatrixX1X2(X1, X2, params, scale=1.0):
         lengthscale = params[0]
 
         distance = (X1-jnp.swapaxes(X2, -1, -2))**2
-        covMatrix = self._scale**2*jnp.exp(-.5*distance/lengthscale**2)
+        covMatrix = scale**2*jnp.exp(-.5*distance/lengthscale**2)
         return covMatrix
 
-    def buildKernelMatrixDiag(self, X, params):
-        covMatrixDiag = self._scale**2*jnp.ones(X.shape, dtype=X.dtype)
-        return covMatrixDiag
 
+class PeriodicKernel:
 
-class PeriodicKernel(Kernel):
+    def buildKernelMatrixX1(X1, params, scale=1.0):
+        return PeriodicKernel.buildKernelMatrixX1X2(X1=X1, X2=X1,
+                                                    params=params, scale=scale)
 
-    def __init__(self, scale=1.0):
-        self._scale = scale
-
-    def buildKernelMatrixX1(self, X1, params):
+    def buildKernelMatrixX1X2(X1, X2, params, scale=1.0):
         lengthscale = params[0]
         period = params[1]
-        X2 = X1
-        if X1.ndim==3:
-            sDistance = X1 - X2.transpose(0, 2, 1)
-        else:
-            sDistance = X1.reshape(-1,1) - X2.reshape(1,-1)
-        rr = math.pi * sDistance / period
-        covMatrix = self._scale**2 * jnp.exp(-2 * jnp.sin(rr)**2 / lengthscale**2)
+        distance = (X1-jnp.swapaxes(X2, -1, -2))**2
+        rr = jnp.pi * distance / period
+        covMatrix = scale**2 * jnp.exp(-2 * jnp.sin(rr)**2 / lengthscale**2)
         return covMatrix
-
-    def buildKernelMatrixX1X2(self, X1, X2, params):
-        lengthscale = params[0]
-        period = params[1]
-        if X1.ndim==3:
-            sDistance = X1 - X2.transpose(0, 2, 1)
-        else:
-            sDistance = X1.reshape(-1,1) - X2.reshape(1,-1)
-        rr = math.pi * sDistance / period
-        covMatrix = self._scale**2 * jnp.exp(-2 * jnp.sin(rr)**2 / lengthscale**2)
-        return covMatrix
-
-    def buildKernelMatrixDiag(self, X, params):
-        covMatrixDiag = self._scale**2 * jnp.ones(X.shape, dtype=X.dtype)
-        return covMatrixDiag
