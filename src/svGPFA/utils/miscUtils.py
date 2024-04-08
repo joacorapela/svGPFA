@@ -56,9 +56,9 @@ def buildKernels(kernels_types, kernels_params):
 
     for k, kernel_type in enumerate(kernels_types):
         if kernels_types[k] == "exponentialQuadratic":
-            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel
         elif kernels_types[k] == "periodic":
-            kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel
         else:
             raise ValueError(f"Invalid kernels type: {kernels_types[k]}")
     return kernels
