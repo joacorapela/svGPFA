@@ -74,7 +74,7 @@ class IndPointsLocsAndQuadTimesKMS:
 class IndPointsLocsAndSpikesTimesKMS:
 
     def init(kernels, t):
-        # t \in n_trials x n_spikes_allNeurons
+        # t \in n_trials x n_spikes
         IndPointsLocsAndSpikesTimesKMS.kernels = kernels
         IndPointsLocsAndSpikesTimesKMS.t = t
 
@@ -85,20 +85,20 @@ class IndPointsLocsAndSpikesTimesKMS:
         n_latents = ind_points_locs.shape[0]
         n_trials = ind_points_locs.shape[1]
         n_ind_points = ind_points_locs.shape[2]
-        n_spikes_allNeurons = IndPointsLocsAndSpikesTimesKMS.t.shape[1]
+        n_spikes = IndPointsLocsAndSpikesTimesKMS.t.shape[1]
 
-        Ktz = jnp.empty(shape=(n_latents, n_trials, n_spikes_allNeurons,
+        Ktz = jnp.empty(shape=(n_latents, n_trials, n_spikes,
                                n_ind_points), dtype=jnp.double)
         for k in range(n_latents):
             def calculateKtz(spikes_points, ind_points_locs):
-                # n_spikes_allNeurons, n_ind_points -> [n_spikes_allNeurons, n_ind_points]
+                # n_spikes, n_ind_points -> [n_spikes, n_ind_points]
                 Ktz = IndPointsLocsAndSpikesTimesKMS.kernels[k].buildKernelMatrixX1X2(
                     X1=spikes_points, X2=ind_points_locs,
                     params=kernels_params[k],
                 )
                 return Ktz
-            # [n_trials, n_spikes_allNeurons], [n_trials, n_ind_points, 1] ->
-            # [n_trials, n_spikes_allNeurons, n_ind_points]
+            # [n_trials, n_spikes], [n_trials, n_ind_points, 1] ->
+            # [n_trials, n_spikes, n_ind_points]
             calculateKtzVMapped = jax.vmap(calculateKtz, in_axes=(0, 0))
             Ktz_k = calculateKtzVMapped(IndPointsLocsAndSpikesTimesKMS.t,
                                         ind_points_locs[k, :, :, :])
