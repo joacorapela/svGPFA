@@ -7,31 +7,38 @@ from . import preIntensity
 
 class PointProcessELLExpLink:
 
-    def init(legQuadWeights):
+    def init(legQuadWeights, validSpikesTimesMask):
         PointProcessELLExpLink.legQuadWeights = legQuadWeights
+        PointProcessELLExpLink.validSpikesTimesMask = validSpikesTimesMask
 
     def evalSumAcrossTrialsAndNeurons(vMean, vCov, C, d, Kzz, Kzz_inv,
-                                      KtzQuad, KtzSpike, KttDiag):
+                                      KtzQuad, KtzSpikes, KttDiag):
         # vMean \in n_latents x n_trials x n_ind_points
         # vCov \in
         #  n_latents x n_trials x n_ind_points x n_ind_points
+        # C \in n_neurons x n_trials
+        # d \in n_neurons x 1
+        # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # KtzQuad \in n_latents x n_trials x n_quad x n_ind_points
+        # KtzSpikes \in n_latents x n_trials x n_spikes x n_ind_points
+        # KttDiag \in Real
+        # return Real
 
         # qHMuQuad \in n_trials x n_neurons x n_quad
         # qHVarQuad \in n_trials x n_neurons x n_quad
-        qHMuQuad, qHVarQuad = \
-            preIntensity.LinearPreIntensityQuad.computeMeansAndVars(
-                vMean=vMean, vCov=vCov, C=C, d=d, Kzz=Kzz, Kzz_inv=Kzz_inv,
-                Ktz=KtzQuad, KttDiag=KttDiag)
-        # qHMuSpikes[r], qHVarSpikes[r] \in nSpikesFromAllNeuronsInTrial[r]
-        qHMuSpikes, qHVarSpikes = \
-            preIntensity.LinearPreIntensitySpikes.computeMeansAndVars(
-                vMean=vMean, vCov=vCov, C=C, d=d, Kzz=Kzz, Kzz_inv=Kzz_inv,
-                Ktz=KtzSpike, KttDiag=KttDiag)
+        qHMuQuad = preIntensity.LinearPreIntensityQuad.computeMeans(
+            vMean=vMean, C=C, d=d, Kzz_inv=Kzz_inv, Ktz=KtzQuad)
+        qHVarQuad = preIntensity.LinearPreIntensityQuad.computeVars(
+            vCov=vCov, C=C, Kzz=Kzz, Kzz_inv=Kzz_inv, Ktz=KtzQuad,
+            KttDiag=KttDiag)
+        # qHMuSpikes \in n_trials x n_neurons x n_spikes
+        qHMuSpikes = preIntensity.LinearPreIntensityQuad.computeMeans(
+            vMean=vMean, C=C, d=d, Kzz_inv=Kzz_inv, Ktz=KtzSpikes)
         # eLinkValues \in n_trials x n_quad_leg x n_neurons
         eLinkValues = PointProcessELLExpLink._getELinkValues(
             qHMu=qHMuQuad, qHVar=qHVarQuad)
-        eLogLinkValues = PointProcessELLExpLink._getELogLinkValues(
-            qHMu=qHMuSpikes, qHVar=qHVarSpikes)
+        eLogLinkValues = jnp.where(PointProcessELLExpLink.validSpikesTimesMask, qHMuSpikes, 0.0)
         # legQuadWeights \in nTrials x nQuad x 1
         # eLinkValues \in  nTrials x nQuad x nNeurons
         # aux1 \in  nTrials x nNeurons x 1
@@ -60,8 +67,3 @@ class PointProcessELLExpLink:
         # eLinkValues \in n_trials x n_quad_leg x n_neurons
         eLinkValues = linkFunction(qHMu + 0.5 * qHVar)
         return eLinkValues
-
-    def _getELogLinkValues(qHMu, qHVar):
-        # qHMu[r], qHVar[r] \in nSpikesFromAllNeuronsInTrial[r]
-        eLogLink = jnp.concatenate([qHMu[r] for r in range(len(qHMu))])
-        return eLogLink
