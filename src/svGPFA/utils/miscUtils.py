@@ -1,5 +1,6 @@
 import scipy.io
 import math
+import numpy as np
 import pandas as pd
 import scipy
 import sklearn.metrics
@@ -484,3 +485,34 @@ def getVectorRepOfLowerTrianMatrices(lt_matrices):
             cholVecs = cholVecs.at[k, r, :, 0].set(cholKRVec)
     return cholVecs
 
+def buildSpikesTimesArray(spikes_times):
+    # spikes_times[r][n]: list of spikes times for trial r and neuron n
+    # answer spikes_times_with_array \in n_neurons x n_spikes_per_trial
+    # answer valid_spikes_times_mask \in n_neurons x n_trials x n_spikes_per_trial
+    n_trials = len(spikes_times)
+    n_neurons = len(spikes_times[0])
+
+    # calculate the number of spikes of all neurons for each trial
+    n_spikes_per_trial = np.empty(shape=(n_trials,), dtype=np.integer)
+    for r in range(n_trials):
+        n_spikes_per_trial[r] = 0
+        for n in range(n_neurons):
+            n_spikes_per_trial[r] += len(spikes_times[r][n])
+    max_n_spikes_per_trial = n_spikes_per_trial.max()
+
+    spikes_times_with_array = np.zeros(shape=(n_trials, max_n_spikes_per_trial,
+                                             1), dtype=np.double)
+    valid_spikes_times_mask = np.zeros(shape=(n_trials, n_neurons,
+                                              max_n_spikes_per_trial),
+                                       dtype=bool)
+    for r in range(n_trials):
+        index = 0
+        for n in range(n_neurons):
+            n_spikes_rn = len(spikes_times[r][n])
+            spikes_times_with_array[r, index:index+n_spikes_rn, 0] = \
+                spikes_times[r][n]
+            valid_spikes_times_mask[r, n, index:index+n_spikes_rn] = True
+            index += n_spikes_rn
+    spikes_times_with_array_jax = jnp.asarray(spikes_times_with_array)
+    valid_spikes_times_mask_jax = jnp.asarray(valid_spikes_times_mask)
+    return spikes_times_with_array_jax, valid_spikes_times_mask_jax
