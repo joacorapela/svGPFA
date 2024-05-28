@@ -4,18 +4,14 @@ import jax.lax
 import jax.numpy as jnp
 
 
-class PosteriorOnLatentsQuad:
+class PosteriorOnLatents:
 
     @jax.jit
-    def computeMeansAndVars(vMean, vCov, Kzz, Kzz_inv, Ktz, KttDiag=1.0):
+    def computeMeans(vMean, Kzz_inv, Ktz):
         # vMean \in n_latents x n_trials x n_ind_points
-        # vCov \in
-        #  n_latents x n_trials x n_ind_points x n_ind_points
-        # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
         # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
-        # Ktz \in n_latents x n_trials x n_quad x n_ind_points
-        # KttDiag \in Reals
-        # return n_latents x n_trials x n_quad
+        # Ktz \in n_latents x n_trials x (n_quad | n_spikes) x n_ind_points
+        # return n_latents x n_trials x (n_quad | n_spikes)
 
         # ([n_ind_points, n_ind_points], [n_ind_points]) ->
         # [n_ind_points]
@@ -53,31 +49,49 @@ class PosteriorOnLatentsQuad:
         # qKMu\in [n_latents, n_trials, n_quad]
         qKMu = computeMeans_vmLatents(Ktz, A)
 
+        return qKMu
+
+    @jax.jit
+    def computeVars(vCov, Kzz, Kzz_inv, Ktz, KttDiag=1.0):
+        # vCov \in
+        #  n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Ktz \in n_latents x n_trials x n_quad x n_ind_points
+        # KttDiag \in Reals
+        # return n_latents x n_trials x n_quad
+
         def computeVars(vCov, Kzz, Kzz_inv, Ktz, KttDiag):
             # vCov \in n_ind_points x n_ind_points
             # Kzz \in n_ind_points x n_ind_points
             # Kzz_inv \in n_ind_points x n_ind_points
-            # Ktz \in n_ind_points
+            # Ktz \in n_quad x n_ind_points
+            # answer n_quad
 
-            # B \in n_ind_points
-            B = jax.scipy.linalg.cho_solve((Kzz_inv, True), Ktz)
-            # diff \in n_ind_points x n_ind_points
-            diff = vCov - Kzz
-            # std \in \Re
-            sigma2 = KttDiag + jnp.dot(B, jnp.matmul(diff, B))
-            return sigma2
+            # B \in n_ind_points x n_quad
+            B = jax.scipy.linalg.cho_solve((Kzz_inv, True), Ktz.T)
+            # mm1f \in n_ind_points x n_quad
+            mm1f = jnp.matmul(vCov-Kzz, B)
+            # aux1 \in n_ind_points x n_quad
+            aux1 = B * mm1f
+            # aux2 \in n_quad
+            aux2 = jnp.sum(aux1, axis=0)
+            # aux3 \in n_quad
+            answer = KttDiag + aux2
+            return answer
 
         # ([n_ind_points, n_ind_points], [n_ind_points, n_ind_points],
         # [n_ind_points, n_ind_points], [n_quad, n_ind_points], []) ->
         # [n_quad]
-        computeVars_vmQuadP = jax.vmap(computeVars,
-                                       in_axes=(None, None, None, 0, None))
+        # computeVars_vmQuadP = jax.vmap(computeVars,
+        #                                in_axes=(None, None, None, 0, None))
+
         # ([n_trials, n_ind_points, n_ind_points],
         #  [n_trials, n_ind_points, n_ind_points],
         # [n_trials, n_ind_points, n_ind_points],
         # [n_trials, n_quad, n_ind_points], []) ->
         # [n_trials, n_quad]
-        computeVars_vmTrials = jax.vmap(computeVars_vmQuadP,
+        computeVars_vmTrials = jax.vmap(computeVars,
                                         in_axes=(0, 0, 0, 0, None))
         # ([n_latents, n_trials, n_ind_points, n_ind_points],
         # [n_latents, n_trials, n_ind_points, n_ind_points],
@@ -87,63 +101,4 @@ class PosteriorOnLatentsQuad:
         computeVars_vmLatents = jax.vmap(computeVars_vmTrials,
                                          in_axes=(0, 0, 0, 0, None))
         qKVar = computeVars_vmLatents(vCov, Kzz, Kzz_inv, Ktz, KttDiag)
-        return qKMu, qKVar
-
-
-class PosteriorOnLatentsSpikes:
-
-    @jax.jit
-    def computeTrialMeansAndVars(vMean, vCov, Kzz, Kzz_inv, Ktz, KttDiag):
-        # vMean \in n_latents x n_ind_points
-        # vCov \in n_latents x n_ind_points x n_ind_points
-        # Kzz \in n_latents x n_ind_points x n_ind_points
-        # Kzz_inv \in n_latents x n_ind_points x n_ind_points
-        # Ktz \in n_latents x n_spikes[r] x n_ind_points
-        # KttDiag \in Real
-        # return (n_spikes_r x n_latents, n_spikes_r x n_latents)
-
-        def computeLatentMeansAndVars(vMean, vCov, Kzz, Kzz_inv, Ktz, KttDiag):
-            Akr = jax.scipy.linalg.cho_solve((Kzz_inv[:, :], True), vMean)
-            qKMu = jnp.squeeze(jnp.matmul(Ktz[:, :], Akr))
-
-            # Bfk \in n_ind_points x n_spikes_r[r]
-            Bfk = jax.scipy.linalg.cho_solve((Kzz_inv[:, :], True),
-                                             Ktz[:, :].transpose((1, 0)))
-
-            # mm1f \in n_ind_points x n_spikes_r[r]
-            diff = vCov[:, :]-Kzz[:, :]
-            mm1f = jnp.matmul(diff, Bfk)
-
-            # qKVar[r] \in nTimes[r] x n_latents
-            qKVar = KttDiag + jnp.sum(a=Bfk*mm1f, axis=0)
-
-            return qKMu, qKVar
-
-        computeLatentMeansAndVars_vmLatents = jax.vmap(
-            computeLatentMeansAndVars, (0, 0, 0, 0, 0, None), (1, 1))
-        qKMu, qKVar = computeLatentMeansAndVars_vmLatents(
-            vMean, vCov, Kzz, Kzz_inv, Ktz, KttDiag)
-        return qKMu, qKVar
-
-    def computeMeansAndVars(vMean, vCov, Kzz, Kzz_inv, Ktz, KttDiag=1.0):
-        # vMean \in n_latents x n_trials x n_ind_points
-        # vCov \in
-        #  n_latents x n_trials x n_ind_points x n_ind_points
-        # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
-        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
-        # Ktz[r] \in n_latents x n_spikes[r] x n_ind_points
-        # KttDiag \in Real
-        # return qKMu[r], qKVar[r] \in n_spikes_r x n_latents
-
-        n_trials = vMean.shape[1]
-        qKMu = [[None] for tr in range(n_trials)]
-        qKVar = [[None] for tr in range(n_trials)]
-        for r in range(n_trials):
-            # qKMu[r] \in nTimes[r] x n_latents
-            qKMu[r], qKVar[r] = \
-                PosteriorOnLatentsSpikes.computeTrialMeansAndVars(
-                    vMean=vMean[:, r, :],
-                    vCov=vCov[:, r, :, :],
-                    Kzz=Kzz[:, r, :, :], Kzz_inv=Kzz_inv[:, r, :, :],
-                    Ktz=Ktz[r], KttDiag=KttDiag)
-        return qKMu, qKVar
+        return qKVar
