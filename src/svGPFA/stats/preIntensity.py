@@ -7,22 +7,44 @@ from . import posteriorOnLatents
 
 class LinearPreIntensityQuad:
 
-    def computeMeansAndVars(vMean, vCov, C, d, Kzz, Kzz_inv, Ktz, KttDiag):
-        qKMu, qKVar = \
-            posteriorOnLatents.PosteriorOnLatentsQuad.computeMeansAndVars(
-                vMean=vMean, vCov=vCov, Kzz=Kzz, Kzz_inv=Kzz_inv, Ktz=Ktz,
-                KttDiag=KttDiag)
-        qHMu, qHVar = LinearPreIntensityQuad.\
-            _computeMeansAndVarsGivenPosteriorOnLatentsStats(
-                qKMu=qKMu, qKVar=qKVar, C=C, d=d)
-        return qHMu, qHVar
+    def computeMeans(vMean, C, d, Kzz_inv, Ktz):
+        # vMean \in n_latents x n_trials x n_ind_points
+        # C \in n_neurons x n_trials
+        # d \in n_neurons x 1
+        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Ktz \in n_latents x n_trials x n_quad x n_ind_points
+        # return n_trials x n_neurons x n_quad
+        qKMu = posteriorOnLatents.PosteriorOnLatentsQuad.computeMeans(
+            vMean=vMean, Kzz_inv=Kzz_inv, Ktz=Ktz)
+        qHMu = LinearPreIntensityQuad.\
+            _computeMeansGivenPosteriorOnLatentsStats(
+                qKMu=qKMu, C=C, d=d)
+        return qHMu
+
+    def computeVars(vCov, C, Kzz, Kzz_inv, Ktz, KttDiag):
+        # vMean \in n_latents x n_trials x n_ind_points
+        # vCov \in
+        #  n_latents x n_trials x n_ind_points x n_ind_points
+        # C \in n_neurons x n_trials
+        # d \in n_neurons x 1
+        # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Ktz \in n_latents x n_trials x n_quad x n_ind_points
+        # KttDiag \in Reals
+        # return n_trials x n_neurons x n_quad
+        qKVar = posteriorOnLatents.PosteriorOnLatentsQuad.computeVars(
+            vCov=vCov, Kzz=Kzz, Kzz_inv=Kzz_inv, Ktz=Ktz, KttDiag=KttDiag)
+        qHVar = LinearPreIntensityQuad._computeVarsGivenPosteriorOnLatentsStats(
+            qKVar=qKVar, C=C)
+        return qHVar
 
     @jax.jit
-    def _computeMeansAndVarsGivenPosteriorOnLatentsStats(qKMu, qKVar, C, d):
-        # qKMu \in n_latents x n_trials x n_quad
-        # qKVar \in n_latents x n_trials x n_quad
-        # qHMu \in n_trials x n_neurons x n_quad
-        # qHVar \in n_trials x n_neurons x n_quad
+    def _computeMeansGivenPosteriorOnLatentsStats(qKMu, C, d):
+        # qKMu \in n_latents x n_trials x n_quad | n_spikes_allNeurons_per_trial
+        # qHMu \in n_trials x n_neurons x n_quad | n_spikes_allNeurons_per_trial
+        # C \in n_neurons x n_trials
+        # d \in n_neurons x 1
+        # answer n_trials x n_neurons x n_quad
 
         def posteriorOnMeans(qKMu, C, d):
             # qKMu \in n_latents x n_quad
@@ -34,6 +56,14 @@ class LinearPreIntensityQuad:
 
         posteriorOnMeans_vmTrials = jax.vmap(posteriorOnMeans, (1, None, None))
         qHMu = posteriorOnMeans_vmTrials(qKMu, C, d)
+        return qHMu
+
+    @jax.jit
+    def _computeVarsGivenPosteriorOnLatentsStats(qKVar, C):
+        # qKVar \in n_latents x n_trials x n_quad | n_spikes_per_trial
+        # qHVar \in n_trials x n_neurons x n_quad | n_spikes_per_trial
+        # C \in n_neurons x n_latents
+        # answer n_trials x n_neurons x n_quad
 
         def posteriorOnVars(qKVar, C):
             # qKVar \in n_latents x n_quad
@@ -45,7 +75,7 @@ class LinearPreIntensityQuad:
         posteriorOnVars_vmTrials = jax.vmap(posteriorOnVars, (1, None))
         qHVar = posteriorOnVars_vmTrials(qKVar, C)
 
-        return qHMu, qHVar
+        return qHVar
 
 
 class LinearPreIntensitySpikes:
