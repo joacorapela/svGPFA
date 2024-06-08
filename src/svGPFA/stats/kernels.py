@@ -30,7 +30,7 @@ class PeriodicKernel:
     def buildKernelMatrixX1X2(X1, X2, params, scale=1.0):
         lengthscale = params[0]
         period = params[1]
-        distance = (X1-jnp.swapaxes(X2, -1, -2))**2
+        distance = jnp.abs(X1-jnp.swapaxes(X2, -1, -2))
         rr = jnp.pi * distance / period
         covMatrix = scale**2 * jnp.exp(-2 * jnp.sin(rr)**2 / lengthscale**2)
         return covMatrix
