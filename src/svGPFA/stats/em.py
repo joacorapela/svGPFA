@@ -13,18 +13,46 @@ import jaxopt
 import scipy.optimize
 
 from ..utils.miscUtils import buildCovsFromCholVecs
+from . import kernelsMatricesStore, expectedLogLikelihood, svLowerBound
 
 class EM_JAX:
 
-    def __init__(self, model, ind_points_locs_KMS, quad_times_KMS,
-                 spike_times_KMS, reg_param):
-        self._model = model
-        self._ind_points_locs_KMS = ind_points_locs_KMS
-        self._quad_times_KMS =quad_times_KMS
-        self._spike_times_KMS = spike_times_KMS
-        self._reg_param = reg_param
+    def init(spikesTimesArray, validSpikesTimesMask, kernels, legQuadPoints,
+             legQuadWeights, reg_param):
+        EM_JAX.indPointsLocsKMS = kernelsMatricesStore.IndPointsLocsKMS_Chol
+        EM_JAX.indPointsLocsKMS.init(kernels=kernels)
+        EM_JAX.quadTimesKMS = kernelsMatricesStore.IndPointsLocsAndQuadTimesKMS
+        EM_JAX.quadTimesKMS.init(kernels=kernels, t=legQuadPoints)
+        EM_JAX.spikesTimesKMS = kernelsMatricesStore.IndPointsLocsAndSpikesTimesKMS
+        EM_JAX.spikesTimesKMS.init(kernels=kernels, t=spikesTimesArray)
+        EM_JAX.reg_param = reg_param
+        EM_JAX.eLL = expectedLogLikelihood.PointProcessELLExpLink
+        EM_JAX.eLL.init(legQuadWeights=legQuadWeights, validSpikesTimesMask=validSpikesTimesMask)
 
-    def maximize(self, params0, optim_params):
+    def maximizeECM(params0, optim_params, n_em_iterations=10):
+        def getVariationalParamsOptimFunc(params):
+            def optimFunc(variational_params):
+                params["variational_mean"] = \
+                    variational_params["variational_mean"]
+                params["variational_chol_vecs"] = \
+                    variational_params["variational_chol_vecs"]
+                value = EM_JAX._eval_func(params)
+                return value
+            return optimFunc
+
+        params = params0
+        for i in range(n_em_iterations):
+            # variational params
+            variational_params = {k: params[k] for k in ('variational_mean', 'variational_chol_vecs')}
+            variational_params_optim_func = getVariationalParamsOptimFunc(params)
+            solver = jaxopt.LBFGS(fun=variational_params_optim_func, **optim_params)
+            res = solver.run(variational_params)
+            breakpoint()
+            params["variational_mean"] = res.params["variational_mean"]
+            params["variational_chol_vecs"] = res.params["variational_chol_vecs"]
+        return params
+
+    def maximize(params0, optim_params):
 #         solver = jaxopt.ScipyMinimize(fun=self._eval_func,
 #                                       method="L-BFGS-B",
 #                                       callback=mycallback,
@@ -33,10 +61,10 @@ class EM_JAX:
 #             lb = -1*self._eval_func(params)
 #             print(f"lower bound: {lb}")
 
-        eval0 = self._eval_func(params=params0)
+        eval0 = EM_JAX._eval_func(params=params0)
         assert(math.isfinite(eval0))
 
-        solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
+        solver = jaxopt.LBFGS(fun=EM_JAX._eval_func, **optim_params)
         res = solver.run(params0)
         return res
 
@@ -65,13 +93,13 @@ class EM_JAX:
 #         print("minimization done")
 #         return res
 
-    def maximize_jaxopt_scipy(self, params0, optim_params):
-        eval_func_jitted = jax.jit(self._eval_func)
+    def maximize_jaxopt_scipy(params0, optim_params):
+        eval_func_jitted = jax.jit(EM_JAX._eval_func)
         eval0 = eval_func_jitted(params=params0)
         assert(math.isfinite(eval0))
 
         def mycallback(params):
-            lb = -1*self._eval_func(params)
+            lb = -1*EM_JAX._eval_func(params)
             print(f"lower bound: {lb}")
 
         solver = jaxopt.ScipyMinimize(fun=eval_func_jitted,
@@ -80,16 +108,17 @@ class EM_JAX:
                                       **optim_params)
         # solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
         res = solver.run(params0)
+        breakpoint()
         return res
 
-    def maximizeInSteps(self, params0, optim_params):
-        eval_func_jitted = jax.jit(self._eval_func)
+    def maximizeInSteps(params0, optim_params):
+        eval_func_jitted = jax.jit(EM_JAX._eval_func)
         solver = jaxopt.LBFGS(fun=eval_func_jitted, **optim_params)
         # solver = jaxopt.LBFGS(fun=self._eval_func, **optim_params)
         params = params0
         print("About to call solver.init_state(params)")
         state = solver.init_state(params)
-        print("Call solver.init_state(params) done")
+        print("Called solver.init_state(params) done")
 
         for step in range(optim_params["maxiter"]):
             params, state = solver.update(params=params, state=state)
@@ -97,29 +126,26 @@ class EM_JAX:
             print(f"Iteration {step}: {lower_bound}")
         return state
 
-    def _eval_func(self, params):
-        variational_mean = params["variational_mean"]
-        variational_chol_vecs = params["variational_chol_vecs"]
+    def _eval_func(params):
+        vMean = params["variational_mean"]
+        vChol = params["variational_chol_vecs"]
         C = params["C"]
         d = params["d"]
         kernels_params = params["kernels_params"]
         ind_points_locs = params["ind_points_locs"]
 
-        Kzz, Kzz_inv = self._ind_points_locs_KMS.buildKernelsMatrices(
+        Kzz, Kzz_inv = EM_JAX.indPointsLocsKMS.buildKernelsMatrices(
             kernels_params=kernels_params, ind_points_locs=ind_points_locs,
-            reg_param=self._reg_param)
-        Ktz_quad, KttDiag_quad = self._quad_times_KMS.buildKernelsMatrices(
+            reg_param=EM_JAX.reg_param)
+        Ktz_quad = EM_JAX.quadTimesKMS.buildKernelsMatrices(
             kernels_params=kernels_params, ind_points_locs=ind_points_locs)
-        Ktz_spike, KttDiag_spike = self._spike_times_KMS.buildKernelsMatrices(
+        Ktz_spikes = EM_JAX.spikesTimesKMS.buildKernelsMatrices(
             kernels_params=kernels_params, ind_points_locs=ind_points_locs)
-        kernels_matrices = dict(Kzz=Kzz, Kzz_inv=Kzz_inv,
-                                Ktz_quad=Ktz_quad, KttDiag_quad=KttDiag_quad, 
-                                Ktz_spike=Ktz_spike, KttDiag_spike=KttDiag_spike)
-        variational_cov = buildCovsFromCholVecs(variational_chol_vecs)
-        answer = -1*self._model.eval(variational_mean=variational_mean,
-                                     variational_cov=variational_cov, C=C, d=d,
-                                     kernels_matrices=kernels_matrices)
-        # print(f"lower bound={-answer}")
+        vCov = buildCovsFromCholVecs(vChol)
+        svlb = svLowerBound.SVLowerBound
+        answer = -1*svlb.eval(vMean=vMean, vCov=vCov, C=C, d=d, Kzz=Kzz,
+                              Kzz_inv=Kzz_inv, KtzQuad=Ktz_quad,
+                              KtzSpikes=Ktz_spikes, KttDiag=1.0)
         return answer
 
 class EM(abc.ABC):
