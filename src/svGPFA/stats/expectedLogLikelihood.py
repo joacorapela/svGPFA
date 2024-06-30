@@ -11,7 +11,7 @@ class PointProcessELLExpLink:
         PointProcessELLExpLink.legQuadWeights = legQuadWeights
         PointProcessELLExpLink.validSpikesTimesMask = validSpikesTimesMask
 
-    def evalSumAcrossTrialsAndNeurons(vMean, vCov, C, d, Kzz, Kzz_inv,
+    def evalSumAcrossTrialsAndNeurons(vMean, vCov, C, d, Kzz, Kzz_cho,
                                       KtzQuad, KtzSpikes, KttDiag):
         # vMean \in n_latents x n_trials x n_ind_points
         # vCov \in
@@ -19,7 +19,7 @@ class PointProcessELLExpLink:
         # C \in n_neurons x n_trials
         # d \in n_neurons x 1
         # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
-        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz_cho \in n_latents x n_trials x n_ind_points x n_ind_points
         # KtzQuad \in n_latents x n_trials x n_quad x n_ind_points
         # KtzSpikes \in n_latents x n_trials x n_spikes x n_ind_points
         # KttDiag \in Real
@@ -27,14 +27,14 @@ class PointProcessELLExpLink:
 
         # qHMuQuad \in n_trials x n_neurons x n_quad
         # qHVarQuad \in n_trials x n_neurons x n_quad
-        qHMuQuad = preIntensity.LinearPreIntensityQuad.computeMeans(
-            vMean=vMean, C=C, d=d, Kzz_inv=Kzz_inv, Ktz=KtzQuad)
-        qHVarQuad = preIntensity.LinearPreIntensityQuad.computeVars(
-            vCov=vCov, C=C, Kzz=Kzz, Kzz_inv=Kzz_inv, Ktz=KtzQuad,
+        qHMuQuad = preIntensity.LinearPreIntensity.computeMeans(
+            vMean=vMean, C=C, d=d, Kzz_cho=Kzz_cho, Ktz=KtzQuad)
+        qHVarQuad = preIntensity.LinearPreIntensity.computeVars(
+            vCov=vCov, C=C, Kzz=Kzz, Kzz_cho=Kzz_cho, Ktz=KtzQuad,
             KttDiag=KttDiag)
         # qHMuSpikes \in n_trials x n_neurons x n_spikes
-        qHMuSpikes = preIntensity.LinearPreIntensityQuad.computeMeans(
-            vMean=vMean, C=C, d=d, Kzz_inv=Kzz_inv, Ktz=KtzSpikes)
+        qHMuSpikes = preIntensity.LinearPreIntensity.computeMeans(
+            vMean=vMean, C=C, d=d, Kzz_cho=Kzz_cho, Ktz=KtzSpikes)
         # eLinkValues \in n_trials x n_quad_leg x n_neurons
         eLinkValues = PointProcessELLExpLink._getELinkValues(
             qHMu=qHMuQuad, qHVar=qHVarQuad)
