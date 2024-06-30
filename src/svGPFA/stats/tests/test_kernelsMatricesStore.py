@@ -6,6 +6,7 @@ import jax
 import jax.numpy as jnp
 import svGPFA.stats.kernels
 import svGPFA.stats.kernelsMatricesStore
+import svGPFA.utils.miscUtils
 
 jax.config.update("jax_enable_x64", True)
 
@@ -24,25 +25,30 @@ def test_eval_IndPointsLocsKMS():
     hprs = mat["hprs"]
     epsilon = mat["epsilon"][0,0]
 
+    Z0array = jnp.empty((len(Z0), Z0[0].shape[0], Z0[0].shape[1],
+                         Z0[0].shape[2]), dtype=jnp.double)
+    for k in range(len(Z0)):
+        Z0array = Z0array.at[k, :, :, :].set(Z0[k])
+
     kernels = [[None] for k in range(nLatents)]
     kernels_params0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if kernelNames[0, k][0] == "PeriodicKernel":
-            kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel
             lengthscale = float(hprs[k,0][0].item())
             period = float(hprs[k,0][1].item())
             kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
-            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel
             lengthscale = float(hprs[k,0][0].item())
             kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol(
-        kernels=kernels)
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol
+    indPointsLocsKMS.init(kernels=kernels)
     Kzz, Kzz_chol = indPointsLocsKMS.buildKernelsMatrices(
-        kernels_params=kernels_params0, ind_points_locs=Z0,
+        kernels_params=kernels_params0, ind_points_locs=Z0array,
         reg_param=epsilon)
 
     for k in range(len(Kzz)):
@@ -78,29 +84,31 @@ def test_eval_IndPointsLocsAndQuadTimesKMS():
     kernels_params0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if kernelNames[0, k][0] == "PeriodicKernel":
-            kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel
             lengthscale = float(hprs[k,0][0].item())
             period = float(hprs[k,0][1].item())
             kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
-            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel
             lengthscale = float(hprs[k,0][0].item())
             kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    indPointsLocsAndQuadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(
-        kernels=kernels, times=t)
-    estKtz, estKttDiag = indPointsLocsAndQuadTimesKMS.buildKernelsMatrices(
-        kernels_params=kernels_params0, ind_points_locs=Z0)
+    Z0array = jnp.empty((len(Z0), Z0[0].shape[0], Z0[0].shape[1],
+                         Z0[0].shape[2]), dtype=jnp.double)
+    for k in range(len(Z0)):
+        Z0array = Z0array.at[k, :, :, :].set(Z0[k])
+
+    indPointsLocsAndQuadTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndQuadTimesKMS
+    indPointsLocsAndQuadTimesKMS.init(kernels=kernels, t=t)
+    estKtz = indPointsLocsAndQuadTimesKMS.buildKernelsMatrices(
+        kernels_params=kernels_params0, ind_points_locs=Z0array)
 
     for k in range(nLatents):
         for r in range(nTrials):
             error = math.sqrt(((estKtz[k][r]-leasKtz[k][r,:,:])**2).flatten().mean())
             assert(error<tol)
-            error = math.sqrt(((estKttDiag[k][r]-leasKttDiag[r,:,k])**2).flatten().mean())
-            assert(error<tol)
-
 
 def test_eval_IndPointsLocsAndSpikesTimesKMS():
     tol = 1e-5
@@ -121,27 +129,40 @@ def test_eval_IndPointsLocsAndSpikesTimesKMS():
     kernels_params0 = [[None] for k in range(nLatents)]
     for k in range(nLatents):
         if kernelNames[0, k][0] == "PeriodicKernel":
-            kernels[k] = svGPFA.stats.kernels.PeriodicKernel()
+            kernels[k] = svGPFA.stats.kernels.PeriodicKernel
             lengthscale = float(hprs[k,0][0].item())
             period = float(hprs[k,0][1].item())
             kernels_params0[k] = jnp.array([lengthscale, period])
         elif kernelNames[0,k][0] == "rbfKernel":
-            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel()
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel
             lengthscale = float(hprs[k,0][0].item())
             kernels_params0[k] = jnp.array([lengthscale])
         else:
             raise ValueError("Invalid kernel name: %s"%(kernelNames[k]))
 
-    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS(
-        kernels=kernels, times=Y)
-    estKtz, estKttDiag = indPointsLocsAndSpikesTimesKMS.buildKernelsMatrices(
-        kernels_params=kernels_params0, ind_points_locs=Z0)
+    Z0array = jnp.empty((len(Z0), Z0[0].shape[0], Z0[0].shape[1],
+                         Z0[0].shape[2]), dtype=jnp.double)
+    for k in range(len(Z0)):
+        Z0array = Z0array.at[k, :, :, :].set(Z0[k])
+
+    max_n_spikes = len(Y[0])
+    for r in range(nTrials):
+        if len(Y[r]) > max_n_spikes:
+            max_n_spikes = len(Y[r])
+
+    spikes_times_array = jnp.zeros((nTrials, max_n_spikes, 1), dtype=jnp.double)
+    for r in range(nTrials):
+        spikes_times_array = spikes_times_array.at[r, :len(Y[r]), 0].set(Y[r].flatten())
+
+    indPointsLocsAndSpikesTimesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndSpikesTimesKMS
+    indPointsLocsAndSpikesTimesKMS.init(kernels=kernels, t=spikes_times_array)
+    estKtz = indPointsLocsAndSpikesTimesKMS.buildKernelsMatrices(
+        kernels_params=kernels_params0, ind_points_locs=Z0array)
 
     for k in range(nLatents):
         for r in range(nTrials):
-            error = math.sqrt(((estKtz[k][r]-leasKtz[k][r])**2).flatten().mean())
-            assert(error<tol)
-            error = math.sqrt(((estKttDiag[k][r]-leasKttDiag[k][r])**2).flatten().mean())
+            n_spikes_r = leasKtz[k][r].shape[0]
+            error = math.sqrt(((estKtz[k, r, :n_spikes_r,:]-leasKtz[k][r])**2).flatten().mean())
             assert(error<tol)
 
 
