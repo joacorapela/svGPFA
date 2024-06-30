@@ -22,13 +22,13 @@ class IndPointsLocsKMS_Chol:
                 X1=ind_points_locs[k, :, :, :], params=kernels_params[k]) +
                 reg_param * jnp.eye(N=n_ind_points, dtype=jnp.double))
             Kzz = Kzz.at[k, :, :, :].set(Kzz_k)
-        Kzz_inv = IndPointsLocsKMS_Chol._invertKzz3D(Kzz)
-        return Kzz, Kzz_inv
+        Kzz_cho = IndPointsLocsKMS_Chol._invertKzz3D(Kzz)
+        return Kzz, Kzz_cho
 
     @jax.jit
     def _invertKzz3D(Kzz):
-        Kzz_chol = jnp.linalg.cholesky(Kzz)  # O(n^3)
-        return Kzz_chol
+        Kzz_cho = jnp.linalg.cholesky(Kzz)  # O(n^3)
+        return Kzz_cho
 
     @jax.jit
     def solve(Kzz_inv, input):
@@ -46,7 +46,7 @@ class IndPointsLocsAndQuadTimesKMS:
     @jax.jit
     def buildKernelsMatrices(kernels_params, ind_points_locs):
         # ind_points_locs \in nLatents x n_trials x n_ind_points x 1
-        # return \in nLatexts x n_trials x nQuadPoints x n_ind_points
+        # return \in nLatents x n_trials x nQuadPoints x n_ind_points
         n_latents = ind_points_locs.shape[0]
         n_trials = ind_points_locs.shape[1]
         n_ind_points = ind_points_locs.shape[2]
@@ -81,7 +81,7 @@ class IndPointsLocsAndSpikesTimesKMS:
     @jax.jit
     def buildKernelsMatrices(kernels_params, ind_points_locs):
         # ind_points_locs \in nLatents x n_trials x n_ind_points x 1
-        # return \in nLatexts x n_trials x nQuadPoints x n_ind_points
+        # return \in nLatents x n_trials x n_spikes x n_ind_points
         n_latents = ind_points_locs.shape[0]
         n_trials = ind_points_locs.shape[1]
         n_ind_points = ind_points_locs.shape[2]
