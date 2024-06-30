@@ -7,20 +7,20 @@ import jax.numpy as jnp
 class PosteriorOnLatents:
 
     @jax.jit
-    def computeMeans(vMean, Kzz_inv, Ktz):
+    def computeMeans(vMean, Kzz_cho, Ktz):
         # vMean \in n_latents x n_trials x n_ind_points
-        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz_cho \in n_latents x n_trials x n_ind_points x n_ind_points
         # Ktz \in n_latents x n_trials x (n_quad | n_spikes) x n_ind_points
         # return n_latents x n_trials x (n_quad | n_spikes)
 
         # ([n_ind_points, n_ind_points], [n_ind_points]) ->
         # [n_ind_points]
-        def computeA(Kzz_inv, vMean):
-            a = jax.scipy.linalg.cho_solve((Kzz_inv, True), vMean)
+        def computeA(Kzz_cho, vMean):
+            a = jax.scipy.linalg.cho_solve((Kzz_cho, True), vMean)
             return a
 
         # ([n_trials, n_ind_points, n_ind_points],
-        #  [n_trials, n_ind_points, 1]) -> [n_trials, n_ind_points]
+        #  [n_trials, n_ind_points]) -> [n_trials, n_ind_points]
         computeA_vmTrials = jax.vmap(computeA, in_axes=(0, 0), out_axes=0)
         # ([n_latents, n_trials, n_ind_points, n_ind_points],
         #  [n_latents, n_trials, n_ind_points]) ->
@@ -29,14 +29,12 @@ class PosteriorOnLatents:
                                       out_axes=0)
 
         # A \in [n_latents x n_trials x n_ind_points]
-        A = computeA_vmLatents(Kzz_inv, vMean)
+        A = computeA_vmLatents(Kzz_cho, vMean)
 
         # ([n_quad, n_ind_points], [n_ind_points]) -> [n_quad]
         def computeMean(Ktz, A):
             answer = jnp.dot(Ktz, A)
             return answer
-        # computeMeans_vmQuad = jax.vmap(computeMean, in_axes=(0, None))
-        # computeMeans_vmTrials = jax.vmap(computeMeans_vmQuad, in_axes=(0, 0))
 
         # ([n_trials, n_quad, n_ind_points], [n_trials, n_ind_points]) ->
         # [n_trials, n_quad]
@@ -52,24 +50,24 @@ class PosteriorOnLatents:
         return qKMu
 
     @jax.jit
-    def computeVars(vCov, Kzz, Kzz_inv, Ktz, KttDiag=1.0):
+    def computeVars(vCov, Kzz, Kzz_cho, Ktz, KttDiag=1.0):
         # vCov \in
         #  n_latents x n_trials x n_ind_points x n_ind_points
         # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
-        # Kzz_inv \in n_latents x n_trials x n_ind_points x n_ind_points
+        # Kzz_cho \in n_latents x n_trials x n_ind_points x n_ind_points
         # Ktz \in n_latents x n_trials x n_quad x n_ind_points
         # KttDiag \in Reals
         # return n_latents x n_trials x n_quad
 
-        def computeVars(vCov, Kzz, Kzz_inv, Ktz, KttDiag):
+        def computeVars(vCov, Kzz, Kzz_cho, Ktz, KttDiag):
             # vCov \in n_ind_points x n_ind_points
             # Kzz \in n_ind_points x n_ind_points
-            # Kzz_inv \in n_ind_points x n_ind_points
+            # Kzz_cho \in n_ind_points x n_ind_points
             # Ktz \in n_quad x n_ind_points
             # answer n_quad
 
             # B \in n_ind_points x n_quad
-            B = jax.scipy.linalg.cho_solve((Kzz_inv, True), Ktz.T)
+            B = jax.scipy.linalg.cho_solve((Kzz_cho, True), Ktz.T)
             # mm1f \in n_ind_points x n_quad
             mm1f = jnp.matmul(vCov-Kzz, B)
             # aux1 \in n_ind_points x n_quad
@@ -100,5 +98,5 @@ class PosteriorOnLatents:
         # [n_latents, n_trials, n_quad]
         computeVars_vmLatents = jax.vmap(computeVars_vmTrials,
                                          in_axes=(0, 0, 0, 0, None))
-        qKVar = computeVars_vmLatents(vCov, Kzz, Kzz_inv, Ktz, KttDiag)
+        qKVar = computeVars_vmLatents(vCov, Kzz, Kzz_cho, Ktz, KttDiag)
         return qKVar
