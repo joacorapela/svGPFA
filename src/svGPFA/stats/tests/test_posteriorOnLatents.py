@@ -84,6 +84,7 @@ def test_computeMeansAndVars_quadTimes():
         qKVarError = math.sqrt(((var_k[r,:,:].T - qKVar[:, r, :])**2).mean())
         assert(qKVarError<tol)
 
+
 if __name__=="__main__":
     test_computeMeansAndVars_quadTimes()
     # test_computeMeansAndVars_spikesTimes()
