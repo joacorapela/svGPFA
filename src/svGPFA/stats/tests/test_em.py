@@ -3,7 +3,7 @@ import sys
 import io
 import os
 import math
-from scipy.io import loadmat
+import scipy.io
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -24,10 +24,9 @@ jax.config.update("jax_enable_x64", True)
 def test_emJAX__eval_func():
     tol = 3e-4
     reg_param = 1e-5
-    yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
     qMu0list = [jax.device_put(mat['q_mu'][(i,0)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]
@@ -41,9 +40,8 @@ def test_emJAX__eval_func():
     obj = mat['obj'][0,0]
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
+    YNonStacked_tmp = mat['YNonStacked']
 
-    yMat = loadmat(yNonStackedFilename)
-    YNonStacked_tmp = yMat['YNonStacked']
     nNeurons = YNonStacked_tmp[0,0].shape[0]
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
@@ -102,10 +100,9 @@ def test_emJAX__eval_func():
     lbEval = em._eval_func_params_as_list(params=params0)
     assert(abs(lbEval-obj)<tol)
 
-def test_maximize_pointProcess_JAX(reg_param=1e-5, maxiter=37500,
+def test_maximize_pointProcess_JAX(reg_param=1e-5, maxiter=400,
                                    max_stepsize=200.0, tol = 1e-5, jit=True,
                                    verbose=True):
-    yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
     mat = loadmat(dataFilename)
@@ -118,11 +115,10 @@ def test_maximize_pointProcess_JAX(reg_param=1e-5, maxiter=37500,
     Z0 = [jax.device_put(mat['Z0'][(i,0)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]
     C0 = jax.device_put(mat["C0"].astype("float64"))
     b0 = jax.device_put(mat["b0"].astype("float64"))
-    indPointsLocsKMSRegEpsilon = 1e-2
     legQuadPoints = jax.device_put(mat['ttQuad'].astype("float64").transpose(2, 0, 1))
     legQuadWeights = jax.device_put(mat['wwQuad'].astype("float64").transpose(2, 0, 1))
-
     YNonStacked_tmp = mat['YNonStacked']
+
     nNeurons = YNonStacked_tmp[0,0].shape[0]
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
