@@ -40,11 +40,11 @@ class EM_JAXopt:
             )
             return value
 
-        def embeddingParamsOptimFunc(embedding_params, all_params):
+        def preIntensityParamsOptimFunc(preIntensity_params, all_params):
             value = EM_JAXopt._eval_func(
                 vMean=all_params["variational_mean"],
                 vChol=all_params["variational_chol_vecs"],
-                C=embedding_params["C"], d=embedding_params["d"],
+                C=preIntensity_params["C"], d=preIntensity_params["d"],
                 kernels_params=all_params["kernels_params"],
                 ind_points_locs=all_params["ind_points_locs"],
             )
@@ -78,10 +78,10 @@ class EM_JAXopt:
         variational_state = variational_solver.init_state(variational_params,
                                                           all_params=params)
 
-        embedding_solver = jaxopt.LBFGS(fun=embeddingParamsOptimFunc,
+        preIntensity_solver = jaxopt.LBFGS(fun=preIntensityParamsOptimFunc,
                                         **optim_params["LBFGS"])
-        embedding_params = {k: params[k] for k in ('C', 'd')}
-        embedding_state = embedding_solver.init_state(embedding_params,
+        preIntensity_params = {k: params[k] for k in ('C', 'd')}
+        preIntensity_state = preIntensity_solver.init_state(preIntensity_params,
                                                       all_params=params)
 
         kernels_solver = jaxopt.LBFGS(fun=kernelsParamsOptimFunc,
@@ -96,51 +96,47 @@ class EM_JAXopt:
         indPointsLocs_state = indPointsLocs_solver.init_state(indPointsLocs_params, all_params=params)
 
         for i in range(optim_params["n_em_iterations"]):
-            # variational params
-            variational_params = {k: params[k] for k in ('variational_mean', 'variational_chol_vecs')}
-            for i in range(params["n_variational_iter"]):
-                variational_params, variational_state = variational_solver.update(params=variational_params, state=variational_state, all_params=params)
-            params["variational_mean"] = variational_params["variational_mean"]
-            params["variational_chol_vecs"] = variational_params["variational_chol_vecs"]
+            if i > 0 and optim_params["estVariationalParams"]:
+                for i in range(optim_params["n_variational_iter"]):
+                    variational_params, variational_state = variational_solver.update(params=variational_params, state=variational_state, all_params=params)
+                params["variational_mean"] = variational_params["variational_mean"]
+                params["variational_chol_vecs"] = variational_params["variational_chol_vecs"]
+                # print(f"Variational={-variational_state.value}")
 
-            # embedding params
-            embedding_params = {k: params[k] for k in ('C', 'd')}
-            for i in range(params["n_embedding_iter"]):
-                embedding_params, embedding_state = embedding_solver.update(params=embedding_params, state=embedding_state, all_params=params)
-            params["C"] = embedding_params["C"]
-            params["d"] = embedding_params["d"]
+            if optim_params["estPreIntensityParams"]:
+                for i in range(optim_params["n_preIntensity_iter"]):
+                    preIntensity_params, preIntensity_state = preIntensity_solver.update(params=preIntensity_params, state=preIntensity_state, all_params=params)
+                params["C"] = preIntensity_params["C"]
+                params["d"] = preIntensity_params["d"]
+                print(f"PreIntensity={-preIntensity_state.value}")
+                breakpoint()
 
-            # kernels params
-            kernels_params = {"kernels_params": params["kernels_params"]}
-            for i in range(params["n_kernels_iter"]):
-                kernels_params, kernels_state = kernels_solver.update(params=kernels_params, state=kernels_state, all_params=params)
-            params["kernels_params"] = kernels_params["kernels_params"]
+            if optim_params["estKernelsParams"]:
+                for i in range(optim_params["n_kernels_iter"]):
+                    kernels_params, kernels_state = kernels_solver.update(params=kernels_params, state=kernels_state, all_params=params)
+                params["kernels_params"] = kernels_params["kernels_params"]
+                # print(f"Kernels={-kernels_state.value}")
 
-            # induncing points params
-            indPointsLocs_params = {"ind_points_locs": params["ind_points_locs"]}
-            for i in range(params["n_indPointsLocs_iter"]):
-                indPointsLocs_params, indPointsLocs_state = indPointsLocs_solver.update(params=indPointsLocs_params, state=indPointsLocs_state, all_params=params)
-            params["ind_points_locs"] = indPointsLocs_params["ind_points_locs"]
-
-            print(f"Lower bound={-indPointsLocs_state.value}")
+            if optim_params["estIndPointsParams"]:
+                for i in range(optim_params["n_indPointsLocs_iter"]):
+                    indPointsLocs_params, indPointsLocs_state = indPointsLocs_solver.update(params=indPointsLocs_params, state=indPointsLocs_state, all_params=params)
+                params["ind_points_locs"] = indPointsLocs_params["ind_points_locs"]
+                # print(f"IndPointsLocs={-indPointsLocs_state.value}")
 
         return params
 
     def maximize(params0, optim_params):
-        eval0 = EM_JAXopt._eval_func_params_as_list(params=params0)
-        assert(math.isfinite(eval0))
-
         solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list, **optim_params)
         res = solver.run(params0)
         return res
 
     def maximizeInSteps(params0, optim_params):
         solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list, **optim_params)
-        params = params0
         print("About to call solver.init_state(params)")
-        state = solver.init_state(params)
+        state = solver.init_state(params0)
         print("Called solver.init_state(params) done")
 
+        params = params0
         for step in range(optim_params["maxiter"]):
             params, state = solver.update(params=params, state=state)
             lower_bound = -state.value
