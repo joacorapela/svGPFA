@@ -20,7 +20,6 @@ jax.config.update("jax_enable_x64", True)
 def test_eval_pointProcess():
     tol = 1e-6
     reg_param = 1e-5
-    yNonStackedFilename = os.path.join(os.path.dirname(__file__), "data/YNonStacked.mat")
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
     mat = loadmat(dataFilename)
@@ -38,11 +37,10 @@ def test_eval_pointProcess():
     obj = mat['obj'][0,0]
     kernelNames = mat["kernelNames"]
     hprs = mat["hprs"]
+    YNonStacked_tmp = mat['YNonStacked']
 
     qSigma0list = svGPFA.utils.miscUtils.buildRank1PlusDiagCov(vecs=qSVec0,
                                                                diags=qSDiag0)
-    yMat = loadmat(yNonStackedFilename)
-    YNonStacked_tmp = yMat['YNonStacked']
     nNeurons = YNonStacked_tmp[0,0].shape[0]
     YNonStacked = [[[] for n in range(nNeurons)] for r in range(nTrials)]
     for r in range(nTrials):
