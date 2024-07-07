@@ -11,7 +11,7 @@ import svGPFA.utils.miscUtils
 jax.config.update("jax_enable_x64", True)
 
 def test_eval_IndPointsLocsKMS():
-    tol = 1e-5
+    tol = 1e-6
     # tolKzzi = 6e-2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
@@ -67,7 +67,7 @@ def test_eval_IndPointsLocsKMS():
 
 
 def test_eval_IndPointsLocsAndQuadTimesKMS():
-    tol = 1e-5
+    tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
     mat = loadmat(dataFilename)
@@ -111,7 +111,7 @@ def test_eval_IndPointsLocsAndQuadTimesKMS():
             assert(error<tol)
 
 def test_eval_IndPointsLocsAndSpikesTimesKMS():
-    tol = 1e-5
+    tol = 1e-6
     # tolKzzi = 6e-2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices_fromSpikes.mat")
 
