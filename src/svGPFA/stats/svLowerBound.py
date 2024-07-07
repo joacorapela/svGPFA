@@ -11,4 +11,6 @@ class SVLowerBound:
         kl_sum = klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials(
             vMean=vMean, vCov=vCov, Kzz=Kzz, Kzz_cho=Kzz_cho)
         the_eval = eLL_value-kl_sum
+        print(f"eLL_value={eLL_value}")
+        print(f"kl_sum={kl_sum}")
         return the_eval

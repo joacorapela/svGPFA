@@ -7,7 +7,7 @@ import jax.numpy as jnp
 class PosteriorOnLatents:
 
     @jax.jit
-    def computeMeans(vMean, Kzz_cho, Ktz):
+    def computeMeans(vMean: jax.Array, Kzz_cho: jax.Array, Ktz: jax.Array) -> jax.Array:
         # vMean \in n_latents x n_trials x n_ind_points
         # Kzz_cho \in n_latents x n_trials x n_ind_points x n_ind_points
         # Ktz \in n_latents x n_trials x (n_quad | n_spikes) x n_ind_points
@@ -38,19 +38,19 @@ class PosteriorOnLatents:
 
         # ([n_trials, n_quad, n_ind_points], [n_trials, n_ind_points]) ->
         # [n_trials, n_quad]
-        computeMeans_vmTrials = jax.vmap(computeMean, in_axes=(0, 0))
+        computeMeans_vmTrials = jax.vmap(computeMean)
         # ([n_latents,n_trials,  n_quad, n_ind_points],
         #  [n_latents, n_trials, n_ind_points]) ->
         # [n_latents, n_trials, n_quad]
-        computeMeans_vmLatents = jax.vmap(computeMeans_vmTrials,
-                                          in_axes=(0, 0))
+        computeMeans_vmLatents = jax.vmap(computeMeans_vmTrials)
         # qKMu\in [n_latents, n_trials, n_quad]
         qKMu = computeMeans_vmLatents(Ktz, A)
 
         return qKMu
 
     @jax.jit
-    def computeVars(vCov, Kzz, Kzz_cho, Ktz, KttDiag=1.0):
+    def computeVars(vCov: jax.Array, Kzz: jax.Array, Kzz_cho: jax.Array,
+                    Ktz: jax.Array, KttDiag: float = 1.0) -> jax.Array:
         # vCov \in
         #  n_latents x n_trials x n_ind_points x n_ind_points
         # Kzz \in n_latents x n_trials x n_ind_points x n_ind_points
@@ -59,7 +59,8 @@ class PosteriorOnLatents:
         # KttDiag \in Reals
         # return n_latents x n_trials x n_quad
 
-        def computeVars(vCov, Kzz, Kzz_cho, Ktz, KttDiag):
+        def computeVars(vCov: jax.Array, Kzz: jax.Array, Kzz_cho: jax.Array,
+                        Ktz: jax.Array, KttDiag: float = 1.0):
             # vCov \in n_ind_points x n_ind_points
             # Kzz \in n_ind_points x n_ind_points
             # Kzz_cho \in n_ind_points x n_ind_points
@@ -77,12 +78,6 @@ class PosteriorOnLatents:
             # aux3 \in n_quad
             answer = KttDiag + aux2
             return answer
-
-        # ([n_ind_points, n_ind_points], [n_ind_points, n_ind_points],
-        # [n_ind_points, n_ind_points], [n_quad, n_ind_points], []) ->
-        # [n_quad]
-        # computeVars_vmQuadP = jax.vmap(computeVars,
-        #                                in_axes=(None, None, None, 0, None))
 
         # ([n_trials, n_ind_points, n_ind_points],
         #  [n_trials, n_ind_points, n_ind_points],

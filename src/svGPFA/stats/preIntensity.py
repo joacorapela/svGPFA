@@ -7,7 +7,8 @@ from . import posteriorOnLatents
 
 class LinearPreIntensity:
 
-    def computeMeans(vMean, C, d, Kzz_cho, Ktz):
+    def computeMeans(vMean: jax.Array, C: jax.Array, d: jax.Array,
+                     Kzz_cho: jax.Array, Ktz: jax.Array) -> jax.Array:
         # vMean \in n_latents x n_trials x n_ind_points
         # C \in n_neurons x n_trials
         # d \in n_neurons x 1
@@ -20,7 +21,9 @@ class LinearPreIntensity:
             qKMu=qKMu, C=C, d=d)
         return qHMu
 
-    def computeVars(vCov, C, Kzz, Kzz_cho, Ktz, KttDiag):
+    def computeVars(vCov: jax.Array, C: jax.Array, Kzz: jax.Array,
+                    Kzz_cho: jax.Array, Ktz: jax.Array,
+                    KttDiag: float = 1.0) -> jax.Array:
         # vMean \in n_latents x n_trials x n_ind_points
         # vCov \in
         #  n_latents x n_trials x n_ind_points x n_ind_points
@@ -38,7 +41,9 @@ class LinearPreIntensity:
         return qHVar
 
     @jax.jit
-    def _computeMeansGivenPosteriorOnLatentsStats(qKMu, C, d):
+    def _computeMeansGivenPosteriorOnLatentsStats(qKMu: jax.Array,
+                                                  C: jax.Array,
+                                                  d: jax.Array) -> jax.Array:
         # qKMu \in n_latents x n_trials x n_quad | n_spikes_allNeurons_per_trial
         # qHMu \in n_trials x n_neurons x n_quad | n_spikes_allNeurons_per_trial
         # C \in n_neurons x n_trials
@@ -50,7 +55,8 @@ class LinearPreIntensity:
             # C \in n_neurons x n_latents
             # d \in n_neurons x 1
             # qHMu \ in n_neurons x n_quad
-            qHMu = C @ qKMu[:, :] + d
+            # qHMu = C @ qKMu[:, :] + d
+            qHMu = C @ qKMu + d
             return qHMu
 
         posteriorOnMeans_vmTrials = jax.vmap(posteriorOnMeans, (1, None, None))
@@ -58,13 +64,13 @@ class LinearPreIntensity:
         return qHMu
 
     @jax.jit
-    def _computeVarsGivenPosteriorOnLatentsStats(qKVar, C):
+    def _computeVarsGivenPosteriorOnLatentsStats(qKVar: jax.Array, C: jax.Array):
         # qKVar \in n_latents x n_trials x n_quad | n_spikes_per_trial
         # qHVar \in n_trials x n_neurons x n_quad | n_spikes_per_trial
         # C \in n_neurons x n_latents
         # answer n_trials x n_neurons x n_quad
 
-        def posteriorOnVars(qKVar, C):
+        def posteriorOnVars(qKVar: jax.Array, C: jax.Array):
             # qKVar \in n_latents x n_quad
             # C \in n_neurons x n_latents
             # qHVar \ in n_neurons x n_quad
