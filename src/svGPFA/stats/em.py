@@ -194,7 +194,6 @@ class EM_JAXopt:
         return answer
 
     def maximize(params0, optim_params):
-        print(f"Initial LB: {-EM_JAXopt._eval_func_params_as_list(params0)}")
         solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
                               **optim_params)
         res = solver.run(params0)
@@ -207,26 +206,40 @@ class EM_JAXopt:
         state = solver.init_state(params0)
         print("Called solver.init_state(params) done")
 
+        lb = -EM_JAXopt._eval_func_params_as_list(params0)
         params = params0
+        elapsed_time_hist = [0.0]
+        lower_bound_hist = [lb]
+        start_time = time.time()
         for step in range(optim_params["maxiter"]):
             params, state = solver.update(params=params, state=state)
-            lower_bound = -state.value
-            print(f"Iteration {step}: {lower_bound}")
-        return params, state
+            lb = -state.value.item()
+            lower_bound_hist.append(lb)
+            elapsed_time_hist.append(time.time()-start_time)
+            # print(f"Iteration {step}: {lb}")
+        answer = {"params": params, "state": state,
+                  "elapsed_time_hist": elapsed_time_hist,
+                  "lower_bound_hist": lower_bound_hist}
+        return answer
 
     def maximize_jaxopt_scipyMinimize(params0, optim_params):
-        print(f"Initial LB: {EM_JAXopt._eval_func_params_as_list(params0)}")
+        lb = -EM_JAXopt._eval_func_params_as_list(params0)
+        print(f"Initial LB: {lb}")
 
+        lower_bounds = [lb]
         def mycallback(params):
             lb = -EM_JAXopt._eval_func_params_as_list(params)
-            print(f"lower bound: {lb}")
+            lower_bounds.append(lb)
+            # print(f"lower bound: {lb}")
 
         solver = jaxopt.ScipyMinimize(fun=EM_JAXopt._eval_func_params_as_list,
                                       method="L-BFGS-B",
                                       callback=mycallback,
                                       **optim_params)
         res = solver.run(params0)
-        return res
+        answer = {"params": res.params, "state": res.state,
+                  "lower_bound": lower_bounds}
+        return answer
 
     def _eval_func_params_as_list(params):
         vMean = params["variational_mean"]
@@ -255,7 +268,6 @@ class EM_JAXopt:
         answer = -svlb.eval(vMean=vMean, vCov=vCov, C=C, d=d, Kzz=Kzz,
                             Kzz_cho=Kzz_cho, KtzQuad=Ktz_quad,
                             KtzSpikes=Ktz_spikes, KttDiag=1.0)
-        print(f"LB: {-answer}")
         return answer
 
 
