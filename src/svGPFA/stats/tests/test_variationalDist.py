@@ -1,6 +1,6 @@
 import sys
 import os
-from scipy.io import loadmat
+import scipy.io
 import jax
 import jax.numpy as jnp
 import svGPFA.stats.variationalDist
@@ -77,7 +77,7 @@ def test_buildCov():
     tol = 1e-5
     dataFilename = os.path.join(os.path.dirname(__file__), "data/get_full_from_lowplusdiag.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[0]
     nTrials = mat['q_sqrt'][(0,0)].shape[2]
     true_qSigma = [jax.device_put(mat['q_sigma'][(0,k)].astype("float64").transpose(2,0,1)) for k in range(nLatents)]

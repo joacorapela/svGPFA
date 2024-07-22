@@ -105,7 +105,7 @@ def test_maximize_pointProcess_JAX(reg_param=1e-5, maxiter=400,
                                    verbose=True):
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = len(mat['Z0'])
     nTrials = mat['Z0'][0,0].shape[2]
     qMu0list = [jax.device_put(mat['q_mu0'][(0,i)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]

@@ -1,7 +1,7 @@
 import sys
 import os
 import math
-from scipy.io import loadmat
+import scipy.io
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -14,7 +14,7 @@ def test_exponentialQuadraticKernel_buildKernelMatrixX1():
     k = 2
     dataFilename = os.path.join(os.path.dirname(__file__),
                                 "data/BuildKernelMatrices.mat")
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     assert(mat["kernelNames"][0, k][0] == "rbfKernel")
 
     Z = mat['Z'][k, 0].astype("float64").transpose((2,0,1))
@@ -38,7 +38,7 @@ def test_exponentialQuadraticKernel_buildKernelMatrixX1X2():
     k = 2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     assert(mat["kernelNames"][0, k][0] == "rbfKernel")
 
     Z = mat['Z'][k, 0].astype("float64").transpose((2,0,1))
@@ -59,7 +59,7 @@ def test_periodicKernel_buildKernelMatrixX1():
     dataFilename = os.path.join(os.path.dirname(__file__),
                                 "data/BuildKernelMatrices.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     Z = mat['Z'][k, 0].astype("float64").transpose((2,0,1))
     leasK = mat['Kzz'][k, 0].astype("float64").transpose((2,0,1))
     epsilon = mat["epsilon"]
@@ -82,7 +82,7 @@ def test_periodicKernel_buildKernelMatrixX1X2():
     k = 0
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     assert(mat["kernelNames"][0, k][0] == "PeriodicKernel")
 
     Z = mat['Z'][k, 0].astype("float64").transpose((2,0,1))

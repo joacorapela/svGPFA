@@ -1,9 +1,6 @@
 
-import sys
 import os
-import math
-from scipy.io import loadmat
-import numpy as np
+import scipy.io
 import jax
 import jax.numpy as jnp
 import svGPFA.utils.miscUtils
@@ -16,12 +13,13 @@ import svGPFA.stats.expectedLogLikelihood
 
 jax.config.update("jax_enable_x64", True)
 
+
 def test_evalSumAcrossTrialsAndNeurons_pointProcessExpLink():
     tol = 3e-4
     reg_param = 1e-5
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = len(mat['Z'])
     nTrials = mat['Z'][0,0].shape[2]
     qMu0list = [jax.device_put(mat['q_mu'][(i,0)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]

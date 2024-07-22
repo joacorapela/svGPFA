@@ -1,7 +1,7 @@
 
 import sys
 import os
-from scipy.io import loadmat
+import scipy.io
 import jax
 import jax.numpy as jnp
 import svGPFA.utils.miscUtils
@@ -16,7 +16,7 @@ def test_evalSumAcrossLatentsTrials():
     reg_param = 1e-5 # Fix: need to read indPointsLocsKMSEpsilon from Matlab's CI test data
     dataFilename = os.path.join(os.path.dirname(__file__), "data/Estep_Objective_PointProcess_svGPFA.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = mat['q_sqrt'].shape[0]
     qMu0list = [jax.device_put(mat['q_mu'][(i, 0)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]
     qSVec0 = [jax.device_put(mat['q_sqrt'][(i, 0)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]

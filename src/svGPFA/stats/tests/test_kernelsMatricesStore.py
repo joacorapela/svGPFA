@@ -1,7 +1,7 @@
 
 import os
 import math
-from scipy.io import loadmat
+import scipy.io
 import jax
 import jax.numpy as jnp
 import svGPFA.stats.kernels
@@ -15,7 +15,7 @@ def test_eval_IndPointsLocsKMS():
     # tolKzzi = 6e-2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = mat['Z'].shape[0]
     nTrials = mat['Z'][0,0].shape[2]
     Z0 = [jax.device_put(mat['Z'][(i,0)].astype("float64").transpose(2,0,1)) for i in range(nLatents)]
@@ -70,7 +70,7 @@ def test_eval_IndPointsLocsAndQuadTimesKMS():
     tol = 1e-6
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = mat['Z'].shape[0]
     nTrials = mat['Z'][0,0].shape[2]
     t = jax.device_put((mat['tt']).astype("float64").transpose(2, 0, 1))
@@ -115,7 +115,7 @@ def test_eval_IndPointsLocsAndSpikesTimesKMS():
     # tolKzzi = 6e-2
     dataFilename = os.path.join(os.path.dirname(__file__), "data/BuildKernelMatrices_fromSpikes.mat")
 
-    mat = loadmat(dataFilename)
+    mat = scipy.io.loadmat(dataFilename)
     nLatents = mat['Z'].shape[0]
     nTrials = mat['Z'][0,0].shape[2]
     Y =  [jax.device_put(mat['Y'][(r,0)].astype("float64")) for r in range(nTrials)]
