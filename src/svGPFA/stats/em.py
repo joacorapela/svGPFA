@@ -131,7 +131,7 @@ class EM_JAXopt:
                     )
                 print(f"Iteration {i}, variational step, "
                       f"LB={best_lower_bound}")
-                # breakpoint()
+                breakpoint()
 
             if i > 0 and optim_params["preIntensity_estimate"]:
                 res = preIntensity_solver.run(preIntensity_params,
@@ -150,7 +150,7 @@ class EM_JAXopt:
                     )
                 print(f"Iteration {i}, preIntensity step, "
                       f"LB={best_lower_bound}")
-                # breakpoint()
+                breakpoint()
 
             if optim_params["kernels_estimate"]:
                 res = kernels_solver.run(kernels_params,
@@ -167,7 +167,7 @@ class EM_JAXopt:
                         f"Not updating parameters"
                     )
                 print(f"Iteration {i}, kernels step, LB={best_lower_bound}")
-                # breakpoint()
+                breakpoint()
 
             if optim_params["indpointslocs_estimate"]:
                 res = indPointsLocs_solver.run(indPointsLocs_params,
@@ -185,7 +185,7 @@ class EM_JAXopt:
                     )
                 print(f"Iteration {i}, indPointsLocs step, "
                       f"LB={best_lower_bound}")
-                # breakpoint()
+                breakpoint()
             lower_bound_hist.append(best_lower_bound)
             elapsed_time_hist.append(time.time()-start_time)
             i += 1
@@ -216,7 +216,7 @@ class EM_JAXopt:
             lb = -state.value.item()
             lower_bound_hist.append(lb)
             elapsed_time_hist.append(time.time()-start_time)
-            # print(f"Iteration {step}: {lb}")
+            print(f"Iteration {step}: {lb}")
         answer = {"params": params, "state": state,
                   "elapsed_time_hist": elapsed_time_hist,
                   "lower_bound_hist": lower_bound_hist}
