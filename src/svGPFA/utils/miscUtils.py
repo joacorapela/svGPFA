@@ -169,12 +169,12 @@ def getCholFromVec(vec):
 
 @jax.jit
 def buildCovsFromCholVecs(chol_vecs):
-    """Build covariances from vector respresntations of their Cholesky
-    descompositions.
+    # """Build covariances from vector respresntations of their Cholesky
+    # descompositions.
 
-    :param chol_vecs: vector respresentations of the lower-triangular Cholesky factors
-    :type  jax.Array \in (n_latents, n_trials, Pk, 1) where Pk=(n_ind_points[k] * (n_ind_points[k] + 1)) / 2
-    """
+    # :param chol_vecs: vector respresentations of the lower-triangular Cholesky factors
+    # :type  jax.Array \in (n_latents, n_trials, Pk, 1) where Pk=(n_ind_points[k] * (n_ind_points[k] + 1)) / 2
+    # """
     # Pk = (n_ind_points * (n_ind_points + 1)) / 2 then
     # n_ind_points = (math.sqrt(1 + 8 * M) - 1) / 2
     # n_latents = chol_vecs.shape[0]
@@ -493,7 +493,8 @@ def buildSpikesTimesArray(spikes_times):
     n_neurons = len(spikes_times[0])
 
     # calculate the number of spikes of all neurons for each trial
-    n_spikes_per_trial = np.empty(shape=(n_trials,), dtype=np.integer)
+    n_spikes_per_trial = np.empty(shape=(n_trials,), dtype=np.int32)
+    # n_spikes_per_trial = np.empty(shape=(n_trials,))
     for r in range(n_trials):
         n_spikes_per_trial[r] = 0
         for n in range(n_neurons):
