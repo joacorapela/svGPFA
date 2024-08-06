@@ -3,6 +3,7 @@ import warnings
 import math
 import time
 import jax
+import jax.numpy as jnp
 import jaxopt
 
 from ..utils.miscUtils import buildCovsFromCholVecs
@@ -131,9 +132,9 @@ class EM_JAXopt:
                     )
                 print(f"Iteration {i}, variational step, "
                       f"LB={best_lower_bound}")
-                breakpoint()
+                # breakpoint()
 
-            if i > 0 and optim_params["preIntensity_estimate"]:
+            if optim_params["preIntensity_estimate"]:
                 res = preIntensity_solver.run(preIntensity_params,
                                               additional_params=params)
                 cur_lower_bound = -res.state.value
@@ -150,7 +151,7 @@ class EM_JAXopt:
                     )
                 print(f"Iteration {i}, preIntensity step, "
                       f"LB={best_lower_bound}")
-                breakpoint()
+                # breakpoint()
 
             if optim_params["kernels_estimate"]:
                 res = kernels_solver.run(kernels_params,
@@ -167,7 +168,7 @@ class EM_JAXopt:
                         f"Not updating parameters"
                     )
                 print(f"Iteration {i}, kernels step, LB={best_lower_bound}")
-                breakpoint()
+                # breakpoint()
 
             if optim_params["indpointslocs_estimate"]:
                 res = indPointsLocs_solver.run(indPointsLocs_params,
@@ -185,7 +186,7 @@ class EM_JAXopt:
                     )
                 print(f"Iteration {i}, indPointsLocs step, "
                       f"LB={best_lower_bound}")
-                breakpoint()
+                # breakpoint()
             lower_bound_hist.append(best_lower_bound)
             elapsed_time_hist.append(time.time()-start_time)
             i += 1
@@ -268,6 +269,16 @@ class EM_JAXopt:
         answer = -svlb.eval(vMean=vMean, vCov=vCov, C=C, d=d, Kzz=Kzz,
                             Kzz_cho=Kzz_cho, KtzQuad=Ktz_quad,
                             KtzSpikes=Ktz_spikes, KttDiag=1.0)
+        # print(f"Negative LB: {answer}")
+        # if True:
+        # if jnp.isnan(answer) or answer < -220000:
+        #     import myUtils
+        #     myUtils.saveDataForLowerBoundEval(
+        #         vMean=vMean, vChol=vChol, C=C, d=d,
+        #         kernels_params=kernels_params, ind_points_locs=ind_points_locs,
+        #         reg_param=EM_JAXopt.reg_param, lowerBound=-answer,
+        #         filename="../../results/dataForLowerBoundEval.pickle"
+        #     )
         return answer
 
 
