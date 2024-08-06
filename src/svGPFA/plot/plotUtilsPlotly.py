@@ -17,21 +17,21 @@ import gcnu_common.utils.neural_data_analysis
 
 
 # spike rates and times
-def getPlotSpikesRatesAllTrialsAllNeurons(
+def getPlotSpikesRatesAllTrialsAllClusters(
         spikes_rates, trials_ids, clusters_ids,
-        xlabel="Neuron Index", ylabel="Average Spike Rate (Hz)"):
+        xlabel="Trial Index", ylabel="Average Spike Rate (Hz)"):
 
     n_neurons = spikes_rates.shape[1]
     neurons_indices = np.arange(n_neurons)
 
     fig = go.Figure()
-    for r, trial_id in enumerate(trials_ids):
+    for n, cluster_id in enumerate(clusters_ids):
         hover_text = \
-            ["Cluster ID: {:02d}<br>Trial ID: {:f}<br>Spike Rate: {:f}".format(
-                cluster_id, trial_id, spikes_rates[r][n])
-                for n, cluster_id in enumerate(clusters_ids)]
-        trace = go.Scatter(x=neurons_indices, y=spikes_rates[r, :],
-                           name=f"{trial_id}", hoverinfo="text", text=hover_text)
+            ["{:s}<br>Trial ID: {:f}<br>Spike Rate: {:f}".format(
+                cluster_id, trial_id, spikes_rates[r, n])
+                for r, trial_id in enumerate(trials_ids)]
+        trace = go.Scatter(x=trials_ids, y=spikes_rates[:, n],
+                           name=f"{cluster_id}", hoverinfo="text", text=hover_text)
         fig.add_trace(trace)
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
@@ -179,7 +179,10 @@ def getSpikesTimesPlotOneNeuron(spikes_times,
         )
         fig.add_trace(trace)
         if marked_events_times is not None:
-            marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            if align_event_times is not None:
+                marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            else:
+                marked_events_times_centered = marked_events_times[r]
             n_marked_events = len(marked_events_times[r])
             for i in range(n_marked_events):
                 if not math.isnan(marked_events_times_centered[i]):
