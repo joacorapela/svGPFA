@@ -282,7 +282,7 @@ def getLegQuadPointsAndWeights(n_quad, trials_start_times, trials_end_times):
                 gcnu_common.numerical_methods.utils.leggaussVarLimits(
                     n=n_quad, a=trials_start_times[r], b=trials_end_times[r])
         leg_quad_points  = leg_quad_points.at[r, :, 0].set(points)
-        leg_quad_weights = leg_quad_weights.at[r, :, 0].set(points)
+        leg_quad_weights = leg_quad_weights.at[r, :, 0].set(weights)
     return leg_quad_points, leg_quad_weights
 
 
