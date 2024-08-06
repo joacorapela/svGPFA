@@ -11,4 +11,6 @@ class SVLowerBound:
         kl_sum = klDivergence.KLDivergence.evalSumAcrossLatentsAndTrials(
             vMean=vMean, vCov=vCov, Kzz=Kzz, Kzz_cho=Kzz_cho)
         the_eval = eLL_value-kl_sum
+        # if the_eval > -65138.77828794:
+        #     breakpoint()
         return the_eval
