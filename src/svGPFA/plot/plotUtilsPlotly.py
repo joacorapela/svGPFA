@@ -1519,9 +1519,11 @@ def getPlotLatentAcrossTrials(
         default_trial_color_pattern="rgba(128,128,128,{:f})",
         cb_transparency=0.3, mean_transparency=1.0, xlabel="Time (sec)",
         ylabel="Value", titlePattern="Latent {:d}"):
+    # latentsMeans, latentsSTDs \in [n_trials, n_samples, n_latents]
+
     # times = times.detach().numpy()
-    latentsMeans = latentsMeans.detach().numpy()
-    latentsSTDs = latentsSTDs.detach().numpy()
+    # latentsMeans = latentsMeans.detach().numpy()
+    # latentsSTDs = latentsSTDs.detach().numpy()
     if indPointsLocs is not None:
         indPointsLocs = [item.detach().numpy() for item in indPointsLocs]
 
