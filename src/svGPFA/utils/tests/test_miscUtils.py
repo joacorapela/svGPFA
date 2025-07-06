@@ -2,12 +2,26 @@
 import sys
 import os
 import math
+import pickle
 from scipy.io import loadmat
 import jax
 import jax.numpy as jnp
 import svGPFA.utils.miscUtils
 
 jax.config.update("jax_enable_x64", True)
+
+def test_buildSpikesTimesArray():
+    spikes_times_filename = "data/00000000_dandisetID000140_epochedEventmove_onset_time_epochedSpikesTimes.pickle"
+    with open(spikes_times_filename, "rb") as f:
+        load_res = pickle.load(f)
+    spikes_times = load_res["spikes_times"]
+    spikes_times_array, valid_spikes_times_mask = svGPFA.utils.miscUtils.buildSpikesTimesArray(spikes_times=spikes_times)
+    n_trials = len(spikes_times)
+    n_neurons = len(spikes_times[0])
+    for r in range(n_trials):
+        for n in range(n_trials):
+            spikes_rn = spikes_times_array[r, valid_spikes_times_mask[r, n, :], 0]
+            assert(set(spikes_times[r][n].tolist()) == set(spikes_rn.tolist()))
 
 def test_getPropSamplesCovered():
     N = 100
@@ -83,5 +97,6 @@ if __name__=="__main__":
     # test_getDiagIndicesIn3DArray()
     # test_build3DdiagFromDiagVector()
     # # test_j_cholesky()
-    test_getPropSamplesCovered()
+    # test_getPropSamplesCovered()
     # test_cholVecs()
+    test_buildSpikesTimesArray()
