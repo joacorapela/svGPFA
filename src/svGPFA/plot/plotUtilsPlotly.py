@@ -211,7 +211,7 @@ def getSpikesTimesPlotOneNeuron(spikes_times,
     return fig
 
 # embedding
-def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
+def getPlotTrueAndEstimatedPreIntensityParams(trueC, trueD,
                                            estimatedC, estimatedD,
                                            linestyleTrue="solid",
                                            linestyleEstimated="dash",
@@ -274,7 +274,7 @@ def getPlotTrueAndEstimatedEmbeddingParams(trueC, trueD,
     # import pdb; pdb.set_trace()
     return fig
 
-def getPlotEmbeddingParams(C, d, linestyle="solid", marker="asterisk", xlabel="Neuron Index", ylabel="Value"):
+def getPlotPreIntensityParams(C, d, linestyle="solid", marker="asterisk", xlabel="Neuron Index", ylabel="Value"):
     figDic = {
         "data": [],
         "layout": {
@@ -312,7 +312,7 @@ def getPlotEmbeddingParams(C, d, linestyle="solid", marker="asterisk", xlabel="N
     return fig
 
 
-def getPlotOrthonormalizedEmbeddingParams(C, d, hovertemplate=None, text=None, mode="lines+markers", linestyle="solid", marker="asterisk", xlabel="Neuron Index", ylabel="Value"):
+def getPlotOrthonormalizedPreIntensityParams(C, d, hovertemplate=None, text=None, mode="lines+markers", linestyle="solid", marker="asterisk", xlabel="Neuron Index", ylabel="Value"):
     nNeurons = C.shape[0]
     nLatents = C.shape[1]
     U, S, Vh = np.linalg.svd(C)
@@ -339,26 +339,26 @@ def getPlotOrthonormalizedEmbeddingParams(C, d, hovertemplate=None, text=None, m
     return fig
 
 
-def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
+def getPlotPreIntensityAcrossTrials(times, preIntensityMeans, preIntensitySTDs,
                                  cbAlpha=0.2,
                                  indPointsLocsColor="rgba(255,0,0,0.5)",
                                  trials_colors_patterns=None,
                                  default_trial_color_pattern="rgba(128,128,128,{:f})",
                                  cb_transparency=0.3, mean_transparency=1.0,
-                                 xlabel="Time (msec)",
+                                 xlabel="Time (sec)",
                                  ylabel="Value",
                                  title=""):
     # times = times.detach().numpy()
-    # embeddingsMeans = embeddingsMeans.detach().numpy()
-    # embeddingsSTDs = embeddingsSTDs.detach().numpy()
+    # preIntensityMeans = preIntensityMeans.detach().numpy()
+    # preIntensitySTDs = preIntensitySTDs.detach().numpy()
 
     # pio.renderers.default = "browser"
     fig = go.Figure()
-    n_trials = embeddingsMeans.shape[0]
+    n_trials = preIntensityMeans.shape[0]
     for r in range(n_trials):
         trial_times = times[r, :, 0]
-        meanToPlot = embeddingsMeans[r, :]
-        stdToPlot = embeddingsSTDs[r, :]
+        meanToPlot = preIntensityMeans[r, :]
+        stdToPlot = preIntensitySTDs[r, :]
         ciToPlot = 1.96*stdToPlot
         if trials_colors_patterns is not None:
             trial_color_pattern = trials_colors_patterns[r]
@@ -405,13 +405,13 @@ def getPlotEmbeddingAcrossTrials(times, embeddingsMeans, embeddingsSTDs,
     fig.update_layout(title_text=title)
     return fig
 
-def getSimulatedEmbeddingPlot(times, samples, means, stds, title, 
+def getSimulatedPreIntensityPlot(times, samples, means, stds, title, 
                               cbAlpha = 0.2, 
                               cbFillColorPattern="rgba(0,0,255,{:f})", 
                               samplesLineColor="black", 
                               meanLineColor="blue", 
                               xlabel="Time (sec)", 
-                              ylabel="Embedding"):
+                              ylabel="PreIntensity"):
     # tSamples[r], tMeans[r], tSTDs[r],
     # eMean[r], eSTDs[r] \in nNeurons x nSamples
     # pio.renderers.default = "browser"
@@ -465,7 +465,7 @@ def getSimulatedEmbeddingPlot(times, samples, means, stds, title,
     fig.update_layout(title=title)
     return fig
 
-def getPlotTrueAndEstimatedEmbedding(tTimes, tSamples, tMeans, tSTDs,
+def getPlotTrueAndEstimatedPreIntensity(tTimes, tSamples, tMeans, tSTDs,
                                      eTimes, eMeans, eSTDs,
                                      CBalpha = 0.2,
                                      tCBFillColorPattern="rgba(0,0,255,{:f})",
@@ -474,7 +474,7 @@ def getPlotTrueAndEstimatedEmbedding(tTimes, tSamples, tMeans, tSTDs,
                                      eCBFillColorPattern="rgba(255,0,0,{:f})",
                                      eMeanLineColor="red",
                                      xlabel="Time (sec)",
-                                     ylabel="Embedding",
+                                     ylabel="PreIntensity",
                                      title=""):
     # tSamples[r], tMeans[r], tSTDs[r],
     # eMean[r], eSTDs[r] \in nNeurons x nSamples
@@ -616,7 +616,7 @@ def getPlotMeanWithCI(x, mean, ci, xlabel="x", ylabel="y", title="", CBalpha=0.3
     # import pdb; pdb.set_trace()
     return fig
 
-def getPlotTrueAndEstimatedEmbeddingPropCovered(propCovered, percent,
+def getPlotTrueAndEstimatedPreIntensityPropCovered(propCovered, percent,
                                                    title="", xlabel="Neuron",
                                                    ylabel="Coverage",
                                                    tColor="blue", pColor="red",
@@ -646,7 +646,7 @@ def getPlotTrueAndEstimatedEmbeddingPropCovered(propCovered, percent,
     fig.update_layout(title=title)
     return fig
 
-def getPlotTruePythonAndMatlabEmbeddingPropCovered(propCovered, percent,
+def getPlotTruePythonAndMatlabPreIntensityPropCovered(propCovered, percent,
                                                    title="", xlabel="Neuron",
                                                    ylabel="Coverage",
                                                    tColor="blue", pColor="red",
@@ -685,7 +685,7 @@ def getPlotTruePythonAndMatlabEmbeddingPropCovered(propCovered, percent,
     fig.update_layout(title=title)
     return fig
 
-def getPlotTruePythonAndMatlabEmbedding(tTimes, tSamples, tMeans, tSTDs,
+def getPlotTruePythonAndMatlabPreIntensity(tTimes, tSamples, tMeans, tSTDs,
                                         pTimes, pMeans, pSTDs,
                                         mTimes, mMeans, mSTDs,
                                         CBalpha = 0.2,
@@ -697,7 +697,7 @@ def getPlotTruePythonAndMatlabEmbedding(tTimes, tSamples, tMeans, tSTDs,
                                         mCBFillColorPattern="rgba(0,255,0,{:f})",
                                         mMeanLineColor="green",
                                         xlabel="Time (sec)",
-                                        ylabel="Embedding",
+                                        ylabel="PreIntensity",
                                         title=""):
     # tSamples[r], tMeans[r], tSTDs[r],
     # eMean[r], eSTDs[r] \in nNeurons x nSamples
@@ -1700,6 +1700,83 @@ def getPlotOrthonormalizedLatentAcrossTrials(
     return fig
 
 
+def get2DPlotOrthonormalizedLatentsAcrossTrials(
+        trials_times, latentsMeans, C, trials_ids,
+        latentsToPlot=[0, 1],
+        align_event_times=None,
+        marked_events_times=None,
+        marked_events_colors=None,
+        marked_events_markers=None,
+        marked_size=10,
+        trials_annotations=None,
+        trials_colors=None, default_trial_color="gray",
+        xyLabelsPattern="Latent {:d}", title=""):
+    n_trials = len(latentsMeans)
+
+    oLatentsMeans = svGPFA.utils.miscUtils.orthonormalizeLatentsMeans(
+        latents_means=latentsMeans, C=C)
+
+    hover_texts = [["Trial: {:02d}<br>Time: {:f}".format(trial_id, trial_time)
+                    for i, trial_time in enumerate(trials_times[r, :, 0])]
+                   for r, trial_id in enumerate(trials_ids)]
+    for r in range(n_trials):
+        n_times = trials_times.shape[1]
+        an_annotation = ""
+        if trials_annotations is not None:
+            for trial_annotation_key in trials_annotations:
+                an_annotation += "<br>{:s}: {}".format(
+                    trial_annotation_key,
+                    trials_annotations[trial_annotation_key][r])
+            for i in range(n_times):
+                hover_texts[r][i] = hover_texts[r][i] + an_annotation
+
+    fig = go.Figure()
+    for r in range(n_trials):
+        if trials_colors is not None:
+            latent_color = trials_colors[r]
+        else:
+            latent_color = default_trial_color
+
+        trace_latent_mean = go.Scatter(
+            x=oLatentsMeans[r][:, latentsToPlot[0]],
+            y=oLatentsMeans[r][:, latentsToPlot[1]],
+            mode="lines",
+            line=dict(color=latent_color, width=8),
+            name="trial {:02d}".format(trials_ids[r]),
+            legendgroup="trial{:02d}".format(trials_ids[r]),
+            showlegend=True,
+            hoverinfo="text",
+            text=hover_texts[r],
+        )
+        fig.add_trace(trace_latent_mean)
+
+        if marked_events_times is not None and \
+           marked_events_colors is not None and \
+           marked_events_markers is not None and \
+           align_event_times is not None:
+            n_marked_events = len(marked_events_times[r])
+            marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            for i in range(n_marked_events):
+                if not math.isnan(marked_events_times_centered[i]):
+                    marked_index = np.argmin(np.abs(
+                        trials_times[r, :, 0]-marked_events_times_centered[i]))
+
+                    trace_marker = go.Scatter(
+                        x=[oLatentsMeans[r][marked_index, latentsToPlot[0]]],
+                        y=[oLatentsMeans[r][marked_index, latentsToPlot[1]]],
+                        marker=dict(color=marked_events_colors[r][i],
+                                    symbol=marked_events_markers[r][i],
+                                    size=marked_size),
+                        mode="markers",
+                        legendgroup="trial{:02d}".format(trials_ids[r]),
+                        showlegend=False)
+                    fig.add_trace(trace_marker)
+
+    fig.update_xaxes(title=xyLabelsPattern.format(latentsToPlot[0]))
+    fig.update_yaxes(title=xyLabelsPattern.format(latentsToPlot[1]))
+    return fig
+
+
 def get3DPlotOrthonormalizedLatentsAcrossTrials(
         trials_times, latentsMeans, C, trials_ids,
         latentsToPlot=[0, 1, 2],
@@ -1742,7 +1819,7 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
             y=oLatentsMeans[r][:, latentsToPlot[1]],
             z=oLatentsMeans[r][:, latentsToPlot[2]],
             mode="lines",
-            line=dict(color=latent_color, width=2),
+            line=dict(color=latent_color, width=8),
             name="trial {:02d}".format(trials_ids[r]),
             legendgroup="trial{:02d}".format(trials_ids[r]),
             showlegend=True,
@@ -2225,9 +2302,9 @@ def getPlotKernelsParams(kernelsTypes, kernelsParams, color="red", ylabel="Value
         else:
             showLegend = False
 
-        if kernelsTypes[k]=="PeriodicKernel":
+        if kernelsTypes[k]=="periodic":
             labels = ["Length Scale", "Period"]
-        elif kernelsTypes[k]=="ExponentialQuadraticKernel":
+        elif kernelsTypes[k]=="exponentialQuadratic":
             labels = ["Length Scale"]
         else:
             raise RuntimeError("Invalid kernel type {:s}".format(kernelsTypes[k]))
