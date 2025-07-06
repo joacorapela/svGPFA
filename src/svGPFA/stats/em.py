@@ -27,7 +27,13 @@ class EM_JAXopt:
         EM_JAXopt.eLL.init(legQuadWeights=legQuadWeights,
                            validSpikesTimesMask=validSpikesTimesMask)
 
-    def maximizeECM(params0, optim_params):
+    def maximize_jaxopt_LBFGS_one_call(params0, optim_params):
+        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
+                              **optim_params)
+        res = solver.run(params0)
+        return res
+
+    def maximize_jaxopt_LBFGS_ECM(params0, optim_params):
         LB0 = -EM_JAXopt._eval_func_params_as_list(params0)
         print(f"Initial LB: {LB0}")
         # breakpoint()
@@ -111,8 +117,8 @@ class EM_JAXopt:
         elapsed_time_hist = [0.0]
         start_time = time.time()
         i = 0
-        while (i < optim_params["n_em_iterations"] and
-               (best_lower_bound - prev_lower_bound) > optim_params["tol"]):
+        while (i < optim_params["em_maxiter"] and
+               (best_lower_bound - prev_lower_bound) > optim_params["em_tol"]):
             prev_lower_bound = best_lower_bound
             if optim_params["variational_estimate"]:
                 res = variational_solver.run(variational_params,
@@ -194,13 +200,7 @@ class EM_JAXopt:
                       elapsed_time_hist=elapsed_time_hist)
         return answer
 
-    def maximize(params0, optim_params):
-        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
-                              **optim_params)
-        res = solver.run(params0)
-        return res
-
-    def maximizeInSteps(params0, optim_params):
+    def maximize_jaxopt_LBFGS_in_steps(params0, optim_params):
         solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
                               **optim_params)
         print("About to call solver.init_state(params)")
