@@ -100,9 +100,14 @@ def test_emJAX__eval_func():
     lbEval = em._eval_func_params_as_list(params=params0)
     assert(abs(lbEval-obj)<tol)
 
-def test_maximize_pointProcess_JAX(reg_param=1e-5, maxiter=400,
-                                   max_stepsize=200.0, tol = 1e-5, jit=True,
-                                   verbose=True):
+def test_maximize_pointProcess_JAX(em_maxiter=5, em_tol=1e-4,
+                                   reg_param=1e-5, maxiter=400,
+                                   max_stepsize=1.0, tol=1e-4,
+                                   history_size=10, jit=True,
+                                   variational_estimate=True,
+                                   preIntensity_estimate=True,
+                                   kernels_estimate=True,
+                                   indpointslocs_estimate=True):
     dataFilename = os.path.join(os.path.dirname(__file__), "data/variationalEM.mat")
 
     mat = scipy.io.loadmat(dataFilename)
@@ -178,22 +183,40 @@ def test_maximize_pointProcess_JAX(reg_param=1e-5, maxiter=400,
         kernels_params = kernels_params0,
         ind_points_locs = Z0array,
     )
-    optim_params = dict(
+    optim_params_aux = dict(
+        jit=jit,
+        tol=tol,
         maxiter=maxiter,
-        tol=1e-6,
-        max_stepsize=5.0,
-        jit=True,
-        # verbose=verbose,
+        max_stepsize=max_stepsize,
+        history_size=history_size,
+    )
+    optim_params = dict(
+        em_maxiter=em_maxiter,
+        em_tol=em_tol,
+        variational_estimate=variational_estimate,
+        variational_params=optim_params_aux,
+        preIntensity_estimate=preIntensity_estimate,
+        preIntensity_params=optim_params_aux,
+        kernels_estimate=kernels_estimate,
+        kernels_params=optim_params_aux,
+        indpointslocs_estimate=indpointslocs_estimate,
+        indpointslocs_params=optim_params_aux,
     )
 
-    res = em.maximize(params0=params0, optim_params=optim_params)
+    res = em.maximize_jaxopt_LBFGS_ECM(params0=params0, optim_params=optim_params)
     # res = em.maximizeInSteps(params0=params0, optim_params=optim_params)
-    lower_bound = -res.state.value
+    lower_bound = res["lower_bound_hist"][-1]
     assert(lower_bound>leasLowerBound)
 
 if __name__=='__main__':
     test_emJAX__eval_func()
-    test_maximize_pointProcess_JAX(reg_param = 1e-5, maxiter=400,
-                                   max_stepsize=200.0, tol = 1e-5, jit=True,
-                                   verbose=False)
+    test_maximize_pointProcess_JAX(em_maxiter=5, em_tol=1e-4,
+                                   reg_param = 1e-5, maxiter=400,
+                                   max_stepsize=1.0, tol = 1e-4,
+                                   history_size=10, jit=True,
+                                   variational_estimate=True,
+                                   preIntensity_estimate=True,
+                                   kernels_estimate=True,
+                                   indpointslocs_estimate=True,
+                                  )
 
