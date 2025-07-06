@@ -29,18 +29,18 @@ def flatToHierarchicalOptimParams(flat_optim_params):
             "tolerance_change": flat_optim_params["estep_tolerance_change"],
             "line_search_fn": flat_optim_params["estep_line_search_fn"],
         },
-        # mstep_embedding_
-        "mstep_embedding_estimate": flat_optim_params[
-            "mstep_embedding_estimate"],
-        "mstep_embedding_optim_params": {
-            "max_iter": flat_optim_params["mstep_embedding_max_iter"],
-            "lr": flat_optim_params["mstep_embedding_lr"],
+        # mstep_preIntensity_
+        "mstep_preIntensity_estimate": flat_optim_params[
+            "mstep_preIntensity_estimate"],
+        "mstep_preIntensity_optim_params": {
+            "max_iter": flat_optim_params["mstep_preIntensity_max_iter"],
+            "lr": flat_optim_params["mstep_preIntensity_lr"],
             "tolerance_grad": flat_optim_params[
-                "mstep_embedding_tolerance_grad"],
+                "mstep_preIntensity_tolerance_grad"],
             "tolerance_change": flat_optim_params[
-                "mstep_embedding_tolerance_change"],
+                "mstep_preIntensity_tolerance_change"],
             "line_search_fn": flat_optim_params[
-                "mstep_embedding_line_search_fn"],
+                "mstep_preIntensity_line_search_fn"],
         },
         # mstep_kernels_
         "mstep_kernels_estimate": flat_optim_params["mstep_kernels_estimate"],
@@ -134,7 +134,7 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
             "variational_mean0": var_mean0,
             "variational_cov0": var_cov0,
         },
-        "embedding_params0": {
+        "preIntensity_params0": {
             "c0_distribution": "Normal",
             "c0_loc": 0.0,
             "c0_scale": 1.0,
@@ -164,12 +164,12 @@ def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
             "estep_tolerance_change": 1e-9,
             "estep_line_search_fn": "strong_wolfe",
             #
-            "mstep_embedding_estimate": True,
-            "mstep_embedding_max_iter": 20,
-            "mstep_embedding_lr": 1.0,
-            "mstep_embedding_tolerance_grad": 1e-7,
-            "mstep_embedding_tolerance_change": 1e-9,
-            "mstep_embedding_line_search_fn": "strong_wolfe",
+            "mstep_preIntensity_estimate": True,
+            "mstep_preIntensity_max_iter": 20,
+            "mstep_preIntensity_lr": 1.0,
+            "mstep_preIntensity_tolerance_grad": 1e-7,
+            "mstep_preIntensity_tolerance_change": 1e-9,
+            "mstep_preIntensity_line_search_fn": "strong_wolfe",
             #
             "mstep_kernels_estimate": True,
             "mstep_kernels_max_iter": 20,
@@ -252,7 +252,7 @@ def getArgsInfo():
                      "variational_mean0_filename_latent{:d}_trial{:d}": str,
                      "variational_cov0_filename_latent{:d}_trial{:d}": str,
                  },
-                 "embedding_params0": {
+                 "preIntensity_params0": {
                      "c0": strTo2DDoubleTensor,
                      "d0": strTo2DDoubleTensor,
                      "c0_filename": str,
@@ -303,12 +303,12 @@ def getArgsInfo():
                      "estep_tolerance_change": float,
                      "estep_line_search_fn": str,
                      #
-                     "mstep_embedding_estimate": bool,
-                     "mstep_embedding_max_iter": int,
-                     "mstep_embedding_lr": float,
-                     "mstep_embedding_tolerance_grad": float,
-                     "mstep_embedding_tolerance_change": float,
-                     "mstep_embedding_line_search_fn": str,
+                     "mstep_preIntensity_estimate": bool,
+                     "mstep_preIntensity_max_iter": int,
+                     "mstep_preIntensity_lr": float,
+                     "mstep_preIntensity_tolerance_grad": float,
+                     "mstep_preIntensity_tolerance_change": float,
+                     "mstep_preIntensity_line_search_fn": str,
                      #
                      "mstep_kernels_estimate": bool,
                      "mstep_kernels_max_iter": int,
@@ -450,7 +450,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
         if common_n_ind_points is not None:
             n_ind_points = [common_n_ind_points] * n_latents
 
-    C0, d0 = getLinearEmbeddingParams0(
+    C0, d0 = getLinearPreIntensityParams0(
         n_neurons=n_neurons, n_latents=n_latents,
         dynamic_params_spec=dynamic_params_spec,
         config_file_params_spec=config_file_params_spec,
@@ -545,16 +545,16 @@ def getParam(section_name, param_name,
     return param
 
 
-def getLinearEmbeddingParams0(n_neurons, n_latents, dynamic_params_spec=None,
+def getLinearPreIntensityParams0(n_neurons, n_latents, dynamic_params_spec=None,
                               config_file_params_spec=None,
                               default_params_spec=None):
-    C = getLinearEmbeddingParam0(
+    C = getLinearPreIntensityParam0(
             param_label="c0", n_rows=n_neurons,
             n_cols=n_latents,
             dynamic_params_spec=dynamic_params_spec,
             config_file_params_spec=config_file_params_spec,
             default_params_spec=default_params_spec)
-    d = getLinearEmbeddingParam0(
+    d = getLinearPreIntensityParam0(
             param_label="d0", n_rows=n_neurons, n_cols=1,
             dynamic_params_spec=dynamic_params_spec,
             config_file_params_spec=config_file_params_spec,
@@ -564,12 +564,12 @@ def getLinearEmbeddingParams0(n_neurons, n_latents, dynamic_params_spec=None,
     return C, d
 
 
-def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
+def getLinearPreIntensityParam0(param_label, n_rows, n_cols,
                              dynamic_params_spec=None,
                              config_file_params_spec=None,
                              default_params_spec=None):
     if dynamic_params_spec is not None:
-        param = getLinearEmbeddingParam0InDict(param_label=param_label,
+        param = getLinearPreIntensityParam0InDict(param_label=param_label,
                                                params_dict=dynamic_params_spec,
                                                params_dict_type="dynamic",
                                                n_rows=n_rows, n_cols=n_cols)
@@ -577,7 +577,7 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
             return param
 
     if config_file_params_spec is not None:
-        param = getLinearEmbeddingParam0InDict(
+        param = getLinearPreIntensityParam0InDict(
             param_label=param_label,
             params_dict=config_file_params_spec,
             params_dict_type="config_file",
@@ -586,19 +586,19 @@ def getLinearEmbeddingParam0(param_label, n_rows, n_cols,
             return param
 
     if default_params_spec is not None:
-        param = getLinearEmbeddingParam0InDict(param_label=param_label,
+        param = getLinearPreIntensityParam0InDict(param_label=param_label,
                                                params_dict=default_params_spec,
                                                params_dict_type="default",
                                                n_rows=n_rows, n_cols=n_cols)
         if param is not None:
             return param
 
-    raise ValueError("embedding_params_spec_params0 not found")
+    raise ValueError("preIntensity_params_spec_params0 not found")
 
 
-def getLinearEmbeddingParam0InDict(param_label, params_dict,
+def getLinearPreIntensityParam0InDict(param_label, params_dict,
                                    params_dict_type, n_rows, n_cols,
-                                   section_name="embedding_params0",
+                                   section_name="preIntensity_params0",
                                    delimiter=","):
     # binary
     if section_name in params_dict and \
