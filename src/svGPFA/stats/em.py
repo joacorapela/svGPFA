@@ -201,11 +201,13 @@ class EM_JAXopt:
         return answer
 
     def maximize_jaxopt_LBFGS_in_steps(params0, optim_params):
+        # jax.debug.print("Before calling jaxopt.LBFGS: optim_params={optim_params}", optim_params=optim_params)
+        # jax.debug.breakpoint()
         solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
                               **optim_params)
-        print("About to call solver.init_state(params)")
+        # jax.debug.print("About to call solver.init_state(params)")
         state = solver.init_state(params0)
-        print("Called solver.init_state(params) done")
+        # jax.debug.print("Called solver.init_state(params) done")
 
         lb = -EM_JAXopt._eval_func_params_as_list(params0)
         params = params0
@@ -213,7 +215,13 @@ class EM_JAXopt:
         lower_bound_hist = [lb]
         start_time = time.time()
         for step in range(optim_params["maxiter"]):
+            # jax.debug.print("Before update: params={params}", params=params)
+            # loss_value, grads = jax.value_and_grad(EM_JAXopt._eval_func_params_as_list)(params)
+            # jax.debug.print("Loss: {}, Grad NaN? {}", loss_value, jnp.isnan(grads).any())
+            # jax.debug.breakpoint()
             params, state = solver.update(params=params, state=state)
+            # jax.debug.print("After update: params={params}", params=params)
+            # jax.debug.breakpoint()
             lb = -state.value.item()
             lower_bound_hist.append(lb)
             elapsed_time_hist.append(time.time()-start_time)
@@ -254,7 +262,6 @@ class EM_JAXopt:
                                       ind_points_locs=ind_points_locs)
         return answer
 
-    @jax.jit
     def _eval_func(vMean, vChol, C, d, kernels_params, ind_points_locs):
 
         Kzz, Kzz_cho = EM_JAXopt.indPointsLocsKMS.buildKernelsMatrices(
