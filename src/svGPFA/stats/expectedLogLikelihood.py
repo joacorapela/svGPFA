@@ -2,6 +2,9 @@
 import jax
 import jax.numpy as jnp
 
+import pickle
+from jax.experimental import io_callback
+
 from . import preIntensity
 
 
@@ -38,7 +41,8 @@ class PointProcessELLExpLink:
         # eLinkValues \in n_trials x n_quad_leg x n_neurons
         eLinkValues = PointProcessELLExpLink._getELinkValues(
             qHMu=qHMuQuad, qHVar=qHVarQuad)
-        eLogLinkValues = jnp.where(PointProcessELLExpLink.validSpikesTimesMask, qHMuSpikes, 0.0)
+        # eLogLinkValues = jnp.where(PointProcessELLExpLink.validSpikesTimesMask, qHMuSpikes, 0.0)
+        eLogLinkValues = PointProcessELLExpLink.validSpikesTimesMask * qHMuSpikes
         # legQuadWeights \in nTrials x nQuad x 1
         # eLinkValues \in  nTrials x nQuad x nNeurons
         # aux1 \in  nTrials x nNeurons x 1
