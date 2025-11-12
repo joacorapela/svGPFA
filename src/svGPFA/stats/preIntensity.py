@@ -40,7 +40,6 @@ class LinearPreIntensity:
             qKVar=qKVar, C=C)
         return qHVar
 
-    @jax.jit
     def _computeMeansGivenPosteriorOnLatentsStats(qKMu: jax.Array,
                                                   C: jax.Array,
                                                   d: jax.Array) -> jax.Array:
@@ -63,7 +62,6 @@ class LinearPreIntensity:
         qHMu = posteriorOnMeans_vmTrials(qKMu, C, d)
         return qHMu
 
-    @jax.jit
     def _computeVarsGivenPosteriorOnLatentsStats(qKVar: jax.Array, C: jax.Array):
         # qKVar \in n_latents x n_trials x n_quad | n_spikes_per_trial
         # qHVar \in n_trials x n_neurons x n_quad | n_spikes_per_trial
