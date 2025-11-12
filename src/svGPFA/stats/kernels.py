@@ -5,12 +5,10 @@ import jax.numpy as jnp
 
 class ExponentialQuadraticKernel:
 
-    @jax.jit
     def buildKernelMatrixX1(X1: jax.Array, params: list, scale: float = 1.0) -> jax.Array:
         return ExponentialQuadraticKernel.buildKernelMatrixX1X2(
             X1=X1, X2=X1, params=params, scale=scale)
 
-    @jax.jit
     def buildKernelMatrixX1X2(X1: jax.Array, X2: jax.Array, params: list,
                               scale: float = 1.0):
         lengthscale = params[0]
@@ -22,12 +20,10 @@ class ExponentialQuadraticKernel:
 
 class PeriodicKernel:
 
-    @jax.jit
     def buildKernelMatrixX1(X1: jax.Array, params: list, scale: float = 1.0) -> jax.Array:
         return PeriodicKernel.buildKernelMatrixX1X2(X1=X1, X2=X1,
                                                     params=params, scale=scale)
 
-    @jax.jit
     def buildKernelMatrixX1X2(X1: jax.Array, X2: jax.Array, params: list,
                               scale: float = 1.0) -> jax.Array:
         lengthscale = params[0]
