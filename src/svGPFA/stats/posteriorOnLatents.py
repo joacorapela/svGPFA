@@ -6,7 +6,6 @@ import jax.numpy as jnp
 
 class PosteriorOnLatents:
 
-    @jax.jit
     def computeMeans(vMean: jax.Array, Kzz_cho: jax.Array, Ktz: jax.Array) -> jax.Array:
         # vMean \in n_latents x n_trials x n_ind_points
         # Kzz_cho \in n_latents x n_trials x n_ind_points x n_ind_points
@@ -48,7 +47,6 @@ class PosteriorOnLatents:
 
         return qKMu
 
-    @jax.jit
     def computeVars(vCov: jax.Array, Kzz: jax.Array, Kzz_cho: jax.Array,
                     Ktz: jax.Array, KttDiag: float = 1.0) -> jax.Array:
         # vCov \in
