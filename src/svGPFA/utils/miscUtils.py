@@ -65,14 +65,18 @@ def buildKernels(kernels_types, kernels_params):
     return kernels
 
 
-def orthonormalizeLatentsMeans(latents_means, C):
-    U, S, Vh = jnp.linalg.svd(C)
-    orthoMatrix = Vh.T*S
+def varianceTransformOfLatents(latents_means, latents_vars, C):
+    # latents_means, latents_vars \in n_trials, n_quad, n_latents
+    _, S, Vh = jnp.linalg.svd(C)
+    A = Vh.T*S
+    A2 = A**2
     n_trials = len(latents_means)
-    oLatentsMeans = [[] for r in range(n_trials)]
+    tLatentsMeans = np.empty_like(latents_means)
+    tLatentsVars = np.empty_like(latents_vars)
     for r in range(n_trials):
-        oLatentsMeans[r] = jnp.matmul(latents_means[r], orthoMatrix)
-    return oLatentsMeans
+        tLatentsMeans[r, :, :] = latents_means[r, :, :] @ A
+        tLatentsVars[r, :, :] = latents_vars[r, :, :] @ A2
+    return tLatentsMeans, tLatentsVars
 
 
 def getPropSamplesCovered(sample, mean, std, percent=.95):
@@ -96,14 +100,13 @@ def getCIFs(C, d, latents):
     return CIFs
 
 
-def computeSpikeRates(trials_times, spikes_times):
+def computeSpikeRates(trials_durations, spikes_times):
     n_trials = len(spikes_times)
     n_neurons = len(spikes_times[0])
-    spikes_rates = jnp.empty((n_trials, n_neurons))
+    spikes_rates = np.empty((n_trials, n_neurons))
     for r in range(n_trials):
-        trial_duration = jnp.max(trials_times[r])-jnp.min(trials_times[r])
         for n in range(n_neurons):
-            spikes_rates[r, n] = len(spikes_times[r][n])/trial_duration
+            spikes_rates[r, n] = len(spikes_times[r][n])/trials_durations[r]
     return spikes_rates
 
 
@@ -122,33 +125,34 @@ def saveDataForMatlabEstimations(qMu, qSVec, qSDiag, C, d,
     nLatents = len(qMu)
     # indPointsLocsKMSEpsilon = jnp.array(indPointsLocsKMSEpsilon)
     mdict = dict(n_trials=n_trials, nNeurons=nNeurons, nLatents=nLatents,
-                 C=C.numpy(), d=jnp.reshape(input=d, shape=(-1,1)).numpy(),
-                 legQuadPoints=legQuadPoints.numpy(),
-                 legQuadWeights=legQuadWeights.numpy(),
+                 C=np.asarray(C),
+                 d=np.asarray(jnp.reshape(d, shape=(-1,1))),
+                 legQuadPoints=np.asarray(legQuadPoints),
+                 legQuadWeights=np.asarray(legQuadWeights),
                  indPointsLocsKMSRegEpsilon=indPointsLocsKMSRegEpsilon,
-                 trialsLengths=trialsLengths.numpy(),
+                 trialsLengths=np.asarray(trialsLengths),
                  emMaxIter=emMaxIter, eStepMaxIter=eStepMaxIter,
                  mStepEmbeddingMaxIter=mStepEmbeddingMaxIter,
                  mStepKernelsMaxIter=mStepKernelsMaxIter,
                  mStepIndPointsMaxIter=mStepIndPointsMaxIter)
     for k in range(nLatents):
         mdict.update({"kernelType_{:d}".format(k): kernelsTypes[k]})
-        mdict.update({"qMu_{:d}".format(k): qMu[k].numpy().astype(jnp.float64)})
-        mdict.update({"qSVec_{:d}".format(k): qSVec[k].numpy().astype(jnp.float64)})
-        mdict.update({"qSDiag_{:d}".format(k): qSDiag[k].numpy().astype(jnp.float64)})
+        mdict.update({"qMu_{:d}".format(k): np.asarray(qMu[k]).astype(np.float64)})
+        mdict.update({"qSVec_{:d}".format(k): np.asarray(qSVec[k]).astype(np.float64)})
+        mdict.update({"qSDiag_{:d}".format(k): np.asarray(qSDiag[k]).astype(np.float64)})
         mdict.update({"kernelsParams_{:d}".format(k):
-                      kernelsParams[k].numpy().astype(jnp.float64)})
+                      np.asarray(kernelsParams[k]).astype(np.float64)})
         mdict.update({"indPointsLocs_{:d}".format(k):
-                      indPointsLocs[k].numpy().astype(jnp.float64)})
-        mdict.update({"qMu_{:d}".format(k): qMu[k].numpy().astype(jnp.float64)})
-        mdict.update({"qSVec_{:d}".format(k): qSVec[k].numpy().astype(jnp.float64)})
-        mdict.update({"qSDiag_{:d}".format(k): qSDiag[k].numpy().astype(jnp.float64)})
+                      np.asarray(indPointsLocs[k]).astype(np.float64)})
+        mdict.update({"qMu_{:d}".format(k): np.asarray(qMu[k]).astype(np.float64)})
+        mdict.update({"qSVec_{:d}".format(k): np.asarray(qSVec[k]).astype(np.float64)})
+        mdict.update({"qSDiag_{:d}".format(k): np.asarray(qSDiag[k]).astype(np.float64)})
         mdict.update({"latentsTrialsTimes_{:d}".format(k):
-                      latentsTrialsTimes[k].numpy().astype(jnp.float64)})
+                      np.asarray(latentsTrialsTimes[k]).astype(np.float64)})
     for r in range(n_trials):
         for n in range(nNeurons):
             mdict.update({"spikesTimes_{:d}_{:d}".format(r, n):
-                          spikesTimes[r][n].numpy().astype(jnp.float64)})
+                          np.asarray(spikesTimes[r][n]).astype(np.float64)})
     scipy.io.savemat(file_name=saveFilename, mdict=mdict)
 
 def getCholFromVec(vec):
@@ -207,18 +211,18 @@ def getQSVecsAndQSDiagsFromQSCholVecs(qsCholVecs):
     for k in range(nLatents):
         Pk = qsCholVecs[k].shape[1]
         nIndPointsK = int((-1.0+math.sqrt(1+8*Pk))/2.0)
-        qSVec[k] = jnp.empty(n_trials, nIndPointsK, 1, dtype=jnp.double)
-        qSDiag[k] = jnp.empty(n_trials, nIndPointsK, 1, dtype=jnp.double)
+        qSVec[k] = jnp.empty((n_trials, nIndPointsK, 1), dtype=jnp.double)
+        qSDiag[k] = jnp.empty((n_trials, nIndPointsK, 1), dtype=jnp.double)
         for r in range(n_trials):
-            qSRSigmaKR = getCholFromVec(vec=qsCholVecs[k][r, :, 0], nIndPoints=nIndPointsK)
-            qSigmaKR = jnp.matmul(qSRSigmaKR, jnp.transpose(qSRSigmaKR, 0, 1))
+            qSRSigmaKR = getCholFromVec(vec=qsCholVecs[k, r, :, 0])
+            qSigmaKR = jnp.matmul(qSRSigmaKR, jnp.transpose(qSRSigmaKR))
             qSDiagKR = jnp.diag(qSigmaKR)
             qSigmaKR = qSigmaKR - jnp.diag(qSDiagKR)
-            eValKR, eVecKR = jnp.eig(qSigmaKR, eigenvectors=True)
-            maxEvalIKR = jnp.argmax(eValKR, dim=0)[0]
-            qSVecKR = eVecKR[:, maxEvalIKR]*jnp.sqrt(eValKR[maxEvalIKR, 0])
-            qSVec[k][r, :, 0] = qSVecKR
-            qSDiag[k][r, :, 0] = qSDiagKR
+            eValKR, eVecKR = jnp.linalg.eigh(qSigmaKR)
+            maxEvalIKR = jnp.argmax(eValKR)
+            qSVecKR = eVecKR[:, maxEvalIKR]*jnp.sqrt(eValKR[maxEvalIKR])
+            qSVec[k] = qSVec[k].at[r, :, 0].set(qSVecKR)
+            qSDiag[k] = qSDiag[k].at[r, :, 0].set(qSDiagKR)
     return qSVec, qSDiag
 
 
@@ -291,8 +295,8 @@ def getTrialsTimes(start_times, end_times, n_steps):
     n_trials = len(start_times)
     trials_times = jnp.empty((n_trials, n_steps, 1), dtype=jnp.double)
     for r in range(n_trials):
-        trials_times[r, :, 0] = jnp.linspace(start_times[r], end_times[r],
-                                               n_steps)
+        trials_times = trials_times.at[r, :, 0].set(
+            jnp.linspace(start_times[r], end_times[r], n_steps))
     return trials_times
 
 
@@ -487,22 +491,21 @@ def getVectorRepOfLowerTrianMatrices(lt_matrices):
 
 def buildSpikesTimesArray(spikes_times):
     # spikes_times[r][n]: list of spikes times for trial r and neuron n
-    # answer spikes_times_with_array \in n_neurons x n_spikes_per_trial
+    # answer spikes_times_array \in n_neurons x n_spikes_per_trial
     # answer valid_spikes_times_mask \in n_neurons x n_trials x n_spikes_per_trial
     n_trials = len(spikes_times)
     n_neurons = len(spikes_times[0])
 
     # calculate the number of spikes of all neurons for each trial
     n_spikes_per_trial = np.empty(shape=(n_trials,), dtype=np.int32)
-    # n_spikes_per_trial = np.empty(shape=(n_trials,))
     for r in range(n_trials):
         n_spikes_per_trial[r] = 0
         for n in range(n_neurons):
             n_spikes_per_trial[r] += len(spikes_times[r][n])
     max_n_spikes_per_trial = n_spikes_per_trial.max()
 
-    spikes_times_with_array = np.zeros(shape=(n_trials, max_n_spikes_per_trial,
-                                             1), dtype=np.double)
+    spikes_times_array = np.zeros(shape=(n_trials, max_n_spikes_per_trial, 1),
+                                  dtype=np.double)
     valid_spikes_times_mask = np.zeros(shape=(n_trials, n_neurons,
                                               max_n_spikes_per_trial),
                                        dtype=bool)
@@ -510,10 +513,10 @@ def buildSpikesTimesArray(spikes_times):
         index = 0
         for n in range(n_neurons):
             n_spikes_rn = len(spikes_times[r][n])
-            spikes_times_with_array[r, index:index+n_spikes_rn, 0] = \
+            spikes_times_array[r, index:index+n_spikes_rn, 0] = \
                 spikes_times[r][n]
             valid_spikes_times_mask[r, n, index:index+n_spikes_rn] = True
             index += n_spikes_rn
-    spikes_times_with_array_jax = jnp.asarray(spikes_times_with_array)
+    spikes_times_array_jax = jnp.asarray(spikes_times_array)
     valid_spikes_times_mask_jax = jnp.asarray(valid_spikes_times_mask)
-    return spikes_times_with_array_jax, valid_spikes_times_mask_jax
+    return spikes_times_array_jax, valid_spikes_times_mask_jax
