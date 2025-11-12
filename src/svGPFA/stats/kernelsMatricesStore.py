@@ -8,7 +8,6 @@ class IndPointsLocsKMS_Chol:
     def init(kernels: list):
         IndPointsLocsKMS_Chol.kernels = kernels
 
-    @jax.jit
     def buildKernelsMatrices(kernels_params: list, ind_points_locs: jax.Array,
                              reg_param: float) -> tuple:
         n_latents = ind_points_locs.shape[0]
@@ -26,12 +25,10 @@ class IndPointsLocsKMS_Chol:
         Kzz_cho = IndPointsLocsKMS_Chol._cho3D(Kzz)
         return Kzz, Kzz_cho
 
-    @jax.jit
     def _cho3D(Kzz: jax.Array):
         Kzz_cho = jnp.linalg.cholesky(Kzz)  # O(n^3)
         return Kzz_cho
 
-    @jax.jit
     def solve(Kzz_cho: jax.Array, input: jax.Array) -> jax.Array:
         solve = jax.scipy.linalg.cho_solve((Kzz_cho, True), input)
         return solve
@@ -44,7 +41,6 @@ class IndPointsLocsAndQuadTimesKMS:
         IndPointsLocsAndQuadTimesKMS.kernels = kernels
         IndPointsLocsAndQuadTimesKMS.t = t
 
-    @jax.jit
     def buildKernelsMatrices(kernels_params: list, ind_points_locs: jax.Array) -> jax.Array:
         # ind_points_locs \in nLatents x n_trials x n_ind_points x 1
         # return \in nLatents x n_trials x nQuadPoints x n_ind_points
@@ -79,7 +75,6 @@ class IndPointsLocsAndSpikesTimesKMS:
         IndPointsLocsAndSpikesTimesKMS.kernels = kernels
         IndPointsLocsAndSpikesTimesKMS.t = t
 
-    @jax.jit
     def buildKernelsMatrices(kernels_params: list, ind_points_locs: jax.Array) -> jax.Array:
         # ind_points_locs \in nLatents x n_trials x n_ind_points x 1
         # return \in nLatents x n_trials x n_spikes x n_ind_points
