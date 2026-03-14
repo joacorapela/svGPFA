@@ -28,13 +28,13 @@ class EM_JAXopt:
                            validSpikesTimesMask=validSpikesTimesMask)
 
     def maximize_jaxopt_LBFGS_one_call(params0, optim_params):
-        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
+        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_dict,
                               **optim_params)
         res = solver.run(params0)
         return res
 
     def maximize_jaxopt_LBFGS_ECM(params0, optim_params):
-        LB0 = -EM_JAXopt._eval_func_params_as_list(params0)
+        LB0 = -EM_JAXopt._eval_func_params_as_dict(params0)
         print(f"Initial LB: {LB0}")
         # breakpoint()
         params = params0
@@ -80,36 +80,40 @@ class EM_JAXopt:
             )
             return value
 
-        variational_solver = jaxopt.LBFGS(fun=variationalParamsOptimFunc,
-                                          **optim_params["variational_params"])
-        # variational_solver = jaxopt.ScipyMinimize(
-        #     fun=variationalParamsOptimFunc, method="L-BFGS-B",
-        #     **optim_params["variational_params"])
-        variational_params = {k: params[k]
-                              for k in ('variational_mean',
-                                        'variational_chol_vecs')}
+        if optim_params["variational_estimate"]:
+            variational_solver = jaxopt.LBFGS(fun=variationalParamsOptimFunc,
+                                              **optim_params["variational_params"])
+            # variational_solver = jaxopt.ScipyMinimize(
+            #     fun=variationalParamsOptimFunc, method="L-BFGS-B",
+            #     **optim_params["variational_params"])
+            variational_params = {k: params[k]
+                                  for k in ('variational_mean',
+                                            'variational_chol_vecs')}
 
-        preIntensity_solver = jaxopt.LBFGS(
-            fun=preIntensityParamsOptimFunc,
-            **optim_params["preIntensity_params"])
-        # preIntensity_solver = jaxopt.ScipyMinimize(
-        #     fun=preIntensityParamsOptimFunc, method="L-BFGS-B",
-        #     **optim_params["preIntensity_params"])
-        preIntensity_params = {k: params[k] for k in ('C', 'd')}
+        if optim_params["preIntensity_estimate"]:
+            preIntensity_solver = jaxopt.LBFGS(
+                fun=preIntensityParamsOptimFunc,
+                **optim_params["preIntensity_params"])
+            # preIntensity_solver = jaxopt.ScipyMinimize(
+            #     fun=preIntensityParamsOptimFunc, method="L-BFGS-B",
+            #     **optim_params["preIntensity_params"])
+            preIntensity_params = {k: params[k] for k in ('C', 'd')}
 
-        kernels_solver = jaxopt.LBFGS(fun=kernelsParamsOptimFunc,
-                                      **optim_params["kernels_params"])
-        # kernels_solver = jaxopt.ScipyMinimize(
-        #     fun=kernelsParamsOptimFunc, method="L-BFGS-B",
-        #     **optim_params["kernels_params"])
-        kernels_params = {"kernels_params": params["kernels_params"]}
+        if optim_params["kernels_estimate"]:
+            kernels_solver = jaxopt.LBFGS(fun=kernelsParamsOptimFunc,
+                                          **optim_params["kernels_params"])
+            # kernels_solver = jaxopt.ScipyMinimize(
+            #     fun=kernelsParamsOptimFunc, method="L-BFGS-B",
+            #     **optim_params["kernels_params"])
+            kernels_params = {"kernels_params": params["kernels_params"]}
 
-        indPointsLocs_solver = jaxopt.LBFGS(
-            fun=indPointsLocsOptimFunc, **optim_params["indpointslocs_params"])
-        # indPointsLocs_solver = jaxopt.ScipyMinimize(
-        #     fun=indPointsLocsOptimFunc, method="L-BFGS-B",
-        #     **optim_params["indpointslocs_params"])
-        indPointsLocs_params = {"ind_points_locs": params["ind_points_locs"]}
+        if optim_params["indpointslocs_estimate"]:
+            indPointsLocs_solver = jaxopt.LBFGS(
+                fun=indPointsLocsOptimFunc, **optim_params["indpointslocs_params"])
+            # indPointsLocs_solver = jaxopt.ScipyMinimize(
+            #     fun=indPointsLocsOptimFunc, method="L-BFGS-B",
+            #     **optim_params["indpointslocs_params"])
+            indPointsLocs_params = {"ind_points_locs": params["ind_points_locs"]}
 
         prev_lower_bound = -math.inf
         best_lower_bound = LB0
@@ -200,48 +204,66 @@ class EM_JAXopt:
                       elapsed_time_hist=elapsed_time_hist)
         return answer
 
-    def maximize_jaxopt_LBFGS_in_steps(params0, optim_params):
+    def maximize_jaxopt_LBFGS_in_steps(params0, em_tol, max_cont_lb_below_thr, optim_params):
         # jax.debug.print("Before calling jaxopt.LBFGS: optim_params={optim_params}", optim_params=optim_params)
         # jax.debug.breakpoint()
-        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_list,
+        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_dict,
                               **optim_params)
         # jax.debug.print("About to call solver.init_state(params)")
         state = solver.init_state(params0)
         # jax.debug.print("Called solver.init_state(params) done")
 
-        lb = -EM_JAXopt._eval_func_params_as_list(params0)
+        lb = -EM_JAXopt._eval_func_params_as_dict(params0)
         params = params0
         elapsed_time_hist = [0.0]
         lower_bound_hist = [lb]
         start_time = time.time()
-        for step in range(optim_params["maxiter"]):
+        step = 0
+        n_cont_lb_below_thr = 0
+        while (step < optim_params["maxiter"] and
+               n_cont_lb_below_thr < max_cont_lb_below_thr):
             # jax.debug.print("Before update: params={params}", params=params)
-            # loss_value, grads = jax.value_and_grad(EM_JAXopt._eval_func_params_as_list)(params)
+            # loss_value, grads = jax.value_and_grad(EM_JAXopt._eval_func_params_as_dict)(params)
             # jax.debug.print("Loss: {}, Grad NaN? {}", loss_value, jnp.isnan(grads).any())
             # jax.debug.breakpoint()
             params, state = solver.update(params=params, state=state)
             # jax.debug.print("After update: params={params}", params=params)
             # jax.debug.breakpoint()
             lb = -state.value.item()
+            lower_bound_diff = lb - lower_bound_hist[-1]
+            if lower_bound_diff > 0 and lower_bound_diff < optim_params["tol"]:
+                n_cont_lb_below_thr += 1
+            else:
+                n_cont_lb_below_thr = 0
             lower_bound_hist.append(lb)
             elapsed_time_hist.append(time.time()-start_time)
-            print(f"Iteration {step}: {lb}")
+            step += 1
+            print(f"Iteration {step}: lower bound {lb}, "
+                  f"lower bound diff: {lower_bound_diff}")
+        if step == optim_params["maxiter"]:
+            conv_reason = f"Reached maximum number of iterations {optim_params['maxiter']}"
+        elif n_cont_lb_below_thr == max_cont_lb_below_thr:
+            conv_reason = "converged"
+        else:
+            raise RuntimeError("Program logic error")
         answer = {"params": params, "state": state,
                   "elapsed_time_hist": elapsed_time_hist,
-                  "lower_bound_hist": lower_bound_hist}
+                  "lower_bound_hist": lower_bound_hist,
+                  "conv_reason": conv_reason,
+                 }
         return answer
 
     def maximize_jaxopt_scipyMinimize(params0, optim_params):
-        lb = -EM_JAXopt._eval_func_params_as_list(params0)
+        lb = -EM_JAXopt._eval_func_params_as_dict(params0)
         print(f"Initial LB: {lb}")
 
         lower_bounds = [lb]
         def mycallback(params):
-            lb = -EM_JAXopt._eval_func_params_as_list(params)
+            lb = -EM_JAXopt._eval_func_params_as_dict(params)
             lower_bounds.append(lb)
             # print(f"lower bound: {lb}")
 
-        solver = jaxopt.ScipyMinimize(fun=EM_JAXopt._eval_func_params_as_list,
+        solver = jaxopt.ScipyMinimize(fun=EM_JAXopt._eval_func_params_as_dict,
                                       method="L-BFGS-B",
                                       callback=mycallback,
                                       **optim_params)
@@ -250,7 +272,7 @@ class EM_JAXopt:
                   "lower_bound": lower_bounds}
         return answer
 
-    def _eval_func_params_as_list(params):
+    def _eval_func_params_as_dict(params):
         vMean = params["variational_mean"]
         vChol = params["variational_chol_vecs"]
         C = params["C"]
@@ -276,16 +298,6 @@ class EM_JAXopt:
         answer = -svlb.eval(vMean=vMean, vCov=vCov, C=C, d=d, Kzz=Kzz,
                             Kzz_cho=Kzz_cho, KtzQuad=Ktz_quad,
                             KtzSpikes=Ktz_spikes, KttDiag=1.0)
-        # print(f"Negative LB: {answer}")
-        # if True:
-        # if jnp.isnan(answer) or answer < -220000:
-        #     import myUtils
-        #     myUtils.saveDataForLowerBoundEval(
-        #         vMean=vMean, vChol=vChol, C=C, d=d,
-        #         kernels_params=kernels_params, ind_points_locs=ind_points_locs,
-        #         reg_param=EM_JAXopt.reg_param, lowerBound=-answer,
-        #         filename="../../results/dataForLowerBoundEval.pickle"
-        #     )
         return answer
 
 
