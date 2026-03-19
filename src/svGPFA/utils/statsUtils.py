@@ -22,6 +22,7 @@ def computeLatents(vMean, vChol, kernels_params, ind_points_locs,
     vCov = svGPFA.utils.miscUtils.buildCovsFromCholVecs(vChol)
     l_vars = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents.computeVars(
         vCov=vCov, Kzz=Kzz, Kzz_cho=Kzz_cho, Ktz=Ktz_quad)
+    # l_means \in n_latents x n_trials x (n_quad | n_spikes)
     return l_means, l_vars
 
 
