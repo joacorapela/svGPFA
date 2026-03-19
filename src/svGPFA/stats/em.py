@@ -122,7 +122,7 @@ class EM_JAXopt:
         start_time = time.time()
         i = 0
         while (i < optim_params["em_maxiter"] and
-               (best_lower_bound - prev_lower_bound) > optim_params["em_tol"]):
+               (best_lower_bound - prev_lower_bound) > em_tol):
             prev_lower_bound = best_lower_bound
             if optim_params["variational_estimate"]:
                 res = variational_solver.run(variational_params,
@@ -204,16 +204,19 @@ class EM_JAXopt:
                       elapsed_time_hist=elapsed_time_hist)
         return answer
 
-    def maximize_jaxopt_LBFGS_in_steps(params0, em_tol, max_cont_lb_below_thr, optim_params):
+    def maximize_jaxopt_LBFGS_in_steps(optim_func, params0, optim_params,
+                                       additional_params=None):
+        em_tol = optim_params.pop("em_tol")
+        max_cont_lb_below_thr = optim_params.pop("max_cont_lb_below_thr")
+
         # jax.debug.print("Before calling jaxopt.LBFGS: optim_params={optim_params}", optim_params=optim_params)
         # jax.debug.breakpoint()
-        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_dict,
-                              **optim_params)
+        solver = jaxopt.LBFGS(fun=optim_func, **optim_params)
         # jax.debug.print("About to call solver.init_state(params)")
-        state = solver.init_state(params0)
+        state = solver.init_state(params0, additional_params=additional_params)
         # jax.debug.print("Called solver.init_state(params) done")
 
-        lb = -EM_JAXopt._eval_func_params_as_dict(params0)
+        lb = -optim_func(params=params0, additional_params=additional_params)
         params = params0
         elapsed_time_hist = [0.0]
         lower_bound_hist = [lb]
@@ -226,7 +229,10 @@ class EM_JAXopt:
             # loss_value, grads = jax.value_and_grad(EM_JAXopt._eval_func_params_as_dict)(params)
             # jax.debug.print("Loss: {}, Grad NaN? {}", loss_value, jnp.isnan(grads).any())
             # jax.debug.breakpoint()
-            params, state = solver.update(params=params, state=state)
+            params, state = solver.update(params=params,
+                                          state=state,
+                                          additional_params=additional_params,
+                                         )
             # jax.debug.print("After update: params={params}", params=params)
             # jax.debug.breakpoint()
             lb = -state.value.item()
@@ -272,7 +278,7 @@ class EM_JAXopt:
                   "lower_bound": lower_bounds}
         return answer
 
-    def _eval_func_params_as_dict(params):
+    def _eval_func_params_as_dict(params, additional_params=None):
         vMean = params["variational_mean"]
         vChol = params["variational_chol_vecs"]
         C = params["C"]
