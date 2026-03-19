@@ -1661,6 +1661,112 @@ def getPlotLatentAcrossTrials(
                         mode="markers",
                         text=[events_names[i]],
                         hovertemplate="x=%{x}<br>" + "y=%{y}<br>" + "event=%{text}",
+                        legendgroup="trial{:02d}".format(r),
+                        showlegend=False)
+                    fig.add_trace(trace_marker)
+
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
+def getPlotLatentMeanAcrossTrials(
+        times, latentsMeans, latentToPlot,
+        trials_ids=None,
+        indPointsLocs=None, cbAlpha=0.2,
+        indPointsLocsColor="rgba(255,0,0,0.5)",
+        trials_colors_patterns=None,
+        default_trial_color_pattern="rgba(128,128,128,{:f})",
+        cb_transparency=0.3, mean_transparency=1.0, xlabel="Time (sec)",
+        align_event_times=None,
+        events_names=None,
+        marked_events_times=None,
+        marked_events_colors=None,
+        marked_events_markers=None,
+        marked_size=10, trials_colors=None,
+        ylabel="Value", titlePattern="Latent {:d}"):
+    # latentsMeans \in [n_trials, n_samples, n_latents]
+
+    # times = times.detach().numpy()
+    # latentsMeans = latentsMeans.detach().numpy()
+    # if indPointsLocs is not None:
+    #     indPointsLocs = [itemnumpy() for item in indPointsLocs]
+
+    # pio.renderers.default = "browser"
+    fig = go.Figure()
+    title = titlePattern.format(latentToPlot)
+    n_trials = latentsMeans.shape[0]
+    for r in range(n_trials):
+        trial_times = times[r, :, 0]
+        meanToPlot = latentsMeans[r, :, latentToPlot]
+        if trials_colors_patterns is not None:
+            trial_color_pattern = trials_colors_patterns[r]
+        else:
+            trial_color_pattern = default_trial_color_pattern
+
+        # pdb.set_trace()
+#         import matplotlib
+#         matplotlib.use('TkAgg')
+#         import matplotlib.pyplot as plt
+#         plt.plot(times, meanToPlot)
+#         plt.show()
+#         pdb.set_trace()
+
+        x = trial_times
+        y = meanToPlot
+        ymax = np.max(meanToPlot)
+        ymin = np.min(meanToPlot)
+
+        if trials_ids is not None:
+            trial_label = "{:02d}".format(trials_ids[r])
+        else:
+            trial_label = "{:02d}".format(r)
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            line=dict(color=trial_color_pattern.format(mean_transparency)),
+            mode="lines",
+            name="trial {:s}".format(trial_label),
+            legendgroup="trial{:02d}".format(r)
+        )
+        fig.add_trace(traceMean)
+
+        if indPointsLocs is not None:
+            for n in range(indPointsLocs.shape[2]):
+                traceIndPoint = go.Scatter(
+                    x=[indPointsLocs[latentToPlot, r, n, 0],
+                       indPointsLocs[latentToPlot, r, n, 0]],
+                    y = [ymin, ymax],
+                    line=dict(color=trial_color_pattern.format(mean_transparency)),
+                    mode="lines",
+                    name="trial {:s}".format(trial_label),
+                    legendgroup="trial{:02d}".format(r),
+                    showlegend=False,
+                )
+                fig.add_trace(traceIndPoint)
+
+        # add markers to trials
+        if events_names is not None and\
+           marked_events_times is not None and \
+           marked_events_colors is not None and \
+           marked_events_markers is not None and \
+           align_event_times is not None:
+            n_marked_events = len(marked_events_times[r])
+            marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            for i in range(n_marked_events):
+                if not math.isnan(marked_events_times_centered[i]):
+                    marked_index = np.argmin(np.abs(
+                        times[r, :, 0]-marked_events_times_centered[i]))
+
+                    trace_marker = go.Scatter(
+                        x=[times[r, marked_index, 0]],
+                        y=[meanToPlot[marked_index]],
+                        marker=dict(color=marked_events_colors[r][i],
+                                    symbol=marked_events_markers[r][i],
+                                    size=marked_size),
+                        mode="markers",
+                        text=[events_names[i]],
+                        hovertemplate="x=%{x}<br>" + "y=%{y}<br>" + "event=%{text}",
                         legendgroup="trial{:02d}".format(trials_ids[r]),
                         showlegend=False)
                     fig.add_trace(trace_marker)
@@ -1672,7 +1778,8 @@ def getPlotLatentAcrossTrials(
 
 
 # def getPlotRightSingularVectorTransformedLatentAcrossTrials(
-def getPlotVarianceTransformedLatentAcrossTrials(
+# def getPlotVarianceTransformedLatentAcrossTrials(
+def getPlotOrthonormalizedLatentAcrossTrials(
         times, latentsMeans, latentsVars, C, trials_ids,
         latentToPlot=0,
         align_event_times=None,
@@ -1686,10 +1793,11 @@ def getPlotVarianceTransformedLatentAcrossTrials(
         cb_transparency=0.3, mean_transparency=1.0,
         trials_annotations=None, ylim=None,
         xlabel="Time (sec)", ylabel="Value",
-        titlePattern="Variance transformed latent {:d}"):
-    # times = times.detach().numpy()
-    # latentsMeans = latentsMeans.detach().numpy()
-    # C = C.detach().numpy()
+        titlePattern="Orthonormalized latent {:d}"):
+    # align_event_times[r] \in double
+    # marked_events_times[r] \in list of size n_events_r
+    # marked_events_colors[r] \in list of size n_events_r
+    # marked_events_markers[r] \in list of size n_events_r
     n_trials = len(latentsMeans)
     tLatentsMeans, tLatentsVars = svGPFA.utils.miscUtils.varianceTransformOfLatents(
         latents_means=latentsMeans, latents_vars=latentsVars, C=C)
@@ -1748,7 +1856,7 @@ def getPlotVarianceTransformedLatentAcrossTrials(
             fillcolor=trial_color_pattern.format(cb_transparency),
             line=dict(color=trial_color_pattern.format(0.0)),
             showlegend=False,
-            legendgroup="trial{:02d}".format(r)
+            legendgroup="trial{:02d}".format(trials_ids[r])
         )
         if trials_ids is not None:
             trial_label = "{:02d}".format(trials_ids[r])
@@ -1838,12 +1946,18 @@ def get2DPlotOrthonormalizedLatentsAcrossTrials(
         else:
             latent_color = default_trial_color
 
+        if align_event_times is not None:
+            legend = "trial {:02d}, eTime {:02f}".format(trials_ids[r],
+                                                         align_event_times[r])
+        else:
+            legend = "trial {:02d}".format(trials_ids[r])
+
         trace_latent_mean = go.Scatter(
             x=tLatentsMeans[r][:, latentsToPlot[0]],
             y=tLatentsMeans[r][:, latentsToPlot[1]],
             mode="lines",
             line=dict(color=latent_color, width=line_width),
-            name="trial {:02d}".format(trials_ids[r]),
+            name=legend,
             legendgroup="trial{:02d}".format(trials_ids[r]),
             showlegend=True,
             hoverinfo="text",
@@ -1918,13 +2032,19 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
         else:
             latent_color = default_trial_color
 
+        if align_event_times is not None:
+            legend = "trial {:02d}, eTime {:02f}".format(trials_ids[r],
+                                                         align_event_times[r])
+        else:
+            legend = "trial {:02d}".format(trials_ids[r])
+
         trace_latent_mean = go.Scatter3d(
             x=tLatentsMeans[r][:, latentsToPlot[0]],
             y=tLatentsMeans[r][:, latentsToPlot[1]],
             z=tLatentsMeans[r][:, latentsToPlot[2]],
             mode="lines",
             line=dict(color=latent_color, width=3),
-            name="trial {:02d}".format(trials_ids[r]),
+            name=legend,
             legendgroup="trial{:02d}".format(trials_ids[r]),
             showlegend=True,
             hoverinfo="text",
