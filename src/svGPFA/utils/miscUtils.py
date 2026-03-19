@@ -10,7 +10,7 @@ import warnings
 
 # from . import my_globals
 import svGPFA.stats.kernels
-import gcnu_common.numerical_methods.utils
+import gcnu_common.numerical_methods
 import gcnu_common.stats.gaussianProcesses.eval
 
 
@@ -283,7 +283,7 @@ def getLegQuadPointsAndWeights(n_quad, trials_start_times, trials_end_times):
     leg_quad_weights = jnp.empty((n_trials, n_quad, 1), dtype=jnp.double)
     for r in range(n_trials):
         points, weights = \
-                gcnu_common.numerical_methods.utils.leggaussVarLimits(
+                gcnu_common.numerical_methods.leggaussVarLimits(
                     n=n_quad, a=trials_start_times[r], b=trials_end_times[r])
         leg_quad_points  = leg_quad_points.at[r, :, 0].set(points)
         leg_quad_weights = leg_quad_weights.at[r, :, 0].set(weights)
