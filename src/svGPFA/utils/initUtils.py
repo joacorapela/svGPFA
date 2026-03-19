@@ -108,7 +108,7 @@ def getOptimParams(dynamic_params_spec, config_file_params_spec,
     return hierarchical_optim_params
 
 
-def getDefaultParamsDict(n_neurons, n_trials, n_latents=3,
+def getDefaultParamsDict(n_trials, n_latents=3,
                          n_ind_points=None, common_n_ind_points=10,
                          n_quad=None, common_n_quad=200,
                          diag_var_cov0_value=1e-2, prior_cov_reg_param=1e-3,
@@ -398,7 +398,7 @@ def getParamsDictFromStringsDict(n_latents, n_trials, strings_dict, args_info):
     return params_dict
 
 
-def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
+def getParamsAndKernelsTypes(n_clusters, n_trials, n_latents,
                              trials_start_times, trials_end_times,
                              default_params_spec=None,
                              config_file_params_spec=None,
@@ -408,8 +408,8 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
     ``default_params_spec``, ``config_file_params_spec`` and
     ``dynamic_params_spec``.
 
-    :param n_neurons: number of neurons.
-    :type  n_neurons: integer
+    :param n_clusters: number of clusters.
+    :type  n_clusters: integer
 
     :param n_trials: number of trials.
     :type  n_trials: integer
@@ -451,7 +451,7 @@ def getParamsAndKernelsTypes(n_neurons, n_trials, n_latents,
             n_ind_points = [common_n_ind_points] * n_latents
 
     C0, d0 = getLinearPreIntensityParams0(
-        n_neurons=n_neurons, n_latents=n_latents,
+        n_clusters=n_clusters, n_latents=n_latents,
         dynamic_params_spec=dynamic_params_spec,
         config_file_params_spec=config_file_params_spec,
         default_params_spec=default_params_spec)
@@ -545,17 +545,17 @@ def getParam(section_name, param_name,
     return param
 
 
-def getLinearPreIntensityParams0(n_neurons, n_latents, dynamic_params_spec=None,
+def getLinearPreIntensityParams0(n_clusters, n_latents, dynamic_params_spec=None,
                               config_file_params_spec=None,
                               default_params_spec=None):
     C = getLinearPreIntensityParam0(
-            param_label="c0", n_rows=n_neurons,
+            param_label="c0", n_rows=n_clusters,
             n_cols=n_latents,
             dynamic_params_spec=dynamic_params_spec,
             config_file_params_spec=config_file_params_spec,
             default_params_spec=default_params_spec)
     d = getLinearPreIntensityParam0(
-            param_label="d0", n_rows=n_neurons, n_cols=1,
+            param_label="d0", n_rows=n_clusters, n_cols=1,
             dynamic_params_spec=dynamic_params_spec,
             config_file_params_spec=config_file_params_spec,
             default_params_spec=default_params_spec)
