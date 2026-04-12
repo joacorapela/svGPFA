@@ -87,5 +87,5 @@ If you use svGPFA, please cite the following paper:
 - [Maneesh Sahani](http://www.gatsby.ucl.ac.uk/~maneesh) (Gatsby Computational Neuroscience Unit, University College London)
 
 # Acknowledgements
-The research and development for svGPFA is supported by funding from the [Gatsby Charitable Foundation](https://www.gatsby.org.uk/).
+The research and development for svGPFA is supported by the [Gatsby Charitable Foundation](https://www.gatsby.org.uk/).
 
