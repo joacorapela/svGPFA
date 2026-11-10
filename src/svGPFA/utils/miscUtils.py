@@ -14,6 +14,34 @@ import gcnu_common.numerical_methods
 import gcnu_common.stats.gaussianProcesses.eval
 
 
+def countParams(n_latents, n_trials, n_ind_points, n_neurons,
+                n_params_all_kernels):
+    n_variational_mean = n_latents * n_trials * n_ind_points
+    n_variational_cov = (n_latents * n_trials *
+                         (n_ind_points * (n_ind_points + 1)) / 2)
+    n_C = n_neurons * n_latents
+    n_d = n_neurons * 1
+    n_kernels = n_params_all_kernels
+    n_ind_points_locs = n_latents * n_trials * n_ind_points
+    answer = dict(n_variational_mean=n_variational_mean,
+                  n_variational_cov=n_variational_cov,
+                  n_C=n_C,
+                  n_d=n_d,
+                  n_kernels=n_kernels,
+                  n_ind_points_locs=n_ind_points_locs)
+    return answer
+
+def getEquispacedTrialsTimes(trials_start_times, trials_end_times, sample_rate):
+    n_trials = len(trials_start_times)
+    trials_times = [None] * n_trials
+
+    for r in range(n_trials):
+        aux = jnp.arange(trials_start_times[r], trials_end_times[r],
+                         1.0/sample_rate)
+        trials_times[r] = aux[:, jnp.newaxis]
+    return trials_times
+
+
 def stackSpikeTimes(spikeTimes):
     # spikeTimes list[nTrials][nNeurons][nSpikes]
     nTrials = len(spikeTimes)
@@ -58,6 +86,8 @@ def buildKernels(kernels_types, kernels_params):
     for k, kernel_type in enumerate(kernels_types):
         if kernels_types[k] == "exponentialQuadratic":
             kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernel
+        elif kernels_types[k] == "exponentialQuadraticSigmaAsParam":
+            kernels[k] = svGPFA.stats.kernels.ExponentialQuadraticKernelSigmaAsParam
         elif kernels_types[k] == "periodic":
             kernels[k] = svGPFA.stats.kernels.PeriodicKernel
         else:
@@ -65,7 +95,18 @@ def buildKernels(kernels_types, kernels_params):
     return kernels
 
 
-def varianceTransformOfLatents(latents_means, latents_vars, C):
+def varianceTransformOfLatentsMeans(latents_means, C):
+    # latents_means[r] \in n_times[r], n_latents
+    _, S, Vh = jnp.linalg.svd(C)
+    A = Vh.T*S
+    n_trials = len(latents_means)
+    tLatentsMeans = [None] * len(latents_means)
+    for r in range(n_trials):
+        tLatentsMeans[r] = latents_means[r] @ A
+    return tLatentsMeans
+
+
+def orthogonalizeLatents(latents_means, latents_vars, C):
     # latents_means, latents_vars \in n_trials, n_quad, n_latents
     _, S, Vh = jnp.linalg.svd(C)
     A = Vh.T*S
@@ -77,6 +118,31 @@ def varianceTransformOfLatents(latents_means, latents_vars, C):
         tLatentsMeans[r, :, :] = latents_means[r, :, :] @ A
         tLatentsVars[r, :, :] = latents_vars[r, :, :] @ A2
     return tLatentsMeans, tLatentsVars
+
+
+def orthogonalizeLatentsWithEquispacedTrialsTimes(latents_means, latents_vars, C):
+    # latents_means[r], latents_vars[r] \in n_times[r], n_latents
+    _, S, Vh = jnp.linalg.svd(C)
+    A = Vh.T*S
+    A2 = A**2
+    n_trials = len(latents_means)
+    tLatentsMeans = [None] * n_trials
+    tLatentsVars = [None] * n_trials
+    for r in range(n_trials):
+        tLatentsMeans[r] = latents_means[r] @ A
+        tLatentsVars[r] = latents_vars[r] @ A2
+    return tLatentsMeans, tLatentsVars
+
+
+def orthogonalizeLatentsMeans(latents_means, C):
+    # latents_means[r] \in n_times[r], n_latents
+    _, S, Vh = jnp.linalg.svd(C)
+    A = Vh.T*S
+    n_trials = len(latents_means)
+    tLatentsMeans = [None] * n_trials
+    for r in range(n_trials):
+        tLatentsMeans[r] = latents_means[r] @ A
+    return tLatentsMeans
 
 
 def getPropSamplesCovered(sample, mean, std, percent=.95):
