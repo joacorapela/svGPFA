@@ -71,9 +71,12 @@ def getSimulatedSpikesTimesPlotMultipleTrials(spikesTimes, xlabel="Time (sec)",
     return fig
 
 
-def getSpikesTimesPlotOneTrial(spikes_times, title,
-                               align_event_times=None, marked_events=None,
-                               xlabel="Time (sec)", ylabel="Cluster",
+def getSpikesTimesPlotOneTrial(spikes_times, title, clusters_ids=None,
+                               marked_events_times=None,
+                               marked_events_colors=None,
+                               marked_events_linetypes=None,
+                               align_event_time=None,
+                               xlabel="Time (sec)", ylabel="Cluster ID",
                                event_line_color="rgba(0, 0, 255, 0.2)",
                                event_line_width=5):
     nClusters = len(spikes_times)
@@ -99,16 +102,18 @@ def getSpikesTimesPlotOneTrial(spikes_times, title,
             # hoverinfo="skip",
         )
         fig.add_trace(trace)
-    if marked_events is not None and align_event_times is not None:
-        n_marked_events = len(marked_events)
+    fig.update_yaxes(ticks="", showticklabels=False)
+    if marked_events_times is not None and align_event_time is not None:
+        n_marked_events = len(marked_events_times)
         for i in range(n_marked_events):
-            marked_time = marked_events[i]-align_event_times
+            marked_time = marked_events_times[i] - align_event_time
             if marked_time > max_time:
                 marked_time = max_time
             if marked_time < min_time:
                 marked_time = min_time
-            fig.add_vline(x=marked_time, line=dict(color=event_line_color,
-                                                   width=event_line_width))
+            fig.add_vline(x=marked_time,
+                          line=dict(color=marked_events_colors[i],
+                                    dash=marked_events_linetypes[i]))
     fig.update_xaxes(title_text=xlabel)
     fig.update_yaxes(title_text=ylabel)
     fig.update_layout(title=title)
@@ -177,6 +182,7 @@ def getSpikesTimesPlotOneCluster(spikes_times,
             text=[trial_label]*len(spikes_times_trial_cluster),
             hovertemplate="Time %{x}<br>" + "Trial %{text}",
         )
+        fig.update_yaxes(tickvals=trials_ids)
         fig.add_trace(trace)
         if marked_events_times is not None:
             if align_event_times is not None:
@@ -1687,12 +1693,6 @@ def getPlotLatentMeanAcrossTrials(
         ylabel="Value", titlePattern="Latent {:d}"):
     # latentsMeans \in [n_trials, n_samples, n_latents]
 
-    # times = times.detach().numpy()
-    # latentsMeans = latentsMeans.detach().numpy()
-    # if indPointsLocs is not None:
-    #     indPointsLocs = [itemnumpy() for item in indPointsLocs]
-
-    # pio.renderers.default = "browser"
     fig = go.Figure()
     title = titlePattern.format(latentToPlot)
     n_trials = latentsMeans.shape[0]
@@ -1703,14 +1703,6 @@ def getPlotLatentMeanAcrossTrials(
             trial_color_pattern = trials_colors_patterns[r]
         else:
             trial_color_pattern = default_trial_color_pattern
-
-        # pdb.set_trace()
-#         import matplotlib
-#         matplotlib.use('TkAgg')
-#         import matplotlib.pyplot as plt
-#         plt.plot(times, meanToPlot)
-#         plt.show()
-#         pdb.set_trace()
 
         x = trial_times
         y = meanToPlot
@@ -1777,6 +1769,99 @@ def getPlotLatentMeanAcrossTrials(
     return fig
 
 
+def getPlotEquispacedLatentMeanAcrossTrials(
+        times, latentsMeans, latentToPlot,
+        trials_ids=None,
+        indPointsLocs=None, cbAlpha=0.2,
+        indPointsLocsColor="rgba(255,0,0,0.5)",
+        trials_colors_patterns=None,
+        default_trial_color_pattern="rgba(128,128,128,{:f})",
+        cb_transparency=0.3, mean_transparency=1.0, xlabel="Time (sec)",
+        align_event_times=None,
+        events_names=None,
+        marked_events_times=None,
+        marked_events_colors=None,
+        marked_events_markers=None,
+        marked_size=10, trials_colors=None,
+        ylabel="Value", titlePattern="Latent {:d}"):
+    # latentsMeans \in [n_trials, n_samples, n_latents]
+
+    fig = go.Figure()
+    title = titlePattern.format(latentToPlot)
+    n_trials = len(latentsMeans)
+    for r in range(n_trials):
+        trial_times = times[r][:, 0]
+        meanToPlot = latentsMeans[r][latentToPlot, :]
+        if trials_colors_patterns is not None:
+            trial_color_pattern = trials_colors_patterns[r]
+        else:
+            trial_color_pattern = default_trial_color_pattern
+
+        x = trial_times
+        y = meanToPlot
+        ymax = np.max(meanToPlot)
+        ymin = np.min(meanToPlot)
+
+        if trials_ids is not None:
+            trial_label = "{:02d}".format(trials_ids[r])
+        else:
+            trial_label = "{:02d}".format(r)
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            line=dict(color=trial_color_pattern.format(mean_transparency)),
+            mode="lines",
+            name="trial {:s}".format(trial_label),
+            legendgroup="trial{:02d}".format(r)
+        )
+        fig.add_trace(traceMean)
+
+        if indPointsLocs is not None:
+            for n in range(indPointsLocs.shape[2]):
+                traceIndPoint = go.Scatter(
+                    x=[indPointsLocs[latentToPlot, r, n, 0],
+                       indPointsLocs[latentToPlot, r, n, 0]],
+                    y = [ymin, ymax],
+                    line=dict(color=trial_color_pattern.format(mean_transparency)),
+                    mode="lines",
+                    name="trial {:s}".format(trial_label),
+                    legendgroup="trial{:02d}".format(r),
+                    showlegend=False,
+                )
+                fig.add_trace(traceIndPoint)
+
+        # add markers to trials
+        if events_names is not None and\
+           marked_events_times is not None and \
+           marked_events_colors is not None and \
+           marked_events_markers is not None and \
+           align_event_times is not None:
+            n_marked_events = len(marked_events_times[r])
+            marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            for i in range(n_marked_events):
+                if not math.isnan(marked_events_times_centered[i]):
+                    marked_index = np.argmin(np.abs(
+                        times[r][:, 0]-marked_events_times_centered[i]))
+
+                    trace_marker = go.Scatter(
+                        x=[times[r][marked_index, 0]],
+                        y=[meanToPlot[marked_index]],
+                        marker=dict(color=marked_events_colors[r][i],
+                                    symbol=marked_events_markers[r][i],
+                                    size=marked_size),
+                        mode="markers",
+                        text=[events_names[i]],
+                        hovertemplate="x=%{x}<br>" + "y=%{y}<br>" + "event=%{text}",
+                        legendgroup="trial{:02d}".format(trials_ids[r]),
+                        showlegend=False)
+                    fig.add_trace(trace_marker)
+
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel)
+    fig.update_layout(title_text=title)
+    return fig
+
+
 # def getPlotRightSingularVectorTransformedLatentAcrossTrials(
 # def getPlotVarianceTransformedLatentAcrossTrials(
 def getPlotOrthonormalizedLatentAcrossTrials(
@@ -1799,7 +1884,7 @@ def getPlotOrthonormalizedLatentAcrossTrials(
     # marked_events_colors[r] \in list of size n_events_r
     # marked_events_markers[r] \in list of size n_events_r
     n_trials = len(latentsMeans)
-    tLatentsMeans, tLatentsVars = svGPFA.utils.miscUtils.varianceTransformOfLatents(
+    tLatentsMeans, tLatentsVars = svGPFA.utils.miscUtils.orthogonalizeLatents(
         latents_means=latentsMeans, latents_vars=latentsVars, C=C)
 
     if ylim is None:
@@ -1858,16 +1943,23 @@ def getPlotOrthonormalizedLatentAcrossTrials(
             showlegend=False,
             legendgroup="trial{:02d}".format(trials_ids[r])
         )
+
         if trials_ids is not None:
             trial_label = "{:02d}".format(trials_ids[r])
         else:
             trial_label = "{:02d}".format(r)
+
+        if align_event_times is not None:
+            name = "trial {:02d}, e_time {:.02f}".format(trials_ids[r], align_event_times[r])
+        else:
+            name = "trial {:02d}".format(trials_ids[r])
+
         traceMean = go.Scatter(
             x=x,
             y=y,
             line=dict(color=trial_color_pattern.format(mean_transparency)),
             mode="lines",
-            name="trial {:02d}".format(trials_ids[r]),
+            name=name,
             legendgroup="trial{:02d}".format(trials_ids[r]),
             showlegend=True,
             hoverinfo="text",
@@ -1907,6 +1999,126 @@ def getPlotOrthonormalizedLatentAcrossTrials(
     return fig
 
 
+def getPlotOrthonormalizedLatentMeanAcrossTrials(
+        times, latentsMeans, C, trials_ids,
+        latentToPlot=0,
+        align_event_times=None,
+        events_names=None,
+        marked_events_times=None,
+        marked_events_colors=None,
+        marked_events_markers=None,
+        marked_size=10,
+        trials_colors_patterns=None,
+        default_trial_color_pattern="rgba(128,128,128,{:f})",
+        mean_transparency=1.0,
+        trials_annotations=None, ylim=None,
+        xlabel="Time (sec)", ylabel="Value",
+        titlePattern="Orthonormalized latent mean {:d}"):
+    # align_event_times[r] \in double
+    # marked_events_times[r] \in list of size n_events_r
+    # marked_events_colors[r] \in list of size n_events_r
+    # marked_events_markers[r] \in list of size n_events_r
+    n_trials = len(latentsMeans)
+    tLatentsMeans = svGPFA.utils.miscUtils.orthogonalizeLatentsMeans(
+        latents_means=latentsMeans, C=C)
+
+    if ylim is None:
+        latents_max = -np.Inf
+        latents_min = np.Inf
+    for r in range(n_trials):
+        if ylim is None:
+            tLatentsMeansr_min = tLatentsMeans[r].min()
+            tLatentsMeansr_max = tLatentsMeans[r].max()
+            if tLatentsMeansr_min < latents_min:
+                latents_min = tLatentsMeansr_min
+            if tLatentsMeansr_max > latents_max:
+                latents_max = tLatentsMeansr_max
+    if ylim is None:
+        ylim = [latents_min, latents_max]
+    fig = go.Figure()
+    title = titlePattern.format(latentToPlot)
+
+    hover_texts = [["Trial: {:02d}<br>Time: {:f}".format(trial_id, time)
+                    for i, time in enumerate(times[r][:, 0])]
+                   for r, trial_id in enumerate(trials_ids)]
+    if trials_annotations is not None:
+        for r in range(n_trials):
+            n_times = times.shape[1]
+            an_annotation = ""
+            for trial_annotation_key in trials_annotations:
+                an_annotation += "<br>{:s}: {}".format(
+                    trial_annotation_key,
+                    trials_annotations[trial_annotation_key][r])
+            for i in range(n_times):
+                hover_texts[r][i] = hover_texts[r][i] + an_annotation
+
+    for r in range(n_trials):
+        trial_times = times[r][:, 0]
+        meanToPlot = tLatentsMeans[r][:, latentToPlot]
+        if trials_colors_patterns is not None:
+            trial_color_pattern = trials_colors_patterns[r]
+        else:
+            trial_color_pattern = default_trial_color_pattern
+
+        x = trial_times
+        y = meanToPlot
+        ymax = max(np.max(meanToPlot), np.max(meanToPlot))
+        ymin = min(np.min(meanToPlot), np.min(meanToPlot))
+
+        if trials_ids is not None:
+            trial_label = "{:02d}".format(trials_ids[r])
+        else:
+            trial_label = "{:02d}".format(r)
+
+        if align_event_times is not None:
+            name = "trial {:02d}, e_time {:.02f}".format(trials_ids[r], align_event_times[r])
+        else:
+            name = "trial {:02d}".format(trials_ids[r])
+
+        traceMean = go.Scatter(
+            x=x,
+            y=y,
+            line=dict(color=trial_color_pattern.format(mean_transparency)),
+            mode="lines",
+            name=name,
+            legendgroup="trial{:02d}".format(trials_ids[r]),
+            showlegend=True,
+            hoverinfo="text",
+            text=hover_texts[r],
+        )
+        fig.add_trace(traceMean)
+
+        # add markers to trials
+        if marked_events_times is not None and \
+                marked_events_colors is not None and \
+                marked_events_markers is not None and \
+                align_event_times is not None:
+            n_marked_events = len(marked_events_times[r])
+            marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            for i in range(n_marked_events):
+                if not math.isnan(marked_events_times_centered[i]):
+                    marked_index = np.argmin(np.abs(
+                        times[r][:, 0]-marked_events_times_centered[i]))
+
+                    trace_marker = go.Scatter(
+                        x=[times[r][marked_index, 0]],
+                        y=[meanToPlot[marked_index]],
+                        marker=dict(color=marked_events_colors[r][i],
+                                    symbol=marked_events_markers[r][i],
+                                    size=marked_size),
+                        text=[events_names[i]],
+                        hovertemplate="x=%{x}<br>" + "y=%{y}<br>" + "event=%{text}",
+                        mode="markers",
+                        legendgroup="trial{:02d}".format(trials_ids[r]),
+                        showlegend=False)
+                    fig.add_trace(trace_marker)
+
+    fig.update_xaxes(title_text=xlabel)
+    fig.update_yaxes(title_text=ylabel, range=ylim)
+    fig.update_layout(title_text=title)
+    return fig
+
+
 def get2DPlotOrthonormalizedLatentsAcrossTrials(
         trials_times, latentsMeans, latentsVars, C, trials_ids,
         latentsToPlot=[0, 1],
@@ -1922,7 +2134,7 @@ def get2DPlotOrthonormalizedLatentsAcrossTrials(
         xyLabelsPattern="Latent {:d}", title=""):
     n_trials = len(latentsMeans)
 
-    tLatentsMeans, _ = svGPFA.utils.miscUtils.varianceTransformOfLatents(
+    tLatentsMeans, _ = svGPFA.utils.miscUtils.orthogonalizeLatents(
         latents_means=latentsMeans, latents_vars=latentsVars, C=C)
 
     hover_texts = [["Trial: {:02d}<br>Time: {:f}".format(trial_id, trial_time)
@@ -2008,7 +2220,7 @@ def get3DPlotOrthonormalizedLatentsAcrossTrials(
         xyzLabelsPattern="Latent {:d}", title=""):
     n_trials = len(latentsMeans)
 
-    tLatentsMeans, _ = svGPFA.utils.miscUtils.varianceTransformOfLatents(
+    tLatentsMeans, _ = svGPFA.utils.miscUtils.orthogonalizeLatents(
         latents_means=latentsMeans, latents_vars=latentsVars, C=C)
 
     hover_texts = [["Trial: {:02d}<br>Time: {:f}".format(trial_id, trial_time)
@@ -2097,7 +2309,7 @@ def getPlotOrthonormalizedLatentImageOneClusterAllTrials(
     # creating latents orthonormalization matrix
     n_trials = len(latentsMeans)
     nTimes = len(times)
-    tLatentsMeans, _ = svGPFA.utils.miscUtils.varianceTransformOfLatents(
+    tLatentsMeans, _ = svGPFA.utils.miscUtils.orthogonalizeLatents(
         latents_means=latentsMeans, latents_vars=latentsVars, C=C)
 
     if zlim is None:
@@ -2532,6 +2744,8 @@ def getPlotKernelsParams(kernelsTypes, kernelsParams, color="red", ylabel="Value
             labels = ["Length Scale", "Period"]
         elif kernelsTypes[k]=="exponentialQuadratic":
             labels = ["Length Scale"]
+        elif kernelsTypes[k]=="exponentialQuadraticSigmaAsParam":
+            labels = ["Sigma", "Length Scale"]
         else:
             raise RuntimeError("Invalid kernel type {:s}".format(kernelsTypes[k]))
 
@@ -2780,7 +2994,7 @@ def getPlotCIFsImageOneClusterAllTrials(times, cif_values, cluster,
 
 
 def getPlotCIFsOneClusterAllTrials(
-        trials_times, cif_means, cif_stds, cluster, cluster_index, trials_ids,
+        trials_times, cif_means, cif_stds, cluster_index, trials_ids,
         spikes_times=None,
         bin_size_secs=0.01,
         align_event_times=None,
@@ -2832,7 +3046,6 @@ def getPlotCIFsOneClusterAllTrials(
         else:
             trial_color_pattern = default_trial_color_pattern
 
-
         t = trials_times[r, :, 0]
         t_rev = t[::-1]
         mean = cif_means[r, cluster_index, :]
@@ -2870,13 +3083,13 @@ def getPlotCIFsOneClusterAllTrials(
         bins_centers = (bins_edges[:-1] + bins_edges[1:])/2
         binned_spikes_times = \
             gcnu_common.utils.neural_data_analysis.binSpikesTimes(
-                spikes_times=spikes_times[r][cluster], bins_edges=bins_edges,
+                spikes_times=spikes_times[r][cluster_index], bins_edges=bins_edges,
                 time_unit="sec")
         trace_bar = go.Bar(x=bins_centers,
                            y=binned_spikes_times,
                            marker_color=trial_color_pattern.format(mean_transparency),
-                           name="trial {:d}".format(r),
-                           legendgroup="trial{:02d}".format(r),
+                           name="trial {:d}".format(trials_ids[r]),
+                           legendgroup="trial{:02d}".format(trials_ids[r]),
                            showlegend=False)
         fig.add_trace(trace_bar)
 
@@ -2909,30 +3122,36 @@ def getPlotCIFsOneClusterAllTrials(
 
 
 # Lower bound
-def getPlotLowerBoundHist(lowerBoundHist, elapsedTimeHist=None,
-                          xlabelIterNumber="Iteration Number",
-                          xlabelElapsedTime="Elapsed Time (sec)",
+def getPlotLowerBoundHist(lower_bound_hist,
+                          iterations=None,
+                          elapsed_time_hist=None,
+                          xlabel_iter_no="Iteration Number",
+                          xlabel_elapsed_time="Elapsed Time (sec)",
                           ylabel="Lower Bound", marker="cross",
                           linestyle="solid"):
-    if elapsedTimeHist is None:
+
+    if elapsed_time_hist is None:
+        if iterations is None:
+            iterations = np.arange(len(lower_bound_hist))
         trace = go.Scatter(
-            y=lowerBoundHist,
+            x=iterations,
+            y=lower_bound_hist,
             mode="lines+markers",
             line={"color": "red", "dash": linestyle},
             marker={"symbol": marker},
             showlegend=False,
         )
-        xlabel = xlabelIterNumber
+        xlabel = xlabel_iter_no
     else:
         trace = go.Scatter(
-            x=elapsedTimeHist,
-            y=lowerBoundHist,
+            x=elapsed_time_hist,
+            y=lower_bound_hist,
             mode="lines+markers",
             line={"color": "red", "dash": linestyle},
             marker_symbol=marker,
             showlegend=False,
         )
-        xlabel = xlabelElapsedTime
+        xlabel = xlabel_elapsed_time
     fig = go.Figure()
     fig.add_trace(trace)
     fig.update_xaxes(title_text=xlabel)
@@ -3141,22 +3360,40 @@ def getPlotSmoothedSpikesEqualLengthTrials(spikes_times, gf_std_secs,
     fig.update_layout(title=title)
     return fig
 
-def getPlotSmoothedSpikesUnequalLengthTrials(spikes_times, gf_std_secs,
-                          trials_start_times, trials_end_times, bin_size_secs,
-                          cluster, trials_to_plot, title,
-                          trials_colors=None, default_trial_color="gray"):
+def getPlotSmoothedSpikesUnequalLengthTrials(
+    spikes_times, gf_std_secs, trials_start_times, trials_end_times,
+    bin_size_secs, cluster_index,
+    trials_indices_to_plot=None,
+    trials_labels=None,
+    align_event_times=None,
+    events_names=None,
+    marked_events_times=None,
+    marked_events_colors=None,
+    marked_events_markers=None,
+    marked_size=10,
+    title="",
+    trials_colors=None,
+    default_trial_color="gray"):
+
     n_trials = len(spikes_times)
     gf_std_samples = int(gf_std_secs / bin_size_secs)
+
+    if trials_indices_to_plot is None:
+        trials_indices_to_plot=np.arange(n_trials)
+
+    if trials_labels is None:
+        trials_labels = [f"trial index {trial_index}"
+                         for trial_index in trials_indices_to_plot]
 
     min_smoothed_spikes = np.Inf
     max_smoothed_spikes = -np.Inf
     fig = go.Figure()
-    for r in trials_to_plot:
+    for r in trials_indices_to_plot:
         bins_edges = np.arange(trials_start_times[r], trials_end_times[r], bin_size_secs)
         bins_centers = (bins_edges[:-1] + bins_edges[1:])/2
         binned_spikes_times = \
             gcnu_common.utils.neural_data_analysis.binSpikesTimes(
-                spikes_times=spikes_times[r][cluster], bins_edges=bins_edges,
+                spikes_times=spikes_times[r][cluster_index], bins_edges=bins_edges,
                 time_unit="sec")
         gf_binned_spikes_times = scipy.ndimage.gaussian_filter1d(
             binned_spikes_times, gf_std_samples)
@@ -3175,17 +3412,44 @@ def getPlotSmoothedSpikesUnequalLengthTrials(spikes_times, gf_std_secs,
         trace_bar = go.Bar(x=bins_centers,
                            y=binned_spikes_times,
                            marker_color=gf_color,
-                           name="trial {:d}".format(r),
-                           legendgroup="trial{:02d}".format(r),
+                           name=trials_labels[r],
+                           legendgroup="trial_index{:02d}".format(r),
                            showlegend=False)
         fig.add_trace(trace_bar)
         trace_line = go.Scatter(x=bins_centers,
                                 y=gf_binned_spikes_times,
                                 line=dict(color=gf_color),
-                                name="trial {:d}".format(r),
-                                legendgroup="trial{:02d}".format(r),
+                                name=trials_labels[r],
+                                legendgroup="trial_index{:02d}".format(r),
                                 showlegend=True)
         fig.add_trace(trace_line)
+
+        # add markers to trials
+        if events_names is not None and\
+           marked_events_times is not None and \
+           marked_events_colors is not None and \
+           marked_events_markers is not None and \
+           align_event_times is not None:
+            n_marked_events = len(marked_events_times[r])
+            marked_events_times_centered = marked_events_times[r]-align_event_times[r]
+            for i in range(n_marked_events):
+                if not math.isnan(marked_events_times_centered[i]):
+                    marked_index = np.argmin(np.abs(
+                        bins_centers-marked_events_times_centered[i]))
+
+                    trace_marker = go.Scatter(
+                        x=[bins_centers[marked_index]],
+                        y=[gf_binned_spikes_times[marked_index]],
+                        marker=dict(color=marked_events_colors[r][i],
+                                    symbol=marked_events_markers[r][i],
+                                    size=marked_size),
+                        mode="markers",
+                        text=[events_names[i]],
+                        hovertemplate="x=%{x}<br>" + "y=%{y}<br>" + "event=%{text}",
+                        legendgroup="trial_index{:02d}".format(r),
+                        showlegend=False)
+                    fig.add_trace(trace_marker)
+
 
     ylim = [min_smoothed_spikes, max_smoothed_spikes]
 
