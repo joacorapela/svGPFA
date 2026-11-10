@@ -27,12 +27,6 @@ class EM_JAXopt:
         EM_JAXopt.eLL.init(legQuadWeights=legQuadWeights,
                            validSpikesTimesMask=validSpikesTimesMask)
 
-    def maximize_jaxopt_LBFGS_one_call(params0, optim_params):
-        solver = jaxopt.LBFGS(fun=EM_JAXopt._eval_func_params_as_dict,
-                              **optim_params)
-        res = solver.run(params0)
-        return res
-
     def maximize_jaxopt_LBFGS_ECM(params0, optim_params):
         LB0 = -EM_JAXopt._eval_func_params_as_dict(params0)
         print(f"Initial LB: {LB0}")
@@ -204,38 +198,37 @@ class EM_JAXopt:
                       elapsed_time_hist=elapsed_time_hist)
         return answer
 
+    def maximize_jaxopt_LBFGS_one_call(optim_func, params0, optim_params):
+        solver = jaxopt.LBFGS(fun=optim_func, **optim_params)
+        res = solver.run(params0)
+        return res
+
     def maximize_jaxopt_LBFGS_in_steps(optim_func, params0, optim_params,
                                        additional_params=None):
         em_tol = optim_params.pop("em_tol")
         max_cont_lb_below_thr = optim_params.pop("max_cont_lb_below_thr")
+        n_updates_btw_reports= optim_params.pop("n_updates_btw_reports")
 
-        # jax.debug.print("Before calling jaxopt.LBFGS: optim_params={optim_params}", optim_params=optim_params)
-        # jax.debug.breakpoint()
         solver = jaxopt.LBFGS(fun=optim_func, **optim_params)
-        # jax.debug.print("About to call solver.init_state(params)")
         state = solver.init_state(params0, additional_params=additional_params)
-        # jax.debug.print("Called solver.init_state(params) done")
+        params = params0
 
         lb = -optim_func(params=params0, additional_params=additional_params)
-        params = params0
+        print(f"Initial lb: {lb}")
+
         elapsed_time_hist = [0.0]
         lower_bound_hist = [lb]
+        prev_state_error = jnp.inf
         start_time = time.time()
         step = 0
         n_cont_lb_below_thr = 0
         while (step < optim_params["maxiter"] and
                n_cont_lb_below_thr < max_cont_lb_below_thr):
-            # jax.debug.print("Before update: params={params}", params=params)
-            # loss_value, grads = jax.value_and_grad(EM_JAXopt._eval_func_params_as_dict)(params)
-            # jax.debug.print("Loss: {}, Grad NaN? {}", loss_value, jnp.isnan(grads).any())
-            # jax.debug.breakpoint()
             params, state = solver.update(params=params,
                                           state=state,
                                           additional_params=additional_params,
                                          )
-            # jax.debug.print("After update: params={params}", params=params)
-            # jax.debug.breakpoint()
-            lb = -state.value.item()
+            lb = -state.value
             lower_bound_diff = lb - lower_bound_hist[-1]
             if lower_bound_diff > 0 and lower_bound_diff < optim_params["tol"]:
                 n_cont_lb_below_thr += 1
@@ -243,15 +236,20 @@ class EM_JAXopt:
                 n_cont_lb_below_thr = 0
             lower_bound_hist.append(lb)
             elapsed_time_hist.append(time.time()-start_time)
+            gradient_l2_norm = state.error
+            if step % n_updates_btw_reports == 0:
+                print(f"iter: {step:06d}, ",
+                      f"lb: {lb.item():.03f}, "
+                      f"|\u2207|: {state.error:.03f}")
+            prev_state_error = state.error
             step += 1
-            print(f"Iteration {step}: lower bound {lb}, "
-                  f"lower bound diff: {lower_bound_diff}")
         if step == optim_params["maxiter"]:
             conv_reason = f"Reached maximum number of iterations {optim_params['maxiter']}"
         elif n_cont_lb_below_thr == max_cont_lb_below_thr:
             conv_reason = "converged"
         else:
             raise RuntimeError("Program logic error")
+
         answer = {"params": params, "state": state,
                   "elapsed_time_hist": elapsed_time_hist,
                   "lower_bound_hist": lower_bound_hist,
