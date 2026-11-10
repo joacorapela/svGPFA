@@ -276,6 +276,7 @@ def getArgsInfo():
                      "k_period0": float,
                      "k_types": str,
                      "k_lengthscales0": float,
+                     "k_sigma0": float,
                      "k_period0s": float,
                      "k_type_latent{:d}": str,
                      "k_lengthscale0_latent{:d}": float,
@@ -546,8 +547,8 @@ def getParam(section_name, param_name,
 
 
 def getLinearPreIntensityParams0(n_clusters, n_latents, dynamic_params_spec=None,
-                              config_file_params_spec=None,
-                              default_params_spec=None):
+                                 config_file_params_spec=None,
+                                 default_params_spec=None):
     C = getLinearPreIntensityParam0(
             param_label="c0", n_rows=n_clusters,
             n_cols=n_latents,
@@ -565,9 +566,9 @@ def getLinearPreIntensityParams0(n_clusters, n_latents, dynamic_params_spec=None
 
 
 def getLinearPreIntensityParam0(param_label, n_rows, n_cols,
-                             dynamic_params_spec=None,
-                             config_file_params_spec=None,
-                             default_params_spec=None):
+                                dynamic_params_spec=None,
+                                config_file_params_spec=None,
+                                default_params_spec=None):
     if dynamic_params_spec is not None:
         param = getLinearPreIntensityParam0InDict(param_label=param_label,
                                                params_dict=dynamic_params_spec,
@@ -597,9 +598,9 @@ def getLinearPreIntensityParam0(param_label, n_rows, n_cols,
 
 
 def getLinearPreIntensityParam0InDict(param_label, params_dict,
-                                   params_dict_type, n_rows, n_cols,
-                                   section_name="preIntensity_params0",
-                                   delimiter=","):
+                                      params_dict_type, n_rows, n_cols,
+                                      section_name="preIntensity_params0",
+                                      delimiter=","):
     # binary
     if section_name in params_dict and \
        f"{param_label}" in params_dict[section_name]:
@@ -726,6 +727,24 @@ def getKernelsParams0AndTypesInDict(n_latents, params_dict, params_dict_type,
             print(f"Extracted from {params_dict_type} "
                   "k_type=exponentialQuadratic and "
                   f"k_lengthsales0={lengthscales0}")
+        elif params_dict[section_name]["k_types"] == "exponentialQuadraticSigmaAsParam":
+            kernels_types = ["exponentialQuadraticSigmaAsParam" for k in range(n_latents)]
+            if "k_lengthscales0" in params_dict[section_name] and "k_sigma0" in params_dict[section_name]:
+                sigma0 = \
+                    float(params_dict[section_name]["k_sigma0"])
+                lengthscales0 = \
+                    float(params_dict[section_name]["k_lengthscales0"])
+            else:
+                raise ValueError("If k_type=exponentialQuadraticSigmaAsParam is specified "
+                                 f"in {params_dict_type}, then both "
+                                 "k_lengthscales0 and k_sigma0 should also be specified in "
+                                 f"{params_dict_type}")
+            params0 = [jnp.asarray([sigma0, lengthscales0], dtype=jnp.double)
+                       for k in range(n_latents)]
+            print(f"Extracted from {params_dict_type} "
+                  "k_type=exponentialQuadratic, "
+                  f"k_lengthsales0={lengthscales0} and"
+                  f"k_sigma0={sigma0}")
         elif params_dict[section_name]["k_types"] == "periodic":
             kernels_types = ["periodic" for k in range(n_latents)]
             if "k_lengthscales0" in params_dict[section_name]:
