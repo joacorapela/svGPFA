@@ -25,6 +25,72 @@ def computeLatents(vMean, vChol, kernels_params, ind_points_locs,
     # l_means \in n_latents x n_trials x (n_quad | n_spikes)
     return l_means, l_vars
 
+def computeLatentsWithEquispacedTrialsTimes(
+    vMean, vChol, kernels_params, ind_points_locs, kernels_types,
+    trials_times, reg_param):
+
+    kernels = svGPFA.utils.miscUtils.buildKernels(
+        kernels_types=kernels_types, kernels_params=kernels_params)
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol
+    indPointsLocsKMS.init(kernels=kernels)
+    timesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS
+    timesKMS.init(kernels=kernels, t=trials_times)
+    Kzz, Kzz_cho = indPointsLocsKMS.buildKernelsMatrices(
+        kernels_params=kernels_params, ind_points_locs=ind_points_locs,
+        reg_param=reg_param)
+    Ktz = timesKMS.buildKernelsMatrices(
+        kernels_params=kernels_params, ind_points_locs=ind_points_locs)
+    # l_means[r] \in n_latents x n_times[r]
+    l_means = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents.computeMeansWithEquispacedTrialsTimes(
+        vMean=vMean, Kzz_cho=Kzz_cho, Ktz=Ktz)
+    vCov = svGPFA.utils.miscUtils.buildCovsFromCholVecs(vChol)
+    # l_vars[r] \in n_latents x n_times[r]
+    l_vars = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents.computeVarsWithEquispacedTrialsTimes(
+        vCov=vCov, Kzz=Kzz, Kzz_cho=Kzz_cho, Ktz=Ktz)
+
+    return l_means, l_vars
+
+def computeLatentsMeansWithEquispacedTrialsTimes(
+    vMean, kernels_params, ind_points_locs, kernels_types,
+    trials_times, reg_param):
+
+    kernels = svGPFA.utils.miscUtils.buildKernels(
+        kernels_types=kernels_types, kernels_params=kernels_params)
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol
+    indPointsLocsKMS.init(kernels=kernels)
+    timesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS
+    timesKMS.init(kernels=kernels, t=trials_times)
+    Kzz, Kzz_cho = indPointsLocsKMS.buildKernelsMatrices(
+        kernels_params=kernels_params, ind_points_locs=ind_points_locs,
+        reg_param=reg_param)
+    Ktz = timesKMS.buildKernelsMatrices(
+        kernels_params=kernels_params, ind_points_locs=ind_points_locs)
+    l_means = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents.computeMeansWithEquispacedTrialsTimes(
+        vMean=vMean, Kzz_cho=Kzz_cho, Ktz=Ktz)
+    # l_means[r] \in n_latents x n_times[r]
+    return l_means
+
+'''
+def computeLatentsVarsWithEquispacedTrialsTimes(
+    vCov, kernels_params, ind_points_locs, kernels_types,
+    trials_times, reg_param):
+
+    kernels = svGPFA.utils.miscUtils.buildKernels(
+        kernels_types=kernels_types, kernels_params=kernels_params)
+    indPointsLocsKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsKMS_Chol
+    indPointsLocsKMS.init(kernels=kernels)
+    timesKMS = svGPFA.stats.kernelsMatricesStore.IndPointsLocsAndTimesKMS
+    timesKMS.init(kernels=kernels, t=trials_times)
+    Kzz, Kzz_cho = indPointsLocsKMS.buildKernelsMatrices(
+        kernels_params=kernels_params, ind_points_locs=ind_points_locs,
+        reg_param=reg_param)
+    Ktz = timesKMS.buildKernelsMatrices(
+        kernels_params=kernels_params, ind_points_locs=ind_points_locs)
+    l_vars = svGPFA.stats.posteriorOnLatents.PosteriorOnLatents.computeVarsWithEquispacedTrialsTimes(
+        vCov=vCov, Kzz=Kzz, Kzz_cho=Kzz_cho, Ktz=Ktz)
+    # l_vars[r] \in n_latents x n_times[r]
+    return l_vars
+'''
 
 def computePreIntensity(C, d, vMean, vChol, kernels_params, ind_points_locs,
                         kernels_types, leg_quad_points, reg_param):
